@@ -1,0 +1,22 @@
+.auth-container {
+  max-width: 400px;
+  margin: 60px auto;
+  padding: 24px;
+}
+.form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 16px;
+}
+.form-group label {
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+.form-group input {
+  padding: 8px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+.error-message { color: red; margin-bottom: 12px; }
+.auth-link { margin-top: 16px; }

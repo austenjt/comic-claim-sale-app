@@ -1,0 +1,15 @@
+<div class="form-section">
+  <div class="form-section-title">Upload GoCollect CSV Data</div>
+  <div class="csv-row">
+    <input type="file" (change)="onFileChange($event)" accept=".csv" [disabled]="status === 'processing'" />
+    <button (click)="processFile()" [disabled]="!selectedFile || status === 'processing'">
+      <span *ngIf="status !== 'processing'">Process CSV</span>
+      <span *ngIf="status === 'processing'" class="btn-processing">
+        <span class="csv-spinner"></span> Processing…
+      </span>
+    </button>
+  </div>
+  <p *ngIf="fileError" class="msg-error">Please upload a valid .csv file.</p>
+  <p *ngIf="status === 'success'" class="msg-success">&#10003; {{ statusMessage }}</p>
+  <p *ngIf="status === 'error'"   class="msg-error">&#10007; {{ statusMessage }}</p>
+</div>

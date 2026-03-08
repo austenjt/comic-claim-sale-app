@@ -1,0 +1,143 @@
+
+<!-- ── Quick Add Wizard ─────────────────────────────────────────────────── -->
+<div class="qa-section">
+  <div class="qa-header">
+    <span class="qa-title">Quick Add</span>
+    <span class="qa-step-indicator">Step {{ qaStep }} of {{ qaStep === 3 ? 3 : 2 }}</span>
+  </div>
+
+  <div *ngIf="qaSuccess" class="qa-success">Saved! Ready for next entry.</div>
+  <div *ngIf="qaError" class="qa-error">{{ qaError }}</div>
+
+  <!-- Step 1 -->
+  <div *ngIf="qaStep === 1" class="qa-fields">
+    <div class="qa-field">
+      <label>Title</label>
+      <input type="text" [(ngModel)]="qa.title" (blur)="qaDefaultSeries()" placeholder="e.g. Amazing Spider-Man" />
+    </div>
+    <div class="qa-field">
+      <label>Series</label>
+      <input type="text" [(ngModel)]="qa.series" placeholder="defaults to Title" />
+    </div>
+    <div class="qa-field">
+      <label>Number</label>
+      <input type="text" [(ngModel)]="qa.number" placeholder="e.g. 1, 121, NN" />
+    </div>
+    <div class="qa-field">
+      <label>Publisher</label>
+      <input type="text" [(ngModel)]="qa.publisher" placeholder="e.g. Marvel" />
+    </div>
+    <div class="qa-field">
+      <label>Variant</label>
+      <select [(ngModel)]="qa.variant">
+        <option value="">— select —</option>
+        <option *ngFor="let v of enums.coverVariants" [value]="v">{{ v }}</option>
+      </select>
+    </div>
+    <div class="qa-field">
+      <label>Bar Code</label>
+      <input type="text" [(ngModel)]="qa.barCode" placeholder="e.g. 75960608628600111" />
+    </div>
+  </div>
+
+  <!-- Step 2 -->
+  <div *ngIf="qaStep === 2" class="qa-fields">
+    <div class="qa-field">
+      <label>Sale Price ($)</label>
+      <input type="number" [(ngModel)]="qa.salePrice" min="0" step="0.25" placeholder="leave blank if not priced" />
+    </div>
+    <div class="qa-field">
+      <label>Personal Estimate ($)</label>
+      <input type="number" [(ngModel)]="qa.personalEstimate" min="0" step="0.25" placeholder="optional" />
+    </div>
+    <div class="qa-field">
+      <label>Price Paid ($)</label>
+      <input type="number" [(ngModel)]="qa.pricePaid" min="0" step="0.25" placeholder="optional" />
+    </div>
+    <div class="qa-field">
+      <label>Date Acquired</label>
+      <input type="text" [(ngModel)]="qa.dateAcquired" placeholder="yyyy-MM-dd" pattern="\d{4}-\d{2}-\d{2}" />
+    </div>
+    <div class="qa-field qa-field-checkbox">
+      <label>For Sale</label>
+      <input type="checkbox" [(ngModel)]="qa.isForSale" />
+    </div>
+  </div>
+
+  <!-- Step 3 — Grading -->
+  <div *ngIf="qaStep === 3" class="qa-fields">
+    <div class="qa-field">
+      <label>Grading Company</label>
+      <select [(ngModel)]="qa.gradingCompany">
+        <option value="">— select —</option>
+        <option *ngFor="let gc of enums.gradingCompanies" [value]="gc">{{ gc }}</option>
+      </select>
+    </div>
+    <div class="qa-field">
+      <label>Grade</label>
+      <select [(ngModel)]="qa.grade">
+        <option [ngValue]="null">— select —</option>
+        <option *ngFor="let g of enums.grades" [ngValue]="g.value">{{ g.value }} — {{ g.label }}</option>
+      </select>
+    </div>
+    <div class="qa-field">
+      <label>Certification ID</label>
+      <input type="text" [(ngModel)]="qa.certificationId" placeholder="e.g. 1234567890" />
+    </div>
+    <div class="qa-field">
+      <label>Page Quality</label>
+      <select [(ngModel)]="qa.pageQuality">
+        <option value="">— select —</option>
+        <option *ngFor="let pq of enums.pageQualities" [value]="pq">{{ pq }}</option>
+      </select>
+    </div>
+    <div class="qa-field qa-field-checkbox">
+      <label>Pedigree</label>
+      <input type="checkbox" [(ngModel)]="qa.pedigree" />
+    </div>
+    <div class="qa-field qa-field-checkbox">
+      <label>Signed</label>
+      <input type="checkbox" [(ngModel)]="qa.signed" />
+    </div>
+  </div>
+
+  <div class="qa-actions">
+    <button *ngIf="qaStep > 1" class="qa-btn qa-btn-back" (click)="qaBack()">&#8592; Back</button>
+    <button *ngIf="qaStep === 1" class="qa-btn qa-btn-next" (click)="qaNext()">Next &#8594;</button>
+    <button *ngIf="qaStep === 2" class="qa-btn qa-btn-save" (click)="qaSave()" [disabled]="qaSaving">
+      {{ qaSaving ? 'Saving…' : 'Save' }}
+    </button>
+    <button *ngIf="qaStep === 2" class="qa-btn qa-btn-graded" (click)="qaToGraded()">Graded &#8594;</button>
+    <button *ngIf="qaStep === 3" class="qa-btn qa-btn-save" (click)="qaSave()" [disabled]="qaSaving">
+      {{ qaSaving ? 'Saving…' : 'Save' }}
+    </button>
+    <button class="qa-btn qa-btn-reset" (click)="qaReset()">Clear</button>
+  </div>
+</div>
+<!-- ───────────────────────────────────────────────────────────────────────── -->
+
+<div class="grid-toolbar">
+  <button class="toolbar-btn refresh-btn" (click)="refreshGrid()" [disabled]="refreshing">
+    {{ refreshing ? 'Loading…' : '&#8635; Refresh' }}
+  </button>
+</div>
+
+<div *ngIf="!dataLoaded" class="grid-placeholder">
+  <span>Click <strong>Refresh</strong> to load the latest data before making edits.</span>
+</div>
+
+<ag-grid-angular
+      *ngIf="dataLoaded"
+      pagination
+      class="ag-theme-alpine"
+      style="height: 600px;"
+      [rowData]="comics"
+      [columnDefs]="columnDefs"
+      [getRowId]="getRowId"
+      (cellClicked)="onCellClicked($event)"
+      rowSelection="single"
+      (rowClicked)="onRowClicked($event)"
+      (cellValueChanged)="onCellValueChanged($event)"
+      [stopEditingWhenCellsLoseFocus]="true"
+>
+</ag-grid-angular>

@@ -1,0 +1,36 @@
+<div class="auth-container">
+  <h2>Request an Account</h2>
+
+  <div *ngIf="submitted" class="success-message">
+    Your request is pending. Check back once approved — the seller will provide your PIN.
+  </div>
+
+  <form *ngIf="!submitted" (ngSubmit)="onSubmit()" #f="ngForm">
+    <div class="form-group">
+      <label>Name *</label>
+      <input type="text" [(ngModel)]="name" name="name" required />
+    </div>
+    <div class="form-group">
+      <label>Email *</label>
+      <input type="email" [(ngModel)]="email" name="email" required />
+    </div>
+    <div class="form-group">
+      <label>Address</label>
+      <input type="text" [(ngModel)]="address" name="address" />
+    </div>
+    <div class="form-group">
+      <label>Phone</label>
+      <input type="tel" [(ngModel)]="phone" name="phone" />
+    </div>
+    <div class="form-group">
+      <label>Payment Notes</label>
+      <textarea [(ngModel)]="paymentNotes" name="paymentNotes" rows="3"></textarea>
+    </div>
+    <div *ngIf="error" class="error-message">{{ error }}</div>
+    <button type="submit" [disabled]="loading || !name || !email">
+      {{ loading ? 'Submitting…' : 'Submit Request' }}
+    </button>
+  </form>
+
+  <p class="auth-link">Already have a PIN? <a routerLink="/login">Log in</a></p>
+</div>

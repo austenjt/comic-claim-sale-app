@@ -1,0 +1,320 @@
+type: collection.insomnia.rest/5.0
+schema_version: "5.1"
+name: Comic DB
+meta:
+  id: wrk_af8179e0e62c4baa95bb55af516f2e20
+  created: 1771282445791
+  modified: 1771282445791
+  description: ""
+collection:
+  - url: http://localhost:7071/api/comics
+    name: getAllComics
+    meta:
+      id: req_dfdf413b3b4d4cec915a969a72060c99
+      created: 1771282453003
+      modified: 1771284113766
+      isPrivate: false
+      description: ""
+      sortKey: -1771282453003
+    method: GET
+    headers:
+      - name: User-Agent
+        value: insomnia/12.3.1
+        description: ""
+        disabled: false
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: "http://localhost:7071/api/comics    "
+    name: createComic
+    meta:
+      id: req_82ed2183ae764956ac1706ca8f97c600
+      created: 1771284171188
+      modified: 1771293267588
+      isPrivate: false
+      description: ""
+      sortKey: -1771284171188
+    method: POST
+    body:
+      mimeType: application/json
+      text: |-
+        {
+        	"id": 35908161,
+        	"title": "Amazing Spider-Man",
+        	"series": "Amazing Spider-Man",
+        	"number": {
+        		"volume": 1,
+        		"number": 300,
+        		"sentinel": null
+        	},
+        	"publisher": "Marvel",
+        	"publishedDate": "1988-05-01",
+        	"era": "Copper Age",
+        	"variant": "Newsstand",
+        	"printRun": 1,
+        	"supplementalBarCode": "759606024582",
+        	"keyIssue": "First full appearance of Venom",
+        	"writer": [
+        		"David Michelinie"
+        	],
+        	"artist": [
+        		"Todd McFarlane"
+        	],
+        	"certificationId": 1234567890,
+        	"certificationCompany": "CGC",
+        	"certifiedGrade": 9.4,
+        	"certifiedSignature": false,
+        	"notCertifiedGrade": 9.0,
+        	"notCertifiedPageQuality": "WHITE",
+        	"notCertifiedSignature": false,
+        	"defects": "Minor spine tick",
+        	"pricePaid": 850.00,
+        	"dateAcquired": "2026-01-15",
+        	"purchasedFrom": "Heritage Auctions",
+        	"purchaseReferenceURL": "https://example.com/listing/12345",
+        	"salePrice": null,
+        	"dateSold": null,
+        	"soldTo": null,
+        	"isForSale": false,
+        	"personalEstimate": 1200.00,
+        	"targetPrice": 1500.00,
+        	"collectionGroup": 1,
+        	"storageLocation": "Short box 3",
+        	"goCollectInfo": {
+        		"gcin": 12345,
+        		"gcinName": "Amazing Spider-Man #300",
+        		"gcinSeries": "Amazing Spider-Man"
+        	},
+        	"gcdbInfo": {
+        		"gcdbIssueId": null,
+        		"gcdbSeriesId": 1234,
+        		"issueUrl": "https://www.comics.org/issue/67890/",
+        		"seriesUrl": "https://www.comics.org/series/1234/"
+        	},
+        	"smallCachedImageId": "small-asm300.jpg",
+        	"largeCachedImageId": "large-asm300.jpg",
+        	"personalNotes": "Grail book, took 2 years to find at this price",
+        	"publicNotes": "Todd McFarlane cover and interior art",
+        	"imageNotes": "Front and back cover scans"
+        }
+    headers:
+      - name: Content-Type
+        value: application/json
+      - name: User-Agent
+        value: insomnia/12.3.1
+        description: ""
+        disabled: false
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: "https://fn-comicbook-db-1703810588398.azurewebsites.net/api/comics "
+    name: createComic - cloud
+    meta:
+      id: req_c678ee885943403c9d6c54fbb87d8d94
+      created: 1771287290371
+      modified: 1771293297458
+      isPrivate: false
+      description: ""
+      sortKey: -1771283312095.5
+    method: POST
+    body:
+      mimeType: application/json
+      text: |2
+         {
+            "title": "Amazing Spider-Man",  
+            "series": "Amazing Spider-Man",                       
+            "number": {     
+              "volume": 1,
+              "number": 300
+            },
+            "publisher": "Marvel",
+            "publishedDate": "1988-05-01",
+            "era": "Copper Age",
+            "variant": "Newsstand",
+            "printRun": 1,
+            "supplementalBarCode": "759606024582",
+            "keyIssue": "First full appearance of Venom",
+            "writer": ["David Michelinie"],
+            "artist": ["Todd McFarlane"],
+            "certificationId": 1234567890,
+            "certificationCompany": "CGC",
+            "certifiedGrade": 9.4,
+            "certifiedSignature": false,
+            "notCertifiedGrade": 9.0,
+            "notCertifiedPageQuality": "WHITE",
+            "notCertifiedSignature": false,
+            "defects": "Minor spine tick",
+            "pricePaid": 850.00,
+            "dateAcquired": "2026-01-15",
+            "purchasedFrom": "Heritage Auctions",
+            "purchaseReferenceURL": "https://example.com/listing/12345",
+            "salePrice": null,
+            "dateSold": null,
+            "soldTo": null,
+            "isForSale": false,
+            "personalEstimate": 1200.00,
+            "targetPrice": 1500.00,
+            "collectionGroup": 1,
+            "storageLocation": "Short box 3",
+            "goCollectInfo": {
+              "gcin": 12345,
+              "gcinName": "Amazing Spider-Man #300",
+              "gcinSeries": "Amazing Spider-Man"
+            },
+            "gcdbInfo": {
+              "gcdbId": 67890,
+              "gcdbSeriesId": 1234,
+              "issueUrl": "https://www.comics.org/issue/67890/",
+              "seriesUrl": "https://www.comics.org/series/1234/"
+            },
+            "smallCachedImageId": "small-asm300.jpg",
+            "largeCachedImageId": "large-asm300.jpg",
+            "personalNotes": "Grail book, took 2 years to find at this price",
+            "publicNotes": "Todd McFarlane cover and interior art",
+            "imageNotes": "Front and back cover scans"
+          }
+    headers:
+      - name: Content-Type
+        value: application/json
+      - name: User-Agent
+        value: insomnia/12.3.1
+        description: ""
+        disabled: false
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: https://fn-comicbook-db-1703810588398.azurewebsites.net/api/comics
+    name: getAllComics - cloud
+    meta:
+      id: req_837f95b52ad14b25bb5e07dae28480bb
+      created: 1771287321825
+      modified: 1771290111084
+      isPrivate: false
+      description: ""
+      sortKey: -1743076024635
+    method: GET
+    headers:
+      - name: User-Agent
+        value: insomnia/12.3.1
+        description: ""
+        disabled: false
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: https://fn-comicbook-db-1703810588398.azurewebsites.net/api/images/asm300.png
+    name: createImage - cloud
+    meta:
+      id: req_1ea3c49361d548909f7273621cf3e973
+      created: 1771291983513
+      modified: 1771293000487
+      isPrivate: false
+      description: ""
+      sortKey: -1771282882549.25
+    method: POST
+    body:
+      mimeType: multipart/form-data
+      params:
+        - name: file
+          value: /Users/austenjt/Downloads/asm300.png
+          description: ""
+          disabled: false
+          fileName: /Users/austenjt/Downloads/asm300.png
+          type: file
+    headers:
+      - name: Content-Type
+        value: multipart/form-data
+      - name: User-Agent
+        value: insomnia/12.3.1
+        description: ""
+        disabled: false
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: https://fn-comicbook-db-1703810588398.azurewebsites.net/api/images
+    name: get Images - cloud
+    meta:
+      id: req_cd41fe80e5f54364915f9f441d96714d
+      created: 1771293079226
+      modified: 1771293093300
+      isPrivate: false
+      description: ""
+      sortKey: -1771282667776.125
+    method: GET
+    headers:
+      - name: User-Agent
+        value: insomnia/12.3.1
+        description: ""
+        disabled: false
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: https://fn-comicbook-db-1703810588398.azurewebsites.net/api/images/asm300.png
+    name: get Image By Name - cloud
+    meta:
+      id: req_515ae02db4984ae48cb005cdf567682e
+      created: 1771293119732
+      modified: 1771293208575
+      isPrivate: false
+      description: ""
+      sortKey: -1771282560389.5625
+    method: GET
+    headers:
+      - name: User-Agent
+        value: insomnia/12.3.1
+        description: ""
+        disabled: false
+      - name: Content-Type
+        value: image/png
+        description: ""
+        disabled: false
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+cookieJar:
+  name: Default Jar
+  meta:
+    id: jar_93861bc142e7cfbe8aec1053c9a59a51112aedd9
+    created: 1771282445793
+    modified: 1771282445793
+environments:
+  name: Base Environment
+  meta:
+    id: env_93861bc142e7cfbe8aec1053c9a59a51112aedd9
+    created: 1771282445792
+    modified: 1771282445792
+    isPrivate: false

@@ -1,0 +1,406 @@
+<div class="hiw-container">
+
+  <h1>Start Here — How Lightning Comics PDX Works</h1>
+
+  <div class="hiw-actions">
+    <a routerLink="/register" class="hiw-btn hiw-btn-primary">Request an Account</a>
+    <a routerLink="/login" class="hiw-btn hiw-btn-secondary">Log In</a>
+    <a routerLink="/dashboard" class="hiw-btn hiw-btn-secondary">Browse Comics</a>
+  </div>
+
+  <!-- ── What Is a Claim Sale ─────────────────────────────────────────── -->
+  <section class="hiw-section">
+    <h2>What Is a Claim Sale?</h2>
+    <p>
+      A <strong>Claim Sale</strong> is a first-come, first-served selling format that originated in
+      comic book communities on social media. The seller lists comics at fixed prices and buyers
+      race to claim individual books — no bidding, no auctions, no back-and-forth negotiating.
+      The price is set, and the first person to claim a book gets it.
+    </p>
+    <p>
+      This site is a private, invite-only storefront built around that format. The seller (that's us)
+      loads the catalogue and sets prices. Approved buyers browse and claim. It's intentionally
+      small and personal — you know exactly who you're buying from, and the seller knows exactly
+      who they're selling to.
+    </p>
+    <p>
+      Claim sales move fast. If you see something you want, don't wait — someone else might grab it
+      first. Once a book is claimed it's off the table for everyone else until it's released
+      back or the order is cancelled.
+    </p>
+    <p>
+      You can simulate a "timed claim sale" by putting books in the database without prices. Then
+      make them go live one by one by setting a price — only priced books show a Claim button.
+    </p>
+  </section>
+
+  <!-- ── Getting Access ─────────────────────────────────────────────────── -->
+  <section class="hiw-section">
+    <h2>Getting Access</h2>
+    <p>
+      This shop is invite-style — you need an approved account before you can claim anything.
+      Anyone can browse the catalogue, but only approved buyers see the Claim buttons.
+    </p>
+    <ol>
+      <li>
+        <strong>Request an account</strong> — fill out the <a routerLink="/register">registration form</a>
+        with your name, email, shipping address, phone number, and your preferred payment method.
+      </li>
+      <li>
+        <strong>Wait for approval</strong> — the seller reviews your request. Once approved, you'll
+        receive a <strong>PIN</strong> directly from the seller via message or email.
+        This PIN is your password — it's generated once and never stored in plain text.
+      </li>
+      <li>
+        <strong>Log in</strong> — head to the <a routerLink="/login">login page</a>, enter your
+        email address and PIN, and you're in. No email verification links, no password resets.
+        If you ever lose your PIN, contact the seller to have it reset.
+      </li>
+    </ol>
+  </section>
+
+  <!-- ── The Dashboard ─────────────────────────────────────────────────── -->
+  <section class="hiw-section">
+    <h2>The Dashboard</h2>
+    <p>
+      The <a routerLink="/dashboard">Dashboard</a> is the main catalogue — every comic currently
+      available for sale is shown here as a card with its cover image, title, series, grade, and price.
+      Comics that have already been sold are not shown at all.
+    </p>
+    <ul>
+      <li>
+        <strong>Available comics</strong> show a blue <em>Claim</em> button if you're logged in as
+        an approved buyer. Comics without a price set do not show a Claim button — the seller hasn't
+        priced them yet.
+      </li>
+      <li>
+        <strong>Claimed comics</strong> show a grey <em>Claimed</em> label with the date it was
+        claimed. They're in someone else's active cart — if that order falls through, the book
+        may become available again.
+      </li>
+      <li>
+        <strong>Comics in your own cart</strong> show a green <em>In Your Cart</em> label so you
+        can see at a glance what you've already claimed.
+      </li>
+    </ul>
+    <p>
+      You can also use the search bar at the top of the dashboard to filter comics by title, series,
+      or other details.
+    </p>
+  </section>
+
+  <!-- ── Comic Detail Pages ─────────────────────────────────────────────── -->
+  <section class="hiw-section">
+    <h2>Comic Detail Pages</h2>
+    <p>
+      Click any comic card on the dashboard to open its detail page. Here you'll find the full
+      information for that book:
+    </p>
+    <ul>
+      <li>High-resolution front and back cover images (click to zoom in)</li>
+      <li>Title, series, issue number, publisher, and publication date</li>
+      <li>Grading details — CGC/CBCS certification number and grade, or estimated grade for raw copies</li>
+      <li>Page quality, pedigree, restoration notes, and signatures if applicable</li>
+      <li>Sale price and any public notes from the seller</li>
+      <li>GoCollect and Grand Comics Database links if available</li>
+    </ul>
+    <p>
+      The <em>Claim</em> and <em>Release</em> buttons are also available on the detail page, so you
+      can review a book fully before adding it to your cart, or remove it from your cart directly.
+    </p>
+  </section>
+
+  <!-- ── Your Cart ─────────────────────────────────────────────────────── -->
+  <section class="hiw-section">
+    <h2>Your Cart</h2>
+    <p>
+      Your cart lives at <a routerLink="/cart">My Cart</a> in the navigation. Every book you
+      claim goes here. The cart moves through a few stages:
+    </p>
+    <ol>
+      <li>
+        <strong>Open</strong> — you can freely add and remove comics. There's no time limit while
+        your cart is open.
+      </li>
+      <li>
+        <strong>Submitted (24-hour window)</strong> — when you're done shopping, click
+        <em>Submit Order</em>. This starts a 24-hour review period. During this window you can
+        still remove items but you cannot add new ones. Any applicable sale discounts are
+        calculated and shown at this point.
+      </li>
+      <li>
+        <strong>Finalized</strong> — after 24 hours, your cart locks automatically. The seller
+        is notified and will reach out to arrange payment and shipping.
+      </li>
+      <li>
+        <strong>Fulfilled</strong> — once the seller marks your order as fulfilled, the cart is
+        closed. You can then start a new cart and claim again.
+      </li>
+    </ol>
+    <p>
+      If a discount applies to your order, you'll see a <em>Discount</em> line in your cart summary
+      with the amount saved and a description of which rule was applied. Discounts are automatically
+      recalculated if you remove items from a submitted cart.
+    </p>
+  </section>
+
+  <!-- ── Orders ────────────────────────────────────────────────────────── -->
+  <section class="hiw-section">
+    <h2>Orders</h2>
+    <p>
+      The <a routerLink="/orders">Orders page</a> shows your complete order history — every order
+      that has been fulfilled, with its line items, prices, and totals. This history is permanently
+      archived and will never be lost, even if the seller resets the catalogue between sale events.
+    </p>
+  </section>
+
+  <!-- ── Live Notifications ─────────────────────────────────────────────── -->
+  <section class="hiw-section">
+    <h2>Live Notifications</h2>
+    <p>
+      The app shows real-time toast notifications in the upper-right corner of every page, so you
+      always know what's happening even when you're not on the dashboard.
+    </p>
+    <ul>
+      <li>
+        When you <strong>claim</strong> a comic, you'll see a confirmation: <em>"Title #N" added to your cart — $XX</em>.
+      </li>
+      <li>
+        When <strong>someone else claims</strong> a comic, you'll see: <em>"Title #N" added to UserName's cart — $XX</em>.
+      </li>
+      <li>
+        When the seller <strong>awards</strong> a comic to a user, everyone sees: <em>"Title #N" awarded to UserName — FREE!</em>
+      </li>
+      <li>
+        When anyone <strong>removes</strong> a comic from their cart, everyone sees: <em>"Title #N" Returned to sale</em>.
+        This is useful so you know a book you wanted has come back available.
+      </li>
+    </ul>
+    <p>
+      Each notification stays visible for 30 seconds and can be dismissed early with the ✕ button.
+      Multiple toasts can stack. Notifications clear automatically when you navigate to a new page.
+    </p>
+  </section>
+
+  <!-- ── Your Profile ──────────────────────────────────────────────────── -->
+  <section class="hiw-section">
+    <h2>Your Profile</h2>
+    <p>
+      Your <a routerLink="/profile">Profile page</a> lets you update your contact details at any
+      time — name, shipping address, phone number, and payment notes. Keeping these current
+      ensures the seller can reach you and knows how you want to pay when your order is finalized.
+    </p>
+  </section>
+
+  <!-- ── Payment ────────────────────────────────────────────────────────── -->
+  <section class="hiw-section">
+    <h2>Payment</h2>
+    <p>
+      Payment is handled directly between you and the seller — there's no checkout or payment
+      processor built into this site. When you register (or update your profile), include your
+      preferred payment method in the <em>Payment Notes</em> field. Common options include
+      PayPal, Venmo, cash at pickup, and so on. The seller will contact you after your order is
+      finalized to confirm the total, payment, and shipping details.
+    </p>
+  </section>
+
+  <!-- ── Admin Section ─────────────────────────────────────────────────── -->
+  <div class="hiw-admin-divider">
+    <span>Admin Reference</span>
+  </div>
+
+  <section class="hiw-section hiw-admin">
+    <h2>Dashboard (Admin View)</h2>
+    <p>
+      When logged in as Admin, the dashboard shows additional controls on each comic card when
+      <strong>Award Mode</strong> is enabled (toggled from the Sales page).
+    </p>
+    <ul>
+      <li>
+        <strong>Award button</strong> — appears on any unclaimed comic. Clicking it opens a modal
+        listing all approved (non-admin) users. Selecting a user immediately adds the comic to
+        that user's cart at <strong>$0.00</strong> (free). If the user has no active cart, one is
+        created for them. Already-claimed comics do not show the Award button.
+      </li>
+    </ul>
+  </section>
+
+  <section class="hiw-section hiw-admin">
+    <h2>Manage Orders</h2>
+    <p>
+      The <strong>Manage Orders</strong> screen is split into three sections: <em>Active Orders</em>
+      (submitted and finalized carts), <em>Open Shopping Carts</em> (carts with items that haven't
+      been submitted yet), and <em>Order Archive</em> (permanently fulfilled orders).
+    </p>
+    <p>
+      Each comic title is a clickable link showing the title and issue number together.
+    </p>
+    <ul>
+      <li>
+        <strong>Release</strong> — removes a single comic from a buyer's cart and returns it to
+        sale. A <em>"Returned to sale"</em> toast is shown to all users in real time. Discounts
+        are automatically recalculated after removal.
+      </li>
+      <li>
+        <strong>Mark as Fulfilled</strong> — only enabled once a cart reaches <em>Finalized</em>
+        status (after the 24-hour window). Uses a two-click confirmation: first click reloads the
+        latest order data, then the button turns orange showing <em>Confirm Fulfill?</em>. The
+        second click permanently archives the order, stamps each comic with the buyer's name and
+        sold date, and removes it from the active list. Fulfilled comics no longer appear on the
+        dashboard.
+      </li>
+    </ul>
+    <p>
+      Carts transition from <em>Submitted</em> to <em>Finalized</em> lazily — the next time the
+      Orders page loads after the 24-hour window passes.
+    </p>
+    <p>
+      The <strong>Order Archive</strong> section at the bottom shows all permanently fulfilled
+      orders. These records are never deleted, even by a database reset, so the full sales history
+      is always preserved.
+    </p>
+  </section>
+
+  <section class="hiw-section hiw-admin">
+    <h2>Sales &amp; Discounts</h2>
+    <p>
+      The <strong>Sales</strong> page lets you configure discount rules automatically applied when
+      a buyer submits their order. Multiple active rules stack. The discount is snapshotted onto
+      the order at submit time, so historical totals are preserved even if you later change or
+      remove a rule.
+    </p>
+    <p>Three discount types are supported:</p>
+    <ul>
+      <li>
+        <strong>Flat Percentage Off</strong> (<em>RAW_PERCENTAGE</em>) — deducts a fixed
+        percentage from the cart subtotal. Example: 10% off everything.
+      </li>
+      <li>
+        <strong>Buy X Get One Free</strong> (<em>BUY_X_GET_ONE_FREE</em>) — for every group
+        of X+1 books, the cheapest book in that group is free. Example: Buy 4, get the 5th free.
+      </li>
+      <li>
+        <strong>Percentage Per X Books</strong> (<em>PERCENTAGE_PER_X_BOOKS</em>) — for every
+        X books in the cart, add a percentage discount (capped at 100%). Example: 5% off per
+        3 books means a 6-book cart gets 10% off, a 9-book cart gets 15%, and so on.
+      </li>
+    </ul>
+    <p>
+      Each rule can be toggled active or inactive. Inactive rules are saved but not applied.
+      You can create, edit, and delete rules from this screen.
+    </p>
+    <p>
+      This page also lets you toggle <strong>Award Mode</strong> — when enabled, an Award button
+      appears on unclaimed comics on the dashboard, letting you add a book to any approved user's
+      cart at $0.00.
+    </p>
+
+    <h3>Reset Database</h3>
+    <p>
+      At the bottom of the Sales page is a <strong>Reset Database</strong> section, intended for
+      use between sale events. To confirm the action, type <code>RESET</code> in the input field
+      and click the button. This will:
+    </p>
+    <ul>
+      <li>Archive any fulfilled carts that haven't been archived yet (order history is preserved)</li>
+      <li>Delete all active carts and discounts</li>
+      <li>Delete all comics and their associated images</li>
+      <li>Delete all sessions except your own (so you stay logged in)</li>
+    </ul>
+    <p>
+      The Order Archive is never touched by a reset — all past sales history remains intact
+      in the <strong>Orders</strong> admin view and in each buyer's <strong>Orders</strong> page.
+    </p>
+  </section>
+
+  <section class="hiw-section hiw-admin">
+    <h2>User Admin</h2>
+    <p>
+      The <strong>User Admin</strong> screen is split into two tables — pending account requests
+      at the top and existing approved users below.
+    </p>
+    <ul>
+      <li>
+        <strong>Approve</strong> — approves a pending request, generates a PIN, and moves the
+        user to the Approved Users table. A modal displays the new PIN — copy it and send it to
+        the buyer directly. It will not be shown again.
+      </li>
+      <li>
+        <strong>Reset PIN</strong> — generates a brand-new PIN for an existing user (for example,
+        if they've lost theirs). The same modal appears with the new PIN. The old PIN stops working
+        immediately.
+      </li>
+      <li>
+        <strong>Suspend / Reactivate</strong> — suspending a user blocks their login immediately
+        without deleting their account. Their status badge turns red. Reactivating restores their
+        access.
+      </li>
+    </ul>
+    <p>
+      The admin account row does not show Reset PIN or Suspend controls — it displays
+      <em>Admin</em> in the Actions column instead.
+    </p>
+  </section>
+
+  <section class="hiw-section hiw-admin">
+    <h2>Comics Management</h2>
+    <p>
+      The <strong>Comics Management</strong> screen is a full-featured data grid showing every
+      comic in the database — not just the ones listed for sale. Each row is directly editable:
+      click any cell to update it and the change saves automatically.
+    </p>
+    <ul>
+      <li>
+        <strong>For Sale</strong> — the checkbox in this column controls whether a comic appears
+        on the buyer-facing dashboard. Unchecking it hides the comic from buyers immediately
+        without deleting it.
+      </li>
+      <li>
+        <strong>Date fields</strong> — Date Acquired, Published Date, and Date Sold use a date
+        picker. Enter dates in YYYY-MM-DD format. Setting a Date Sold value on a comic
+        automatically hides it from the dashboard.
+      </li>
+      <li>
+        <strong>Sale Price vs Target Price</strong> — Target Price is your internal reference;
+        Sale Price is what buyers see on the dashboard and in their cart totals. Books without
+        a Sale Price do not show a Claim button to buyers.
+      </li>
+      <li>
+        <strong>Add</strong> — use the toolbar button to add a new comic row with placeholder
+        values. Fill in the details directly in the grid.
+      </li>
+      <li>
+        <strong>Delete</strong> — the delete icon on the left of any row permanently removes the
+        comic, deletes all of its associated images (front cover, back cover, and thumbnails),
+        and automatically releases it from any active carts.
+      </li>
+      <li>
+        <strong>Sorting and filtering</strong> — click any column header to sort, or use the
+        filter icon to narrow the list by any field.
+      </li>
+    </ul>
+  </section>
+
+  <section class="hiw-section hiw-admin">
+    <h2>Comic Detail Page (Admin View)</h2>
+    <p>
+      When logged in as Admin, comic detail pages include additional image management controls.
+    </p>
+    <ul>
+      <li>
+        <strong>Update Image</strong> — uploads a new front cover image for the comic. The image
+        is automatically resized if it is very large, and a small thumbnail is generated for use
+        on the dashboard. If the upload fails, an error message appears below the button.
+      </li>
+      <li>
+        <strong>Update Back Cover</strong> — uploads a back cover image. This section only appears
+        after a front cover image has been uploaded. A thumbnail is generated automatically.
+      </li>
+    </ul>
+    <p>
+      Uploaded images are stored with metadata (comic ID, title, series, and issue number)
+      attached to each image record.
+    </p>
+  </section>
+
+</div>

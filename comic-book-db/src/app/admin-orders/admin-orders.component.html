@@ -1,0 +1,166 @@
+<div class="orders-container">
+  <h2>Active Orders</h2>
+
+  <div *ngIf="fulfilledCartId" class="success-message">Order marked as fulfilled.</div>
+  <div *ngIf="error" class="error-message">{{ error }}</div>
+  <div *ngIf="loading">Loading…</div>
+  <div *ngIf="!loading && orders.length === 0 && !error">No active orders.</div>
+
+  <div *ngFor="let order of orders" class="order-card">
+    <div class="order-header">
+      <div class="order-buyer">
+        <strong>{{ order.userName }}</strong>
+        <span class="buyer-email">{{ order.userEmail }}</span>
+      </div>
+      <div class="order-meta">
+        <span class="order-status" [ngClass]="'status-' + order.status.toLowerCase()">
+          {{ statusLabel(order.status) }}
+        </span>
+        <span class="order-date">Opened: {{ order.createdAt | date:'short' }}</span>
+        <span *ngIf="order.finalizedAt" class="order-date">Finalized: {{ order.finalizedAt | date:'short' }}</span>
+      </div>
+    </div>
+
+    <table>
+      <thead>
+        <tr><th>Comic</th><th>Price</th><th>Claimed</th><th></th></tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of order.items">
+          <td><a [routerLink]="['/detail', item.comicId]">{{ item.comicTitle }}{{ item.comicNumber ? ' ' + item.comicNumber : '' }}</a></td>
+          <td>{{ item.price | currency }}</td>
+          <td>{{ item.claimedAt | date:'short' }}</td>
+          <td>
+            <button class="btn-release" (click)="unclaim(item.comicId)"
+              title="Release this comic back to available">Release</button>
+          </td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr *ngIf="order.discountAmount && order.discountAmount > 0">
+          <td>Discount</td>
+          <td style="color:#2e7d32">-{{ order.discountAmount | currency }}
+            <span *ngIf="order.discountDescription" style="font-size:0.85em;color:#555;margin-left:0.4rem">({{ order.discountDescription }})</span>
+          </td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td><strong>Total</strong></td>
+          <td><strong>{{ (cartTotal(order) - (order.discountAmount || 0)) | currency }}</strong></td>
+          <td></td>
+          <td></td>
+        </tr>
+      </tfoot>
+    </table>
+
+    <div class="order-actions">
+      <button
+        class="btn-fulfill"
+        [class.btn-fulfill-confirm]="pendingFulfillId === order.id"
+        [disabled]="order.status !== 'FINALIZED'"
+        (click)="fulfill(order)"
+        [title]="order.status !== 'FINALIZED' ? 'Order must be finalized before fulfillment' : ''">
+        {{ pendingFulfillId === order.id ? 'Confirm Fulfill?' : 'Mark as Fulfilled' }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Open Shopping Carts -->
+  <div class="section-divider"></div>
+  <h2>Open Shopping Carts</h2>
+
+  <div *ngIf="loadingOpen">Loading…</div>
+  <div *ngIf="openCartsError" class="error-message">{{ openCartsError }}</div>
+  <div *ngIf="!loadingOpen && !openCartsError && openCarts.length === 0">No open shopping carts.</div>
+
+  <div *ngFor="let cart of openCarts" class="order-card open-cart-card">
+    <div class="order-header">
+      <div class="order-buyer">
+        <strong>{{ cart.userName }}</strong>
+        <span class="buyer-email">{{ cart.userEmail }}</span>
+      </div>
+      <div class="order-meta">
+        <span class="order-status status-open">Open</span>
+        <span class="order-date">Since: {{ cart.createdAt | date:'short' }}</span>
+        <span class="order-date">{{ cart.items.length }} item{{ cart.items.length !== 1 ? 's' : '' }}</span>
+      </div>
+    </div>
+
+    <table>
+      <thead>
+        <tr><th>Comic</th><th>Price</th><th>Claimed</th><th></th></tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of cart.items">
+          <td><a [routerLink]="['/detail', item.comicId]">{{ item.comicTitle }}{{ item.comicNumber ? ' ' + item.comicNumber : '' }}</a></td>
+          <td>{{ item.price | currency }}</td>
+          <td>{{ item.claimedAt | date:'short' }}</td>
+          <td>
+            <button class="btn-release" (click)="unclaim(item.comicId)"
+              title="Release this comic back to available">Release</button>
+          </td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td><strong>Total</strong></td>
+          <td><strong>{{ cartTotal(cart) | currency }}</strong></td>
+          <td></td>
+          <td></td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+  <!-- Order Archive -->
+  <div class="section-divider"></div>
+  <h2>Order Archive</h2>
+  <p class="section-hint">All fulfilled orders, preserved across database resets.</p>
+
+  <div *ngIf="loadingArchived">Loading…</div>
+  <div *ngIf="archivedError" class="error-message">{{ archivedError }}</div>
+  <div *ngIf="!loadingArchived && !archivedError && archivedOrders.length === 0">No archived orders yet.</div>
+
+  <div *ngFor="let order of archivedOrders" class="order-card archived-card">
+    <div class="order-header">
+      <div class="order-buyer">
+        <strong>{{ order.userName }}</strong>
+        <span class="buyer-email">{{ order.userEmail }}</span>
+      </div>
+      <div class="order-meta">
+        <span class="order-status status-fulfilled">Fulfilled</span>
+        <span class="order-date">Ordered: {{ order.createdAt | date:'short' }}</span>
+        <span *ngIf="order.fulfilledAt" class="order-date">Fulfilled: {{ order.fulfilledAt | date:'short' }}</span>
+      </div>
+    </div>
+
+    <table>
+      <thead>
+        <tr><th>Comic</th><th>Price</th><th>Claimed</th></tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of order.items">
+          <td>{{ item.comicTitle }}</td>
+          <td>{{ item.price | currency }}</td>
+          <td>{{ item.claimedAt | date:'short' }}</td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr *ngIf="order.discountAmount && order.discountAmount > 0">
+          <td>Discount</td>
+          <td style="color:#2e7d32">-{{ order.discountAmount | currency }}
+            <span *ngIf="order.discountDescription" style="font-size:0.85em;color:#555;margin-left:0.4rem">({{ order.discountDescription }})</span>
+          </td>
+          <td></td>
+        </tr>
+        <tr>
+          <td><strong>Total</strong></td>
+          <td><strong>{{ (archivedTotal(order) - (order.discountAmount || 0)) | currency }}</strong></td>
+          <td></td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+</div>

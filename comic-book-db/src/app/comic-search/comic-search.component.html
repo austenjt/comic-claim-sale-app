@@ -1,0 +1,16 @@
+<div id="search-component">
+  <label for="search-box">Comic Search</label>
+  <input #searchBox id="search-box" (input)="search(searchBox.value)" />
+
+  <ul class="search-result">
+    <li *ngFor="let comic of comics$ | async">
+      <a routerLink="/detail/{{comic.id}}">
+        {{comic.title}}
+        <span *ngIf="comic.number?.number != null || comic.number?.sentinel != null" class="search-result-number">
+          #{{ comic.number?.sentinel ?? comic.number?.number }}
+        </span>
+      </a>
+    </li>
+  </ul>
+</div>
+

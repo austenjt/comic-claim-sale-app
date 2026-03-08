@@ -1,0 +1,40 @@
+<div class="orders-container">
+  <h2>My Orders</h2>
+
+  <div *ngIf="loading">Loading…</div>
+  <div *ngIf="error" class="error-message">{{ error }}</div>
+  <div *ngIf="!loading && !error && orders.length === 0" class="empty-state">
+    You have no completed orders yet.
+  </div>
+
+  <div *ngFor="let order of orders" class="order-card">
+    <div class="order-header">
+      <div class="order-meta">
+        <span class="order-status">Fulfilled</span>
+        <span class="order-date">Ordered: {{ order.createdAt | date:'mediumDate' }}</span>
+        <span *ngIf="order.fulfilledAt" class="order-date">Shipped: {{ order.fulfilledAt | date:'mediumDate' }}</span>
+      </div>
+      <div class="order-total">{{ orderTotal(order) | currency }}</div>
+    </div>
+
+    <table>
+      <thead>
+        <tr><th>Comic</th><th>Price</th><th>Claimed</th></tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of order.items">
+          <td>{{ item.comicTitle }}</td>
+          <td>{{ item.price | currency }}</td>
+          <td>{{ item.claimedAt | date:'mediumDate' }}</td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td><strong>Total</strong></td>
+          <td><strong>{{ orderTotal(order) | currency }}</strong></td>
+          <td></td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</div>

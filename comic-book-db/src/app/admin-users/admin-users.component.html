@@ -1,0 +1,93 @@
+<div class="admin-users">
+  <h2>Pending Account Requests</h2>
+
+  <!-- PIN modal -->
+  <div *ngIf="approvedPin" class="pin-modal-overlay">
+    <div class="pin-modal">
+      <h3>User Approved: {{ approvedUserName }}</h3>
+      <p>Copy this PIN — it won't be shown again:</p>
+      <div class="pin-display">{{ approvedPin }}</div>
+      <button (click)="dismissPin()">Dismiss</button>
+    </div>
+  </div>
+
+  <div *ngIf="error" class="error-message">{{ error }}</div>
+  <div *ngIf="loading">Loading…</div>
+
+  <div *ngIf="!loading && pendingUsers.length === 0 && !error">
+    No pending account requests.
+  </div>
+
+  <table *ngIf="pendingUsers.length > 0">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Address</th>
+        <th>Phone</th>
+        <th>Payment Notes</th>
+        <th>Requested</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let user of pendingUsers">
+        <td>{{ user.name }}</td>
+        <td>{{ user.email }}</td>
+        <td class="address-cell">{{ user.address }}</td>
+        <td>{{ user.phone }}</td>
+        <td>{{ user.paymentNotes }}</td>
+        <td>{{ user.createdDate | date:'short' }}</td>
+        <td><button (click)="approve(user)">Approve</button></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2 class="section-heading">Approved Users</h2>
+
+  <div *ngIf="!loading && existingUsers.length === 0 && !error">
+    No approved users yet.
+  </div>
+
+  <table *ngIf="existingUsers.length > 0">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Address</th>
+        <th>Phone</th>
+        <th>Payment Notes</th>
+        <th>Approved</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let user of existingUsers">
+        <td>{{ user.name }}</td>
+        <td>{{ user.email }}</td>
+        <td class="address-cell">{{ user.address }}</td>
+        <td>{{ user.phone }}</td>
+        <td>{{ user.paymentNotes }}</td>
+        <td>{{ user.approvedDate | date:'short' }}</td>
+        <td>
+          <span class="status-badge"
+            [class.badge-active]="user.status === 'APPROVED'"
+            [class.badge-suspended]="user.status === 'SUSPENDED'">
+            {{ user.status === 'APPROVED' ? 'Active' : 'Suspended' }}
+          </span>
+        </td>
+        <td class="action-cell">
+          <ng-container *ngIf="user.isAdmin; else userActions">
+            <span class="admin-label">Admin</span>
+          </ng-container>
+          <ng-template #userActions>
+            <button (click)="resetPin(user)">Reset PIN</button>
+            <button *ngIf="user.status === 'APPROVED'" class="btn-suspend" (click)="suspend(user)">Suspend</button>
+            <button *ngIf="user.status === 'SUSPENDED'" class="btn-reactivate" (click)="reactivate(user)">Reactivate</button>
+          </ng-template>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

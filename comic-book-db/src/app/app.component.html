@@ -1,0 +1,46 @@
+<header class="app-header">
+  <div class="header-logo">
+    <img src="assets/logo.svg" alt="Logo" class="logo-img">
+  </div>
+
+  <div class="header-right">
+    <div class="header-title">{{title}}</div>
+    <nav>
+      <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
+
+      <ng-container *ngIf="auth.isLoggedIn() && !auth.isAdmin()">
+        <a routerLink="/cart" routerLinkActive="active">My Cart</a>
+        <a routerLink="/orders" routerLinkActive="active">Orders</a>
+      </ng-container>
+
+      <ng-container *ngIf="auth.isAdmin()">
+        <a routerLink="/admin/orders" routerLinkActive="active">Manage Orders</a>
+        <a routerLink="/comics" routerLinkActive="active">Comics Management</a>
+        <a routerLink="/admin/users" routerLinkActive="active">User Admin</a>
+        <a routerLink="/admin/sales" routerLinkActive="active">Sales</a>
+      </ng-container>
+
+      <a *ngIf="!auth.isAdmin()" routerLink="/how-it-works" routerLinkActive="active" class="nav-start-here">Start Here</a>
+
+      <ng-container *ngIf="!auth.isLoggedIn()">
+        <a routerLink="/login" routerLinkActive="active">Login</a>
+        <a routerLink="/register" routerLinkActive="active">Register</a>
+      </ng-container>
+
+      <ng-container *ngIf="auth.isLoggedIn()">
+        <a routerLink="/profile" class="nav-user">{{ (auth.currentUser$ | async)?.name }}</a>
+        <a href="#" (click)="$event.preventDefault(); logout()">Logout</a>
+      </ng-container>
+    </nav>
+  </div>
+</header>
+<div class="toast-stack">
+  <div *ngFor="let t of toastService.toasts" class="app-toast">
+    <span>{{ t.message }}</span>
+    <button class="toast-close" (click)="toastService.dismiss(t.id)">&#x2715;</button>
+  </div>
+</div>
+
+<main class="app-main">
+  <router-outlet></router-outlet>
+</main>

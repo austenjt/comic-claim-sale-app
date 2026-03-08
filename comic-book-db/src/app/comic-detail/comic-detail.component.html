@@ -1,0 +1,439 @@
+<div *ngIf="comic">
+  <button type="button" (click)="goBack()">go back</button>
+  <h2>{{comicHeading | uppercase}}</h2>
+  <div class="content-container">
+    <div class="images-column">
+
+      <!-- Front Cover -->
+      <div class="large-image" #largeImageContainer>
+        <img [src]="getFullImageURLByName(comic.largeCachedImageId) | async"
+             alt="Large Comic Image" loading="lazy"
+             class="zoomable" (click)="toggleZoom()">
+
+        <div *ngIf="auth.isAdmin()" class="img-update-bar">
+          <button class="img-update-btn" (click)="imageFileInput.click()" [disabled]="imageUploading">
+            {{ imageUploading ? 'Uploading...' : 'Update Image' }}
+          </button>
+          <div *ngIf="imageUploadError" class="img-upload-error">{{ imageUploadError }}</div>
+        </div>
+
+        <input #imageFileInput type="file" accept="image/png,image/jpeg" style="display:none"
+               (change)="onImageFileSelected($event)">
+      </div>
+
+      <!-- Back Cover (only shown if front image exists; admin sees it to upload, others only if back image exists) -->
+      <div class="large-image" *ngIf="comic.largeCachedImageId && (auth.isAdmin() || comic.largeBackImageId)">
+        <img [src]="getFullImageURLByName(comic.largeBackImageId) | async"
+             alt="Back Cover Image" loading="lazy"
+             class="zoomable" (click)="toggleZoom()">
+
+        <div *ngIf="auth.isAdmin()" class="img-update-bar">
+          <button class="img-update-btn" (click)="backImageFileInput.click()" [disabled]="backImageUploading">
+            {{ backImageUploading ? 'Uploading...' : 'Update Back Cover' }}
+          </button>
+          <div *ngIf="backImageUploadError" class="img-upload-error">{{ backImageUploadError }}</div>
+        </div>
+
+        <input #backImageFileInput type="file" accept="image/png,image/jpeg" style="display:none"
+               (change)="onBackImageFileSelected($event)">
+      </div>
+
+    </div>
+
+    <div class="zoom-overlay" *ngIf="zoomOpen" (click)="toggleZoom()">
+      <img [src]="getFullImageURLByName(comic.largeCachedImageId) | async" alt="Zoomed Comic Image">
+    </div>
+    <div class="details">
+
+      <!-- Issue Details -->
+      <div class="detail-section">
+        <div class="detail-section-title">Issue Details</div>
+        <div class="detail-item" *ngIf="comic.id">
+          <span class="detail-label">Internal ID</span>
+          <span class="detail-value">{{comic.id}}</span>
+        </div>
+        <div class="detail-item" *ngIf="comic.series && comic.series !== ''">
+          <span class="detail-label">Series</span>
+          <span class="detail-value">{{comic.series}}</span>
+        </div>
+        <div class="detail-item" *ngIf="comic.number?.number != null">
+          <span class="detail-label">Issue Number</span>
+          <span class="detail-value">{{comic.number?.number}}</span>
+        </div>
+        <div class="detail-item" *ngIf="comic.number?.volume != null">
+          <span class="detail-label">Volume</span>
+          <span class="detail-value">{{comic.number?.volume}}</span>
+        </div>
+        <div class="detail-item" *ngIf="comic.publisher">
+          <span class="detail-label">Publisher</span>
+          <span class="detail-value">{{comic.publisher}}</span>
+        </div>
+        <div class="detail-item" *ngIf="comic.publishedDate">
+          <span class="detail-label">Published Date</span>
+          <span class="detail-value">{{comic.publishedDate}}</span>
+        </div>
+        <div class="detail-item" *ngIf="comic.era">
+          <span class="detail-label">Era</span>
+          <span class="detail-value">{{comic.era}}</span>
+        </div>
+        <div class="detail-item" *ngIf="comic.variant">
+          <span class="detail-label">Variant</span>
+          <span class="detail-value">{{comic.variant}}</span>
+        </div>
+        <div class="detail-item" *ngIf="comic.printRun">
+          <span class="detail-label">Print Run</span>
+          <span class="detail-value">{{comic.printRun}}</span>
+        </div>
+        <div class="detail-item" *ngIf="comic.barCode">
+          <span class="detail-label">Bar Code</span>
+          <span class="detail-value">{{comic.barCode}}</span>
+        </div>
+        <div class="detail-item" *ngIf="comic.keyIssue">
+          <span class="detail-label">Key Issue</span>
+          <span class="detail-value">{{comic.keyIssue}}</span>
+        </div>
+        <div class="detail-item" *ngIf="comic.salePrice">
+          <span class="detail-label">Sale Price</span>
+          <span class="detail-value">{{ comic.salePrice | currency:'USD':'symbol':'1.2-2' }}</span>
+        </div>
+      </div>
+
+      <!-- Credits -->
+      <div class="detail-section" *ngIf="(comic.writer && comic.writer.length > 0) || (comic.artist && comic.artist.length > 0)">
+        <div class="detail-section-title">Credits</div>
+        <div class="detail-item" *ngIf="comic.writer && comic.writer.length > 0">
+          <span class="detail-label">Writer(s)</span>
+          <span class="detail-value">{{comic.writer.join(', ')}}</span>
+        </div>
+        <div class="detail-item" *ngIf="comic.artist && comic.artist.length > 0">
+          <span class="detail-label">Artist(s)</span>
+          <span class="detail-value">{{comic.artist.join(', ')}}</span>
+        </div>
+      </div>
+
+      <!-- Third-party Info -->
+      <div class="detail-section">
+        <div class="detail-section-title">External References</div>
+        <div class="detail-item" *ngIf="comic.goCollectInfo?.gcIndex && comic.goCollectInfo?.gcIndex !== -1">
+          <span class="detail-label">GoCollect Index</span>
+          <a *ngIf="comic.goCollectInfo?.gcSlug"
+             [href]="'https://gocollect.com/comic/' + comic.goCollectInfo?.gcSlug"
+             target="_blank">{{comic.goCollectInfo?.gcIndex}}</a>
+          <span class="detail-value" *ngIf="!comic.goCollectInfo?.gcSlug">{{comic.goCollectInfo?.gcIndex}}</span>
+        </div>
+        <div class="detail-item" *ngIf="comic.goCollectInfo?.gcSlug">
+          <span class="detail-label">GoCollect</span>
+          <a [href]="'https://gocollect.com/comic/' + comic.goCollectInfo?.gcSlug" target="_blank">
+            {{comic.goCollectInfo?.gcSlug}}
+          </a>
+        </div>
+        <div class="detail-item" *ngIf="comic.goCollectInfo?.gcSeries && comic.goCollectInfo?.gcSeries !== ''">
+          <span class="detail-label">GoCollect Series URL</span>
+          <a [href]="'https://gocollect.com/app/comics/series/' + (comic.goCollectInfo?.gcSeries | lowercase)" target="_blank">
+            {{comic.goCollectInfo?.gcSeries | lowercase}}
+          </a>
+        </div>
+        <div class="detail-item" *ngIf="comic.grandComicDBInfo?.gcdbIssueId && comic.grandComicDBInfo?.gcdbIssueId !== -1">
+          <span class="detail-label">Grand Comic DB</span>
+          <a [href]="getGrandComicDatabaseURL(comic.grandComicDBInfo?.gcdbIssueId) | async" target="_blank">Issue: {{comic.grandComicDBInfo?.gcdbIssueId}}</a>
+        </div>
+        <div class="detail-item" *ngIf="comic.grandComicDBInfo?.gcdbSeriesId && comic.grandComicDBInfo?.gcdbSeriesId !== -1">
+          <span class="detail-label">GCDB Series</span>
+          <a [href]="getGrandComicSeriesDatabaseURL(comic.grandComicDBInfo?.gcdbSeriesId) | async" target="_blank">Series: {{comic.grandComicDBInfo?.gcdbSeriesId}}</a>
+        </div>
+      </div>
+
+      <!-- Condition -->
+      <div class="detail-section" *ngIf="comic.comicCondition">
+        <div class="detail-section-title">Condition</div>
+
+        <!-- CGC -->
+        <ng-container *ngIf="comic.comicCondition?.cgcCondition">
+          <div class="detail-subsection-title">CGC</div>
+          <div class="detail-item" *ngIf="comic.comicCondition?.certificationId">
+            <span class="detail-label">Cert ID</span>
+            <span class="detail-value">
+              <a [href]="'https://www.cgccomics.com/certlookup/' + comic.comicCondition?.certificationId + '/'" target="_blank">
+                {{comic.comicCondition?.certificationId}}
+              </a>
+            </span>
+          </div>
+          <div class="detail-item" *ngIf="comic.comicCondition?.cgcCondition?.label">
+            <span class="detail-label">Label</span>
+            <span class="detail-value">{{comic.comicCondition?.cgcCondition?.label}}</span>
+          </div>
+          <div class="detail-item" *ngIf="comic.comicCondition?.cgcCondition?.grade">
+            <span class="detail-label">Grade</span>
+            <span class="detail-value">{{comic.comicCondition?.cgcCondition?.grade}}</span>
+          </div>
+          <div class="detail-item" *ngIf="comic.comicCondition?.cgcCondition?.pageQuality">
+            <span class="detail-label">Page Quality</span>
+            <span class="detail-value">{{comic.comicCondition?.cgcCondition?.pageQuality}}</span>
+          </div>
+          <div class="detail-item" *ngIf="comic.comicCondition?.cgcCondition?.pedigree">
+            <span class="detail-label">Pedigree</span>
+            <span class="detail-value">{{comic.comicCondition?.cgcCondition?.pedigree}}</span>
+          </div>
+          <div class="detail-item" *ngIf="comic.comicCondition?.cgcCondition?.signature">
+            <span class="detail-label">Signature</span>
+            <span class="detail-value">{{comic.comicCondition?.cgcCondition?.signature}}</span>
+          </div>
+          <div class="detail-item" *ngIf="comic.comicCondition?.cgcCondition?.degreeOfRestoration">
+            <span class="detail-label">Restoration</span>
+            <span class="detail-value">{{comic.comicCondition?.cgcCondition?.degreeOfRestoration}}</span>
+          </div>
+          <div class="detail-item" *ngIf="comic.comicCondition?.cgcCondition?.graderNotes">
+            <span class="detail-label">Grader Notes</span>
+            <span class="detail-value">{{comic.comicCondition?.cgcCondition?.graderNotes}}</span>
+          </div>
+        </ng-container>
+
+        <!-- CBCS -->
+        <ng-container *ngIf="comic.comicCondition?.cbcsCondition">
+          <div class="detail-subsection-title">CBCS</div>
+          <div class="detail-item" *ngIf="comic.comicCondition?.certificationId">
+            <span class="detail-label">Cert ID</span>
+            <span class="detail-value">{{comic.comicCondition?.certificationId}}</span>
+          </div>
+          <div class="detail-item" *ngIf="comic.comicCondition?.cbcsCondition?.label">
+            <span class="detail-label">Label</span>
+            <span class="detail-value">{{comic.comicCondition?.cbcsCondition?.label}}</span>
+          </div>
+          <div class="detail-item" *ngIf="comic.comicCondition?.cbcsCondition?.grade">
+            <span class="detail-label">Grade</span>
+            <span class="detail-value">{{comic.comicCondition?.cbcsCondition?.grade}}</span>
+          </div>
+          <div class="detail-item" *ngIf="comic.comicCondition?.cbcsCondition?.pageQuality">
+            <span class="detail-label">Page Quality</span>
+            <span class="detail-value">{{comic.comicCondition?.cbcsCondition?.pageQuality}}</span>
+          </div>
+          <div class="detail-item" *ngIf="comic.comicCondition?.cbcsCondition?.pedigree">
+            <span class="detail-label">Pedigree</span>
+            <span class="detail-value">{{comic.comicCondition?.cbcsCondition?.pedigree}}</span>
+          </div>
+          <div class="detail-item" *ngIf="comic.comicCondition?.cbcsCondition?.signature">
+            <span class="detail-label">Signature</span>
+            <span class="detail-value">{{comic.comicCondition?.cbcsCondition?.signature}}</span>
+          </div>
+          <div class="detail-item" *ngIf="comic.comicCondition?.cbcsCondition?.degreeOfRestoration">
+            <span class="detail-label">Restoration</span>
+            <span class="detail-value">{{comic.comicCondition?.cbcsCondition?.degreeOfRestoration}}</span>
+          </div>
+        </ng-container>
+
+        <!-- Raw / Not Certified -->
+        <ng-container *ngIf="comic.comicCondition?.notCertifiedGrade || comic.comicCondition?.notCertifiedLabel || comic.comicCondition?.notCertifiedPageQuality">
+          <div class="detail-subsection-title">Raw</div>
+          <div class="detail-item" *ngIf="comic.comicCondition?.notCertifiedLabel">
+            <span class="detail-label">Label</span>
+            <span class="detail-value">{{comic.comicCondition?.notCertifiedLabel}}</span>
+          </div>
+          <div class="detail-item" *ngIf="comic.comicCondition?.notCertifiedGrade">
+            <span class="detail-label">Grade</span>
+            <span class="detail-value">{{comic.comicCondition?.notCertifiedGrade}}</span>
+          </div>
+          <div class="detail-item" *ngIf="comic.comicCondition?.notCertifiedPageQuality">
+            <span class="detail-label">Page Quality</span>
+            <span class="detail-value">{{comic.comicCondition?.notCertifiedPageQuality}}</span>
+          </div>
+          <div class="detail-item" *ngIf="comic.comicCondition?.notCertifiedPedigree">
+            <span class="detail-label">Pedigree</span>
+            <span class="detail-value">{{comic.comicCondition?.notCertifiedPedigree}}</span>
+          </div>
+          <div class="detail-item" *ngIf="comic.comicCondition?.notCertifiedDegreeOfRestoration">
+            <span class="detail-label">Restoration</span>
+            <span class="detail-value">{{comic.comicCondition?.notCertifiedDegreeOfRestoration}}</span>
+          </div>
+          <div class="detail-item" *ngIf="comic.comicCondition?.notCertifiedSignature">
+            <span class="detail-label">Signature</span>
+            <span class="detail-value">{{comic.comicCondition?.notCertifiedSignature}}</span>
+          </div>
+        </ng-container>
+
+        <div class="detail-item" *ngIf="comic.defects">
+          <span class="detail-label">Defects</span>
+          <span class="detail-value">{{comic.defects}}</span>
+        </div>
+      </div>
+
+      <!-- Purchase Info / Sale Info / Valuation — admin only -->
+      <ng-container *ngIf="auth.isAdmin()">
+
+      <!-- Purchase Info -->
+      <div class="detail-section" *ngIf="comic.pricePaid || comic.dateAcquired || comic.purchasedFrom || comic.purchaseReferenceURL">
+        <div class="detail-section-title">Purchase Info</div>
+        <div class="detail-item" *ngIf="comic.pricePaid">
+          <span class="detail-label">Price Paid</span>
+          <span class="detail-value">{{ comic.pricePaid | currency:'USD':'symbol':'1.2-2' }}</span>
+        </div>
+        <div class="detail-item" *ngIf="comic.dateAcquired">
+          <span class="detail-label">Date Acquired</span>
+          <span class="detail-value">{{comic.dateAcquired}}</span>
+        </div>
+        <div class="detail-item" *ngIf="comic.purchasedFrom">
+          <span class="detail-label">Purchased From</span>
+          <span class="detail-value">{{comic.purchasedFrom}}</span>
+        </div>
+        <div class="detail-item" *ngIf="comic.purchaseReferenceURL">
+          <span class="detail-label">Reference URL</span>
+          <span class="detail-value">{{comic.purchaseReferenceURL}}</span>
+        </div>
+      </div>
+
+      <!-- Sale Info -->
+      <div class="detail-section" *ngIf="comic.isForSale || comic.salePrice || comic.dateSold || comic.soldTo">
+        <div class="detail-section-title">Sale Info</div>
+        <div class="detail-item" *ngIf="comic.isForSale">
+          <span class="detail-label">For Sale</span>
+          <span class="detail-value">{{comic.isForSale}}</span>
+        </div>
+        <div class="detail-item" *ngIf="comic.salePrice">
+          <span class="detail-label">Sale Price</span>
+          <span class="detail-value">{{ comic.salePrice | currency:'USD':'symbol':'1.2-2' }}</span>
+        </div>
+        <div class="detail-item" *ngIf="comic.dateSold">
+          <span class="detail-label">Date Sold</span>
+          <span class="detail-value">{{comic.dateSold | date:'medium'}}</span>
+        </div>
+        <div class="detail-item" *ngIf="comic.soldTo">
+          <span class="detail-label">Sold To</span>
+          <span class="detail-value">{{comic.soldTo}}</span>
+        </div>
+      </div>
+
+      <!-- Valuation -->
+      <div class="detail-section" *ngIf="comic.personalEstimate || comic.targetPrice">
+        <div class="detail-section-title">Valuation</div>
+        <div class="detail-item" *ngIf="comic.personalEstimate">
+          <span class="detail-label">Personal Estimate</span>
+          <span class="detail-value">{{ comic.personalEstimate | currency:'USD':'symbol':'1.2-2' }}</span>
+        </div>
+        <div class="detail-item" *ngIf="comic.targetPrice">
+          <span class="detail-label">Target Price</span>
+          <span class="detail-value">{{ comic.targetPrice | currency:'USD':'symbol':'1.2-2' }}</span>
+        </div>
+      </div>
+
+      </ng-container><!-- end admin-only -->
+
+      <!-- Collection & Storage -->
+      <div class="detail-section" *ngIf="(comic.collectionGroup && comic.collectionGroup !== -1) || comic.storageLocation">
+        <div class="detail-section-title">Collection</div>
+        <div class="detail-item" *ngIf="comic.collectionGroup && comic.collectionGroup !== -1">
+          <span class="detail-label">Collection Group</span>
+          <span class="detail-value">{{comic.collectionGroup}}</span>
+        </div>
+        <div class="detail-item" *ngIf="comic.storageLocation">
+          <span class="detail-label">Storage Location</span>
+          <span class="detail-value">{{comic.storageLocation}}</span>
+        </div>
+      </div>
+
+      <!-- Images -->
+      <div class="detail-section" *ngIf="comic.smallCachedImageId || comic.largeCachedImageId || comic.smallBackImageId || comic.largeBackImageId">
+        <div class="detail-section-title">Images</div>
+        <div class="detail-item" *ngIf="comic.smallCachedImageId">
+          <span class="detail-label">Small Image ID</span>
+          <span class="detail-value">{{comic.smallCachedImageId}}</span>
+        </div>
+        <div class="detail-item" *ngIf="comic.largeCachedImageId">
+          <span class="detail-label">Large Image ID</span>
+          <span class="detail-value">{{comic.largeCachedImageId}}</span>
+        </div>
+        <div class="detail-item" *ngIf="comic.smallBackImageId">
+          <span class="detail-label">Small Back Image ID</span>
+          <span class="detail-value">{{comic.smallBackImageId}}</span>
+        </div>
+        <div class="detail-item" *ngIf="comic.largeBackImageId">
+          <span class="detail-label">Large Back Image ID</span>
+          <span class="detail-value">{{comic.largeBackImageId}}</span>
+        </div>
+      </div>
+
+      <!-- Notes -->
+      <div class="detail-section" *ngIf="comic.personalNotes || comic.publicNotes || comic.imageNotes">
+        <div class="detail-section-title">Notes</div>
+        <div class="detail-item" *ngIf="comic.personalNotes">
+          <span class="detail-label">Personal Notes</span>
+          <span class="detail-value">{{comic.personalNotes}}</span>
+        </div>
+        <div class="detail-item" *ngIf="comic.publicNotes">
+          <span class="detail-label">Public Notes</span>
+          <span class="detail-value">{{comic.publicNotes}}</span>
+        </div>
+        <div class="detail-item" *ngIf="comic.imageNotes">
+          <span class="detail-label">Image Notes</span>
+          <span class="detail-value">{{comic.imageNotes}}</span>
+        </div>
+      </div>
+
+      <!-- Claim Status -->
+      <div class="detail-section">
+        <div class="detail-section-title">Claim Status</div>
+
+        <!-- Sold -->
+        <ng-container *ngIf="comic.soldTo">
+          <div class="detail-item">
+            <span class="detail-label">Status</span>
+            <span class="detail-value claim-status-sold">Sold</span>
+          </div>
+        </ng-container>
+
+        <!-- In my cart -->
+        <ng-container *ngIf="!comic.soldTo && isInMyCart(comic.id)">
+          <div class="detail-item">
+            <span class="detail-label">Status</span>
+            <span class="detail-value claim-status-mine">In Your Cart</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Date Claimed</span>
+            <span class="detail-value">{{ claimedDate(comic.id) | date:'medium' }}</span>
+          </div>
+          <div class="detail-item" *ngIf="auth.isApproved() && !auth.isAdmin() && myCart?.status === 'OPEN'">
+            <span class="detail-label"></span>
+            <span class="detail-value">
+              <div *ngIf="claimError" class="claim-error">{{ claimError }}</div>
+              <button class="btn-release-detail" (click)="release()" [disabled]="actionLoading">
+                {{ actionLoading ? 'Releasing…' : 'Release Claim' }}
+              </button>
+            </span>
+          </div>
+        </ng-container>
+
+        <!-- Claimed by someone else -->
+        <ng-container *ngIf="!comic.soldTo && !isInMyCart(comic.id) && claimedDate(comic.id)">
+          <div class="detail-item">
+            <span class="detail-label">Status</span>
+            <span class="detail-value claim-status-claimed">Claimed</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Date Claimed</span>
+            <span class="detail-value">{{ claimedDate(comic.id) | date:'medium' }}</span>
+          </div>
+        </ng-container>
+
+        <!-- Available -->
+        <ng-container *ngIf="!comic.soldTo && !claimedDate(comic.id)">
+          <div class="detail-item">
+            <span class="detail-label">Status</span>
+            <span class="detail-value claim-status-available">Available</span>
+          </div>
+          <div class="detail-item" *ngIf="auth.isApproved() && !auth.isAdmin()">
+            <span class="detail-label"></span>
+            <span class="detail-value">
+              <div *ngIf="claimError" class="claim-error">{{ claimError }}</div>
+              <button *ngIf="canClaim(comic.id)" class="btn-claim-detail" (click)="claim()" [disabled]="actionLoading">
+                {{ actionLoading ? 'Claiming…' : 'Claim' }}
+              </button>
+              <span *ngIf="!canClaim(comic.id)" class="claim-blocked">
+                Your cart must be open to claim new items.
+              </span>
+            </span>
+          </div>
+        </ng-container>
+
+      </div>
+
+    </div>
+  </div>
+</div>

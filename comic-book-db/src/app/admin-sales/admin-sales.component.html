@@ -1,0 +1,114 @@
+<div class="sales-container">
+  <h2>Sales &amp; Discount Rules</h2>
+
+  <div *ngIf="error" class="error-message">{{ error }}</div>
+  <div *ngIf="loading">Loading…</div>
+
+  <!-- Award Mode Toggle -->
+  <div class="award-mode-row">
+    <label class="toggle-label">
+      <input type="checkbox" [checked]="awardModeEnabled" (change)="toggleAwardMode($any($event.target).checked)" />
+      Award Mode
+    </label>
+    <span class="award-mode-hint">When enabled, an Award button appears on unclaimed dashboard cards.</span>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <button class="btn-create" (click)="openCreate()" *ngIf="!showForm">+ New Rule</button>
+
+  <!-- Create / Edit Form -->
+  <div *ngIf="showForm" class="discount-form">
+    <h3>{{ editingId ? 'Edit Rule' : 'New Rule' }}</h3>
+
+    <div class="form-row">
+      <label>Name</label>
+      <input type="text" [(ngModel)]="formName" placeholder="e.g. Summer Sale" />
+    </div>
+
+    <div class="form-row">
+      <label>Type</label>
+      <select [(ngModel)]="formType">
+        <option *ngFor="let opt of typeOptions" [value]="opt.value">{{ opt.label }}</option>
+      </select>
+    </div>
+
+    <div class="form-row" *ngIf="needsPercentage()">
+      <label>Percentage Off (%)</label>
+      <input type="number" [(ngModel)]="formPercentageOff" min="0" max="100" step="0.5" />
+    </div>
+
+    <div class="form-row" *ngIf="needsXBooks()">
+      <label>{{ formType === 'BUY_X_GET_ONE_FREE' ? 'Buy X books (get 1 free)' : 'Books per group (X)' }}</label>
+      <input type="number" [(ngModel)]="formXBooks" min="1" step="1" />
+    </div>
+
+    <div class="form-row">
+      <label>Active</label>
+      <input type="checkbox" [(ngModel)]="formActive" />
+    </div>
+
+    <div class="rule-preview">
+      <strong>Preview:</strong> {{ rulePreview }}
+    </div>
+
+    <div class="form-actions">
+      <button class="btn-save" (click)="save()">Save</button>
+      <button class="btn-cancel" (click)="cancelForm()">Cancel</button>
+    </div>
+  </div>
+
+  <!-- Discount Table -->
+  <table *ngIf="discounts.length > 0 && !showForm">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Parameters</th>
+        <th>Active</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let d of discounts" [class.inactive]="!d.isActive">
+        <td>{{ d.name }}</td>
+        <td>{{ d.type }}</td>
+        <td>{{ describeDiscount(d) }}</td>
+        <td>
+          <span class="badge" [class.badge-active]="d.isActive" [class.badge-inactive]="!d.isActive">
+            {{ d.isActive ? 'Yes' : 'No' }}
+          </span>
+        </td>
+        <td class="actions">
+          <button class="btn-edit" (click)="openEdit(d)">Edit</button>
+          <button class="btn-delete" (click)="delete(d)">Delete</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p *ngIf="discounts.length === 0 && !loading && !showForm" class="empty-state">
+    No discount rules configured yet.
+  </p>
+
+  <!-- Database Reset -->
+  <div class="section-divider"></div>
+  <h3 class="danger-title">Reset Database</h3>
+  <p class="reset-warning">
+    This will permanently delete all comics, images, shopping carts, discounts, and user sessions (except yours).
+    Fulfilled order history will be preserved. This action cannot be undone.
+  </p>
+
+  <div *ngIf="resetSuccess" class="success-message">{{ resetSuccess }}</div>
+  <div *ngIf="resetError" class="error-message">{{ resetError }}</div>
+
+  <div class="reset-confirm-row">
+    <input type="text" [(ngModel)]="resetConfirmText" placeholder='Type "RESET" to confirm' class="reset-confirm-input" />
+    <button
+      class="btn-danger"
+      [disabled]="resetConfirmText !== 'RESET' || resetInProgress"
+      (click)="resetDatabase()">
+      {{ resetInProgress ? 'Resetting…' : 'Reset Database' }}
+    </button>
+  </div>
+</div>

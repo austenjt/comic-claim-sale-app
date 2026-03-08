@@ -1,0 +1,40 @@
+<div class="profile-page">
+  <h2>My Account</h2>
+
+  <div class="profile-email">
+    <span class="label">Email</span>
+    <span class="value">{{ (auth.currentUser$ | async)?.email }}</span>
+  </div>
+
+  <form (ngSubmit)="save()" #profileForm="ngForm" class="profile-form">
+    <div class="form-group">
+      <label for="name">Name</label>
+      <input id="name" type="text" [(ngModel)]="name" name="name" required />
+    </div>
+
+    <div class="form-group">
+      <label for="address">Address</label>
+      <textarea id="address" [(ngModel)]="address" name="address" rows="3"></textarea>
+    </div>
+
+    <div class="form-group">
+      <label for="phone">Phone</label>
+      <input id="phone" type="tel" [(ngModel)]="phone" name="phone" />
+    </div>
+
+    <div class="form-group">
+      <label for="paymentNotes">Payment Notes</label>
+      <textarea id="paymentNotes" [(ngModel)]="paymentNotes" name="paymentNotes" rows="2"
+                placeholder="e.g. Venmo @handle, PayPal email, etc."></textarea>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" [disabled]="saving || !profileForm.valid">
+        {{ saving ? 'Saving…' : 'Save Changes' }}
+      </button>
+    </div>
+
+    <p *ngIf="saveSuccess" class="msg-success">&#10003; Changes saved.</p>
+    <p *ngIf="saveError" class="msg-error">&#10007; {{ saveError }}</p>
+  </form>
+</div>

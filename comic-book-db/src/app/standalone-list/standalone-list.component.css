@@ -1,0 +1,168 @@
+.grid-toolbar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.toolbar-btn {
+  padding: 6px 14px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.add-btn {
+  background-color: #3d5a80;
+  color: white;
+  border-color: #3d5a80;
+}
+
+.add-btn:hover {
+  background-color: #2c4a6e;
+}
+
+.refresh-btn {
+  background-color: #3d5a80;
+  color: white;
+}
+
+.refresh-btn:hover:not(:disabled) {
+  background-color: #2c4a6e;
+}
+
+.refresh-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.grid-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 160px;
+  border: 2px dashed #b0c8e0;
+  border-radius: 6px;
+  color: #5a7a9a;
+  font-size: 0.95rem;
+  background: #f5f9fd;
+}
+
+/* ── Quick Add ──────────────────────────────────────────────────────────── */
+
+.qa-section {
+  border: 1px solid #c8d8ea;
+  border-radius: 6px;
+  background: #f0f5fa;
+  padding: 14px 18px 10px;
+  margin-bottom: 14px;
+}
+
+.qa-header {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.qa-title {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #1e3a5f;
+}
+
+.qa-step-indicator {
+  font-size: 0.8rem;
+  color: #7a9abf;
+}
+
+.qa-fields {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px 16px;
+  margin-bottom: 10px;
+}
+
+.qa-field {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.qa-field label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #3d5a80;
+}
+
+.qa-field input[type="text"],
+.qa-field input[type="number"],
+.qa-field input[type="date"],
+.qa-field select {
+  padding: 5px 8px;
+  border: 1px solid #b0c8e0;
+  border-radius: 4px;
+  font-size: 0.88rem;
+  background: white;
+  color: #1a1a1a;
+}
+
+.qa-field-checkbox {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  padding-top: 18px;
+}
+
+.qa-field-checkbox input[type="checkbox"] {
+  width: 1rem;
+  height: 1rem;
+}
+
+.qa-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.qa-btn {
+  padding: 6px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: white;
+  margin: 0;
+}
+
+.qa-btn-next  { background: #3d5a80; }
+.qa-btn-next:hover  { background: #2c4a6e; }
+
+.qa-btn-back  { background: #6c757d; }
+.qa-btn-back:hover  { background: #545b62; }
+
+.qa-btn-graded { background: #5c4a8a; }
+.qa-btn-graded:hover { background: #3e2f6e; }
+
+.qa-btn-save  { background: #2e7d32; }
+.qa-btn-save:hover:not(:disabled)  { background: #1b5e20; }
+.qa-btn-save:disabled { background: #b0bec5; cursor: not-allowed; }
+
+.qa-btn-reset { background: transparent; border: 1px solid #9ab0c8; color: #3d5a80; }
+.qa-btn-reset:hover { background: #dce8f5; }
+
+.qa-success {
+  color: #2e7d32;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.qa-error {
+  color: #c62828;
+  font-size: 0.85rem;
+  margin-bottom: 8px;
+}

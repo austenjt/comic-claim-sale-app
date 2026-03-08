@@ -1,0 +1,84 @@
+<div class="cart-container">
+  <h2>My Cart</h2>
+
+  <div *ngIf="loading">Loading…</div>
+  <div *ngIf="error" class="error-message">{{ error }}</div>
+
+  <div *ngIf="!loading && !cart" class="empty-cart">
+    Your cart is empty. <a routerLink="/dashboard">Browse comics</a> to start claiming.
+  </div>
+
+  <ng-container *ngIf="cart">
+    <div class="cart-status" [ngClass]="'status-' + cart.status.toLowerCase()">
+      {{ statusLabel }}
+      <span *ngIf="cart.status === 'FINALIZING' && finalizeDeadline">
+        Finalizes: <strong>{{ finalizeDeadline | date:'medium' }}</strong>
+      </span>
+    </div>
+
+    <table *ngIf="cart.items.length > 0">
+      <thead>
+        <tr>
+          <th>Comic</th>
+          <th>Price</th>
+          <th>Claimed At</th>
+          <th *ngIf="canRemove()"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of cart.items">
+          <td><a [routerLink]="['/detail', item.comicId]">{{ item.comicTitle }}{{ item.comicNumber ? ' ' + item.comicNumber : '' }}</a></td>
+          <td>{{ item.price | currency }}</td>
+          <td>{{ item.claimedAt | date:'short' }}</td>
+          <td *ngIf="canRemove()">
+            <button class="btn-remove" (click)="removeItem(item.comicId)">Remove</button>
+          </td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr *ngIf="cart.discountAmount && cart.discountAmount > 0">
+          <td>Discount</td>
+          <td class="discount-savings">-{{ cart.discountAmount | currency }}
+            <span *ngIf="cart.discountDescription" class="discount-desc">({{ cart.discountDescription }})</span>
+          </td>
+          <td></td>
+          <td *ngIf="canRemove()"></td>
+        </tr>
+        <tr>
+          <td><strong>Total</strong></td>
+          <td><strong>{{ discountedTotal | currency }}</strong></td>
+          <td></td>
+          <td *ngIf="canRemove()"></td>
+        </tr>
+      </tfoot>
+    </table>
+
+    <div *ngIf="cart.items.length === 0" class="empty-cart">
+      Your cart is empty. <a routerLink="/dashboard">Browse comics</a> to start claiming.
+    </div>
+
+    <div class="cart-actions finalizing-note" *ngIf="cart.status === 'FINALIZING'">
+      <p>
+        Until your order is finalized, you cannot claim more books for this order.
+        Once this order is shipped or fulfilled, you can start a new claim cart.
+      </p>
+    </div>
+
+    <div class="cart-actions" *ngIf="canSubmit()">
+      <p class="submit-note">
+        Ready to order? Submitting starts a 24-hour review window before your order is finalized.
+        You can still remove items during this window, but not add new ones.
+      </p>
+      <button class="btn-submit" (click)="submitOrder()" [disabled]="submitting">
+        {{ submitting ? 'Submitting…' : 'Submit Order' }}
+      </button>
+    </div>
+
+    <div class="cart-actions" *ngIf="cart.status === 'FINALIZED'">
+      <p class="finalized-note">
+        Your order is finalized and with the seller. Payment details will be arranged directly.
+      </p>
+    </div>
+  </ng-container>
+
+</div>

@@ -1,0 +1,63 @@
+package org.example.functions;
+
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.microsoft.azure.functions.HttpMethod;
+import com.microsoft.azure.functions.HttpRequestMessage;
+import com.microsoft.azure.functions.HttpResponseMessage;
+import com.microsoft.azure.functions.HttpStatus;
+import com.microsoft.azure.functions.annotation.AuthorizationLevel;
+import com.microsoft.azure.functions.annotation.FunctionName;
+import com.microsoft.azure.functions.annotation.HttpTrigger;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.example.functions.model.ComicBook;
+import org.example.functions.service.ComicService;
+
+import java.util.List;
+import java.util.Optional;
+
+@Slf4j
+public class SearchTriggers {
+
+    private static final ObjectMapper OBJECT_MAPPER = JsonMapper.builder()
+        .addModule(new JavaTimeModule())
+        .enable(JsonGenerator.Feature.WRITE_BIGDECIMAL_AS_PLAIN)
+        .build();
+
+    @FunctionName("getComicsSearch")
+    public HttpResponseMessage getComicsSearch(
+        @HttpTrigger(
+            name = "getComicsSearch",
+            route = "search",
+            methods = {HttpMethod.GET},
+            authLevel = AuthorizationLevel.ANONYMOUS)
+        HttpRequestMessage<Optional<String>> request
+    ) {
+        String titleSearch = request.getQueryParameters().get("title");
+        log.info("Processing getComicsSearch(...) with '{}'.", titleSearch);
+        ComicService comicService = ComicService.getServiceInstance();
+        List<ComicBook> comicBookData = comicService.getComicsSearch(titleSearch);
+        try {
+            return request.createResponseBuilder(HttpStatus.OK)
+                .header("Access-Control-Allow-Origin", "*")
+                .header("Access-Control-Allow-Methods", "*")
+                .header("Content-Type", "application/json")
+                .body(OBJECT_MAPPER.writerWithDefaultPrettyPrinter()
+                    .writeValueAsString(comicBookData))
+                .build();
+        } catch (JsonProcessingException e) {
+            log.error("Severe error processing getComics().", e);
+            return request.createResponseBuilder(HttpStatus.I_AM_A_TEAPOT)
+                .header("Access-Control-Allow-Origin", "*")
+                .header("Access-Control-Allow-Methods", "*")
+                .header("Content-Type", "text/plain")
+                .body(ExceptionUtils.getMessage(e))
+                .build();
+        }
+    }
+
+}

@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" width="80" height="80">
+  <!-- Outer badge circle -->
+  <circle cx="40" cy="40" r="38" fill="#f5c842" stroke="#fff" stroke-width="2"/>
+
+  <!-- Inner circle -->
+  <circle cx="40" cy="40" r="30" fill="#1a2b4a"/>
+
+  <!-- Open book shape -->
+  <g transform="translate(40,40)">
+    <!-- Left page -->
+    <path d="M-18,-12 C-18,-14 -16,-15 -10,-15 L-2,-15 L-2,14 C-6,13 -12,12 -18,10 Z"
+          fill="#fff" opacity="0.95"/>
+    <!-- Spine -->
+    <rect x="-2" y="-15" width="4" height="29" fill="#f5c842"/>
+    <!-- Right page -->
+    <path d="M18,-12 C18,-14 16,-15 10,-15 L2,-15 L2,14 C6,13 12,12 18,10 Z"
+          fill="#fff" opacity="0.95"/>
+    <!-- Left page lines -->
+    <line x1="-15" y1="-8" x2="-4" y2="-8" stroke="#aebccf" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="-15" y1="-3" x2="-4" y2="-3" stroke="#aebccf" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="-15" y1="2"  x2="-4" y2="2"  stroke="#aebccf" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="-15" y1="7"  x2="-4" y2="7"  stroke="#aebccf" stroke-width="1.2" stroke-linecap="round"/>
+    <!-- Right page lines -->
+    <line x1="4" y1="-8" x2="15" y2="-8" stroke="#aebccf" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="4" y1="-3" x2="15" y2="-3" stroke="#aebccf" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="4" y1="2"  x2="15" y2="2"  stroke="#aebccf" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="4" y1="7"  x2="15" y2="7"  stroke="#aebccf" stroke-width="1.2" stroke-linecap="round"/>
+  </g>
+
+  <!-- Starburst pop accent (top-right) -->
+  <polygon points="62,10 64,16 70,14 66,19 72,22 66,23 67,29 62,25 57,29 58,23 52,22 58,19 54,14 60,16"
+           fill="#f5c842" stroke="#1a2b4a" stroke-width="0.8"/>
+</svg>

@@ -1,0 +1,28 @@
+.auth-container {
+  max-width: 480px;
+  margin: 40px auto;
+  padding: 24px;
+}
+.form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 16px;
+}
+.form-group label {
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+.form-group input, .form-group textarea {
+  padding: 8px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+button {
+  padding: 10px 20px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+.success-message { color: green; font-size: 1.1rem; }
+.error-message { color: red; margin-bottom: 12px; }
+.auth-link { margin-top: 16px; }
