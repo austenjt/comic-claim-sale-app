@@ -147,6 +147,15 @@
       <div class="detail-section" *ngIf="comic.comicCondition">
         <div class="detail-section-title">Condition</div>
 
+        <div class="detail-item" *ngIf="!comic.comicCondition?.cgcCondition && !comic.comicCondition?.cbcsCondition">
+          <span class="detail-label">Graded</span>
+          <span class="detail-value">No</span>
+        </div>
+        <div class="detail-item" *ngIf="!comic.comicCondition?.cgcCondition && !comic.comicCondition?.cbcsCondition && comic.comicCondition?.notCertifiedGrade">
+          <span class="detail-label">Raw Grade</span>
+          <span class="detail-value">{{comic.comicCondition?.notCertifiedGrade}}</span>
+        </div>
+
         <!-- CGC -->
         <ng-container *ngIf="comic.comicCondition?.cgcCondition">
           <div class="detail-subsection-title">CGC</div>

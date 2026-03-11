@@ -1,5 +1,6 @@
 export interface ArchivedOrderItem {
   comicTitle: string;
+  comicNumber: string | null;
   price: number;
   claimedAt: string;
 }

@@ -120,6 +120,19 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
       }
     },
     {
+      headerName: "Publisher",
+      field: "publisher",
+      resizable: true,
+      filter: true,
+      sortable: true,
+      editable: true,
+      minWidth: 160,
+      cellEditor: 'agTextCellEditor',
+      cellEditorParams: {
+        maxLength: 256
+      }
+    },
+    {
       headerName: "Volume",
       field: "number.volume",
       resizable: true,
