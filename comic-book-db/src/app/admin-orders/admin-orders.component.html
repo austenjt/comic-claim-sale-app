@@ -161,6 +161,15 @@
         </tr>
       </tfoot>
     </table>
+
+    <div class="order-actions">
+      <button
+        class="btn-delete"
+        [class.btn-delete-confirm]="pendingDeleteId === order.id"
+        (click)="deleteArchivedOrder(order)">
+        {{ pendingDeleteId === order.id ? 'Confirm Delete?' : 'Delete' }}
+      </button>
+    </div>
   </div>
 
 </div>

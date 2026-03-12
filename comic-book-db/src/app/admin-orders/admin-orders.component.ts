@@ -56,6 +56,7 @@ export class AdminOrdersComponent implements OnInit {
   }
 
   pendingFulfillId: string | null = null;
+  pendingDeleteId: string | null = null;
 
   fulfill(cart: Cart) {
     if (this.pendingFulfillId !== cart.id) {
@@ -78,6 +79,18 @@ export class AdminOrdersComponent implements OnInit {
     this.cartService.adminUnclaim(comicId).subscribe({
       next: () => { this.loadOrders(); this.loadOpenCarts(); },
       error: () => this.error = 'Failed to release claim.'
+    });
+  }
+
+  deleteArchivedOrder(order: ArchivedOrder) {
+    if (this.pendingDeleteId !== order.id) {
+      this.pendingDeleteId = order.id;
+      return;
+    }
+    this.pendingDeleteId = null;
+    this.cartService.deleteArchivedOrder(order.id).subscribe({
+      next: () => { this.archivedOrders = this.archivedOrders.filter(o => o.id !== order.id); },
+      error: () => { this.archivedError = 'Failed to delete archived order.'; }
     });
   }
 

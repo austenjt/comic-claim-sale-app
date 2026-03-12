@@ -72,6 +72,12 @@ public class ArchiveService {
         return queryOrders(query);
     }
 
+    /** Permanently deletes an archived order by ID. */
+    public void deleteArchivedOrder(String orderId) {
+        archivedOrdersContainer.deleteItem(orderId, new PartitionKey(orderId), new CosmosItemRequestOptions());
+        log.info("Deleted archived order {}", orderId);
+    }
+
     /** Migrate any fulfilled carts that are not yet in archived-orders (one-time safe call). */
     public void migrateAll(List<Cart> fulfilledCarts) {
         for (Cart cart : fulfilledCarts) {

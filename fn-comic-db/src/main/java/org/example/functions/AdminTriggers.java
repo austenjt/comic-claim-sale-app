@@ -168,6 +168,25 @@ public class AdminTriggers {
         }
     }
 
+    // ─── DELETE /api/orders/archived/{orderId} ────────────────────────────────
+
+    @FunctionName("deleteArchivedOrder")
+    public HttpResponseMessage deleteArchivedOrder(
+        @HttpTrigger(name = "deleteArchivedOrder", route = "orders/archived/{orderId}",
+            methods = {HttpMethod.DELETE}, authLevel = AuthorizationLevel.ANONYMOUS)
+        HttpRequestMessage<Optional<String>> request,
+        @BindingName("orderId") String orderId)
+    {
+        if (requireAdmin(request) == null) return unauthorized(request);
+        try {
+            ArchiveService.getServiceInstance().deleteArchivedOrder(orderId);
+            return cors(request.createResponseBuilder(HttpStatus.NO_CONTENT)).build();
+        } catch (Exception e) {
+            log.error("deleteArchivedOrder error", e);
+            return serverError(request, e);
+        }
+    }
+
     // ─── POST /api/reset ─────────────────────────────────────────────────────
 
     @FunctionName("resetDatabase")

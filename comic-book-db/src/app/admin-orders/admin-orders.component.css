@@ -90,6 +90,20 @@ tfoot td { font-weight: bold; }
   color: #34d399;
 }
 
+.btn-delete {
+  padding: 8px 20px;
+  background: transparent;
+  color: #f87171;
+  border: 1px solid #f87171;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  font-weight: 600;
+}
+.btn-delete:hover { background: rgba(248,113,113,0.1); }
+.btn-delete-confirm { border-color: #ef4444; color: #ef4444; }
+.btn-delete-confirm:hover { background: rgba(239,68,68,0.15); }
+
 .section-hint {
   color: var(--color-text-muted);
   font-size: 0.88rem;
