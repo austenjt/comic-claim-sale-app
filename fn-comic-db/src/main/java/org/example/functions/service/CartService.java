@@ -153,7 +153,7 @@ public class CartService {
         return cart;
     }
 
-    /** Start the 24-hour finalization countdown. Cart must be OPEN with at least one item. */
+    /** Start the 20-hour finalization countdown. Cart must be OPEN with at least one item. */
     public Cart submitOrder(String userId) {
         Cart cart = getActiveCart(userId)
             .orElseThrow(() -> new IllegalStateException("No active cart found."));
@@ -167,7 +167,7 @@ public class CartService {
         cart.setDiscountAmount(discountResult.getAmount());
         cart.setDiscountDescription(discountResult.getDescription());
         cart.setStatus("FINALIZING");
-        cart.setFinalizeAfter(Instant.now().plus(24, ChronoUnit.HOURS).toString());
+        cart.setFinalizeAfter(Instant.now().plus(20, ChronoUnit.HOURS).toString());
         save(cart);
         log.info("Cart {} submitted, finalizes after {}", cart.getId(), cart.getFinalizeAfter());
         return cart;

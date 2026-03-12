@@ -104,7 +104,7 @@ export class AdminOrdersComponent implements OnInit {
 
   statusLabel(status: string): string {
     const labels: Record<string, string> = {
-      OPEN: 'Open', FINALIZING: 'Submitted (24h)', FINALIZED: 'Finalized'
+      OPEN: 'Open', FINALIZING: 'Submitted (20h)', FINALIZED: 'Finalized'
     };
     return labels[status] ?? status;
   }
@@ -113,7 +113,7 @@ export class AdminOrdersComponent implements OnInit {
     if (order.status === 'FINALIZED') return '';
     if (order.status === 'FINALIZING' && order.finalizeAfter) {
       const deadline = new Date(order.finalizeAfter);
-      return `Still in 24h review window — unlocks ${deadline.toLocaleString()}`;
+      return `Still in 20h review window — unlocks ${deadline.toLocaleString()}`;
     }
     return 'Order must be finalized before fulfillment';
   }

@@ -15,7 +15,7 @@ public class Cart {
     // OPEN | FINALIZING | FINALIZED | FULFILLED
     private String status;
     private String createdAt;
-    private String finalizeAfter;  // ISO-8601, set when user submits order (now + 24h)
+    private String finalizeAfter;  // ISO-8601, set when user submits order (now + 20h)
     private String finalizedAt;
     private String fulfilledAt;
     private double discountAmount;       // snapshotted at submit time
