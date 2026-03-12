@@ -79,6 +79,7 @@ export class ComicDetailComponent implements OnInit, AfterViewInit {
   canClaim(comicId: number): boolean {
     return !this.claimedDate(comicId) &&
            !this.comic?.soldTo &&
+           !!this.comic?.salePrice &&
            (this.myCart?.status === 'OPEN' || !this.myCart);
   }
 
