@@ -95,4 +95,13 @@ export class AdminOrdersComponent implements OnInit {
     };
     return labels[status] ?? status;
   }
+
+  fulfillTitle(order: Cart): string {
+    if (order.status === 'FINALIZED') return '';
+    if (order.status === 'FINALIZING' && order.finalizeAfter) {
+      const deadline = new Date(order.finalizeAfter);
+      return `Still in 24h review window — unlocks ${deadline.toLocaleString()}`;
+    }
+    return 'Order must be finalized before fulfillment';
+  }
 }

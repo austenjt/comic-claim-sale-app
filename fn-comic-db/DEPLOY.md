@@ -192,10 +192,21 @@ az cosmosdb sql container create \
 
 ## CORS Configuration
 
-The Angular frontend must be listed as an allowed origin on the Function App.
+The Angular frontend must be listed as an allowed origin on the Function App. Azure Functions handles OPTIONS preflight at the platform level using this list — the code-level `Access-Control-Allow-Origin` headers alone are not sufficient.
+
+**Current allowed origins** (as of 2026-03-11):
+- `https://lightningcomics.rocks` — production custom domain
+- `https://lemon-pebble-00417c11e.6.azurestaticapps.net` — original Azure Static Web Apps URL (kept for backwards compatibility)
+- `http://localhost:4200` — local development
 
 ```bash
-# Allow the production frontend
+# Allow the production custom domain
+az functionapp cors add \
+  --name fn-comicBook-db-1703810588398 \
+  --resource-group comic-db-rg \
+  --allowed-origins "https://lightningcomics.rocks"
+
+# Allow the Azure Static Web Apps URL (original domain)
 az functionapp cors add \
   --name fn-comicBook-db-1703810588398 \
   --resource-group comic-db-rg \
@@ -212,6 +223,8 @@ az functionapp cors show \
   --name fn-comicBook-db-1703810588398 \
   --resource-group comic-db-rg
 ```
+
+> **Note:** When adding a new frontend domain (e.g. a custom domain or new Static Web Apps URL), always run `az functionapp cors add` with the new origin — otherwise all API requests from that domain will fail with CORS errors.
 
 ---
 

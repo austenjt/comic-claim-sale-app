@@ -6,7 +6,7 @@ label {
   font-size: 1.2rem;
   margin-top: 1rem;
   margin-bottom: .5rem;
-
+  color: var(--color-text);
 }
 input {
   padding: .5rem;
@@ -14,31 +14,38 @@ input {
   max-width: 600px;
   box-sizing: border-box;
   display: block;
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
 }
 
 input:focus {
-  outline: #336699 auto 1px;
+  outline: none;
+  border-color: #10b981;
+  box-shadow: 0 0 0 3px rgba(16,185,129,0.2);
 }
 
 li {
   list-style-type: none;
 }
 .search-result li a {
-  border-bottom: 1px solid gray;
-  border-left: 1px solid gray;
-  border-right: 1px solid gray;
+  border-bottom: 1px solid var(--color-border);
+  border-left: 1px solid var(--color-border);
+  border-right: 1px solid var(--color-border);
   display: inline-block;
   width: 100%;
   max-width: 600px;
   padding: .5rem;
   box-sizing: border-box;
   text-decoration: none;
-  color: black;
+  color: var(--color-text);
+  background: var(--color-surface);
 }
 
 .search-result li a:hover {
-  background-color: #435A60;
-  color: white;
+  background-color: #10b981;
+  color: #071020;
 }
 
 ul.search-result {
@@ -49,11 +56,11 @@ ul.search-result {
 .search-result-number {
   margin-left: 6px;
   font-size: 0.85em;
-  color: #666;
+  color: var(--color-text-muted);
 }
 
 .search-result li a:hover .search-result-number {
-  color: rgba(255,255,255,0.75);
+  color: rgba(7,16,32,0.75);
 }
 
 

@@ -20,14 +20,14 @@ h2 {
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(40,70,40,0.09);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
   width: calc(33.333% - 12px);
   overflow: hidden;
   transition: box-shadow 0.2s, transform 0.2s;
 }
 
 .comics-list a:hover {
-  box-shadow: 0 6px 18px rgba(40,70,40,0.15);
+  box-shadow: 0 6px 18px rgba(16,185,129,0.15);
   transform: translateY(-2px);
   background-color: var(--color-surface);
   text-decoration: none;
@@ -51,25 +51,10 @@ h2 {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #899afa;
+  background-color: #071020;
   padding: 14px;
   border-bottom: 1px solid var(--color-border);
   min-height: 80px;
-}
-
-.graded-badge {
-  position: absolute;
-  bottom: 8px;
-  right: 8px;
-  background: #1a1a2e;
-  color: #f0c040;
-  font-size: 0.65rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  padding: 3px 7px;
-  border-radius: 4px;
-  pointer-events: none;
 }
 
 .image-container img {
@@ -94,13 +79,13 @@ h2 {
   flex-grow: 1;
   word-wrap: break-word;
   overflow-wrap: break-word;
-  background-color: white;
+  background-color: var(--color-surface);
 }
 
 .comic-title {
   font-size: 0.95rem;
   margin-bottom: 4px;
-  color: #1a1a2e;
+  color: var(--color-text);
 }
 
 .meta-grid {
@@ -126,13 +111,13 @@ h2 {
 .comic-grade-certified,
 .comic-grade-est {
   font-size: 0.8rem;
-  color: #555;
+  color: var(--color-text-muted);
   margin-bottom: 3px;
 }
 
 .comic-key-issue {
   font-size: 0.8rem;
-  color: #c0392b;
+  color: #f87171;
   font-weight: 600;
   margin-bottom: 3px;
 }
@@ -141,7 +126,7 @@ h2 {
 .comic-price {
   font-size: 0.85rem;
   margin-top: 8px;
-  color: #3d5a80;
+  color: #10b981;
   font-weight: 600;
 }
 .comic-claim-actions {
@@ -157,28 +142,28 @@ h2 {
 }
 
 .btn-claim {
-  background: #3d5a80;
-  color: white;
+  background: #10b981;
+  color: #071020;
   border: none;
 }
-.btn-claim:hover { background: #2e4460; }
+.btn-claim:hover { background: #059669; }
 
 .btn-in-cart {
-  background: white;
-  color: #1b5e20;
-  border: 1px solid #1b5e20;
+  background: transparent;
+  color: #10b981;
+  border: 1px solid #10b981;
   cursor: default;
 }
 
 .btn-claimed {
-  background: #f5f5f5;
-  color: #999;
+  background: #1e3a50;
+  color: #94a3b8;
   border: none;
   cursor: default;
 }
 
 .claim-error {
-  color: #c62828;
+  color: #f87171;
   text-align: center;
   margin-bottom: 12px;
 }
@@ -187,13 +172,13 @@ h2 {
   margin-top: 8px;
   font-size: 0.8rem;
   font-weight: 600;
-  color: #999;
+  color: #94a3b8;
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
 
 .card-sold {
-  opacity: 0.55;
+  opacity: 0.4;
   pointer-events: none;
 }
 
@@ -201,7 +186,7 @@ h2 {
   margin-top: 8px;
   font-size: 0.82rem;
   font-weight: 700;
-  color: #c62828;
+  color: #f87171;
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
@@ -212,16 +197,16 @@ h2 {
   font-size: 0.85rem;
   font-weight: 700;
   cursor: pointer;
-  background: #6a4c93;
+  background: #7c3aed;
   color: white;
   border: none;
 }
-.btn-award:hover { background: #4e3570; }
+.btn-award:hover { background: #6d28d9; }
 
 .award-modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0,0,0,0.7);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -229,24 +214,25 @@ h2 {
 }
 
 .award-modal {
-  background: white;
+  background: #0f2535;
+  border: 1px solid #1e3a50;
   border-radius: 10px;
   padding: 28px 32px;
   min-width: 320px;
   max-width: 480px;
   width: 90%;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
 }
 
 .award-modal h3 {
   margin: 0 0 6px;
   font-size: 1.1rem;
-  color: #1a1a2e;
+  color: #e2f4ff;
 }
 
 .award-subtitle {
   font-size: 0.88rem;
-  color: #555;
+  color: #94a3b8;
   margin-bottom: 16px;
 }
 
@@ -262,7 +248,7 @@ h2 {
 }
 
 .award-user-row {
-  border: 1px solid #ddd;
+  border: 1px solid #1e3a50;
   border-radius: 6px;
   overflow: hidden;
 }
@@ -273,19 +259,19 @@ h2 {
   gap: 10px;
   padding: 10px 14px;
   cursor: pointer;
-  background: #f8f9fa;
-  color: #222;
+  background: #0a1628;
+  color: #e2f4ff;
   font-size: 0.9rem;
   transition: background 0.15s;
 }
-.award-radio-label:hover { background: #e8f0fe; }
+.award-radio-label:hover { background: #1e3a50; }
 .award-radio-label input[type="radio"] { cursor: pointer; flex-shrink: 0; }
 
-.award-user-name { font-weight: 500; color: #222; }
+.award-user-name { font-weight: 500; color: #e2f4ff; }
 
 .award-user-email {
   font-size: 0.78rem;
-  color: #666;
+  color: #94a3b8;
 }
 
 .award-modal-actions {
@@ -297,34 +283,34 @@ h2 {
   padding: 8px 22px;
   border-radius: 4px;
   border: none;
-  background: #2e7d32;
-  color: #fff;
+  background: #10b981;
+  color: #071020;
   cursor: pointer;
   font-size: 0.9rem;
   font-weight: 600;
 }
-.award-confirm-btn:hover:not(:disabled) { background: #1b5e20; }
-.award-confirm-btn:disabled { background: #b0bec5; color: #fff; cursor: not-allowed; }
+.award-confirm-btn:hover:not(:disabled) { background: #059669; }
+.award-confirm-btn:disabled { background: #1e3a50; color: #94a3b8; cursor: not-allowed; }
 
 .award-cancel-btn {
   padding: 8px 22px;
   border-radius: 4px;
-  border: 1px solid #999;
-  background: #fff;
-  color: #333;
+  border: 1px solid #1e3a50;
+  background: transparent;
+  color: #94a3b8;
   cursor: pointer;
   font-size: 0.9rem;
 }
-.award-cancel-btn:hover { background: #f5f5f5; }
+.award-cancel-btn:hover { background: #1e3a50; }
 
 .award-error {
-  color: #c62828;
+  color: #f87171;
   font-size: 0.88rem;
   margin-bottom: 10px;
 }
 
 .award-loading {
-  color: #555;
+  color: #94a3b8;
   font-size: 0.88rem;
   margin-bottom: 10px;
 }
@@ -335,19 +321,34 @@ h2 {
   justify-content: center;
   gap: 12px;
   padding: 48px 0;
-  color: #666;
+  color: #94a3b8;
   font-size: 1rem;
 }
 
 .warming-up-spinner {
   width: 22px;
   height: 22px;
-  border: 3px solid #dee2e6;
-  border-top-color: #3d5a80;
+  border: 3px solid #1e3a50;
+  border-top-color: #10b981;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
 
 @keyframes spin {
   to { transform: rotate(360deg); }
+}
+
+.graded-badge {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  background: #10b981;
+  color: #071020;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 3px 7px;
+  border-radius: 4px;
+  pointer-events: none;
 }

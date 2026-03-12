@@ -1,28 +1,29 @@
 .admin-users { padding: 24px; }
 
 table { width: 100%; border-collapse: collapse; margin-top: 16px; }
-th, td { padding: 10px 12px; border: 1px solid #ddd; text-align: left; }
-th { background: #e8e3dc; font-weight: bold; }
+th, td { padding: 10px 12px; border: 1px solid var(--color-border); text-align: left; color: var(--color-text); }
+th { background: #071020; font-weight: bold; }
 
 button { padding: 6px 14px; cursor: pointer; }
 
 .address-cell { white-space: pre-line; }
 
-.error-message { color: red; margin-bottom: 12px; }
+.error-message { color: #f87171; margin-bottom: 12px; }
 
 .section-heading { margin-top: 40px; }
 
 .pin-modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0,0,0,0.7);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
 }
 .pin-modal {
-  background: #fff;
+  background: #0f2535;
+  border: 1px solid var(--color-border);
   padding: 32px;
   border-radius: 8px;
   max-width: 380px;
@@ -36,32 +37,32 @@ button { padding: 6px 14px; cursor: pointer; }
   font-weight: 700;
   text-transform: uppercase;
 }
-.badge-active { background: #e8f5e9; color: #1b5e20; }
-.badge-suspended { background: #fce4ec; color: #c62828; }
+.badge-active { background: rgba(16,185,129,0.15); color: #34d399; }
+.badge-suspended { background: rgba(248,113,113,0.15); color: #f87171; }
 
 .action-cell { display: flex; gap: 6px; flex-wrap: wrap; }
 
 .btn-suspend {
-  background: white;
-  color: #c62828;
-  border: 1px solid #c62828;
+  background: transparent;
+  color: #f87171;
+  border: 1px solid #f87171;
   border-radius: 4px;
   padding: 4px 10px;
   cursor: pointer;
 }
-.btn-suspend:hover { background: #ffebee; }
+.btn-suspend:hover { background: rgba(248,113,113,0.1); }
 
 .btn-reactivate {
-  background: white;
-  color: #1b5e20;
-  border: 1px solid #1b5e20;
+  background: transparent;
+  color: #34d399;
+  border: 1px solid #34d399;
   border-radius: 4px;
   padding: 4px 10px;
   cursor: pointer;
 }
-.btn-reactivate:hover { background: #e8f5e9; }
+.btn-reactivate:hover { background: rgba(16,185,129,0.1); }
 
-.admin-label { font-style: italic; color: #666; }
+.admin-label { font-style: italic; color: var(--color-text-muted); }
 
 .pin-display {
   font-size: 2.5rem;
@@ -69,5 +70,5 @@ button { padding: 6px 14px; cursor: pointer; }
   letter-spacing: 0.3em;
   margin: 16px 0;
   font-family: monospace;
-  color: #333;
+  color: #10b981;
 }

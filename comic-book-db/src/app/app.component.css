@@ -1,11 +1,11 @@
 .app-header {
-  background-color: #3d5a80;
+  background-color: #071020;
   color: white;
   padding: 0 2rem;
   height: 98px;
   display: flex;
   align-items: stretch;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
 }
 
 .header-logo {
@@ -13,7 +13,7 @@
   align-items: center;
   justify-content: center;
   padding-right: 1.5rem;
-  border-right: 1px solid rgba(255,255,255,0.2);
+  border-right: 1px solid rgba(255,255,255,0.1);
   margin-right: 1.5rem;
   min-width: 80px;
 }
@@ -35,7 +35,7 @@
 .header-title {
   font-size: 1.2rem;
   font-weight: 700;
-  color: white;
+  color: #10b981;
   letter-spacing: 0.02em;
   line-height: 1;
 }
@@ -46,26 +46,26 @@ nav {
 }
 
 nav a {
-  color: rgba(255,255,255,0.85);
+  color: rgba(255,255,255,0.75);
   text-decoration: none;
   padding: 0.35rem 0.85rem;
   border-radius: 4px;
   font-size: 0.9rem;
   font-weight: 500;
   transition: background-color 0.2s, color 0.2s;
-  background-color: rgba(255,255,255,0.15);
+  background-color: rgba(16, 185, 129, 0.08);
   margin: 0;
 }
 
 nav a:hover {
-  background-color: rgba(255,255,255,0.15);
-  color: white;
+  background-color: rgba(16, 185, 129, 0.18);
+  color: #10b981;
   text-decoration: none;
 }
 
 nav a.active {
-  background-color: rgba(255,255,255,0.22);
-  color: white;
+  background-color: rgba(16, 185, 129, 0.22);
+  color: #10b981;
 }
 
 .app-main {
@@ -75,12 +75,12 @@ nav a.active {
 }
 
 .nav-start-here {
-  background-color: rgba(255,255,255,0.2) !important;
+  background-color: rgba(16, 185, 129, 0.2) !important;
   font-weight: 700 !important;
 }
 
 .nav-user {
-  color: rgba(255,255,255,0.85);
+  color: rgba(255,255,255,0.75);
   padding: 0.35rem 0.85rem;
   font-size: 0.9rem;
   font-weight: 500;
@@ -98,13 +98,14 @@ nav a.active {
 }
 
 .app-toast {
-  background: #2e7d32;
-  color: white;
+  background: #0f2535;
+  border: 1px solid #10b981;
+  color: #e2f4ff;
   padding: 12px 16px;
   border-radius: 6px;
   font-size: 0.9rem;
   font-weight: 500;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
   display: flex;
   align-items: center;
   gap: 12px;
@@ -116,7 +117,7 @@ nav a.active {
 .toast-close {
   background: transparent;
   border: none;
-  color: white;
+  color: #94a3b8;
   font-size: 1rem;
   cursor: pointer;
   padding: 0;

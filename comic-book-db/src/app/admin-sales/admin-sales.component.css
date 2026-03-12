@@ -5,24 +5,25 @@
 }
 
 .error-message {
-  color: #c00;
+  color: #f87171;
   margin-bottom: 1rem;
 }
 
 .btn-create {
   margin-bottom: 1.5rem;
   padding: 0.5rem 1.2rem;
-  background: #2a7ae2;
-  color: #fff;
+  background: #10b981;
+  color: #071020;
   border: none;
   border-radius: 4px;
   cursor: pointer;
   font-size: 0.95rem;
+  font-weight: 600;
 }
 
 .discount-form {
-  background: #f8f9fa;
-  border: 1px solid #ddd;
+  background: #071020;
+  border: 1px solid var(--color-border);
   border-radius: 6px;
   padding: 1.5rem;
   margin-bottom: 2rem;
@@ -30,6 +31,7 @@
 
 .discount-form h3 {
   margin-top: 0;
+  color: var(--color-text);
 }
 
 .form-row {
@@ -43,6 +45,7 @@
   width: 180px;
   font-weight: 500;
   flex-shrink: 0;
+  color: var(--color-text-muted);
 }
 
 .form-row input[type="text"],
@@ -50,18 +53,21 @@
 .form-row select {
   flex: 1;
   padding: 0.4rem 0.6rem;
-  border: 1px solid #ccc;
+  border: 1px solid var(--color-border);
   border-radius: 4px;
   font-size: 0.95rem;
+  background: var(--color-surface);
+  color: var(--color-text);
 }
 
 .rule-preview {
-  background: #e9f5ff;
-  border-left: 3px solid #2a7ae2;
+  background: rgba(16,185,129,0.08);
+  border-left: 3px solid #10b981;
   padding: 0.6rem 1rem;
   margin: 1rem 0;
   border-radius: 3px;
   font-size: 0.9rem;
+  color: #34d399;
 }
 
 .form-actions {
@@ -71,17 +77,18 @@
 
 .btn-save {
   padding: 0.45rem 1.2rem;
-  background: #28a745;
-  color: #fff;
+  background: #10b981;
+  color: #071020;
   border: none;
   border-radius: 4px;
   cursor: pointer;
+  font-weight: 600;
 }
 
 .btn-cancel {
   padding: 0.45rem 1.2rem;
-  background: #6c757d;
-  color: #fff;
+  background: #2a3f55;
+  color: #94a3b8;
   border: none;
   border-radius: 4px;
   cursor: pointer;
@@ -95,16 +102,17 @@ table {
 th, td {
   padding: 0.6rem 0.8rem;
   text-align: left;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text);
 }
 
 th {
-  background: #f0f0f0;
+  background: #071020;
   font-weight: 600;
 }
 
 tr.inactive td {
-  color: #999;
+  color: #94a3b8;
 }
 
 .badge {
@@ -116,13 +124,13 @@ tr.inactive td {
 }
 
 .badge-active {
-  background: #d4edda;
-  color: #155724;
+  background: rgba(16,185,129,0.15);
+  color: #34d399;
 }
 
 .badge-inactive {
-  background: #f8d7da;
-  color: #721c24;
+  background: rgba(248,113,113,0.15);
+  color: #f87171;
 }
 
 .actions {
@@ -132,8 +140,9 @@ tr.inactive td {
 
 .btn-edit {
   padding: 0.3rem 0.75rem;
-  background: #ffc107;
-  border: none;
+  background: rgba(251,191,36,0.15);
+  color: #fbbf24;
+  border: 1px solid #fbbf24;
   border-radius: 4px;
   cursor: pointer;
   font-size: 0.85rem;
@@ -141,16 +150,16 @@ tr.inactive td {
 
 .btn-delete {
   padding: 0.3rem 0.75rem;
-  background: #dc3545;
-  color: #fff;
-  border: none;
+  background: transparent;
+  color: #f87171;
+  border: 1px solid #f87171;
   border-radius: 4px;
   cursor: pointer;
   font-size: 0.85rem;
 }
 
 .empty-state {
-  color: #888;
+  color: var(--color-text-muted);
   font-style: italic;
 }
 
@@ -168,6 +177,7 @@ tr.inactive td {
   font-weight: 600;
   cursor: pointer;
   font-size: 0.95rem;
+  color: var(--color-text);
 }
 
 .toggle-label input[type="checkbox"] {
@@ -177,23 +187,23 @@ tr.inactive td {
 }
 
 .award-mode-hint {
-  color: #666;
+  color: var(--color-text-muted);
   font-size: 0.85rem;
 }
 
 .section-divider {
   border: none;
-  border-top: 1px solid #ddd;
+  border-top: 1px solid var(--color-border);
   margin: 1.25rem 0;
 }
 
 .danger-title {
-  color: #b71c1c;
+  color: #f87171;
   margin-bottom: 0.5rem;
 }
 
 .reset-warning {
-  color: #555;
+  color: var(--color-text-muted);
   font-size: 0.9rem;
   margin-bottom: 1rem;
   max-width: 620px;
@@ -208,17 +218,19 @@ tr.inactive td {
 
 .reset-confirm-input {
   padding: 0.4rem 0.75rem;
-  border: 1px solid #ccc;
+  border: 1px solid var(--color-border);
   border-radius: 4px;
   font-size: 0.95rem;
   width: 220px;
+  background: var(--color-surface);
+  color: var(--color-text);
 }
 
 .btn-danger {
   padding: 0.45rem 1.2rem;
-  background: #c62828;
-  color: #fff;
-  border: none;
+  background: transparent;
+  color: #f87171;
+  border: 1px solid #f87171;
   border-radius: 4px;
   cursor: pointer;
   font-weight: 600;
@@ -230,9 +242,9 @@ tr.inactive td {
 }
 
 .success-message {
-  color: #1b5e20;
-  background: #e8f5e9;
-  border: 1px solid #a5d6a7;
+  color: #34d399;
+  background: rgba(16,185,129,0.1);
+  border: 1px solid rgba(16,185,129,0.3);
   border-radius: 4px;
   padding: 0.5rem 0.9rem;
   margin-bottom: 0.75rem;

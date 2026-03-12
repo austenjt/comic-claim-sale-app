@@ -60,7 +60,7 @@
         [class.btn-fulfill-confirm]="pendingFulfillId === order.id"
         [disabled]="order.status !== 'FINALIZED'"
         (click)="fulfill(order)"
-        [title]="order.status !== 'FINALIZED' ? 'Order must be finalized before fulfillment' : ''">
+        [title]="fulfillTitle(order)">
         {{ pendingFulfillId === order.id ? 'Confirm Fulfill?' : 'Mark as Fulfilled' }}
       </button>
     </div>

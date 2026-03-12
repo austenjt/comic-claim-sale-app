@@ -14,22 +14,22 @@
 }
 
 .add-btn {
-  background-color: #3d5a80;
-  color: white;
-  border-color: #3d5a80;
+  background-color: #10b981;
+  color: #071020;
+  border-color: #10b981;
 }
 
 .add-btn:hover {
-  background-color: #2c4a6e;
+  background-color: #059669;
 }
 
 .refresh-btn {
-  background-color: #3d5a80;
-  color: white;
+  background-color: #10b981;
+  color: #071020;
 }
 
 .refresh-btn:hover:not(:disabled) {
-  background-color: #2c4a6e;
+  background-color: #059669;
 }
 
 .refresh-btn:disabled {
@@ -42,19 +42,19 @@
   align-items: center;
   justify-content: center;
   height: 160px;
-  border: 2px dashed #b0c8e0;
+  border: 2px dashed #1e3a50;
   border-radius: 6px;
-  color: #5a7a9a;
+  color: #94a3b8;
   font-size: 0.95rem;
-  background: #f5f9fd;
+  background: #071020;
 }
 
 /* ── Quick Add ──────────────────────────────────────────────────────────── */
 
 .qa-section {
-  border: 1px solid #c8d8ea;
+  border: 1px solid #1e3a50;
   border-radius: 6px;
-  background: #f0f5fa;
+  background: #071020;
   padding: 14px 18px 10px;
   margin-bottom: 14px;
 }
@@ -69,12 +69,12 @@
 .qa-title {
   font-weight: 700;
   font-size: 0.95rem;
-  color: #1e3a5f;
+  color: #e2f4ff;
 }
 
 .qa-step-indicator {
   font-size: 0.8rem;
-  color: #7a9abf;
+  color: #94a3b8;
 }
 
 .qa-fields {
@@ -93,7 +93,7 @@
 .qa-field label {
   font-size: 0.78rem;
   font-weight: 600;
-  color: #3d5a80;
+  color: #10b981;
 }
 
 .qa-field input[type="text"],
@@ -101,11 +101,11 @@
 .qa-field input[type="date"],
 .qa-field select {
   padding: 5px 8px;
-  border: 1px solid #b0c8e0;
+  border: 1px solid #1e3a50;
   border-radius: 4px;
   font-size: 0.88rem;
-  background: white;
-  color: #1a1a1a;
+  background: #0f2535;
+  color: #e2f4ff;
 }
 
 .qa-field-checkbox {
@@ -134,35 +134,35 @@
   cursor: pointer;
   font-size: 0.88rem;
   font-weight: 600;
-  color: white;
+  color: #071020;
   margin: 0;
 }
 
-.qa-btn-next  { background: #3d5a80; }
-.qa-btn-next:hover  { background: #2c4a6e; }
+.qa-btn-next  { background: #10b981; }
+.qa-btn-next:hover  { background: #059669; }
 
-.qa-btn-back  { background: #6c757d; }
-.qa-btn-back:hover  { background: #545b62; }
+.qa-btn-back  { background: #2a3f55; color: #94a3b8; }
+.qa-btn-back:hover  { background: #1e3a50; }
 
-.qa-btn-graded { background: #5c4a8a; }
-.qa-btn-graded:hover { background: #3e2f6e; }
+.qa-btn-graded { background: #7c3aed; color: white; }
+.qa-btn-graded:hover { background: #6d28d9; }
 
-.qa-btn-save  { background: #2e7d32; }
-.qa-btn-save:hover:not(:disabled)  { background: #1b5e20; }
-.qa-btn-save:disabled { background: #b0bec5; cursor: not-allowed; }
+.qa-btn-save  { background: #10b981; }
+.qa-btn-save:hover:not(:disabled)  { background: #059669; }
+.qa-btn-save:disabled { background: #1e3a50; color: #94a3b8; cursor: not-allowed; }
 
-.qa-btn-reset { background: transparent; border: 1px solid #9ab0c8; color: #3d5a80; }
-.qa-btn-reset:hover { background: #dce8f5; }
+.qa-btn-reset { background: transparent; border: 1px solid #1e3a50; color: #94a3b8; }
+.qa-btn-reset:hover { background: #1e3a50; }
 
 .qa-success {
-  color: #2e7d32;
+  color: #34d399;
   font-size: 0.85rem;
   font-weight: 600;
   margin-bottom: 8px;
 }
 
 .qa-error {
-  color: #c62828;
+  color: #f87171;
   font-size: 0.85rem;
   margin-bottom: 8px;
 }
