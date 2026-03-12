@@ -47,14 +47,14 @@ public class UserService {
         this.usersContainer = CosmosDbClient.getInstance().getUsersContainer();
     }
 
-    public User registerUser(String name, String email, String address, String phone, String paymentNotes) {
+    public User registerUser(String name, String email, String address, String phone, String notes) {
         User user = new User();
         user.setId(UUID.randomUUID().toString());
         user.setName(name);
         user.setEmail(email);
         user.setAddress(address);
         user.setPhone(phone);
-        user.setPaymentNotes(paymentNotes);
+        user.setNotes(notes);
         user.setStatus("PENDING");
         user.setCreatedDate(Instant.now().toString());
 
@@ -153,7 +153,7 @@ public class UserService {
         return pin;
     }
 
-    public User updateContactDetails(String userId, String name, String address, String phone, String paymentNotes) {
+    public User updateContactDetails(String userId, String name, String address, String phone, String notes, String preferences) {
         Optional<User> optUser = findById(userId);
         if (optUser.isEmpty()) {
             throw new IllegalArgumentException("User not found: " + userId);
@@ -162,7 +162,8 @@ public class UserService {
         if (name != null) user.setName(name);
         if (address != null) user.setAddress(address);
         if (phone != null) user.setPhone(phone);
-        if (paymentNotes != null) user.setPaymentNotes(paymentNotes);
+        if (notes != null) user.setNotes(notes);
+        if (preferences != null) user.setPreferences(preferences);
         ObjectNode node = OBJECT_MAPPER.valueToTree(user);
         usersContainer.replaceItem(node, userId, new PartitionKey(userId), new CosmosItemRequestOptions());
         log.info("Updated contact details for user: {}", userId);

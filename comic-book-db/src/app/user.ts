@@ -4,7 +4,8 @@ export interface User {
   email: string;
   address?: string;
   phone?: string;
-  paymentNotes?: string;
+  notes?: string;
+  preferences?: string;
   status: 'PENDING' | 'APPROVED' | 'SUSPENDED';
   isAdmin: boolean;
   createdDate?: string;

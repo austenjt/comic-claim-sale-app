@@ -25,7 +25,7 @@
         <th>Email</th>
         <th>Address</th>
         <th>Phone</th>
-        <th>Payment Notes</th>
+        <th>Notes</th>
         <th>Requested</th>
         <th>Action</th>
       </tr>
@@ -36,7 +36,7 @@
         <td>{{ user.email }}</td>
         <td class="address-cell">{{ user.address }}</td>
         <td>{{ user.phone }}</td>
-        <td>{{ user.paymentNotes }}</td>
+        <td>{{ user.notes }}</td>
         <td>{{ user.createdDate | date:'short' }}</td>
         <td><button (click)="approve(user)">Approve</button></td>
       </tr>
@@ -56,7 +56,7 @@
         <th>Email</th>
         <th>Address</th>
         <th>Phone</th>
-        <th>Payment Notes</th>
+        <th>Notes</th>
         <th>Approved</th>
         <th>Status</th>
         <th>Actions</th>
@@ -68,7 +68,7 @@
         <td>{{ user.email }}</td>
         <td class="address-cell">{{ user.address }}</td>
         <td>{{ user.phone }}</td>
-        <td>{{ user.paymentNotes }}</td>
+        <td>{{ user.notes }}</td>
         <td>{{ user.approvedDate | date:'short' }}</td>
         <td>
           <span class="status-badge"

@@ -23,9 +23,14 @@
     </div>
 
     <div class="form-group">
-      <label for="paymentNotes">Payment Notes</label>
-      <textarea id="paymentNotes" [(ngModel)]="paymentNotes" name="paymentNotes" rows="2"
+      <label for="paymentNotes">Notes</label>
+      <textarea id="paymentNotes" [(ngModel)]="notes" name="paymentNotes" rows="2"
                 placeholder="e.g. Venmo @handle, PayPal email, etc."></textarea>
+    </div>
+
+    <div class="form-group">
+      <label for="preferences">Preferences</label>
+      <textarea id="preferences" [(ngModel)]="preferences" name="preferences" rows="2"></textarea>
     </div>
 
     <div class="form-actions">

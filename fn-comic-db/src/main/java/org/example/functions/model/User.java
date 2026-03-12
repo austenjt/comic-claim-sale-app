@@ -10,7 +10,8 @@ public class User {
     private String email;
     private String address;
     private String phone;
-    private String paymentNotes;
+    private String notes;
+    private String preferences;
     private String status; // "PENDING" | "APPROVED"
     private String pinHash;
     private String pinSalt;
@@ -36,8 +37,11 @@ public class User {
     public String getPhone() { return phone; }
     public void setPhone(String phone) { this.phone = phone; }
 
-    public String getPaymentNotes() { return paymentNotes; }
-    public void setPaymentNotes(String paymentNotes) { this.paymentNotes = paymentNotes; }
+    public String getNotes() { return notes; }
+    public void setNotes(String notes) { this.notes = notes; }
+
+    public String getPreferences() { return preferences; }
+    public void setPreferences(String preferences) { this.preferences = preferences; }
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }

@@ -50,7 +50,7 @@ public class UserTriggers {
             String email = getString(json, "email");
             String address = getString(json, "address");
             String phone = getString(json, "phone");
-            String paymentNotes = getString(json, "paymentNotes");
+            String notes = getString(json, "notes");
 
             if (name == null || email == null) {
                 return cors(request.createResponseBuilder(HttpStatus.BAD_REQUEST))
@@ -65,7 +65,7 @@ public class UserTriggers {
                     .build();
             }
 
-            User user = userService.registerUser(name, email, address, phone, paymentNotes);
+            User user = userService.registerUser(name, email, address, phone, notes);
             ObjectNode resp = OBJECT_MAPPER.createObjectNode();
             resp.put("id", user.getId());
             resp.put("status", user.getStatus());
@@ -215,9 +215,10 @@ public class UserTriggers {
             String name = getString(json, "name");
             String address = getString(json, "address");
             String phone = getString(json, "phone");
-            String paymentNotes = getString(json, "paymentNotes");
+            String notes = getString(json, "notes");
+            String preferences = getString(json, "preferences");
             User updated = UserService.getServiceInstance()
-                .updateContactDetails(caller.getId(), name, address, phone, paymentNotes);
+                .updateContactDetails(caller.getId(), name, address, phone, notes, preferences);
             return cors(request.createResponseBuilder(HttpStatus.OK))
                 .header("Content-Type", "application/json")
                 .body(OBJECT_MAPPER.writeValueAsString(safeUserNode(updated)))
@@ -457,7 +458,8 @@ public class UserTriggers {
         node.put("email", user.getEmail());
         node.put("address", user.getAddress());
         node.put("phone", user.getPhone());
-        node.put("paymentNotes", user.getPaymentNotes());
+        node.put("notes", user.getNotes());
+        node.put("preferences", user.getPreferences());
         node.put("status", user.getStatus());
         node.put("isAdmin", user.isAdmin());
         node.put("createdDate", user.getCreatedDate());

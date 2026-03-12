@@ -12,7 +12,8 @@ export class AccountProfileComponent implements OnInit {
   name = '';
   address = '';
   phone = '';
-  paymentNotes = '';
+  notes = '';
+  preferences = '';
 
   saving = false;
   saveSuccess = false;
@@ -26,7 +27,8 @@ export class AccountProfileComponent implements OnInit {
       this.name = user.name ?? '';
       this.address = user.address ?? '';
       this.phone = user.phone ?? '';
-      this.paymentNotes = user.paymentNotes ?? '';
+      this.notes = user.notes ?? '';
+      this.preferences = user.preferences ?? '';
     }
   }
 
@@ -34,7 +36,7 @@ export class AccountProfileComponent implements OnInit {
     this.saving = true;
     this.saveSuccess = false;
     this.saveError = '';
-    this.userService.updateProfile(this.name, this.address, this.phone, this.paymentNotes).subscribe({
+    this.userService.updateProfile(this.name, this.address, this.phone, this.notes, this.preferences).subscribe({
       next: (updated: User) => {
         this.saving = false;
         this.saveSuccess = true;

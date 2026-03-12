@@ -4,7 +4,7 @@
 
   <ul class="search-result">
     <li *ngFor="let comic of comics$ | async">
-      <a routerLink="/detail/{{comic.id}}">
+      <a routerLink="/detail/{{comic.id}}" [class.sold]="comic.soldTo">
         {{comic.title}}
         <span *ngIf="comic.number?.number != null || comic.number?.sentinel != null" class="search-result-number">
           #{{ comic.number?.sentinel ?? comic.number?.number }}
