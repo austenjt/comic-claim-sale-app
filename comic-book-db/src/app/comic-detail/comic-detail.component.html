@@ -434,7 +434,10 @@
               <button *ngIf="canClaim(comic.id)" class="btn-claim-detail" (click)="claim()" [disabled]="actionLoading">
                 {{ actionLoading ? 'Claiming…' : 'Claim' }}
               </button>
-              <span *ngIf="!canClaim(comic.id)" class="claim-blocked">
+              <span *ngIf="!comic.salePrice" class="claim-blocked">
+                This item can't be claimed until it is priced.
+              </span>
+              <span *ngIf="comic.salePrice && !canClaim(comic.id)" class="claim-blocked">
                 Your cart must be open to claim new items.
               </span>
             </span>

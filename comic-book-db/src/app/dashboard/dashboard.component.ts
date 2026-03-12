@@ -102,9 +102,10 @@ export class DashboardComponent implements OnInit {
     return !!this.claimedMap[String(comicId)] && !this.isInMyCart(comicId);
   }
 
-  canClaim(comicId: number): boolean {
-    return !this.isInMyCart(comicId) &&
-           !this.isClaimedByOther(comicId) &&
+  canClaim(comic: Comic): boolean {
+    return !!comic.salePrice &&
+           !this.isInMyCart(comic.id) &&
+           !this.isClaimedByOther(comic.id) &&
            (this.myCart?.status === 'OPEN' || !this.myCart);
   }
 

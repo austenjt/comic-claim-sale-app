@@ -65,7 +65,7 @@
               <button *ngIf="isInMyCart(comic.id)" class="btn-in-cart" disabled>
                 In Your Cart
               </button>
-              <button *ngIf="canClaim(comic.id)" class="btn-claim"
+              <button *ngIf="canClaim(comic)" class="btn-claim"
                 (click)="$event.preventDefault(); $event.stopPropagation(); claim(comic)">
                 Claim
               </button>
