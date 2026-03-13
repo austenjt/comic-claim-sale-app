@@ -25,6 +25,7 @@ import { AdminOrdersComponent } from './admin-orders/admin-orders.component';
 import { AccountProfileComponent } from './account-profile/account-profile.component';
 import { OrderHistoryComponent } from './order-history/order-history.component';
 import { AdminSalesComponent } from './admin-sales/admin-sales.component';
+import { ContactComponent } from './contact/contact.component';
 
 @NgModule({
   declarations: [
@@ -43,7 +44,8 @@ import { AdminSalesComponent } from './admin-sales/admin-sales.component';
     AdminOrdersComponent,
     AccountProfileComponent,
     OrderHistoryComponent,
-    AdminSalesComponent
+    AdminSalesComponent,
+    ContactComponent
   ],
   imports: [
     BrowserModule,

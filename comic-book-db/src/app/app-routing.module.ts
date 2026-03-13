@@ -16,6 +16,7 @@ import { AuthGuard } from './auth.guard';
 import { AccountProfileComponent } from './account-profile/account-profile.component';
 import { OrderHistoryComponent } from './order-history/order-history.component';
 import { AdminSalesComponent } from './admin-sales/admin-sales.component';
+import { ContactComponent } from './contact/contact.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
@@ -30,7 +31,8 @@ const routes: Routes = [
   { path: 'profile', component: AccountProfileComponent, canActivate: [AuthGuard] },
   { path: 'admin/orders', component: AdminOrdersComponent, canActivate: [AdminGuard] },
   { path: 'orders', component: OrderHistoryComponent, canActivate: [AuthGuard] },
-  { path: 'admin/sales', component: AdminSalesComponent, canActivate: [AdminGuard] }
+  { path: 'admin/sales', component: AdminSalesComponent, canActivate: [AdminGuard] },
+  { path: 'contact', component: ContactComponent }
 ];
 
 @NgModule({

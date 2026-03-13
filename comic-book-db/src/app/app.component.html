@@ -21,6 +21,7 @@
       </ng-container>
 
       <a *ngIf="!auth.isAdmin()" routerLink="/how-it-works" routerLinkActive="active" class="nav-start-here">Start Here</a>
+      <a *ngIf="!auth.isAdmin()" routerLink="/contact" routerLinkActive="active">Contact</a>
 
       <ng-container *ngIf="!auth.isLoggedIn()">
         <a routerLink="/login" routerLinkActive="active">Login</a>

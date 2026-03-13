@@ -97,6 +97,21 @@ public class UserService {
         }
     }
 
+    public List<User> getAdminUsers() {
+        SqlQuerySpec querySpec = new SqlQuerySpec("SELECT * FROM c WHERE c.isAdmin = true");
+        CosmosPagedIterable<ObjectNode> items = usersContainer.queryItems(
+            querySpec, new CosmosQueryRequestOptions(), ObjectNode.class);
+        List<User> result = new ArrayList<>();
+        for (ObjectNode node : items) {
+            try {
+                result.add(OBJECT_MAPPER.treeToValue(node, User.class));
+            } catch (Exception e) {
+                log.error("Error parsing admin user", e);
+            }
+        }
+        return result;
+    }
+
     public List<User> getPendingUsers() {
         SqlQuerySpec querySpec = new SqlQuerySpec("SELECT * FROM c WHERE c.status = 'PENDING'");
         CosmosPagedIterable<ObjectNode> items = usersContainer.queryItems(

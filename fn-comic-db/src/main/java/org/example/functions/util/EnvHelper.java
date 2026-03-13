@@ -13,6 +13,14 @@ public class EnvHelper {
         return getProp("ADMIN_EMAIL");
     }
 
+    public static String getSendGridApiKey() {
+        return getProp("SENDGRID_API_KEY");
+    }
+
+    public static String getSendGridFromEmail() {
+        return getProp("SENDGRID_FROM_EMAIL");
+    }
+
     static String getProp(String prop) {
         Optional<String> config = Optional.ofNullable(Configuration.getGlobalConfiguration().get(prop));
         return config.orElse(System.getenv(prop));

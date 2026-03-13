@@ -11,9 +11,10 @@ For frontend deployment, see `../comic-book-db/DEPLOY.md`.
 2. [Azure Resource Overview](#azure-resource-overview)
 3. [Local Development](#local-development)
 4. [RBAC Roles](#rbac-roles)
-5. [Cosmos DB Setup](#cosmos-db-setup)
-6. [CORS Configuration](#cors-configuration)
-7. [Build & Deploy](#build--deploy)
+5. [SendGrid Email Setup](#sendgrid-email-setup)
+6. [Cosmos DB Setup](#cosmos-db-setup)
+7. [CORS Configuration](#cors-configuration)
+8. [Build & Deploy](#build--deploy)
 
 ---
 
@@ -132,6 +133,55 @@ az functionapp config appsettings set \
   --name fn-comicBook-db-1703810588398 \
   --resource-group comic-db-rg \
   --settings "ADMIN_EMAIL=<your-admin-email>"
+```
+
+---
+
+## SendGrid Email Setup
+
+The contact form sends email to all admin users via the SendGrid v3 API. No SDK is required — the function uses Java 11's built-in `HttpClient`.
+
+Using a free account at https://app.sendgrid.com/ .
+
+### 1. Create a SendGrid Account
+
+Sign up at **sendgrid.com** (free tier: 100 emails/day) or provision through the Azure Marketplace.
+
+### 2. Create an API Key
+
+In the SendGrid dashboard: **Settings → API Keys → Create API Key**.
+Give it **Mail Send** access (restricted) or Full Access. Copy the key — it is only shown once.
+
+### 3. Verify a Sender Identity
+
+In the SendGrid dashboard: **Settings → Sender Authentication → Single Sender Verification**.
+Enter the email address you want as the `from` address and click the verification link SendGrid sends you.
+This becomes the value for `SENDGRID_FROM_EMAIL`.
+
+### 4. Configure Domain Authentication (Recommended)
+
+For better deliverability, complete domain authentication under **Settings → Sender Authentication → Authenticate Your Domain**. This adds DKIM/SPF DNS records to your domain.
+
+NOTE: If you use Namecheap DNS server, the instructions for copying the CNAME records is not exactly correct.  Be aware.
+
+### 5. Add App Settings to the Function App
+
+```bash
+az functionapp config appsettings set \
+  --name fn-comicBook-db-1703810588398 \
+  --resource-group comic-db-rg \
+  --settings SENDGRID_API_KEY="<your-sendgrid-api-key>" SENDGRID_FROM_EMAIL="<your-verified-sender-email>"
+```
+
+### 6. Add to local.settings.json for local development
+
+```json
+{
+  "Values": {
+    "SENDGRID_API_KEY": "<your-sendgrid-api-key>",
+    "SENDGRID_FROM_EMAIL": "<your-verified-sender-email>"
+  }
+}
 ```
 
 ---
