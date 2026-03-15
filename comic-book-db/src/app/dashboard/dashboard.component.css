@@ -51,7 +51,7 @@ h2 {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #071020;
+  background-color: #1e2a38;
   padding: 14px;
   border-bottom: 1px solid var(--color-border);
   min-height: 80px;
@@ -143,7 +143,7 @@ h2 {
 
 .btn-claim {
   background: #10b981;
-  color: #071020;
+  color: #1e2a38;
   border: none;
 }
 .btn-claim:hover { background: #059669; }
@@ -156,7 +156,7 @@ h2 {
 }
 
 .btn-claimed {
-  background: #1e3a50;
+  background: #4a5c70;
   color: #94a3b8;
   border: none;
   cursor: default;
@@ -214,8 +214,8 @@ h2 {
 }
 
 .award-modal {
-  background: #0f2535;
-  border: 1px solid #1e3a50;
+  background: #3a4a5c;
+  border: 1px solid #4a5c70;
   border-radius: 10px;
   padding: 28px 32px;
   min-width: 320px;
@@ -227,7 +227,7 @@ h2 {
 .award-modal h3 {
   margin: 0 0 6px;
   font-size: 1.1rem;
-  color: #e2f4ff;
+  color: #e8eef4;
 }
 
 .award-subtitle {
@@ -248,7 +248,7 @@ h2 {
 }
 
 .award-user-row {
-  border: 1px solid #1e3a50;
+  border: 1px solid #4a5c70;
   border-radius: 6px;
   overflow: hidden;
 }
@@ -259,15 +259,15 @@ h2 {
   gap: 10px;
   padding: 10px 14px;
   cursor: pointer;
-  background: #0a1628;
-  color: #e2f4ff;
+  background: #2d3a4a;
+  color: #e8eef4;
   font-size: 0.9rem;
   transition: background 0.15s;
 }
-.award-radio-label:hover { background: #1e3a50; }
+.award-radio-label:hover { background: #4a5c70; }
 .award-radio-label input[type="radio"] { cursor: pointer; flex-shrink: 0; }
 
-.award-user-name { font-weight: 500; color: #e2f4ff; }
+.award-user-name { font-weight: 500; color: #e8eef4; }
 
 .award-user-email {
   font-size: 0.78rem;
@@ -284,24 +284,24 @@ h2 {
   border-radius: 4px;
   border: none;
   background: #10b981;
-  color: #071020;
+  color: #1e2a38;
   cursor: pointer;
   font-size: 0.9rem;
   font-weight: 600;
 }
 .award-confirm-btn:hover:not(:disabled) { background: #059669; }
-.award-confirm-btn:disabled { background: #1e3a50; color: #94a3b8; cursor: not-allowed; }
+.award-confirm-btn:disabled { background: #4a5c70; color: #94a3b8; cursor: not-allowed; }
 
 .award-cancel-btn {
   padding: 8px 22px;
   border-radius: 4px;
-  border: 1px solid #1e3a50;
+  border: 1px solid #4a5c70;
   background: transparent;
   color: #94a3b8;
   cursor: pointer;
   font-size: 0.9rem;
 }
-.award-cancel-btn:hover { background: #1e3a50; }
+.award-cancel-btn:hover { background: #4a5c70; }
 
 .award-error {
   color: #f87171;
@@ -328,7 +328,7 @@ h2 {
 .warming-up-spinner {
   width: 22px;
   height: 22px;
-  border: 3px solid #1e3a50;
+  border: 3px solid #4a5c70;
   border-top-color: #10b981;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
@@ -343,7 +343,7 @@ h2 {
   bottom: 8px;
   right: 8px;
   background: #10b981;
-  color: #071020;
+  color: #1e2a38;
   font-size: 0.65rem;
   font-weight: 700;
   letter-spacing: 0.08em;

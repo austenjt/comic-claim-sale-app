@@ -2,7 +2,7 @@
 
 table { width: 100%; border-collapse: collapse; margin-top: 16px; }
 th, td { padding: 10px 12px; border: 1px solid var(--color-border); text-align: left; color: var(--color-text); }
-th { background: #071020; font-weight: bold; }
+th { background: #1e2a38; font-weight: bold; }
 
 button { padding: 6px 14px; cursor: pointer; }
 
@@ -22,7 +22,7 @@ button { padding: 6px 14px; cursor: pointer; }
   z-index: 1000;
 }
 .pin-modal {
-  background: #0f2535;
+  background: #3a4a5c;
   border: 1px solid var(--color-border);
   padding: 32px;
   border-radius: 8px;

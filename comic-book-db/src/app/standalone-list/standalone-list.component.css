@@ -15,7 +15,7 @@
 
 .add-btn {
   background-color: #10b981;
-  color: #071020;
+  color: #1e2a38;
   border-color: #10b981;
 }
 
@@ -25,7 +25,7 @@
 
 .refresh-btn {
   background-color: #10b981;
-  color: #071020;
+  color: #1e2a38;
 }
 
 .refresh-btn:hover:not(:disabled) {
@@ -42,19 +42,19 @@
   align-items: center;
   justify-content: center;
   height: 160px;
-  border: 2px dashed #1e3a50;
+  border: 2px dashed #4a5c70;
   border-radius: 6px;
   color: #94a3b8;
   font-size: 0.95rem;
-  background: #071020;
+  background: #1e2a38;
 }
 
 /* ── Quick Add ──────────────────────────────────────────────────────────── */
 
 .qa-section {
-  border: 1px solid #1e3a50;
+  border: 1px solid #4a5c70;
   border-radius: 6px;
-  background: #071020;
+  background: #1e2a38;
   padding: 14px 18px 10px;
   margin-bottom: 14px;
 }
@@ -69,7 +69,7 @@
 .qa-title {
   font-weight: 700;
   font-size: 0.95rem;
-  color: #e2f4ff;
+  color: #e8eef4;
 }
 
 .qa-step-indicator {
@@ -101,11 +101,11 @@
 .qa-field input[type="date"],
 .qa-field select {
   padding: 5px 8px;
-  border: 1px solid #1e3a50;
+  border: 1px solid #4a5c70;
   border-radius: 4px;
   font-size: 0.88rem;
-  background: #0f2535;
-  color: #e2f4ff;
+  background: #3a4a5c;
+  color: #e8eef4;
 }
 
 .qa-field-checkbox {
@@ -134,25 +134,25 @@
   cursor: pointer;
   font-size: 0.88rem;
   font-weight: 600;
-  color: #071020;
+  color: #1e2a38;
   margin: 0;
 }
 
 .qa-btn-next  { background: #10b981; }
 .qa-btn-next:hover  { background: #059669; }
 
-.qa-btn-back  { background: #2a3f55; color: #94a3b8; }
-.qa-btn-back:hover  { background: #1e3a50; }
+.qa-btn-back  { background: #3d5068; color: #94a3b8; }
+.qa-btn-back:hover  { background: #4a5c70; }
 
 .qa-btn-graded { background: #7c3aed; color: white; }
 .qa-btn-graded:hover { background: #6d28d9; }
 
 .qa-btn-save  { background: #10b981; }
 .qa-btn-save:hover:not(:disabled)  { background: #059669; }
-.qa-btn-save:disabled { background: #1e3a50; color: #94a3b8; cursor: not-allowed; }
+.qa-btn-save:disabled { background: #4a5c70; color: #94a3b8; cursor: not-allowed; }
 
-.qa-btn-reset { background: transparent; border: 1px solid #1e3a50; color: #94a3b8; }
-.qa-btn-reset:hover { background: #1e3a50; }
+.qa-btn-reset { background: transparent; border: 1px solid #4a5c70; color: #94a3b8; }
+.qa-btn-reset:hover { background: #4a5c70; }
 
 .qa-success {
   color: #34d399;

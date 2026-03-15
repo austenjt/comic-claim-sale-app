@@ -10,7 +10,7 @@
   align-items: baseline;
   margin-bottom: 24px;
   padding: 10px 14px;
-  background: #071020;
+  background: #1e2a38;
   border: 1px solid var(--color-border);
   border-radius: 6px;
 }
@@ -68,7 +68,7 @@
 .form-actions button {
   padding: 9px 24px;
   background: #10b981;
-  color: #071020;
+  color: #1e2a38;
   border: none;
   border-radius: 4px;
   font-size: 1rem;

@@ -12,7 +12,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 12px 16px;
-  background: #071020;
+  background: #1e2a38;
   border-bottom: 1px solid var(--color-border);
   flex-wrap: wrap;
   gap: 8px;
@@ -37,10 +37,10 @@
 
 table { width: 100%; border-collapse: collapse; }
 th, td { padding: 10px 16px; border-bottom: 1px solid var(--color-border); text-align: left; color: var(--color-text); }
-th { font-weight: bold; background: #071020; }
+th { font-weight: bold; background: #1e2a38; }
 tfoot td { font-weight: bold; }
 
-.order-actions { padding: 12px 16px; background: #071020; border-top: 1px solid var(--color-border); }
+.order-actions { padding: 12px 16px; background: #1e2a38; border-top: 1px solid var(--color-border); }
 
 .btn-fulfill {
   padding: 8px 20px;
@@ -53,7 +53,7 @@ tfoot td { font-weight: bold; }
   font-weight: 600;
 }
 .btn-fulfill:hover:not(:disabled) { background: rgba(16,185,129,0.1); }
-.btn-fulfill:disabled { background: transparent; color: #2a3f55; border-color: #2a3f55; cursor: not-allowed; }
+.btn-fulfill:disabled { background: transparent; color: #3d5068; border-color: #3d5068; cursor: not-allowed; }
 .btn-fulfill-confirm { border-color: #fbbf24; color: #fbbf24; }
 .btn-fulfill-confirm:hover:not(:disabled) { background: rgba(251,191,36,0.1); }
 
@@ -82,7 +82,7 @@ tfoot td { font-weight: bold; }
 }
 
 .archived-card {
-  border-color: #1e3a50;
+  border-color: #4a5c70;
 }
 
 .status-fulfilled {

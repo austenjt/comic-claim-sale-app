@@ -4,15 +4,15 @@
 @import 'ag-grid-community/styles/ag-theme-alpine.css';
 
 :root {
-  --color-bg: #0a1628;
-  --color-surface: #0f2535;
+  --color-bg: #2d3a4a;
+  --color-surface: #3a4a5c;
   --color-accent: #10b981;
   --color-accent-dark: #059669;
-  --color-text: #e2f4ff;
-  --color-text-muted: #94a3b8;
-  --color-border: #1e3a50;
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
-  --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
+  --color-text: #e8eef4;
+  --color-text-muted: #8da3b8;
+  --color-border: #4a5c70;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.15);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.2);
   --radius: 6px;
 }
 
@@ -69,7 +69,7 @@ button {
   border: none;
   border-radius: var(--radius);
   cursor: pointer;
-  color: #071020;
+  color: #1e2a38;
   font-family: inherit;
   font-size: 0.95rem;
   font-weight: 600;
@@ -84,7 +84,7 @@ button:hover {
 }
 
 button:disabled {
-  background-color: #2a3f55;
+  background-color: #3d5068;
   color: #94a3b8;
   cursor: not-allowed;
 }
@@ -130,19 +130,19 @@ hr {
 /* ── AG Grid — Inkwell theme overrides ─────────────────────────────────── */
 .ag-theme-alpine {
   --ag-alpine-active-color: #10b981;
-  --ag-background-color: #0f2535;
-  --ag-foreground-color: #e2f4ff;
-  --ag-border-color: #1e3a50;
-  --ag-secondary-border-color: #1e3a50;
-  --ag-row-border-color: #1e3a50;
-  --ag-cell-horizontal-border: solid #1e3a50;
+  --ag-background-color: #3a4a5c;
+  --ag-foreground-color: #e8eef4;
+  --ag-border-color: #4a5c70;
+  --ag-secondary-border-color: #4a5c70;
+  --ag-row-border-color: #4a5c70;
+  --ag-cell-horizontal-border: solid #4a5c70;
 
-  --ag-header-background-color: #071020;
-  --ag-header-foreground-color: #e2f4ff;
-  --ag-header-column-separator-color: #1e3a50;
+  --ag-header-background-color: #1e2a38;
+  --ag-header-foreground-color: #e8eef4;
+  --ag-header-column-separator-color: #4a5c70;
   --ag-header-column-resize-handle-color: #10b981;
 
-  --ag-odd-row-background-color: #0a1628;
+  --ag-odd-row-background-color: #2d3a4a;
   --ag-row-hover-color: rgba(16, 185, 129, 0.08);
   --ag-selected-row-background-color: rgba(16, 185, 129, 0.15);
   --ag-column-hover-color: rgba(16, 185, 129, 0.04);
@@ -150,28 +150,28 @@ hr {
   --ag-range-selection-border-color: #10b981;
   --ag-range-selection-background-color: rgba(16, 185, 129, 0.1);
 
-  --ag-input-border-color: #1e3a50;
+  --ag-input-border-color: #4a5c70;
   --ag-input-focus-border-color: #10b981;
   --ag-input-focus-box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
 
-  --ag-checkbox-background-color: #0f2535;
+  --ag-checkbox-background-color: #3a4a5c;
   --ag-checkbox-checked-color: #10b981;
-  --ag-checkbox-unchecked-color: #1e3a50;
+  --ag-checkbox-unchecked-color: #4a5c70;
   --ag-checkbox-indeterminate-color: #10b981;
 
-  --ag-chip-background-color: #1e3a50;
+  --ag-chip-background-color: #4a5c70;
   --ag-disabled-foreground-color: #94a3b8;
 
-  --ag-control-panel-background-color: #071020;
-  --ag-subheader-background-color: #071020;
-  --ag-tool-panel-background-color: #071020;
-  --ag-tool-panel-separator-color: #1e3a50;
+  --ag-control-panel-background-color: #1e2a38;
+  --ag-subheader-background-color: #1e2a38;
+  --ag-tool-panel-background-color: #1e2a38;
+  --ag-tool-panel-separator-color: #4a5c70;
 
-  --ag-menu-background-color: #0f2535;
-  --ag-menu-border-color: #1e3a50;
+  --ag-menu-background-color: #3a4a5c;
+  --ag-menu-border-color: #4a5c70;
 
   --ag-value-change-value-highlight-background-color: rgba(16, 185, 129, 0.25);
 
-  --ag-modal-overlay-background-color: rgba(7, 16, 32, 0.7);
+  --ag-modal-overlay-background-color: rgba(30, 42, 56, 0.7);
   --ag-icon-color: #94a3b8;
 }

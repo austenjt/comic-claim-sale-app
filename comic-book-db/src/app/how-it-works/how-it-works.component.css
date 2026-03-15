@@ -20,7 +20,7 @@ h1 {
   margin-bottom: 10px;
   border-bottom: 2px solid #10b981;
   padding-bottom: 4px;
-  color: #e2f4ff;
+  color: #e8eef4;
 }
 
 .hiw-section p, .hiw-section li {
@@ -55,23 +55,23 @@ h1 {
 
 .hiw-btn-primary {
   background: #10b981;
-  color: #071020;
+  color: #1e2a38;
 }
 
 .hiw-btn-primary:hover {
   background: #059669;
-  color: #071020;
+  color: #1e2a38;
 }
 
 .hiw-btn-secondary {
   background: #10b981;
-  color: #071020;
+  color: #1e2a38;
   border: none;
 }
 
 .hiw-btn-secondary:hover {
   background: #059669;
-  color: #071020;
+  color: #1e2a38;
 }
 
 .hiw-admin-divider {
@@ -94,7 +94,7 @@ h1 {
 }
 
 .hiw-admin {
-  background: #071020;
+  background: #1e2a38;
   border-left: 3px solid #10b981;
   border-radius: 0 6px 6px 0;
   padding: 16px 20px;

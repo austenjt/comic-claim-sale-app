@@ -162,7 +162,7 @@ This becomes the value for `SENDGRID_FROM_EMAIL`.
 
 For better deliverability, complete domain authentication under **Settings → Sender Authentication → Authenticate Your Domain**. This adds DKIM/SPF DNS records to your domain.
 
-NOTE: If you use Namecheap DNS server, the instructions for copying the CNAME records is not exactly correct.  Be aware.
+NOTE: If you use Namecheap DNS server, the instructions for copying the CNAME records is not exactly correct.  Be aware.WHen
 
 ### 5. Add App Settings to the Function App
 
