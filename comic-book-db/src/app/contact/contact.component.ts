@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { ConfigService } from '../config.service';
 
 @Component({
   selector: 'app-contact',
@@ -17,7 +18,11 @@ export class ContactComponent {
   sent = false;
   sendError = '';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private configService: ConfigService) {}
+
+  get gmailEnabled(): boolean {
+    return this.configService.gmailEnabled;
+  }
 
   submit() {
     this.sending = true;

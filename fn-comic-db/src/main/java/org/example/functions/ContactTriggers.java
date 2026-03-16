@@ -12,14 +12,11 @@ import com.microsoft.azure.functions.annotation.AuthorizationLevel;
 import com.microsoft.azure.functions.annotation.FunctionName;
 import com.microsoft.azure.functions.annotation.HttpTrigger;
 import lombok.extern.slf4j.Slf4j;
-import org.example.functions.model.User;
 import org.example.functions.service.EmailService;
-import org.example.functions.service.UserService;
 import org.example.functions.util.EnvHelper;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Slf4j
 public class ContactTriggers {
@@ -54,24 +51,24 @@ public class ContactTriggers {
                     .body("name, email, and message are required").build();
             }
 
-            if (EnvHelper.getSendGridApiKey() == null || EnvHelper.getSendGridFromEmail() == null) {
-                log.error("SENDGRID_API_KEY or SENDGRID_FROM_EMAIL not configured");
+            if (EnvHelper.getGmailUsername() == null || EnvHelper.getGmailClientId() == null
+                    || EnvHelper.getGmailClientSecret() == null || EnvHelper.getGmailRefreshToken() == null) {
+                log.error("Gmail OAuth2 credentials not fully configured");
                 return cors(request.createResponseBuilder(HttpStatus.INTERNAL_SERVER_ERROR))
                     .body("Email service not configured").build();
             }
 
-            List<User> admins = UserService.getServiceInstance().getAdminUsers();
-            if (admins.isEmpty()) {
-                log.warn("No admin users found to receive contact form submission");
+            String adminEmail = EnvHelper.getAdminEmail();
+            if (adminEmail == null) {
+                log.warn("ADMIN_EMAIL not configured — no recipient for contact form");
                 return cors(request.createResponseBuilder(HttpStatus.INTERNAL_SERVER_ERROR))
                     .body("No recipients configured").build();
             }
 
-            List<String> adminEmails = admins.stream().map(User::getEmail).collect(Collectors.toList());
             String subject = "Contact Form: " + senderName;
             String text = "Name: " + senderName + "\nEmail: " + senderEmail + "\n\nMessage:\n" + message;
 
-            EmailService.getServiceInstance().send(adminEmails, senderEmail, subject, text);
+            EmailService.getServiceInstance().send(List.of(adminEmail), senderEmail, subject, text);
 
             log.info("Contact form submitted by {}", senderEmail);
             return cors(request.createResponseBuilder(HttpStatus.OK))

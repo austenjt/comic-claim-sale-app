@@ -32,37 +32,39 @@
       </div>
     </div>
 
-    <p class="reach-out">
+    <p *ngIf="gmailEnabled" class="reach-out">
       Also, if you see something you like, want to make an offer, or looking for a specific issue?
       Use the form below and I'll get back to you within 1–2 business days.
     </p>
   </div>
 
-  <div *ngIf="sent" class="msg-success">&#10003; Your message has been sent — I'll be in touch soon!</div>
+  <ng-container *ngIf="gmailEnabled">
+    <div *ngIf="sent" class="msg-success">&#10003; Your message has been sent — I'll be in touch soon!</div>
 
-  <form *ngIf="!sent" (ngSubmit)="submit()" #contactForm="ngForm" class="contact-form">
-    <div class="form-group">
-      <label for="name">Name</label>
-      <input id="name" type="text" [(ngModel)]="name" name="name" required />
-    </div>
+    <form *ngIf="!sent" (ngSubmit)="submit()" #contactForm="ngForm" class="contact-form">
+      <div class="form-group">
+        <label for="name">Name</label>
+        <input id="name" type="text" [(ngModel)]="name" name="name" required />
+      </div>
 
-    <div class="form-group">
-      <label for="email">Email</label>
-      <input id="email" type="email" [(ngModel)]="email" name="email" required />
-    </div>
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input id="email" type="email" [(ngModel)]="email" name="email" required />
+      </div>
 
-    <div class="form-group">
-      <label for="message">Message</label>
-      <textarea id="message" [(ngModel)]="message" name="message" rows="6" required
-                placeholder="Ask about a listing, make an offer, or say hello!"></textarea>
-    </div>
+      <div class="form-group">
+        <label for="message">Message</label>
+        <textarea id="message" [(ngModel)]="message" name="message" rows="6" required
+                  placeholder="Ask about a listing, make an offer, or say hello!"></textarea>
+      </div>
 
-    <div class="form-actions">
-      <button type="submit" [disabled]="sending || !contactForm.valid">
-        {{ sending ? 'Sending…' : 'Send Message' }}
-      </button>
-    </div>
+      <div class="form-actions">
+        <button type="submit" [disabled]="sending || !contactForm.valid">
+          {{ sending ? 'Sending…' : 'Send Message' }}
+        </button>
+      </div>
 
-    <p *ngIf="sendError" class="msg-error">&#10007; {{ sendError }}</p>
-  </form>
+      <p *ngIf="sendError" class="msg-error">&#10007; {{ sendError }}</p>
+    </form>
+  </ng-container>
 </div>

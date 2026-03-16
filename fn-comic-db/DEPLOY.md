@@ -11,7 +11,7 @@ For frontend deployment, see `../comic-book-db/DEPLOY.md`.
 2. [Azure Resource Overview](#azure-resource-overview)
 3. [Local Development](#local-development)
 4. [RBAC Roles](#rbac-roles)
-5. [SendGrid Email Setup](#sendgrid-email-setup)
+5. [Gmail OAuth2 Email Setup](#gmail-oauth2-email-setup)
 6. [Cosmos DB Setup](#cosmos-db-setup)
 7. [CORS Configuration](#cors-configuration)
 8. [Build & Deploy](#build--deploy)
@@ -63,7 +63,11 @@ Create `local.settings.json` in the project root. **Do not commit this file** �
     "AzureWebJobsStorage": "UseDevelopmentStorage=true",
     "FUNCTIONS_WORKER_RUNTIME": "java",
     "COSMOS_ENDPOINT": "https://<your-cosmos-account>.documents.azure.com:443/",
-    "ADMIN_EMAIL": "<your-admin-email>"
+    "ADMIN_EMAIL": "<your-admin-email>",
+    "GMAIL_USERNAME": "<your-gmail-address>",
+    "GMAIL_CLIENT_ID": "<your-client-id>.apps.googleusercontent.com",
+    "GMAIL_CLIENT_SECRET": "<your-client-secret>",
+    "GMAIL_REFRESH_TOKEN": "<your-refresh-token>"
   }
 }
 ```
@@ -127,7 +131,7 @@ az functionapp config appsettings set \
   --settings "COSMOS_ENDPOINT=https://<your-cosmos-account>.documents.azure.com:443/"
 ```
 
-**Step 4: Set ADMIN_EMAIL** (the email address that receives admin privileges on first registration)
+**Step 4: Set ADMIN_EMAIL** (the email address that receives admin privileges on first registration; must match `GMAIL_USERNAME` if the email form is enabled)
 ```bash
 az functionapp config appsettings set \
   --name fn-comicBook-db-1703810588398 \
@@ -137,49 +141,59 @@ az functionapp config appsettings set \
 
 ---
 
-## SendGrid Email Setup
+## Gmail OAuth2 Email Setup
 
-The contact form sends email to all admin users via the SendGrid v3 API. No SDK is required — the function uses Java 11's built-in `HttpClient`.
+The contact form sends email via the **Gmail REST API** using OAuth2 user credentials (`google-api-services-gmail` + `google-auth-library-oauth2-http`). No Gmail password is stored — the app holds a refresh token and the Google auth library exchanges it for a short-lived access token automatically.
 
-Using a free account at https://app.sendgrid.com/ .
+The contact form can be toggled on or off with the `GMAIL_ENABLED` app setting (`true`/`false`). When `false`, the Angular frontend hides the form entirely and the backend rejects submissions. Defaults to `true` if the setting is absent.
 
-### 1. Create a SendGrid Account
+> **Note:** `GMAIL_USERNAME` and `ADMIN_EMAIL` must be the same Gmail address when the email form is enabled. `ADMIN_EMAIL` identifies the single admin user; `GMAIL_USERNAME` is the Google account the OAuth credentials were created under and is the address that sends and receives contact form emails.
 
-Sign up at **sendgrid.com** (free tier: 100 emails/day) or provision through the Azure Marketplace.
+### 1. Create a Google Cloud Project and Enable the Gmail API
 
-### 2. Create an API Key
+1. Go to **console.cloud.google.com** and create a new project (or select an existing one).
+2. Navigate to **APIs & Services → Library**, search for **Gmail API**, and enable it.
 
-In the SendGrid dashboard: **Settings → API Keys → Create API Key**.
-Give it **Mail Send** access (restricted) or Full Access. Copy the key — it is only shown once.
+### 2. Create OAuth 2.0 Credentials
 
-### 3. Verify a Sender Identity
+1. Go to **APIs & Services → Credentials → Create Credentials → OAuth 2.0 Client ID**.
+2. Choose **Desktop app** as the application type.
+3. Download the JSON — it contains your `client_id` and `client_secret`.
 
-In the SendGrid dashboard: **Settings → Sender Authentication → Single Sender Verification**.
-Enter the email address you want as the `from` address and click the verification link SendGrid sends you.
-This becomes the value for `SENDGRID_FROM_EMAIL`.
+### 3. Obtain a Refresh Token (one-time)
 
-### 4. Configure Domain Authentication (Recommended)
+Use the **OAuth 2.0 Playground** at `https://developers.google.com/oauthplayground`:
 
-For better deliverability, complete domain authentication under **Settings → Sender Authentication → Authenticate Your Domain**. This adds DKIM/SPF DNS records to your domain.
+1. Click the gear icon → check **"Use your own OAuth credentials"** → enter your `client_id` and `client_secret`.
+2. In the scope list, enter `https://mail.google.com/` and authorize it with your Gmail account.
+3. Click **"Exchange authorization code for tokens"** and copy the **Refresh token**.
 
-NOTE: If you use Namecheap DNS server, the instructions for copying the CNAME records is not exactly correct.  Be aware.WHen
-
-### 5. Add App Settings to the Function App
+### 4. Add App Settings to the Function App
 
 ```bash
 az functionapp config appsettings set \
   --name fn-comicBook-db-1703810588398 \
   --resource-group comic-db-rg \
-  --settings SENDGRID_API_KEY="<your-sendgrid-api-key>" SENDGRID_FROM_EMAIL="<your-verified-sender-email>"
+  --settings \
+    GMAIL_ENABLED="true" \
+    GMAIL_USERNAME="<your-gmail-address>" \
+    GMAIL_CLIENT_ID="<your-client-id>.apps.googleusercontent.com" \
+    GMAIL_CLIENT_SECRET="<your-client-secret>" \
+    GMAIL_REFRESH_TOKEN="<your-refresh-token>"
 ```
 
-### 6. Add to local.settings.json for local development
+To disable the contact form without redeploying, set `GMAIL_ENABLED=false` in the Function App settings — the frontend will hide the form on next load.
+
+### 5. Add to local.settings.json for local development
 
 ```json
 {
   "Values": {
-    "SENDGRID_API_KEY": "<your-sendgrid-api-key>",
-    "SENDGRID_FROM_EMAIL": "<your-verified-sender-email>"
+    "GMAIL_ENABLED": "true",
+    "GMAIL_USERNAME": "<your-gmail-address>",
+    "GMAIL_CLIENT_ID": "<your-client-id>.apps.googleusercontent.com",
+    "GMAIL_CLIENT_SECRET": "<your-client-secret>",
+    "GMAIL_REFRESH_TOKEN": "<your-refresh-token>"
   }
 }
 ```

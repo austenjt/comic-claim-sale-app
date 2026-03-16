@@ -18,6 +18,7 @@ import org.example.functions.model.User;
 import org.example.functions.service.EmailService;
 import org.example.functions.service.SessionService;
 import org.example.functions.service.UserService;
+import org.example.functions.util.EnvHelper;
 
 import java.util.List;
 import java.util.Optional;
@@ -68,17 +69,18 @@ public class UserTriggers {
 
             User user = userService.registerUser(name, email, address, phone, notes);
 
-            // Notify all admins of the new account request
-            List<String> adminEmails = userService.getAdminUsers().stream()
-                .map(User::getEmail).collect(java.util.stream.Collectors.toList());
-            String subject = "New Account Request: " + name;
-            String emailBody = "A new user has requested an account.\n\n"
-                + "Name:    " + name + "\n"
-                + "Email:   " + email + "\n"
-                + (address != null ? "Address: " + address + "\n" : "")
-                + (phone   != null ? "Phone:   " + phone   + "\n" : "")
-                + "\nLog in to approve or reject this request.";
-            EmailService.getServiceInstance().send(adminEmails, email, subject, emailBody);
+            // Notify the admin of the new account request
+            String adminEmail = EnvHelper.getAdminEmail();
+            if (adminEmail != null) {
+                String subject = "New Account Request: " + name;
+                String emailBody = "A new user has requested an account.\n\n"
+                    + "Name:    " + name + "\n"
+                    + "Email:   " + email + "\n"
+                    + (address != null ? "Address: " + address + "\n" : "")
+                    + (phone   != null ? "Phone:   " + phone   + "\n" : "")
+                    + "\nLog in to approve or reject this request.";
+                EmailService.getServiceInstance().send(List.of(adminEmail), email, subject, emailBody);
+            }
 
             ObjectNode resp = OBJECT_MAPPER.createObjectNode();
             resp.put("id", user.getId());
