@@ -71,6 +71,8 @@ public class ComicBook {
 
     // Collection & storage
     private Integer collectionGroup;
+    @com.fasterxml.jackson.annotation.JsonProperty("isContainer")
+    private boolean isContainer;
     private String storageLocation;
 
     // Metadata from externally supported sites

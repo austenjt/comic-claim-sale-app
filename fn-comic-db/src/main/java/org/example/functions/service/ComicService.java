@@ -143,6 +143,19 @@ public class ComicService {
         return result;
     }
 
+    public List<ComicBook> getComicsByCollectionGroup(int collectionGroup) {
+        SqlQuerySpec querySpec = new SqlQuerySpec(
+            "SELECT * FROM c WHERE c.collectionGroup = @collectionGroup",
+            List.of(new SqlParameter("@collectionGroup", collectionGroup)));
+        CosmosPagedIterable<ObjectNode> items = comicsContainer.queryItems(
+            querySpec, new CosmosQueryRequestOptions(), ObjectNode.class);
+        List<ComicBook> result = new ArrayList<>();
+        for (ObjectNode node : items) {
+            result.add(nodeToComicBook(node));
+        }
+        return result;
+    }
+
     public Optional<ComicBook> findByCertificationId(String certificationId) {
         SqlQuerySpec querySpec = new SqlQuerySpec(
             "SELECT * FROM c WHERE c.comicCondition.certificationId = @certId",

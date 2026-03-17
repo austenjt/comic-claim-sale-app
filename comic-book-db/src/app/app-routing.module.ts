@@ -17,11 +17,13 @@ import { AccountProfileComponent } from './account-profile/account-profile.compo
 import { OrderHistoryComponent } from './order-history/order-history.component';
 import { AdminSalesComponent } from './admin-sales/admin-sales.component';
 import { ContactComponent } from './contact/contact.component';
+import { SetDetailComponent } from './set-detail/set-detail.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
   { path: 'dashboard', component: DashboardComponent },
   { path: 'detail/:id', component: ComicDetailComponent },
+  { path: 'set/:id', component: SetDetailComponent },
   { path: 'comics', component: ComicsComponent },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: AccountRequestComponent },

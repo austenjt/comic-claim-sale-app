@@ -85,6 +85,35 @@ public class CartTriggers {
         }
     }
 
+    // ─── POST /api/cart/set ───────────────────────────────────────────────────
+
+    @FunctionName("addCartSet")
+    public HttpResponseMessage addCartSet(
+        @HttpTrigger(name = "addCartSet", route = "cart/set",
+            methods = {HttpMethod.POST}, authLevel = AuthorizationLevel.ANONYMOUS)
+        HttpRequestMessage<Optional<String>> request)
+    {
+        User user = requireApproved(request);
+        if (user == null) return unauthorized(request);
+        try {
+            JsonNode body = OBJECT_MAPPER.readTree(request.getBody().orElse("{}"));
+            String containerId = getString(body, "containerId");
+            if (containerId == null) return badRequest(request, "containerId is required");
+
+            Cart cart = CartService.getServiceInstance().addSet(user, containerId);
+            return cors(request.createResponseBuilder(HttpStatus.OK))
+                .header("Content-Type", "application/json")
+                .body(OBJECT_MAPPER.writeValueAsString(cart)).build();
+        } catch (IllegalStateException e) {
+            return cors(request.createResponseBuilder(HttpStatus.CONFLICT)).body(e.getMessage()).build();
+        } catch (IllegalArgumentException e) {
+            return badRequest(request, e.getMessage());
+        } catch (Exception e) {
+            log.error("addCartSet error", e);
+            return serverError(request, e);
+        }
+    }
+
     // ─── DELETE /api/cart/items/{comicId} ─────────────────────────────────────
 
     @FunctionName("removeCartItem")

@@ -1,0 +1,123 @@
+<div *ngIf="loading" class="warming-up">
+  <div class="warming-up-spinner"></div>
+  <span>Loading set…</span>
+</div>
+
+<div *ngIf="!loading && container">
+  <button type="button" (click)="goBack()">go back</button>
+
+  <div class="set-heading">
+    <span class="set-badge-lg">SET</span>
+    <h2>{{ container.title | uppercase }}</h2>
+  </div>
+
+  <div class="content-container">
+
+    <!-- Images from the container comic -->
+    <div class="images-column">
+      <div class="large-image">
+        <img [src]="getImageURL(container.largeCachedImageId) | async" alt="Set Cover" loading="lazy">
+      </div>
+      <div class="large-image" *ngIf="container.largeBackImageId">
+        <img [src]="getImageURL(container.largeBackImageId) | async" alt="Set Back Cover" loading="lazy">
+      </div>
+    </div>
+
+    <!-- Set metadata -->
+    <div class="details">
+
+      <div class="detail-section">
+        <div class="detail-section-title">Set Details</div>
+        <div class="detail-item" *ngIf="container.series && container.series !== ''">
+          <span class="detail-label">Series</span>
+          <span class="detail-value">{{ container.series }}</span>
+        </div>
+        <div class="detail-item" *ngIf="container.publisher">
+          <span class="detail-label">Publisher</span>
+          <span class="detail-value">{{ container.publisher }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Books in Set</span>
+          <span class="detail-value">{{ setMembers.length }}</span>
+        </div>
+        <div class="detail-item" *ngIf="totalPrice > 0">
+          <span class="detail-label">Total Price</span>
+          <span class="detail-value">{{ totalPrice | currency:'USD':'symbol':'1.2-2' }}</span>
+        </div>
+        <div class="detail-item" *ngIf="container.publicNotes">
+          <span class="detail-label">Notes</span>
+          <span class="detail-value">{{ container.publicNotes }}</span>
+        </div>
+      </div>
+
+      <div class="detail-section">
+        <div class="detail-section-title">Claim Status</div>
+
+        <ng-container *ngIf="isSetInMyCart()">
+          <div class="detail-item">
+            <span class="detail-label">Status</span>
+            <span class="detail-value claim-status-mine">In Your Cart</span>
+          </div>
+        </ng-container>
+
+        <ng-container *ngIf="!isSetInMyCart() && isSetClaimedByOther()">
+          <div class="detail-item">
+            <span class="detail-label">Status</span>
+            <span class="detail-value claim-status-claimed">Claimed</span>
+          </div>
+        </ng-container>
+
+        <ng-container *ngIf="!isSetInMyCart() && !isSetClaimedByOther()">
+          <div class="detail-item">
+            <span class="detail-label">Status</span>
+            <span class="detail-value claim-status-available">Available</span>
+          </div>
+          <div class="detail-item" *ngIf="auth.isApproved() && !auth.isAdmin()">
+            <span class="detail-label"></span>
+            <span class="detail-value">
+              <div *ngIf="claimError" class="claim-error">{{ claimError }}</div>
+              <button *ngIf="canClaimSet()" class="btn-claim-detail" (click)="claimSet()" [disabled]="actionLoading">
+                {{ actionLoading ? 'Claiming…' : 'Claim Set' }}
+              </button>
+              <span *ngIf="totalPrice === 0" class="claim-blocked">
+                This set can't be claimed until all books are priced.
+              </span>
+              <span *ngIf="totalPrice > 0 && !canClaimSet() && !isSetInMyCart() && !isSetClaimedByOther()" class="claim-blocked">
+                Your cart must be open to claim new items.
+              </span>
+            </span>
+          </div>
+        </ng-container>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Member comics list -->
+  <div class="set-members-section" *ngIf="setMembers.length > 0">
+    <div class="set-members-title">Books in This Set</div>
+    <div class="comics-list">
+      <a *ngFor="let member of setMembers" routerLink="/detail/{{ member.id }}">
+        <div class="image-container" [class.two-images]="member.smallBackImageId">
+          <img [src]="getMemberImageURL(member.smallCachedImageId) | async" alt="Front Cover" loading="lazy">
+          <img *ngIf="member.smallBackImageId"
+               [src]="getMemberImageURL(member.smallBackImageId) | async" alt="Back Cover" loading="lazy">
+        </div>
+        <div class="member-details">
+          <div class="comic-title"><b>{{ member.title }}{{ comicNumberLabel(member) }}</b></div>
+          <div class="meta-grid">
+            <div *ngIf="member.series && member.series !== ''" class="comic-series">Series: <b>{{ member.series }}</b></div>
+            <div *ngIf="member.publisher" class="comic-publisher">Publisher: <b>{{ member.publisher }}</b></div>
+            <div *ngIf="member.comicCondition?.cgcCondition?.grade" class="comic-grade-certified">CGC: <b>{{ member.comicCondition?.cgcCondition?.grade }}</b></div>
+            <div *ngIf="member.comicCondition?.cbcsCondition?.grade" class="comic-grade-certified">CBCS: <b>{{ member.comicCondition?.cbcsCondition?.grade }}</b></div>
+            <div *ngIf="member.comicCondition?.notCertifiedGrade" class="comic-grade-est">Grade: <b>{{ member.comicCondition?.notCertifiedGrade }}</b></div>
+            <div *ngIf="member.salePrice" class="comic-price">Price: <b>{{ member.salePrice | currency:'USD':'symbol':'1.2-2' }}</b></div>
+          </div>
+          <div *ngIf="member.comicCondition?.cgcCondition?.grade || member.comicCondition?.cbcsCondition?.grade"
+               class="graded-badge">Graded</div>
+        </div>
+      </a>
+    </div>
+  </div>
+
+</div>

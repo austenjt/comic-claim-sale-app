@@ -28,6 +28,10 @@ export class CartService {
     return this.http.post<Cart>(`${this.apiBase}/cart/items`, { comicId });
   }
 
+  addSet(containerId: string): Observable<Cart> {
+    return this.http.post<Cart>(`${this.apiBase}/cart/set`, { containerId });
+  }
+
   removeItem(comicId: string): Observable<Cart> {
     return this.http.delete<Cart>(`${this.apiBase}/cart/items/${comicId}`);
   }

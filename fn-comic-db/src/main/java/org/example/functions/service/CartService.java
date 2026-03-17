@@ -107,6 +107,51 @@ public class CartService {
         return cart;
     }
 
+    /** Add all comics in a set to the user's cart. containerId must reference an isContainer=true comic. */
+    public Cart addSet(User user, String containerId) {
+        ComicBook container = ComicService.getServiceInstance().getComicById(Integer.parseInt(containerId))
+            .orElseThrow(() -> new IllegalArgumentException("Container comic not found: " + containerId));
+        if (!container.isContainer()) {
+            throw new IllegalArgumentException("Comic " + containerId + " is not a set container.");
+        }
+        Integer collectionGroup = container.getCollectionGroup();
+        if (collectionGroup == null) {
+            throw new IllegalArgumentException("Container comic has no collectionGroup set.");
+        }
+
+        List<ComicBook> setMembers = ComicService.getServiceInstance().getComicsByCollectionGroup(collectionGroup);
+        if (setMembers.isEmpty()) {
+            throw new IllegalArgumentException("No comics found in collection group: " + collectionGroup);
+        }
+
+        // Pre-validate: none of the set members are already in an active cart
+        for (ComicBook member : setMembers) {
+            String memberId = String.valueOf(member.getId());
+            if (isComicClaimed(memberId)) {
+                throw new IllegalStateException("Comic " + memberId + " in the set is already claimed.");
+            }
+        }
+
+        Cart cart = getOrCreateCart(user);
+        if (!"OPEN".equals(cart.getStatus())) {
+            throw new IllegalStateException("Cart is not open for new claims (status: " + cart.getStatus() + ").");
+        }
+
+        String claimedAt = Instant.now().toString();
+        for (ComicBook member : setMembers) {
+            CartItem item = new CartItem();
+            item.setComicId(String.valueOf(member.getId()));
+            item.setComicTitle(member.getTitle());
+            item.setComicNumber(formatComicNumber(member.getNumber()));
+            item.setPrice(member.getTargetPrice() != null ? member.getTargetPrice().doubleValue() : 1.00);
+            item.setClaimedAt(claimedAt);
+            cart.getItems().add(item);
+        }
+        save(cart);
+        log.info("User {} claimed set (collectionGroup={}) with {} items", user.getId(), collectionGroup, setMembers.size());
+        return cart;
+    }
+
     /** Remove an item from the cart. Allowed in OPEN or FINALIZING status. */
     public Cart removeItem(String userId, String comicId) {
         Cart cart = getActiveCart(userId)

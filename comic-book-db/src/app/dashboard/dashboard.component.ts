@@ -33,6 +33,10 @@ export class DashboardComponent implements OnInit {
   awardLoading = false;
   awardError = '';
 
+  // Set state
+  setMap: Map<number, Comic[]> = new Map();       // collectionGroup → all members
+  containerMap: Map<number, Comic> = new Map();   // collectionGroup → isContainer comic
+
   constructor(
     private comicService: ComicService,
     private imageService: ImageService,
@@ -55,11 +59,48 @@ export class DashboardComponent implements OnInit {
     this.loading = true;
     this.comicService.getRemoteComics().subscribe({
       next: comics => {
-        this.comics = comics.filter(c => c.isForSale !== false && !c.dateSold);
+        if (comics.length === 0) {
+          // Remote call returned nothing (likely a cold-start failure swallowed by catchError).
+          // Fall back to the in-memory cache so the dashboard still populates.
+          this.comicService.getCachedComics().subscribe({
+            next: cached => {
+              const forSale = cached.filter(c => c.isForSale !== false && !c.dateSold);
+              this.buildSetMaps(forSale);
+              this.loading = false;
+            },
+            error: () => { this.loading = false; }
+          });
+          return;
+        }
+        const forSale = comics.filter(c => c.isForSale !== false && !c.dateSold);
+        this.buildSetMaps(forSale);
         this.loading = false;
       },
       error: () => { this.loading = false; }
     });
+  }
+
+  private buildSetMaps(comics: Comic[]): void {
+    this.setMap = new Map();
+    this.containerMap = new Map();
+    for (const comic of comics) {
+      if (comic.collectionGroup != null) {
+        const group = this.setMap.get(comic.collectionGroup) ?? [];
+        group.push(comic);
+        this.setMap.set(comic.collectionGroup, group);
+        if (comic.isContainer) {
+          this.containerMap.set(comic.collectionGroup, comic);
+        }
+      }
+    }
+    // Only positive collectionGroup values form real sets.
+    // null/undefined/-1/0 are treated as "no group" and always shown as regular cards.
+    // Within a real set (collectionGroup > 0), only the isContainer=true record shows.
+    this.comics = comics.filter(c =>
+      c.collectionGroup == null ||
+      c.collectionGroup <= 0 ||
+      c.isContainer === true
+    );
   }
 
   loadClaimedMap(): void {
@@ -79,6 +120,10 @@ export class DashboardComponent implements OnInit {
 
   claim(comic: Comic): void {
     this.claimError = '';
+    if (comic.isContainer) {
+      this.claimSet(comic);
+      return;
+    }
     this.cartService.addItem(String(comic.id)).subscribe({
       next: cart => {
         this.myCart = cart;
@@ -92,6 +137,28 @@ export class DashboardComponent implements OnInit {
         this.claimError = err?.error || 'Failed to claim comic.';
       }
     });
+  }
+
+  claimSet(container: Comic): void {
+    this.cartService.addSet(String(container.id)).subscribe({
+      next: cart => {
+        this.myCart = cart;
+        const members = this.setMap.get(container.collectionGroup!) ?? [];
+        for (const m of members) {
+          this.claimedMap[String(m.id)] = new Date().toISOString();
+          this.toastService.markActed(String(m.id));
+        }
+        this.toastService.show(`"${container.title}" set (${members.length} books) added to your cart.`);
+      },
+      error: (err) => {
+        this.claimError = err?.error || 'Failed to claim set.';
+      }
+    });
+  }
+
+  getSetPrice(container: Comic): number {
+    const members = this.setMap.get(container.collectionGroup!) ?? [];
+    return members.reduce((sum, m) => sum + (m.salePrice ?? 0), 0);
   }
 
   isInMyCart(comicId: number): boolean {
@@ -129,6 +196,24 @@ export class DashboardComponent implements OnInit {
     this.awardingComic = null;
     this.selectedUserId = null;
     this.awardError = '';
+  }
+
+  isSetInMyCart(container: Comic): boolean {
+    const members = this.setMap.get(container.collectionGroup!) ?? [];
+    return members.some(m => this.isInMyCart(m.id));
+  }
+
+  isSetClaimedByOther(container: Comic): boolean {
+    const members = this.setMap.get(container.collectionGroup!) ?? [];
+    return members.some(m => this.isClaimedByOther(m.id));
+  }
+
+  canClaimSet(container: Comic): boolean {
+    const members = this.setMap.get(container.collectionGroup!) ?? [];
+    return members.length > 0 &&
+           !this.isSetInMyCart(container) &&
+           !this.isSetClaimedByOther(container) &&
+           (this.myCart?.status === 'OPEN' || !this.myCart);
   }
 
   confirmAward(): void {

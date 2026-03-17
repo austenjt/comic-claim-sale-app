@@ -236,6 +236,16 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
       }
     },
     {
+      headerName: "Is Container",
+      field: "isContainer",
+      filter: true,
+      sortable: true,
+      editable: true,
+      maxWidth: 120,
+      cellEditor: 'agCheckboxCellEditor',
+      cellRenderer: 'agCheckboxCellRenderer'
+    },
+    {
       headerName: "Estimate",
       field: "personalEstimate",
       filter: true,
@@ -693,6 +703,7 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
       personalEstimate: this.qa.personalEstimate,
       targetPrice: null,
       collectionGroup: null,
+      isContainer: null,
       storageLocation: null,
       goCollectInfo: null,
       grandComicDBInfo: null,
@@ -778,6 +789,7 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
       personalEstimate: 0,
       targetPrice: 0,
       collectionGroup: -1,
+      isContainer: null,
       storageLocation: null,
       goCollectInfo: null,
       grandComicDBInfo: null,
