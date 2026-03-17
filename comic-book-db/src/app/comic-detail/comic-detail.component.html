@@ -1,6 +1,10 @@
 <div *ngIf="comic">
   <button type="button" (click)="goBack()">go back</button>
-  <h2>{{comicHeading | uppercase}}</h2>
+  <div class="comic-heading">
+    <span *ngIf="comic.comicCondition?.cgcCondition?.grade || comic.comicCondition?.cbcsCondition?.grade"
+          class="graded-badge-lg">Graded</span>
+    <h2>{{comicHeading | uppercase}}</h2>
+  </div>
   <div class="content-container">
     <div class="images-column">
 

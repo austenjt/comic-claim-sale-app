@@ -9,6 +9,7 @@ public class CartItem {
     private String comicNumber;
     private double price;
     private String claimedAt;
+    private Integer collectionGroup;
 
     public CartItem() {}
 
@@ -26,4 +27,7 @@ public class CartItem {
 
     public String getClaimedAt() { return claimedAt; }
     public void setClaimedAt(String claimedAt) { this.claimedAt = claimedAt; }
+
+    public Integer getCollectionGroup() { return collectionGroup; }
+    public void setCollectionGroup(Integer collectionGroup) { this.collectionGroup = collectionGroup; }
 }

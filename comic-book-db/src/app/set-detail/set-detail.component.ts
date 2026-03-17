@@ -25,6 +25,10 @@ export class SetDetailComponent implements OnInit {
   claimError = '';
   actionLoading = false;
   loading = true;
+  imageUploading = false;
+  imageUploadError = '';
+  backImageUploading = false;
+  backImageUploadError = '';
 
   constructor(
     private route: ActivatedRoute,
@@ -62,6 +66,10 @@ export class SetDetailComponent implements OnInit {
 
   get totalPrice(): number {
     return this.setMembers.reduce((sum, m) => sum + (m.salePrice ?? 0), 0);
+  }
+
+  get displayMembers(): Comic[] {
+    return this.setMembers.filter(m => !m.isContainer && !(m as any).container);
   }
 
   comicNumberLabel(comic: Comic): string {
@@ -110,6 +118,52 @@ export class SetDetailComponent implements OnInit {
       error: err => {
         this.claimError = err?.error || 'Failed to claim set.';
         this.actionLoading = false;
+      }
+    });
+  }
+
+  onImageFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (!input.files?.length || !this.container) return;
+    const file = input.files[0];
+    this.imageUploading = true;
+    this.imageUploadError = '';
+    this.imageService.uploadComicImage(this.container.id, file).subscribe({
+      next: (updatedComic: Comic) => {
+        this.imageUploading = false;
+        if (this.container) {
+          this.container.largeCachedImageId = updatedComic.largeCachedImageId;
+          this.container.smallCachedImageId = updatedComic.smallCachedImageId;
+        }
+        input.value = '';
+      },
+      error: () => {
+        this.imageUploading = false;
+        this.imageUploadError = 'Upload failed. Image may be too large or an invalid format.';
+        input.value = '';
+      }
+    });
+  }
+
+  onBackImageFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (!input.files?.length || !this.container) return;
+    const file = input.files[0];
+    this.backImageUploading = true;
+    this.backImageUploadError = '';
+    this.imageService.uploadComicBackImage(this.container.id, file).subscribe({
+      next: (updatedComic: Comic) => {
+        this.backImageUploading = false;
+        if (this.container) {
+          this.container.largeBackImageId = updatedComic.largeBackImageId;
+          this.container.smallBackImageId = updatedComic.smallBackImageId;
+        }
+        input.value = '';
+      },
+      error: () => {
+        this.backImageUploading = false;
+        this.backImageUploadError = 'Upload failed. Image may be too large or an invalid format.';
+        input.value = '';
       }
     });
   }

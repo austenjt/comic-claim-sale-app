@@ -2,6 +2,30 @@ button {
   margin-bottom: 1rem;
 }
 
+.comic-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 0;
+}
+
+.comic-heading h2 {
+  margin: 0 0 1rem;
+}
+
+.graded-badge-lg {
+  background: #10b981;
+  color: #1e2a38;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 4px 12px;
+  border-radius: 4px;
+  flex-shrink: 0;
+  margin-bottom: 1rem;
+}
+
 .content-container {
   display: flex;
   align-items: flex-start;

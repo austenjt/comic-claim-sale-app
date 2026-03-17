@@ -145,6 +145,7 @@ public class CartService {
             item.setComicNumber(formatComicNumber(member.getNumber()));
             item.setPrice(member.getTargetPrice() != null ? member.getTargetPrice().doubleValue() : 1.00);
             item.setClaimedAt(claimedAt);
+            item.setCollectionGroup(collectionGroup);
             cart.getItems().add(item);
         }
         save(cart);
@@ -152,16 +153,35 @@ public class CartService {
         return cart;
     }
 
-    /** Remove an item from the cart. Allowed in OPEN or FINALIZING status. */
+    /** Remove an item from the cart. If the item belongs to a set (collectionGroup > 0),
+     *  all other items in the same set are also removed. Allowed in OPEN or FINALIZING status. */
     public Cart removeItem(String userId, String comicId) {
         Cart cart = getActiveCart(userId)
             .orElseThrow(() -> new IllegalStateException("No active cart found."));
         if ("FINALIZED".equals(cart.getStatus()) || "FULFILLED".equals(cart.getStatus())) {
             throw new IllegalStateException("Cannot remove items from a " + cart.getStatus() + " cart.");
         }
-        CartItem removed = cart.getItems().stream()
+
+        CartItem target = cart.getItems().stream()
             .filter(i -> comicId.equals(i.getComicId())).findFirst().orElse(null);
-        cart.getItems().removeIf(i -> comicId.equals(i.getComicId()));
+
+        // Collect all items to remove (cascade for set members, single for standalone)
+        List<CartItem> toRemove;
+        if (target != null && target.getCollectionGroup() != null && target.getCollectionGroup() > 0) {
+            final int group = target.getCollectionGroup();
+            toRemove = cart.getItems().stream()
+                .filter(i -> i.getCollectionGroup() != null && group == i.getCollectionGroup())
+                .collect(java.util.stream.Collectors.toList());
+            log.info("Set removal: removing {} items with collectionGroup={} from cart {}", toRemove.size(), group, cart.getId());
+        } else {
+            toRemove = target != null ? List.of(target) : List.of();
+        }
+
+        java.util.Set<String> idsToRemove = toRemove.stream()
+            .map(CartItem::getComicId)
+            .collect(java.util.stream.Collectors.toSet());
+        cart.getItems().removeIf(i -> idsToRemove.contains(i.getComicId()));
+
         if (cart.getItems().isEmpty()) {
             cart.setStatus("DELETED");
             cart.setFinalizeAfter(null);
@@ -169,7 +189,9 @@ public class CartService {
             log.info("Cart {} is now empty after user removal, marked as DELETED", cart.getId());
         }
         save(cart);
-        if (removed != null) writeReturnEvent(removed);
+        for (CartItem removed : toRemove) {
+            writeReturnEvent(removed);
+        }
         return cart;
     }
 

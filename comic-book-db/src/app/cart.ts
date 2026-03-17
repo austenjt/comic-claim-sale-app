@@ -4,6 +4,7 @@ export interface CartItem {
   comicNumber: string | null;
   price: number;
   claimedAt: string;
+  collectionGroup: number | null;
 }
 
 export interface Cart {

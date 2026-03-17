@@ -80,6 +80,32 @@ button {
   display: block;
 }
 
+.img-update-bar {
+  padding: 8px;
+  background-color: #1e2a38;
+  border-top: 1px solid var(--color-border);
+  text-align: center;
+}
+
+.img-update-btn {
+  padding: 5px 16px;
+  background-color: #f59e0b;
+  color: #1e2a38;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.img-update-btn:hover:not(:disabled) { background-color: #d97706; }
+.img-update-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.img-upload-error {
+  margin-top: 6px;
+  font-size: 0.78rem;
+  color: #f87171;
+}
+
 .details {
   flex-grow: 1;
   max-width: 560px;

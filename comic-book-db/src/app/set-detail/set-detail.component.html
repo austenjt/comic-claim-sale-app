@@ -15,12 +15,33 @@
 
     <!-- Images from the container comic -->
     <div class="images-column">
+
+      <!-- Front Cover -->
       <div class="large-image">
         <img [src]="getImageURL(container.largeCachedImageId) | async" alt="Set Cover" loading="lazy">
+        <div *ngIf="auth.isAdmin()" class="img-update-bar">
+          <button class="img-update-btn" (click)="imageFileInput.click()" [disabled]="imageUploading">
+            {{ imageUploading ? 'Uploading...' : 'Update Image' }}
+          </button>
+          <div *ngIf="imageUploadError" class="img-upload-error">{{ imageUploadError }}</div>
+        </div>
+        <input #imageFileInput type="file" accept="image/png,image/jpeg" style="display:none"
+               (change)="onImageFileSelected($event)">
       </div>
-      <div class="large-image" *ngIf="container.largeBackImageId">
+
+      <!-- Back Cover (admin always sees it to upload; others only if back image exists) -->
+      <div class="large-image" *ngIf="container.largeCachedImageId && (auth.isAdmin() || container.largeBackImageId)">
         <img [src]="getImageURL(container.largeBackImageId) | async" alt="Set Back Cover" loading="lazy">
+        <div *ngIf="auth.isAdmin()" class="img-update-bar">
+          <button class="img-update-btn" (click)="backImageFileInput.click()" [disabled]="backImageUploading">
+            {{ backImageUploading ? 'Uploading...' : 'Update Back Cover' }}
+          </button>
+          <div *ngIf="backImageUploadError" class="img-upload-error">{{ backImageUploadError }}</div>
+        </div>
+        <input #backImageFileInput type="file" accept="image/png,image/jpeg" style="display:none"
+               (change)="onBackImageFileSelected($event)">
       </div>
+
     </div>
 
     <!-- Set metadata -->
@@ -97,7 +118,7 @@
   <div class="set-members-section" *ngIf="setMembers.length > 0">
     <div class="set-members-title">Books in This Set</div>
     <div class="comics-list">
-      <a *ngFor="let member of setMembers" routerLink="/detail/{{ member.id }}">
+      <a *ngFor="let member of displayMembers" routerLink="/detail/{{ member.id }}">
         <div class="image-container" [class.two-images]="member.smallBackImageId">
           <img [src]="getMemberImageURL(member.smallCachedImageId) | async" alt="Front Cover" loading="lazy">
           <img *ngIf="member.smallBackImageId"
@@ -111,7 +132,7 @@
             <div *ngIf="member.comicCondition?.cgcCondition?.grade" class="comic-grade-certified">CGC: <b>{{ member.comicCondition?.cgcCondition?.grade }}</b></div>
             <div *ngIf="member.comicCondition?.cbcsCondition?.grade" class="comic-grade-certified">CBCS: <b>{{ member.comicCondition?.cbcsCondition?.grade }}</b></div>
             <div *ngIf="member.comicCondition?.notCertifiedGrade" class="comic-grade-est">Grade: <b>{{ member.comicCondition?.notCertifiedGrade }}</b></div>
-            <div *ngIf="member.salePrice" class="comic-price">Price: <b>{{ member.salePrice | currency:'USD':'symbol':'1.2-2' }}</b></div>
+            <div class="comic-price">Price: <b>{{ (member.salePrice ?? 0) | currency:'USD':'symbol':'1.2-2' }}</b></div>
           </div>
           <div *ngIf="member.comicCondition?.cgcCondition?.grade || member.comicCondition?.cbcsCondition?.grade"
                class="graded-badge">Graded</div>

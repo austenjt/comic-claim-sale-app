@@ -29,17 +29,29 @@ export class CartComponent implements OnInit {
   }
 
   removeItem(comicId: string) {
-    if (this.cart?.status === 'FINALIZING') {
-      const confirmed = window.confirm('Are you sure you want to remove a book from an established order?');
-      if (!confirmed) return;
-    }
     const item = this.cart?.items.find(i => i.comicId === comicId);
+    const isSetItem = item?.collectionGroup != null && item.collectionGroup > 0;
+    const setCount = isSetItem
+      ? (this.cart?.items.filter(i => i.collectionGroup === item!.collectionGroup).length ?? 0)
+      : 0;
+
+    if (this.cart?.status === 'FINALIZING') {
+      const msg = isSetItem
+        ? `Are you sure you want to remove all ${setCount} books in this set from your established order?`
+        : 'Are you sure you want to remove a book from an established order?';
+      if (!window.confirm(msg)) return;
+    } else if (isSetItem) {
+      if (!window.confirm(`This will return all ${setCount} books in this set to available. Continue?`)) return;
+    }
+
     this.cartService.removeItem(comicId).subscribe({
       next: cart => {
         this.cart = cart;
         if (item) {
-          const numPart = item.comicNumber ? ` ${item.comicNumber}` : '';
-          this.toastService.show(`"${item.comicTitle}${numPart}" Returned to sale`);
+          const msg = isSetItem
+            ? `"${item.comicTitle}" set (${setCount} books) returned to available.`
+            : `"${item.comicTitle}${item.comicNumber ? ' ' + item.comicNumber : ''}" Returned to sale`;
+          this.toastService.show(msg);
         }
       },
       error: () => this.error = 'Failed to remove item.'
