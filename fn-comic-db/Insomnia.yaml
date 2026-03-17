@@ -99,8 +99,7 @@ collection:
         	"smallCachedImageId": "small-asm300.jpg",
         	"largeCachedImageId": "large-asm300.jpg",
         	"personalNotes": "Grail book, took 2 years to find at this price",
-        	"publicNotes": "Todd McFarlane cover and interior art",
-        	"imageNotes": "Front and back cover scans"
+        	"publicNotes": "Todd McFarlane cover and interior art"
         }
     headers:
       - name: Content-Type
@@ -180,8 +179,7 @@ collection:
             "smallCachedImageId": "small-asm300.jpg",
             "largeCachedImageId": "large-asm300.jpg",
             "personalNotes": "Grail book, took 2 years to find at this price",
-            "publicNotes": "Todd McFarlane cover and interior art",
-            "imageNotes": "Front and back cover scans"
+            "publicNotes": "Todd McFarlane cover and interior art"
           }
     headers:
       - name: Content-Type

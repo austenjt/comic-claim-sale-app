@@ -273,7 +273,6 @@ public class CsvToJsonConverter {
           // Notes
           comicBook.setPersonalNotes(record.get(GoCollectFields.PERSONAL_NOTES.col()));
           comicBook.setPublicNotes(record.get(GoCollectFields.PUBLIC_NOTES.col()));
-          comicBook.setImageNotes(record.get(GoCollectFields.IMAGE_NOTES.col()));
 
           // Images (defaults)
           comicBook.setSmallCachedImageId("");

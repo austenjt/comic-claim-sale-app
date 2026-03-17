@@ -77,7 +77,7 @@ public class ComicBook {
     private GoCollectInfo goCollectInfo;
     private GrandComicDBInfo grandComicDBInfo;
 
-    // Images
+    // Front & Back Images
     private String smallCachedImageId;
     private String largeCachedImageId;
     private String smallBackImageId;
@@ -86,7 +86,6 @@ public class ComicBook {
     // Notes
     private String personalNotes;
     private String publicNotes;
-    private String imageNotes;
 
     /**
      * Used to prevent duplicate data being added.

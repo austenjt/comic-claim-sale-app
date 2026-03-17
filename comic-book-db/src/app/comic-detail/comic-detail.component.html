@@ -360,7 +360,7 @@
       </div>
 
       <!-- Notes -->
-      <div class="detail-section" *ngIf="comic.personalNotes || comic.publicNotes || comic.imageNotes">
+      <div class="detail-section" *ngIf="comic.personalNotes || comic.publicNotes">
         <div class="detail-section-title">Notes</div>
         <div class="detail-item" *ngIf="comic.personalNotes">
           <span class="detail-label">Personal Notes</span>
@@ -369,10 +369,6 @@
         <div class="detail-item" *ngIf="comic.publicNotes">
           <span class="detail-label">Public Notes</span>
           <span class="detail-value">{{comic.publicNotes}}</span>
-        </div>
-        <div class="detail-item" *ngIf="comic.imageNotes">
-          <span class="detail-label">Image Notes</span>
-          <span class="detail-value">{{comic.imageNotes}}</span>
         </div>
       </div>
 

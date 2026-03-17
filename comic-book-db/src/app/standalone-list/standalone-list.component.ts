@@ -420,19 +420,6 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
       }
     },
     {
-      headerName: "Image Notes",
-      field: "imageNotes",
-      resizable: true,
-      filter: true,
-      sortable: true,
-      editable: true,
-      minWidth: 120,
-      cellEditor: 'agTextCellEditor',
-      cellEditorParams: {
-        maxLength: 256
-      }
-    },
-    {
       headerName: "Cert Company",
       field: "comicCondition.certificationCompany",
       resizable: true,
@@ -714,8 +701,7 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
       smallBackImageId: null,
       largeBackImageId: null,
       personalNotes: null,
-      publicNotes: null,
-      imageNotes: null
+      publicNotes: null
     };
 
     this.comicService.addComic(newComic).subscribe({
@@ -800,8 +786,7 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
       smallBackImageId: null,
       largeBackImageId: null,
       personalNotes: null,
-      publicNotes: null,
-      imageNotes: null
+      publicNotes: null
     };
     this.comicService.addComic(newRow).subscribe(returned => {
       this.rowData = [...this.rowData, returned];
