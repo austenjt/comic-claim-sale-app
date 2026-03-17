@@ -81,9 +81,14 @@ export class DashboardComponent implements OnInit {
   }
 
   private buildSetMaps(comics: Comic[]): void {
+    // Normalize: old backend serializes "container", new backend serializes "isContainer"
+    const normalized = comics.map(c => ({
+      ...c,
+      isContainer: c.isContainer ?? (c as any).container ?? null
+    }));
     this.setMap = new Map();
     this.containerMap = new Map();
-    for (const comic of comics) {
+    for (const comic of normalized) {
       if (comic.collectionGroup != null) {
         const group = this.setMap.get(comic.collectionGroup) ?? [];
         group.push(comic);
@@ -96,7 +101,7 @@ export class DashboardComponent implements OnInit {
     // Only positive collectionGroup values form real sets.
     // null/undefined/-1/0 are treated as "no group" and always shown as regular cards.
     // Within a real set (collectionGroup > 0), only the isContainer=true record shows.
-    this.comics = comics.filter(c =>
+    this.comics = normalized.filter(c =>
       c.collectionGroup == null ||
       c.collectionGroup <= 0 ||
       c.isContainer === true
