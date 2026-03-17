@@ -25,7 +25,7 @@ export class AccountProfileComponent implements OnInit {
     const user = this.auth.currentUser$.value;
     if (user) {
       this.name = user.name ?? '';
-      this.address = user.address ?? '';
+      this.address = (user.address ?? '').replace(/,\s*/g, '\n');
       this.phone = user.phone ?? '';
       this.notes = user.notes ?? '';
       this.preferences = user.preferences ?? '';

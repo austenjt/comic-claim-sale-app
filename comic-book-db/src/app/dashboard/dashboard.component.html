@@ -70,7 +70,7 @@
                 Claim
               </button>
             </div>
-            <div *ngIf="auth.isAdmin() && adminSettings.awardModeEnabled && !claimedDate(comic.id)" class="comic-claim-actions">
+            <div *ngIf="auth.isAdmin() && configService.awardModeEnabled && !claimedDate(comic.id)" class="comic-claim-actions">
               <button class="btn-award"
                 (click)="$event.preventDefault(); $event.stopPropagation(); openAwardModal(comic)">
                 Award

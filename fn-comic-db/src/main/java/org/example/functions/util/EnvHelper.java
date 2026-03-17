@@ -18,6 +18,11 @@ public class EnvHelper {
         return val == null || Boolean.parseBoolean(val); // defaults to true if not set
     }
 
+    public static boolean isAwardModeEnabled() {
+        String val = getProp("AWARD_MODE_ENABLED");
+        return val == null || Boolean.parseBoolean(val); // defaults to true if not set
+    }
+
     public static String getSmtpHost() {
         return getProp("SMTP_HOST");
     }

@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { DiscountService } from '../discount.service';
 import { Discount, DiscountType } from '../discount';
-import { AdminSettingsService } from '../admin-settings.service';
 import { CartService } from '../cart.service';
 
 @Component({
@@ -36,12 +35,8 @@ export class AdminSalesComponent implements OnInit {
 
   constructor(
     private discountService: DiscountService,
-    public adminSettings: AdminSettingsService,
     private cartService: CartService
   ) {}
-
-  get awardModeEnabled(): boolean { return this.adminSettings.awardModeEnabled; }
-  toggleAwardMode(val: boolean): void { this.adminSettings.awardModeEnabled = val; }
 
   ngOnInit() {
     this.load();

@@ -17,10 +17,12 @@ export interface ComicEnums {
 
 export interface AppConfig extends ComicEnums {
   emailEnabled: boolean;
+  awardModeEnabled: boolean;
 }
 
 const DEFAULT_CONFIG: AppConfig = {
   emailEnabled: true,
+  awardModeEnabled: true,
   coverVariants: [],
   gradingCompanies: [],
   grades: [],
@@ -47,6 +49,10 @@ export class ConfigService {
 
   get emailEnabled(): boolean {
     return this._config.emailEnabled;
+  }
+
+  get awardModeEnabled(): boolean {
+    return this._config.awardModeEnabled;
   }
 
   getEnums(): ComicEnums {

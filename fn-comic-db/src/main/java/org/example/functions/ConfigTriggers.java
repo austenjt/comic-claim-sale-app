@@ -42,6 +42,7 @@ public class ConfigTriggers {
         try {
             Map<String, Object> response = new LinkedHashMap<>();
             response.put("emailEnabled", EnvHelper.isEmailEnabled());
+            response.put("awardModeEnabled", EnvHelper.isAwardModeEnabled());
 
             List<String> coverVariants = new ArrayList<>();
             for (CoverVariant cv : CoverVariant.values()) {

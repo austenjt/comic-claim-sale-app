@@ -6,7 +6,7 @@ import { AuthService } from '../auth.service';
 import { CartService } from '../cart.service';
 import { ToastService } from '../toast.service';
 import { UserService } from '../user.service';
-import { AdminSettingsService } from '../admin-settings.service';
+import { ConfigService } from '../config.service';
 import { Cart } from '../cart';
 import { User } from '../user';
 import { Observable, of } from 'rxjs';
@@ -40,7 +40,7 @@ export class DashboardComponent implements OnInit {
     private cartService: CartService,
     private toastService: ToastService,
     private userService: UserService,
-    public adminSettings: AdminSettingsService
+    public configService: ConfigService
   ) {}
 
   ngOnInit(): void {

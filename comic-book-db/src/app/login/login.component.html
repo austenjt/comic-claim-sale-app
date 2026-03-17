@@ -11,6 +11,10 @@
       <input type="password" [(ngModel)]="pin" name="pin" required inputmode="numeric" />
     </div>
     <div *ngIf="error" class="error-message">{{ error }}</div>
+    <div *ngIf="suspended" class="error-message">
+      Your account has been disabled for your protection.
+      Use the <a routerLink="/contact">Contact form</a> to ask about re-enabling it.
+    </div>
     <button type="submit" [disabled]="loading || !email || !pin">
       {{ loading ? 'Logging in…' : 'Log In' }}
     </button>

@@ -11,21 +11,27 @@ export class LoginComponent {
   email = '';
   pin = '';
   error = '';
+  suspended = false;
   loading = false;
 
   constructor(private auth: AuthService, private router: Router) {}
 
   onSubmit() {
     this.error = '';
+    this.suspended = false;
     this.loading = true;
     this.auth.login(this.email, this.pin).subscribe({
       next: () => {
         this.loading = false;
         this.router.navigate(['/dashboard']);
       },
-      error: () => {
-        this.error = 'Invalid email or PIN. Please try again.';
+      error: (err) => {
         this.loading = false;
+        if (err.status === 403) {
+          this.suspended = true;
+        } else {
+          this.error = 'Invalid email or PIN. Please try again.';
+        }
       }
     });
   }

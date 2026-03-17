@@ -4,17 +4,6 @@
   <div *ngIf="error" class="error-message">{{ error }}</div>
   <div *ngIf="loading">Loading…</div>
 
-  <!-- Award Mode Toggle -->
-  <div class="award-mode-row">
-    <label class="toggle-label">
-      <input type="checkbox" [checked]="awardModeEnabled" (change)="toggleAwardMode($any($event.target).checked)" />
-      Award Mode
-    </label>
-    <span class="award-mode-hint">When enabled, an Award button appears on unclaimed dashboard cards.</span>
-  </div>
-
-  <div class="section-divider"></div>
-
   <button class="btn-create" (click)="openCreate()" *ngIf="!showForm">+ New Rule</button>
 
   <!-- Create / Edit Form -->
