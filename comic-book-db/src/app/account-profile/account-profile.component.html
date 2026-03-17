@@ -6,6 +6,11 @@
     <span class="value">{{ (auth.currentUser$ | async)?.email }}</span>
   </div>
 
+  <div *ngIf="auth.isAdmin()" class="profile-email">
+    <span class="label">Email App</span>
+    <a href="https://privateemail.com/" target="_blank" rel="noopener">privateemail.com</a>
+  </div>
+
   <form (ngSubmit)="save()" #profileForm="ngForm" class="profile-form">
     <div class="form-group">
       <label for="name">Name</label>

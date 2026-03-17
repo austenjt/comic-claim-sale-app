@@ -5,6 +5,22 @@ For frontend deployment, see `../comic-book-db/DEPLOY.md`.
 
 ---
 
+## Platform & Services
+
+This app is built and operated using the following services:
+
+| Service | Purpose | Cost |
+|---|---|---|
+| Azure Cosmos DB (Serverless) | NoSQL database for comics, users, sessions, carts | Pay-per-use |
+| Azure Function App | Serverless Java backend API | Pay-per-use |
+| Azure Static Web Apps | Hosts the Angular frontend | Free tier |
+| Namecheap DNS | Custom domain (`lightningcomics.rocks`) | ~$15/yr |
+| Namecheap Private Email | Transactional email via SMTP (`privateemail.com`) | ~$14/yr |
+| GitHub | Source code hosting | Free |
+| Claude AI | Coding assistant used to build and maintain the app | ~$20/mo |
+
+---
+
 ## Table of Contents
 
 1. [Prerequisites](#prerequisites)
@@ -41,14 +57,17 @@ az account set --subscription "<your-subscription-id>"
 |---|---|---|---|
 | Function App | `fn-comicBook-db-1703810588398` | `comic-db-rg` | `westus2` |
 | App Service Plan | `java-functions-app-service-plan` | `comic-db-rg` | `westus2` |
-| Cosmos DB Account | *(your account name)* | `comic-db-rg` | `westus2` |
+| Cosmos DB Account | `comic-cosmos-db` | `comic-db-rg` | `westus2` |
 | Cosmos DB Database | `comic-db` | — | — |
 | Cosmos DB Container | `comics` | partition key: `/id` | — |
 | Cosmos DB Container | `images` | partition key: `/id` | — |
 | Cosmos DB Container | `users` | partition key: `/id` | — |
 | Cosmos DB Container | `sessions` | partition key: `/id` | — |
 | Cosmos DB Container | `carts` | partition key: `/id` | — |
+| Cosmos DB Container | `discounts` | partition key: `/id` | — |
 | Static Web App (frontend) | `comic-book-db` | `comic-db-rg` | — |
+| Storage Account | *(auto-provisioned with Function App)* | `comic-db-rg` | `westus2` |
+| Application Insights | *(auto-provisioned with Function App)* | `comic-db-rg` | `westus2` |
 
 ---
 
@@ -139,9 +158,15 @@ az functionapp config appsettings set \
   --settings "ADMIN_EMAIL=<your-admin-email>"
 ```
 
+### Storage Account & Application Insights
+
+Both are **auto-provisioned** when the Function App is created via the Azure portal or `az functionapp create`. They do not require manual RBAC assignments — the Function App's connection strings (`AzureWebJobsStorage`, `WEBSITE_CONTENTAZUREFILECONNECTIONSTRING`) and instrumentation key (`APPINSIGHTS_INSTRUMENTATIONKEY`) are injected automatically as app settings at provisioning time.
+
+> If you ever need to rotate the Storage Account key, update `AzureWebJobsStorage` and `WEBSITE_CONTENTAZUREFILECONNECTIONSTRING` in the Function App settings and redeploy.
+
 ---
 
-## Private Email SMTP Setup
+## PrivateEmail.Com SMTP Setup (from Namecheap)
 
 The contact form sends email via **STARTTLS SMTP** against `mail.privateemail.com` (Namecheap Private Email) on port 587, using plain username/password auth via JavaMail (`com.sun.mail:jakarta.mail`).
 
@@ -193,16 +218,16 @@ To disable the contact form without redeploying, set `EMAIL_ENABLED=false` — t
 
 ---
 
-## Cosmos DB Setup
+## Serverless Cosmos DB Setup
 
-Run these only when creating the database from scratch.
+Run these only when creating the database from scratch.  Because CosmosDB needs to be serverless, I would create the database by hand.
 
 ```bash
 # Create database
-az cosmosdb sql database create \
-  --account-name comic-cosmos-db \
-  --resource-group comic-db-rg \
-  --name comic-db
+#az cosmosdb sql database create \
+#  --account-name comic-cosmos-db \
+#  --resource-group comic-db-rg \
+#  --name comic-db
 
 # Create comics container
 az cosmosdb sql container create \
@@ -242,6 +267,14 @@ az cosmosdb sql container create \
   --resource-group comic-db-rg \
   --database-name comic-db \
   --name carts \
+  --partition-key-path "/id"
+
+# Create discounts container
+az cosmosdb sql container create \
+  --account-name comic-cosmos-db \
+  --resource-group comic-db-rg \
+  --database-name comic-db \
+  --name discounts \
   --partition-key-path "/id"
 ```
 
