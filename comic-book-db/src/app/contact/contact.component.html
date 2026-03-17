@@ -32,13 +32,13 @@
       </div>
     </div>
 
-    <p *ngIf="gmailEnabled" class="reach-out">
+    <p *ngIf="emailEnabled" class="reach-out">
       Also, if you see something you like, want to make an offer, or looking for a specific issue?
       Use the form below and I'll get back to you within 1–2 business days.
     </p>
   </div>
 
-  <ng-container *ngIf="gmailEnabled">
+  <ng-container *ngIf="emailEnabled">
     <div *ngIf="sent" class="msg-success">&#10003; Your message has been sent — I'll be in touch soon!</div>
 
     <form *ngIf="!sent" (ngSubmit)="submit()" #contactForm="ngForm" class="contact-form">

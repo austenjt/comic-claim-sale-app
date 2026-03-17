@@ -100,22 +100,11 @@
             <version>2.6.4</version>
         </dependency>
 
-        <!-- Gmail API (REST-based send — no SMTP) -->
+        <!-- JavaMail — SMTP send and MIME construction -->
         <dependency>
-            <groupId>com.google.apis</groupId>
-            <artifactId>google-api-services-gmail</artifactId>
-            <version>v1-rev20220404-2.0.0</version>
-        </dependency>
-        <dependency>
-            <groupId>com.google.auth</groupId>
-            <artifactId>google-auth-library-oauth2-http</artifactId>
-            <version>1.11.0</version>
-        </dependency>
-        <!-- javax.mail used only for MIME message construction, not transport -->
-        <dependency>
-            <groupId>javax.mail</groupId>
-            <artifactId>mail</artifactId>
-            <version>1.4.7</version>
+            <groupId>com.sun.mail</groupId>
+            <artifactId>jakarta.mail</artifactId>
+            <version>2.0.1</version>
         </dependency>
 
         <!-- Test -->

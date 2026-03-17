@@ -13,25 +13,21 @@ public class EnvHelper {
         return getProp("ADMIN_EMAIL");
     }
 
-    public static boolean isGmailEnabled() {
-        String val = getProp("GMAIL_ENABLED");
+    public static boolean isEmailEnabled() {
+        String val = getProp("EMAIL_ENABLED");
         return val == null || Boolean.parseBoolean(val); // defaults to true if not set
     }
 
-    public static String getGmailUsername() {
-        return getProp("GMAIL_USERNAME");
+    public static String getSmtpHost() {
+        return getProp("SMTP_HOST");
     }
 
-    public static String getGmailClientId() {
-        return getProp("GMAIL_CLIENT_ID");
+    public static String getSmtpUsername() {
+        return getProp("SMTP_USERNAME");
     }
 
-    public static String getGmailClientSecret() {
-        return getProp("GMAIL_CLIENT_SECRET");
-    }
-
-    public static String getGmailRefreshToken() {
-        return getProp("GMAIL_REFRESH_TOKEN");
+    public static String getSmtpPassword() {
+        return getProp("SMTP_PASSWORD");
     }
 
     static String getProp(String prop) {

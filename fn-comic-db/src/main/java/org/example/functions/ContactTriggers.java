@@ -51,9 +51,9 @@ public class ContactTriggers {
                     .body("name, email, and message are required").build();
             }
 
-            if (EnvHelper.getGmailUsername() == null || EnvHelper.getGmailClientId() == null
-                    || EnvHelper.getGmailClientSecret() == null || EnvHelper.getGmailRefreshToken() == null) {
-                log.error("Gmail OAuth2 credentials not fully configured");
+            if (EnvHelper.getSmtpUsername() == null || EnvHelper.getSmtpPassword() == null
+                    || EnvHelper.getSmtpHost() == null) {
+                log.error("SMTP credentials not fully configured");
                 return cors(request.createResponseBuilder(HttpStatus.INTERNAL_SERVER_ERROR))
                     .body("Email service not configured").build();
             }

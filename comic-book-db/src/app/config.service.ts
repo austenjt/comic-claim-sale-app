@@ -3,11 +3,29 @@ import { HttpClient } from '@angular/common/http';
 import { catchError, firstValueFrom } from 'rxjs';
 import { of } from 'rxjs';
 
-export interface AppConfig {
-  gmailEnabled: boolean;
+export interface GradeOption {
+  value: number;
+  label: string;
 }
 
-const DEFAULT_CONFIG: AppConfig = { gmailEnabled: true };
+export interface ComicEnums {
+  coverVariants: string[];
+  gradingCompanies: string[];
+  grades: GradeOption[];
+  pageQualities: string[];
+}
+
+export interface AppConfig extends ComicEnums {
+  emailEnabled: boolean;
+}
+
+const DEFAULT_CONFIG: AppConfig = {
+  emailEnabled: true,
+  coverVariants: [],
+  gradingCompanies: [],
+  grades: [],
+  pageQualities: []
+};
 
 @Injectable({ providedIn: 'root' })
 export class ConfigService {
@@ -27,7 +45,16 @@ export class ConfigService {
     ).then(config => { this._config = config; });
   }
 
-  get gmailEnabled(): boolean {
-    return this._config.gmailEnabled;
+  get emailEnabled(): boolean {
+    return this._config.emailEnabled;
+  }
+
+  getEnums(): ComicEnums {
+    return {
+      coverVariants: this._config.coverVariants,
+      gradingCompanies: this._config.gradingCompanies,
+      grades: this._config.grades,
+      pageQualities: this._config.pageQualities
+    };
   }
 }

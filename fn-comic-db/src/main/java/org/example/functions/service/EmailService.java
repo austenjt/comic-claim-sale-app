@@ -1,21 +1,15 @@
 package org.example.functions.service;
 
-import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.json.gson.GsonFactory;
-import com.google.api.services.gmail.Gmail;
-import com.google.api.services.gmail.model.Message;
-import com.google.auth.http.HttpCredentialsAdapter;
-import com.google.auth.oauth2.UserCredentials;
+import jakarta.mail.Message;
+import jakarta.mail.MessagingException;
+import jakarta.mail.PasswordAuthentication;
+import jakarta.mail.Session;
+import jakarta.mail.Transport;
+import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MimeMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.example.functions.util.EnvHelper;
 
-import javax.mail.MessagingException;
-import javax.mail.Session;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.Base64;
 import java.util.List;
 import java.util.Properties;
 
@@ -32,8 +26,7 @@ public class EmailService {
     }
 
     /**
-     * Sends a plain-text email via the Gmail REST API using OAuth2 user credentials.
-     * javax.mail is used only to construct the MIME message — no SMTP connection is made.
+     * Sends a plain-text email via STARTTLS SMTP (privateemail.com port 587).
      *
      * @param toAddresses list of recipient email addresses
      * @param replyTo     reply-to address (may be null)
@@ -41,13 +34,12 @@ public class EmailService {
      * @param body        plain-text body
      */
     public void send(List<String> toAddresses, String replyTo, String subject, String body) {
-        String username     = EnvHelper.getGmailUsername();
-        String clientId     = EnvHelper.getGmailClientId();
-        String clientSecret = EnvHelper.getGmailClientSecret();
-        String refreshToken = EnvHelper.getGmailRefreshToken();
+        String host     = EnvHelper.getSmtpHost();
+        String username = EnvHelper.getSmtpUsername();
+        String password = EnvHelper.getSmtpPassword();
 
-        if (username == null || clientId == null || clientSecret == null || refreshToken == null) {
-            log.error("Gmail OAuth2 credentials not fully configured — email not sent");
+        if (host == null || username == null || password == null) {
+            log.error("SMTP credentials not fully configured — email not sent");
             return;
         }
         if (toAddresses == null || toAddresses.isEmpty()) {
@@ -55,47 +47,35 @@ public class EmailService {
             return;
         }
 
+        Properties props = new Properties();
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.host", host);
+        props.put("mail.smtp.port", "587");
+
+        Session session = Session.getInstance(props, new jakarta.mail.Authenticator() {
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(username, password);
+            }
+        });
+
         try {
-            UserCredentials credentials = UserCredentials.newBuilder()
-                .setClientId(clientId)
-                .setClientSecret(clientSecret)
-                .setRefreshToken(refreshToken)
-                .build();
-
-            Gmail service = new Gmail.Builder(
-                    new NetHttpTransport(),
-                    GsonFactory.getDefaultInstance(),
-                    new HttpCredentialsAdapter(credentials))
-                .setApplicationName("Lightning Comics PDX")
-                .build();
-
-            // Build MIME message (javax.mail used for serialization only)
-            Properties props = new Properties();
-            Session session = Session.getDefaultInstance(props, null);
             MimeMessage email = new MimeMessage(session);
             email.setFrom(new InternetAddress(username));
             for (String to : toAddresses) {
-                email.addRecipient(javax.mail.Message.RecipientType.TO, new InternetAddress(to));
+                email.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
             }
             if (replyTo != null) {
-                email.setReplyTo(new javax.mail.Address[]{new InternetAddress(replyTo)});
+                email.setReplyTo(new jakarta.mail.Address[]{new InternetAddress(replyTo)});
             }
-            email.setSubject("From LightningComics.Rocks! " + subject);
+            email.setSubject("LightningComics.Rocks: " + subject);
             email.setText(body);
 
-            // Encode as base64url and wrap in Gmail API message
-            ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-            email.writeTo(buffer);
-            String encodedEmail = Base64.getUrlEncoder().withoutPadding()
-                .encodeToString(buffer.toByteArray());
-            Message message = new Message();
-            message.setRaw(encodedEmail);
+            Transport.send(email);
+            log.info("Email sent to {} recipient(s): {}", toAddresses.size(), subject);
 
-            Message sent = service.users().messages().send("me", message).execute();
-            log.info("Email sent to {} recipient(s): {} (id={})", toAddresses.size(), subject, sent.getId());
-
-        } catch (MessagingException | IOException e) {
-            log.error("Failed to send email via Gmail API", e);
+        } catch (MessagingException e) {
+            log.error("Failed to send email via SMTP", e);
         }
     }
 }

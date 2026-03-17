@@ -4,7 +4,8 @@ import { AgGridModule } from 'ag-grid-angular';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Comic } from '../comic';
-import { ComicService, ComicEnums, GradeOption } from '../comic.service';
+import { ComicService } from '../comic.service';
+import { ConfigService, ComicEnums, GradeOption } from '../config.service';
 import { ColDef, CellClickedEvent, RowClickedEvent, GetRowIdParams } from 'ag-grid-community';
 import { DeleteButtonCellRendererComponent } from './delete-button-cell-renderer.component';
 import { NumberCellEditorComponent } from './number-cell-editor.component';
@@ -733,10 +734,10 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
   }
   // ─────────────────────────────────────────────────────────────────────────
 
-  constructor(private comicService: ComicService) { }
+  constructor(private comicService: ComicService, private configService: ConfigService) { }
 
   ngOnInit() {
-    this.comicService.getEnums().subscribe(e => { if (e) this.enums = e; });
+    this.enums = this.configService.getEnums();
   }
 
   ngOnDestroy() { }

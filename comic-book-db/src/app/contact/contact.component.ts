@@ -20,8 +20,8 @@ export class ContactComponent {
 
   constructor(private http: HttpClient, private configService: ConfigService) {}
 
-  get gmailEnabled(): boolean {
-    return this.configService.gmailEnabled;
+  get emailEnabled(): boolean {
+    return this.configService.emailEnabled;
   }
 
   submit() {

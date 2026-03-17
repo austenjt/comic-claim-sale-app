@@ -14,25 +14,12 @@ export interface CsvUploadResult {
   duplicates: any[];
 }
 
-export interface GradeOption {
-  value: number;
-  label: string;
-}
-
-export interface ComicEnums {
-  coverVariants: string[];
-  gradingCompanies: string[];
-  grades: GradeOption[];
-  pageQualities: string[];
-}
-
 @Injectable({ providedIn: 'root' })
 export class ComicService {
 
   private baseServiceUrl = 'https://fn-comicBook-db-1703810588398.azurewebsites.net/api';
   //private baseServiceUrl = 'http://localhost:7071/api';
   private comicsUrl = this.baseServiceUrl + '/comics';
-  private enumsUrl = this.baseServiceUrl + '/enums';
   private dataLoadUrl = this.comicsUrl + '/data';
   private searchUrl = this.baseServiceUrl + '/search';
   private syncUrl = this.comicsUrl + '/data/sync'
@@ -115,13 +102,6 @@ export class ComicService {
   }
 
   //////// Save methods //////////
-
-  /** GET: fetch all enum reference lists in one call */
-  getEnums(): Observable<ComicEnums> {
-    return this.http.get<ComicEnums>(this.enumsUrl).pipe(
-      catchError(this.handleError<ComicEnums>('getEnums'))
-    );
-  }
 
   /** POST: add a new comic to the server */
   addComic(comic: Comic): Observable<Comic> {
