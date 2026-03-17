@@ -74,12 +74,34 @@ h2 {
 }
 
 .details {
-  position: relative;
   padding: 12px 14px;
   flex-grow: 1;
   word-wrap: break-word;
   overflow-wrap: break-word;
   background-color: var(--color-surface);
+}
+
+.card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px 10px;
+  min-height: 36px;
+  border-top: 1px solid var(--color-border);
+  background-color: var(--color-surface);
+  flex-shrink: 0;
+}
+
+.footer-badges {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.footer-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .comic-title {
@@ -128,9 +150,6 @@ h2 {
   margin-top: 8px;
   color: #10b981;
   font-weight: 600;
-}
-.comic-claim-actions {
-  margin-top: 10px;
 }
 
 .btn-claim, .btn-in-cart, .btn-claimed {
@@ -338,14 +357,11 @@ h2 {
   to { transform: rotate(360deg); }
 }
 
-/* ── Set card badge (bottom-right corner, mirrors .graded-badge) ─────────── */
+/* ── Footer badges ─────────────────────────────────────────────────────────── */
 
-.set-badge-corner {
-  position: absolute;
-  bottom: 8px;
-  right: 8px;
-  background: #f59e0b;
-  color: #1e2a38;
+.badge-graded,
+.badge-set {
+  display: inline-block;
   font-size: 0.65rem;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -355,17 +371,12 @@ h2 {
   pointer-events: none;
 }
 
-.graded-badge {
-  position: absolute;
-  bottom: 8px;
-  right: 8px;
+.badge-graded {
   background: #10b981;
   color: #1e2a38;
-  font-size: 0.65rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  padding: 3px 7px;
-  border-radius: 4px;
-  pointer-events: none;
+}
+
+.badge-set {
+  background: #f59e0b;
+  color: #1e2a38;
 }

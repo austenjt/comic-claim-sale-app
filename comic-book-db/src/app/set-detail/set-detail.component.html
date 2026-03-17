@@ -134,8 +134,13 @@
             <div *ngIf="member.comicCondition?.notCertifiedGrade" class="comic-grade-est">Grade: <b>{{ member.comicCondition?.notCertifiedGrade }}</b></div>
             <div class="comic-price">Price: <b>{{ (member.salePrice ?? 0) | currency:'USD':'symbol':'1.2-2' }}</b></div>
           </div>
-          <div *ngIf="member.comicCondition?.cgcCondition?.grade || member.comicCondition?.cbcsCondition?.grade"
-               class="graded-badge">Graded</div>
+        </div>
+        <div class="card-footer">
+          <div class="footer-badges">
+            <span *ngIf="member.comicCondition?.cgcCondition?.grade || member.comicCondition?.cbcsCondition?.grade"
+                  class="badge-graded">Graded</span>
+          </div>
+          <div class="footer-actions"></div>
         </div>
       </a>
     </div>

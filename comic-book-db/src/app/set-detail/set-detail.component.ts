@@ -69,7 +69,7 @@ export class SetDetailComponent implements OnInit {
   }
 
   get displayMembers(): Comic[] {
-    return this.setMembers.filter(m => !m.isContainer && !(m as any).container);
+    return this.setMembers.filter(m => !m.isSet);
   }
 
   comicNumberLabel(comic: Comic): string {

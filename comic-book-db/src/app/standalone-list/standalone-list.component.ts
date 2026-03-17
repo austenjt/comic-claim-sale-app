@@ -236,8 +236,8 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
       }
     },
     {
-      headerName: "Is Container",
-      field: "isContainer",
+      headerName: "Is Set",
+      field: "isSet",
       filter: true,
       sortable: true,
       editable: true,
@@ -703,7 +703,7 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
       personalEstimate: this.qa.personalEstimate,
       targetPrice: null,
       collectionGroup: null,
-      isContainer: null,
+      isSet: null,
       storageLocation: null,
       goCollectInfo: null,
       grandComicDBInfo: null,
@@ -789,7 +789,7 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
       personalEstimate: 0,
       targetPrice: 0,
       collectionGroup: -1,
-      isContainer: null,
+      isSet: null,
       storageLocation: null,
       goCollectInfo: null,
       grandComicDBInfo: null,

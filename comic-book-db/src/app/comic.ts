@@ -80,7 +80,7 @@ export interface Comic {
   personalEstimate: number | null;
   targetPrice: number | null;
   collectionGroup: number | null;
-  isContainer: boolean | null;
+  isSet: boolean | null;
   storageLocation: string | null;
   goCollectInfo: GoCollectInfo | null;
   grandComicDBInfo: GrandComicDBInfo | null;

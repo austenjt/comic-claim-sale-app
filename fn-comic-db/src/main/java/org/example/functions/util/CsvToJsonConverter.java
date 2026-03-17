@@ -217,6 +217,7 @@ public class CsvToJsonConverter {
           // Defaults
           comicBook.setBarCode("");
           comicBook.setCollectionGroup(-1);
+          comicBook.setIsSet(false);
 
           // Financial
           comicBook.setPersonalEstimate(parseBigDecimal(record.get(GoCollectFields.PERSONAL_ESTIMATE.col())));

@@ -1,6 +1,7 @@
 package org.example.functions.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.AllArgsConstructor;
 import org.example.functions.util.MoneySerializer;
@@ -61,6 +62,7 @@ public class ComicBook {
     private BigDecimal salePrice;
     private String dateSold;
     private String soldTo;
+    @JsonProperty("isForSale")
     private Boolean isForSale;
 
     // Valuation
@@ -71,8 +73,8 @@ public class ComicBook {
 
     // Collection & storage
     private Integer collectionGroup;
-    @com.fasterxml.jackson.annotation.JsonProperty("isContainer")
-    private boolean isContainer;
+    @JsonProperty("isSet")
+    private Boolean isSet;
     private String storageLocation;
 
     // Metadata from externally supported sites

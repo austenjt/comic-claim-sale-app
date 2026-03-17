@@ -35,7 +35,7 @@ export class DashboardComponent implements OnInit {
 
   // Set state
   setMap: Map<number, Comic[]> = new Map();       // collectionGroup → all members
-  containerMap: Map<number, Comic> = new Map();   // collectionGroup → isContainer comic
+  containerMap: Map<number, Comic> = new Map();   // collectionGroup → isSet comic
 
   constructor(
     private comicService: ComicService,
@@ -81,11 +81,7 @@ export class DashboardComponent implements OnInit {
   }
 
   private buildSetMaps(comics: Comic[]): void {
-    // Normalize: old backend serializes "container", new backend serializes "isContainer"
-    const normalized = comics.map(c => ({
-      ...c,
-      isContainer: c.isContainer ?? (c as any).container ?? null
-    }));
+    const normalized = comics.map(c => ({ ...c }));
     this.setMap = new Map();
     this.containerMap = new Map();
     for (const comic of normalized) {
@@ -93,18 +89,18 @@ export class DashboardComponent implements OnInit {
         const group = this.setMap.get(comic.collectionGroup) ?? [];
         group.push(comic);
         this.setMap.set(comic.collectionGroup, group);
-        if (comic.isContainer) {
+        if (comic.isSet) {
           this.containerMap.set(comic.collectionGroup, comic);
         }
       }
     }
     // Only positive collectionGroup values form real sets.
     // null/undefined/-1/0 are treated as "no group" and always shown as regular cards.
-    // Within a real set (collectionGroup > 0), only the isContainer=true record shows.
+    // Within a real set (collectionGroup > 0), only the isSet=true record shows.
     this.comics = normalized.filter(c =>
       c.collectionGroup == null ||
       c.collectionGroup <= 0 ||
-      c.isContainer === true
+      c.isSet === true
     );
   }
 
@@ -125,7 +121,7 @@ export class DashboardComponent implements OnInit {
 
   claim(comic: Comic): void {
     this.claimError = '';
-    if (comic.isContainer) {
+    if (comic.isSet) {
       this.claimSet(comic);
       return;
     }

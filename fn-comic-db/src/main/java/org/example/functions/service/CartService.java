@@ -107,11 +107,11 @@ public class CartService {
         return cart;
     }
 
-    /** Add all comics in a set to the user's cart. containerId must reference an isContainer=true comic. */
+    /** Add all comics in a set to the user's cart. containerId must reference an isSet=true comic. */
     public Cart addSet(User user, String containerId) {
         ComicBook container = ComicService.getServiceInstance().getComicById(Integer.parseInt(containerId))
             .orElseThrow(() -> new IllegalArgumentException("Container comic not found: " + containerId));
-        if (!container.isContainer()) {
+        if (!Boolean.TRUE.equals(container.getIsSet())) {
             throw new IllegalArgumentException("Comic " + containerId + " is not a set container.");
         }
         Integer collectionGroup = container.getCollectionGroup();
