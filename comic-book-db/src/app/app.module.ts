@@ -12,7 +12,7 @@ import { AgGridModule } from 'ag-grid-angular';
 import { AppComponent } from './app.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { ComicDetailComponent } from './comic-detail/comic-detail.component';
-import { ComicsComponent } from './comics/comics.component';
+import { ManagementComponent } from './management/management.component';
 import { ComicSearchComponent } from './comic-search/comic-search.component';
 import { MessagesComponent } from './messages/messages.component';
 import { StandaloneListComponent } from './standalone-list/standalone-list.component';
@@ -33,7 +33,7 @@ import { SetDetailComponent } from './set-detail/set-detail.component';
   declarations: [
     AppComponent,
     DashboardComponent,
-    ComicsComponent,
+    ManagementComponent,
     ComicDetailComponent,
     MessagesComponent,
     ComicSearchComponent,

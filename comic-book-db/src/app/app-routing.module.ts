@@ -3,7 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { HashLocationStrategy, LocationStrategy } from '@angular/common';
 
 import { DashboardComponent } from './dashboard/dashboard.component';
-import { ComicsComponent } from './comics/comics.component';
+import { ManagementComponent } from './management/management.component';
 import { ComicDetailComponent } from './comic-detail/comic-detail.component';
 import { LoginComponent } from './login/login.component';
 import { AccountRequestComponent } from './account-request/account-request.component';
@@ -24,7 +24,7 @@ const routes: Routes = [
   { path: 'dashboard', component: DashboardComponent },
   { path: 'detail/:id', component: ComicDetailComponent },
   { path: 'set/:id', component: SetDetailComponent },
-  { path: 'comics', component: ComicsComponent },
+  { path: 'comics', component: ManagementComponent },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: AccountRequestComponent },
   { path: 'admin/users', component: AdminUsersComponent, canActivate: [AdminGuard] },

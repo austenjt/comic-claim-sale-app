@@ -202,29 +202,33 @@
 </div>
 <!-- ───────────────────────────────────────────────────────────────────────── -->
 
-<div class="mass-edit-label">Mass Edit</div>
-<div class="grid-toolbar">
-  <button class="toolbar-btn refresh-btn" (click)="refreshGrid()" [disabled]="refreshing">
-    {{ refreshing ? 'Loading…' : '&#8635; Refresh' }}
-  </button>
-</div>
+<div class="qa-section">
+  <div class="qa-header">
+    <span class="qa-title">Mass Edit</span>
+  </div>
+  <div class="grid-toolbar">
+    <button class="toolbar-btn refresh-btn" (click)="refreshGrid()" [disabled]="refreshing">
+      {{ refreshing ? 'Loading…' : '&#8635; Refresh' }}
+    </button>
+  </div>
 
-<div *ngIf="!dataLoaded" class="grid-placeholder">
-  <span>Click <strong>Refresh</strong> to load the latest data before making edits.</span>
-</div>
+  <div *ngIf="!dataLoaded" class="grid-placeholder">
+    <span>Click <strong>Refresh</strong> to load the latest data before making edits.</span>
+  </div>
 
-<ag-grid-angular
-      *ngIf="dataLoaded"
-      pagination
-      class="ag-theme-alpine"
-      style="height: 600px;"
-      [rowData]="comics"
-      [columnDefs]="columnDefs"
-      [getRowId]="getRowId"
-      (cellClicked)="onCellClicked($event)"
-      rowSelection="single"
-      (rowClicked)="onRowClicked($event)"
-      (cellValueChanged)="onCellValueChanged($event)"
-      [stopEditingWhenCellsLoseFocus]="true"
->
-</ag-grid-angular>
+  <ag-grid-angular
+        *ngIf="dataLoaded"
+        pagination
+        class="ag-theme-alpine"
+        style="height: 600px;"
+        [rowData]="comics"
+        [columnDefs]="columnDefs"
+        [getRowId]="getRowId"
+        (cellClicked)="onCellClicked($event)"
+        rowSelection="single"
+        (rowClicked)="onRowClicked($event)"
+        (cellValueChanged)="onCellValueChanged($event)"
+        [stopEditingWhenCellsLoseFocus]="true"
+  >
+  </ag-grid-angular>
+</div>
