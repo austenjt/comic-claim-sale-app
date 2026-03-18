@@ -255,6 +255,7 @@
     <button class="toolbar-btn refresh-btn" (click)="refreshGrid()" [disabled]="refreshing">
       {{ refreshing ? 'Loading…' : '&#8635; Refresh' }}
     </button>
+    <input *ngIf="dataLoaded" class="grid-search" type="search" placeholder="Search…" [(ngModel)]="gridSearch" />
   </div>
 
   <div *ngIf="!dataLoaded" class="grid-placeholder">
@@ -274,6 +275,7 @@
         (rowClicked)="onRowClicked($event)"
         (cellValueChanged)="onCellValueChanged($event)"
         [stopEditingWhenCellsLoseFocus]="true"
+        [quickFilterText]="gridSearch"
   >
   </ag-grid-angular>
 </div>

@@ -565,6 +565,7 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
   rowData: any[] = [];
   dataLoaded = false;
   refreshing = false;
+  gridSearch = '';
 
   // ── Enum reference data ───────────────────────────────────────────────────
   enums: ComicEnums = { coverVariants: [], gradingCompanies: [], grades: [], pageQualities: [] };

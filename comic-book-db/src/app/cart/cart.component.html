@@ -73,7 +73,7 @@
 
     <div class="cart-actions" *ngIf="canSubmit()">
       <p class="submit-note">
-        Ready to order? Submitting starts a 24-hour review window before your order is finalized.
+        Ready to order? Submitting starts a {{ configService.finalizeHours }}-hour review window before your order is finalized.
         You can still remove items during this window, but not add new ones.
       </p>
       <button class="btn-submit" (click)="submitOrder()" [disabled]="submitting">

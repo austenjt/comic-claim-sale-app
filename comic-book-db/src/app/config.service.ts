@@ -18,11 +18,13 @@ export interface ComicEnums {
 export interface AppConfig extends ComicEnums {
   emailEnabled: boolean;
   awardModeEnabled: boolean;
+  finalizeHours: number;
 }
 
 const DEFAULT_CONFIG: AppConfig = {
   emailEnabled: true,
   awardModeEnabled: true,
+  finalizeHours: 20,
   coverVariants: [],
   gradingCompanies: [],
   grades: [],
@@ -53,6 +55,10 @@ export class ConfigService {
 
   get awardModeEnabled(): boolean {
     return this._config.awardModeEnabled;
+  }
+
+  get finalizeHours(): number {
+    return this._config.finalizeHours ?? 20;
   }
 
   getEnums(): ComicEnums {

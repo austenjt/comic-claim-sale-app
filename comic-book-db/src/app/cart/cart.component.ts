@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CartService } from '../cart.service';
 import { ToastService } from '../toast.service';
+import { ConfigService } from '../config.service';
 import { Cart } from '../cart';
 
 @Component({
@@ -14,7 +15,7 @@ export class CartComponent implements OnInit {
   error = '';
   submitting = false;
 
-  constructor(private cartService: CartService, private toastService: ToastService) {}
+  constructor(private cartService: CartService, private toastService: ToastService, public configService: ConfigService) {}
 
   ngOnInit() {
     this.loadCart();
@@ -89,7 +90,7 @@ export class CartComponent implements OnInit {
   get statusLabel(): string {
     switch (this.cart?.status) {
       case 'OPEN': return 'Open — add or remove items freely.';
-      case 'FINALIZING': return 'Submitted — 24-hour review window in progress.';
+      case 'FINALIZING': return `Submitted — ${this.configService.finalizeHours}-hour review window in progress.`;
       case 'FINALIZED': return 'Finalized — awaiting seller fulfillment.';
       case 'FULFILLED': return 'Fulfilled — your order has been shipped!';
       default: return '';
