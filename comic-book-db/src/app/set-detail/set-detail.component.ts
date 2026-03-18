@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Location } from '@angular/common';
 import { Observable, of } from 'rxjs';
+import { filter, take } from 'rxjs/operators';
 
 import { Comic } from '../comic';
 import { Cart } from '../cart';
@@ -43,19 +44,13 @@ export class SetDetailComponent implements OnInit {
   ngOnInit(): void {
     const id = parseInt(this.route.snapshot.paramMap.get('id')!, 10);
 
-    this.comicService.getComic(id).subscribe(comic => {
-      this.container = comic;
-      if (comic?.collectionGroup != null) {
-        this.comicService.getRemoteComics().subscribe({
-          next: all => {
-            this.setMembers = all.filter(c => c.collectionGroup === comic.collectionGroup);
-            this.loading = false;
-          },
-          error: () => { this.loading = false; }
-        });
-      } else {
-        this.loading = false;
-      }
+    this.comicService.getCachedNestedComics().pipe(
+      filter(comics => comics.length > 0),
+      take(1)
+    ).subscribe(nestedComics => {
+      this.container = nestedComics.find(c => c.id === id);
+      this.setMembers = this.container?.items ?? [];
+      this.loading = false;
     });
 
     this.cartService.getClaimedMap().subscribe({ next: m => this.claimedMap = m, error: () => {} });
@@ -85,11 +80,15 @@ export class SetDetailComponent implements OnInit {
   }
 
   isSetInMyCart(): boolean {
-    return this.setMembers.some(m => this.isInMyCart(m.id));
+    const containerInCart = this.container ? this.isInMyCart(this.container.id) : false;
+    return containerInCart || this.setMembers.some(m => this.isInMyCart(m.id));
   }
 
   isSetClaimedByOther(): boolean {
-    return this.setMembers.some(m =>
+    const containerClaimed = this.container
+      ? (!!this.claimedMap[String(this.container.id)] && !this.isInMyCart(this.container.id))
+      : false;
+    return containerClaimed || this.setMembers.some(m =>
       !!this.claimedMap[String(m.id)] && !this.isInMyCart(m.id)
     );
   }
@@ -109,6 +108,9 @@ export class SetDetailComponent implements OnInit {
     this.cartService.addSet(String(this.container.id)).subscribe({
       next: cart => {
         this.myCart = cart;
+        if (this.container) {
+          this.claimedMap[String(this.container.id)] = new Date().toISOString();
+        }
         for (const m of this.setMembers) {
           this.claimedMap[String(m.id)] = new Date().toISOString();
         }

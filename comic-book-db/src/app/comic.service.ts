@@ -24,7 +24,8 @@ export class ComicService {
   private searchUrl = this.baseServiceUrl + '/search';
   private syncUrl = this.comicsUrl + '/data/sync'
 
-  private comicsSubject = new BehaviorSubject<Comic[]>([]);
+  private comicsSubject = new BehaviorSubject<Comic[]>([]);        // flat list (all comics including set members)
+  private nestedComicsSubject = new BehaviorSubject<Comic[]>([]); // top-level list (sets with items embedded)
 
   httpOptions = {
     headers: new HttpHeaders({ 'Content-Type': 'application/json' })
@@ -37,7 +38,23 @@ export class ComicService {
 
   private loadInitialData() {
     this.http.get<Comic[]>(this.comicsUrl)
-        .subscribe(comics => this.comicsSubject.next(comics));
+        .subscribe(nested => {
+          this.nestedComicsSubject.next(nested);
+          this.comicsSubject.next(this.flattenComics(nested));
+        });
+  }
+
+  /** Flattens a nested comics response into a flat list that includes set members. */
+  private flattenComics(nestedComics: Comic[]): Comic[] {
+    const result: Comic[] = [];
+    for (const comic of nestedComics) {
+      const { items, ...rest } = comic as any;
+      result.push(rest as Comic);
+      if (items && items.length > 0) {
+        result.push(...items);
+      }
+    }
+    return result;
   }
 
   syncImages(): Observable<string[]> {
@@ -51,17 +68,33 @@ export class ComicService {
   }
 
 
+  /** Returns a flat cached list of all comics including set members (used by admin grid). */
   getCachedComics(): Observable<Comic[]> {
     this.log('fetched comics from memory cache')
     return this.comicsSubject.asObservable();
   }
 
-  /** GET heroes from the server */
+  /** Returns the top-level nested cached list: sets have items[] populated, members excluded from top level. */
+  getCachedNestedComics(): Observable<Comic[]> {
+    return this.nestedComicsSubject.asObservable();
+  }
+
+  /** GET comics from the server as a flat list (set members included at top level). */
   getRemoteComics(): Observable<Comic[]> {
     return this.http.get<Comic[]>(this.comicsUrl)
       .pipe(
+        map(nested => this.flattenComics(nested)),
         tap(_ => this.log('fetched comics from remote')),
         catchError(this.handleError<Comic[]>('getRemoteComics', []))
+      );
+  }
+
+  /** GET comics from the server in nested form: sets include items[], members excluded from top level. */
+  getRemoteNestedComics(): Observable<Comic[]> {
+    return this.http.get<Comic[]>(this.comicsUrl)
+      .pipe(
+        tap(_ => this.log('fetched nested comics from remote')),
+        catchError(this.handleError<Comic[]>('getRemoteNestedComics', []))
       );
   }
 
@@ -138,7 +171,10 @@ export class ComicService {
 
   refreshComics() {
     console.log('Refreshing comic list.');
-    this.http.get<Comic[]>(this.comicsUrl).subscribe(comics => this.comicsSubject.next(comics));
+    this.http.get<Comic[]>(this.comicsUrl).subscribe(nested => {
+      this.nestedComicsSubject.next(nested);
+      this.comicsSubject.next(this.flattenComics(nested));
+    });
   }
 
   /**

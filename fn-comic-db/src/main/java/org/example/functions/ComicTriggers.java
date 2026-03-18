@@ -23,6 +23,7 @@ import org.example.functions.service.ImageService;
 import org.example.functions.service.SessionService;
 import org.example.functions.service.UserService;
 import org.example.functions.util.CsvToJsonConverter;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -58,7 +59,7 @@ public class ComicTriggers {
                 int pageSize = Integer.parseInt(pageSizeStr);
                 comicBookData = comicService.getComicsList(pageNumber, pageSize);
             } else {
-                comicBookData = comicService.getComicsList();
+                comicBookData = comicService.getComicsListEnriched();
             }
             String body = admin
                 ? OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(comicBookData)
@@ -277,12 +278,12 @@ public class ComicTriggers {
         return user != null && user.isAdmin();
     }
 
-    /** Serializes a list of comics, removing pricePaid from each item. */
+    /** Serializes a list of comics, removing pricePaid from each item and its nested set members. */
     private String serializeComicsStripped(List<ComicBook> comics) throws JsonProcessingException {
         ArrayNode array = OBJECT_MAPPER.createArrayNode();
         for (ComicBook comic : comics) {
             ObjectNode node = OBJECT_MAPPER.valueToTree(comic);
-            node.remove("pricePaid");
+            stripPricePaid(node);
             array.add(node);
         }
         return OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(array);
@@ -291,8 +292,18 @@ public class ComicTriggers {
     /** Serializes a single comic, removing pricePaid. */
     private String serializeComicStripped(ComicBook comic) throws JsonProcessingException {
         ObjectNode node = OBJECT_MAPPER.valueToTree(comic);
-        node.remove("pricePaid");
+        stripPricePaid(node);
         return OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(node);
+    }
+
+    /** Removes pricePaid from a comic node and recursively from any nested items. */
+    private void stripPricePaid(ObjectNode node) {
+        node.remove("pricePaid");
+        if (node.has("items")) {
+            for (JsonNode item : node.get("items")) {
+                ((ObjectNode) item).remove("pricePaid");
+            }
+        }
     }
 
     /* URI: /comics/data */

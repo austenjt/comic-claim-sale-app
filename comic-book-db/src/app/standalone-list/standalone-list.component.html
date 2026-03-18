@@ -116,6 +116,19 @@
 </div>
 <!-- ───────────────────────────────────────────────────────────────────────── -->
 
+<!-- ── Add Set ───────────────────────────────────────────────────────────── -->
+<div class="qa-section add-set-section">
+  <div class="qa-header">
+    <span class="qa-title">Add Set</span>
+  </div>
+  <div *ngIf="addSetError" class="qa-error">{{ addSetError }}</div>
+  <button class="toolbar-btn add-btn" (click)="openAddSet()" [disabled]="addSetSaving">
+    {{ addSetSaving ? 'Saving…' : 'Add Set' }}
+  </button>
+</div>
+<!-- ───────────────────────────────────────────────────────────────────────── -->
+
+<div class="mass-edit-label">Mass Edit</div>
 <div class="grid-toolbar">
   <button class="toolbar-btn refresh-btn" (click)="refreshGrid()" [disabled]="refreshing">
     {{ refreshing ? 'Loading…' : '&#8635; Refresh' }}

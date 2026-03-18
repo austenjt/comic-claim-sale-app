@@ -23,6 +23,7 @@ import org.example.functions.model.ComicBook;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
@@ -127,6 +128,41 @@ public class ComicService {
             .header("Content-Type", "application/json")
             .body(responseDeleted)
             .build();
+    }
+
+    /**
+     * Fetches all comics and returns a top-level list where set containers have their
+     * member comics embedded in the {@code items} field. Set members are excluded from
+     * the top-level list — only containers (isSet=true) and standalone comics appear.
+     * One Cosmos query; the grouping is done in memory.
+     */
+    public List<ComicBook> getComicsListEnriched() {
+        List<ComicBook> all = getComicsList();
+
+        // Group non-container members by collectionGroup
+        Map<Integer, List<ComicBook>> membersByGroup = all.stream()
+            .filter(c -> c.getCollectionGroup() != null
+                      && c.getCollectionGroup() > 0
+                      && !Boolean.TRUE.equals(c.getIsSet()))
+            .collect(Collectors.groupingBy(ComicBook::getCollectionGroup));
+
+        List<ComicBook> topLevel = new ArrayList<>();
+        for (ComicBook comic : all) {
+            boolean isRealSet = Boolean.TRUE.equals(comic.getIsSet())
+                && comic.getCollectionGroup() != null
+                && comic.getCollectionGroup() > 0;
+            boolean isStandalone = comic.getCollectionGroup() == null
+                || comic.getCollectionGroup() <= 0;
+
+            if (isRealSet) {
+                comic.setItems(membersByGroup.getOrDefault(comic.getCollectionGroup(), new ArrayList<>()));
+                topLevel.add(comic);
+            } else if (isStandalone) {
+                topLevel.add(comic);
+            }
+            // Members (collectionGroup > 0 && !isSet) are embedded in their container
+        }
+        return topLevel;
     }
 
     public List<ComicBook> getComicsSearch(final String subString) {

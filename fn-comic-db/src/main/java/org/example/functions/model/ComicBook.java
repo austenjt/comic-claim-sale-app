@@ -1,6 +1,7 @@
 package org.example.functions.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.AllArgsConstructor;
@@ -90,6 +91,10 @@ public class ComicBook {
     // Notes
     private String personalNotes;
     private String publicNotes;
+
+    // Set members — populated at response-time when isSet=true; not persisted in Cosmos
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private List<ComicBook> items;
 
     /**
      * Used to prevent duplicate data being added.

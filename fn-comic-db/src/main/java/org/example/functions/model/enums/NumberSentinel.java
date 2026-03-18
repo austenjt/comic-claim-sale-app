@@ -8,7 +8,8 @@ import com.fasterxml.jackson.annotation.JsonValue;
  */
 public enum NumberSentinel {
     NEGATIVE_ONE("-1"),
-    NN("NN");
+    NN("NN"),
+    SET("SET");
 
     private final String value;
 

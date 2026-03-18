@@ -60,7 +60,7 @@ export class NumberCellEditorComponent implements ICellEditorAngularComp, OnInit
   value = '';
   error = '';
   validating = false;
-  hint = 'Whole number ≥ 0, or: -1, NN';
+  hint = 'Whole number ≥ 0, or: -1, NN, SET';
 
   private lastResult: NumberValidationResult | null = null;
   private inputSubject = new Subject<string>();

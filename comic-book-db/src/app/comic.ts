@@ -90,4 +90,5 @@ export interface Comic {
   largeBackImageId: string | null;
   personalNotes: string | null;
   publicNotes: string | null;
+  items?: Comic[];
 }

@@ -49,6 +49,17 @@
   background: #1e2a38;
 }
 
+.mass-edit-label {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #e8eef4;
+  margin-bottom: 6px;
+}
+
+.add-set-section {
+  padding: 12px 18px;
+}
+
 /* ── Quick Add ──────────────────────────────────────────────────────────── */
 
 .qa-section {

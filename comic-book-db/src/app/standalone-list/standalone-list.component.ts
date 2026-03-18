@@ -568,6 +568,10 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
   // ── Enum reference data ───────────────────────────────────────────────────
   enums: ComicEnums = { coverVariants: [], gradingCompanies: [], grades: [], pageQualities: [] };
 
+  // ── Add Set ───────────────────────────────────────────────────────────────
+  addSetSaving = false;
+  addSetError = '';
+
   // ── Quick Add wizard ──────────────────────────────────────────────────────
   qaStep = 1;
   qaSaving = false;
@@ -809,6 +813,72 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
     console.log('Cell Update:', event.data);
     this.comicService.updateComic(event.data).subscribe();
     // update of table is implicit i think
+  }
+
+  openAddSet(): void {
+    this.addSetSaving = true;
+    this.addSetError = '';
+    const setComic: Comic = {
+      id: -1,
+      title: 'Set (Needs Name)',
+      series: '',
+      number: { volume: null, number: null, sentinel: 'SET' },
+      publisher: null,
+      publishedDate: null,
+      era: null,
+      variant: null,
+      printRun: null,
+      barCode: null,
+      keyIssue: null,
+      writer: [],
+      artist: [],
+      comicCondition: {
+        isGraded: false,
+        certificationCompany: 'NOT CERTIFIED',
+        certificationId: null,
+        cgcCondition: null,
+        cbcsCondition: null,
+        notCertifiedLabel: null,
+        notCertifiedGrade: null,
+        notCertifiedPageQuality: null,
+        notCertifiedPedigree: null,
+        notCertifiedDegreeOfRestoration: null,
+        notCertifiedSignature: null
+      },
+      defects: null,
+      pricePaid: null,
+      dateAcquired: null,
+      purchasedFrom: null,
+      purchaseReferenceURL: null,
+      salePrice: 0,
+      dateSold: null,
+      soldTo: null,
+      isForSale: true,
+      personalEstimate: null,
+      targetPrice: null,
+      collectionGroup: null,
+      isSet: true,
+      storageLocation: null,
+      goCollectInfo: null,
+      grandComicDBInfo: null,
+      smallCachedImageId: null,
+      largeCachedImageId: null,
+      smallBackImageId: null,
+      largeBackImageId: null,
+      personalNotes: null,
+      publicNotes: null
+    };
+    this.comicService.addComic(setComic).subscribe({
+      next: returned => {
+        this.comics = [...this.comics, returned];
+        this.addSetSaving = false;
+        this.dataLoaded = true;
+      },
+      error: () => {
+        this.addSetError = 'Failed to create set. Please try again.';
+        this.addSetSaving = false;
+      }
+    });
   }
 
   refreshGrid(): void {

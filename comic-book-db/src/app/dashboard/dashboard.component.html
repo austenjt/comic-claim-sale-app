@@ -46,7 +46,7 @@
           <div class="meta-grid">
             <div *ngIf="comic.series && comic.series !== ''" class="comic-series">Series: <b>{{ comic.series }}</b></div>
             <div *ngIf="comic.publisher" class="comic-publisher">Publisher: <b>{{ comic.publisher }}</b></div>
-            <div class="comic-number">Books: <b>{{ setMap.get(comic.collectionGroup!)?.length ?? 0 }}</b></div>
+            <div class="comic-number">Books: <b>{{ comic.items?.length ?? 0 }}</b></div>
             <div *ngIf="getSetPrice(comic) > 0" class="comic-price">Total: <b>{{ getSetPrice(comic) | currency:'USD':'symbol':'1.2-2' }}</b></div>
           </div>
         </div>
