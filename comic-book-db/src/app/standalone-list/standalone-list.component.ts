@@ -1,5 +1,6 @@
 
 import { Component, OnInit, OnDestroy, Output, EventEmitter } from '@angular/core';
+import { take } from 'rxjs/operators';
 import { AgGridModule } from 'ag-grid-angular';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -568,9 +569,22 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
   // ── Enum reference data ───────────────────────────────────────────────────
   enums: ComicEnums = { coverVariants: [], gradingCompanies: [], grades: [], pageQualities: [] };
 
-  // ── Add Set ───────────────────────────────────────────────────────────────
+  // ── Add Set modal ─────────────────────────────────────────────────────────
+  showAddSetModal = false;
+  addSetCollectionGroup: number | null = null;
   addSetSaving = false;
   addSetError = '';
+
+  // ── Add To Set modal ──────────────────────────────────────────────────────
+  showAddToSetModal = false;
+  addToSetStep = 1;
+  addToSetAvailableSets: Comic[] = [];
+  addToSetUnassigned: Comic[] = [];
+  addToSetSelectedSet: Comic | null = null;
+  addToSetSearchTerm = '';
+  addToSetSearchResults: Comic[] = [];
+  addToSetSaving = false;
+  addToSetError = '';
 
   // ── Quick Add wizard ──────────────────────────────────────────────────────
   qaStep = 1;
@@ -816,6 +830,19 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
   }
 
   openAddSet(): void {
+    this.addSetCollectionGroup = null;
+    this.addSetError = '';
+    this.showAddSetModal = true;
+  }
+
+  cancelAddSet(): void {
+    this.showAddSetModal = false;
+    this.addSetCollectionGroup = null;
+    this.addSetError = '';
+  }
+
+  confirmAddSet(): void {
+    if (!this.addSetCollectionGroup) return;
     this.addSetSaving = true;
     this.addSetError = '';
     const setComic: Comic = {
@@ -856,7 +883,7 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
       isForSale: true,
       personalEstimate: null,
       targetPrice: null,
-      collectionGroup: null,
+      collectionGroup: this.addSetCollectionGroup,
       isSet: true,
       storageLocation: null,
       goCollectInfo: null,
@@ -873,12 +900,76 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
         this.comics = [...this.comics, returned];
         this.addSetSaving = false;
         this.dataLoaded = true;
+        this.showAddSetModal = false;
+        this.addSetCollectionGroup = null;
       },
       error: () => {
         this.addSetError = 'Failed to create set. Please try again.';
         this.addSetSaving = false;
       }
     });
+  }
+
+  openAddToSet(): void {
+    this.comicService.getCachedComics().pipe(take(1)).subscribe(allComics => {
+      this.addToSetAvailableSets = allComics.filter(c => c.isSet === true);
+      this.addToSetUnassigned = allComics.filter(c =>
+        !c.isSet && (c.collectionGroup == null || c.collectionGroup <= 0)
+      );
+      this.addToSetStep = 1;
+      this.addToSetSelectedSet = null;
+      this.addToSetSearchTerm = '';
+      this.addToSetSearchResults = [];
+      this.addToSetError = '';
+      this.showAddToSetModal = true;
+    });
+  }
+
+  selectSetForAddTo(set: Comic): void {
+    this.addToSetSelectedSet = set;
+    this.addToSetSearchTerm = '';
+    this.addToSetSearchResults = [];
+    this.addToSetError = '';
+    this.addToSetStep = 2;
+  }
+
+  filterAddToSetResults(): void {
+    const term = this.addToSetSearchTerm.trim().toLowerCase();
+    if (!term) {
+      this.addToSetSearchResults = [];
+      return;
+    }
+    this.addToSetSearchResults = this.addToSetUnassigned.filter(c =>
+      c.title?.toLowerCase().includes(term) ||
+      c.series?.toLowerCase().includes(term)
+    );
+  }
+
+  confirmAddToSet(comic: Comic): void {
+    if (!this.addToSetSelectedSet) return;
+    this.addToSetSaving = true;
+    this.addToSetError = '';
+    const updated: Comic = { ...comic, collectionGroup: this.addToSetSelectedSet.collectionGroup };
+    this.comicService.updateComic(updated).subscribe({
+      next: () => {
+        this.comicService.refreshComics();
+        this.comics = this.comics.map(c => c.id === updated.id ? updated : c);
+        this.addToSetSaving = false;
+        this.showAddToSetModal = false;
+      },
+      error: () => {
+        this.addToSetError = 'Failed to add to set. Please try again.';
+        this.addToSetSaving = false;
+      }
+    });
+  }
+
+  comicNumberLabel(comic: Comic): string {
+    const n = comic.number;
+    if (!n) return '';
+    if (n.number != null) return ` #${n.number}`;
+    if (n.sentinel) return ` ${n.sentinel}`;
+    return '';
   }
 
   refreshGrid(): void {
