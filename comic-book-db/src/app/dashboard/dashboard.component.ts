@@ -33,6 +33,8 @@ export class DashboardComponent implements OnInit {
   awardLoading = false;
   awardError = '';
 
+  pendingDeleteId: number | null = null;
+
 
   constructor(
     private comicService: ComicService,
@@ -211,6 +213,23 @@ export class DashboardComponent implements OnInit {
         this.awardError = err?.error || 'Award failed.';
         this.awardLoading = false;
       }
+    });
+  }
+
+  deleteComic(comic: Comic, event: Event): void {
+    event.preventDefault();
+    event.stopPropagation();
+    if (this.pendingDeleteId !== comic.id) {
+      this.pendingDeleteId = comic.id;
+      return;
+    }
+    this.pendingDeleteId = null;
+    this.comicService.deleteComic(comic.id).subscribe({
+      next: () => {
+        this.comics = this.comics.filter(c => c.id !== comic.id);
+        this.comicService.refreshComics();
+      },
+      error: () => {}
     });
   }
 

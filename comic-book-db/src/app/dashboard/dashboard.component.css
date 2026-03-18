@@ -222,6 +222,20 @@ h2 {
 }
 .btn-award:hover { background: #6d28d9; }
 
+.btn-delete-card {
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: transparent;
+  color: #f87171;
+  border: 1px solid #f87171;
+}
+.btn-delete-card:hover { background: rgba(248,113,113,0.1); }
+.btn-delete-card-confirm { border-color: #ef4444; color: #ef4444; background: rgba(239,68,68,0.12); }
+.btn-delete-card-confirm:hover { background: rgba(239,68,68,0.2); }
+
 .award-modal-overlay {
   position: fixed;
   inset: 0;

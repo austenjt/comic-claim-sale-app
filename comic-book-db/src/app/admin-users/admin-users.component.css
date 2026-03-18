@@ -6,8 +6,6 @@ th { background: #1e2a38; font-weight: bold; }
 
 button { padding: 6px 14px; cursor: pointer; }
 
-.address-cell { white-space: pre-line; }
-
 .error-message { color: #f87171; margin-bottom: 12px; }
 
 .section-heading { margin-top: 40px; }

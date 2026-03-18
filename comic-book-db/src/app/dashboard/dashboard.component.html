@@ -111,6 +111,12 @@
               <button *ngIf="auth.isAdmin() && configService.awardModeEnabled && !claimedDate(comic.id) && !comic.comicCondition?.cgcCondition?.grade && !comic.comicCondition?.cbcsCondition?.grade"
                 class="btn-award"
                 (click)="$event.preventDefault(); $event.stopPropagation(); openAwardModal(comic)">Award</button>
+              <button *ngIf="auth.isAdmin()"
+                class="btn-delete-card"
+                [class.btn-delete-card-confirm]="pendingDeleteId === comic.id"
+                (click)="deleteComic(comic, $event)">
+                {{ pendingDeleteId === comic.id ? 'Confirm?' : 'Delete' }}
+              </button>
             </ng-template>
           </div>
         </div>
