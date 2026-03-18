@@ -25,6 +25,7 @@ import org.example.functions.service.UserService;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 public class AdminTriggers {
@@ -164,6 +165,46 @@ public class AdminTriggers {
                 .body(OBJECT_MAPPER.writeValueAsString(orders)).build();
         } catch (Exception e) {
             log.error("getArchivedOrders error", e);
+            return serverError(request, e);
+        }
+    }
+
+    // ─── DELETE /api/orders/archived/{orderId}/full ───────────────────────────
+
+    @FunctionName("fullDeleteArchivedOrder")
+    public HttpResponseMessage fullDeleteArchivedOrder(
+        @HttpTrigger(name = "fullDeleteArchivedOrder", route = "orders/archived/{orderId}/full",
+            methods = {HttpMethod.DELETE}, authLevel = AuthorizationLevel.ANONYMOUS)
+        HttpRequestMessage<Optional<String>> request,
+        @BindingName("orderId") String orderId)
+    {
+        if (requireAdmin(request) == null) return unauthorized(request);
+        try {
+            ArchivedOrder order = ArchiveService.getServiceInstance().getArchivedOrderById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("Archived order not found: " + orderId));
+
+            // Collect distinct non-null collectionGroups from order items
+            List<Integer> groups = order.getItems().stream()
+                .map(org.example.functions.model.ArchivedOrderItem::getCollectionGroup)
+                .filter(g -> g != null && g > 0)
+                .distinct()
+                .collect(Collectors.toList());
+
+            ArchiveService.getServiceInstance().deleteArchivedOrder(orderId);
+
+            for (Integer group : groups) {
+                try {
+                    ComicService.getServiceInstance().deleteSetFully(group);
+                } catch (Exception e) {
+                    log.warn("fullDeleteArchivedOrder: could not delete set group {}: {}", group, e.getMessage());
+                }
+            }
+
+            return cors(request.createResponseBuilder(HttpStatus.NO_CONTENT)).build();
+        } catch (IllegalArgumentException e) {
+            return cors(request.createResponseBuilder(HttpStatus.NOT_FOUND)).body(e.getMessage()).build();
+        } catch (Exception e) {
+            log.error("fullDeleteArchivedOrder error", e);
             return serverError(request, e);
         }
     }

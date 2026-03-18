@@ -997,8 +997,8 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
         this.showDeleteSetModal = false;
         this.deleteSetSelected = null;
       },
-      error: () => {
-        this.deleteSetError = 'Failed to delete set. Please try again.';
+      error: (err: any) => {
+        this.deleteSetError = err?.error || 'Failed to delete set. Please try again.';
         this.deleteSetSaving = false;
       }
     });

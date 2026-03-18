@@ -104,6 +104,22 @@ tfoot td { font-weight: bold; }
   color: #34d399;
 }
 
+.order-actions { display: flex; gap: 10px; }
+
+.btn-full-delete {
+  padding: 8px 20px;
+  background: transparent;
+  color: #f97316;
+  border: 1px solid #f97316;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  font-weight: 600;
+}
+.btn-full-delete:hover { background: rgba(249,115,22,0.1); }
+.btn-full-delete-confirm { border-color: #dc2626; color: #dc2626; }
+.btn-full-delete-confirm:hover { background: rgba(220,38,38,0.15); }
+
 .btn-delete {
   padding: 8px 20px;
   background: transparent;

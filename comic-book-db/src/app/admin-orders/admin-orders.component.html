@@ -169,6 +169,13 @@
         (click)="deleteArchivedOrder(order)">
         {{ pendingDeleteId === order.id ? 'Confirm Delete?' : 'Delete' }}
       </button>
+      <button *ngIf="hasSetItems(order)"
+        class="btn-full-delete"
+        [class.btn-full-delete-confirm]="pendingFullDeleteId === order.id"
+        (click)="fullDeleteArchivedOrder(order)"
+        title="Delete this archived order AND permanently remove all associated set comics from the database">
+        {{ pendingFullDeleteId === order.id ? 'Confirm Full Delete?' : 'Full Delete' }}
+      </button>
     </div>
   </div>
 

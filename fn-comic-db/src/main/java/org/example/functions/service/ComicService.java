@@ -276,6 +276,15 @@ public class ComicService {
         }
     }
 
+    /** Deletes ALL comics in a collectionGroup (container and members). Used when cleaning up fulfilled sets. */
+    public void deleteSetFully(int collectionGroup) {
+        List<ComicBook> all = getComicsByCollectionGroup(collectionGroup);
+        log.info("Fully deleting set with collectionGroup={}, removing {} comics", collectionGroup, all.size());
+        for (ComicBook comic : all) {
+            deleteComic(comic.getId());
+        }
+    }
+
     private ObjectNode comicBookToNode(ComicBook comic) {
         ObjectNode node = OBJECT_MAPPER.valueToTree(comic);
         node.put("id", String.valueOf(comic.getId()));

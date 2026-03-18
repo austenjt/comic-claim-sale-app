@@ -341,6 +341,15 @@ public class CartService {
         return claimed;
     }
 
+    /** Returns true if any item with the given collectionGroup is in an active (non-FULFILLED, non-DELETED) cart. */
+    public boolean isSetClaimed(int collectionGroup) {
+        SqlQuerySpec query = new SqlQuerySpec(
+            "SELECT c.id FROM c JOIN item IN c.items WHERE item.collectionGroup = @group AND c.status NOT IN ('FULFILLED', 'DELETED')",
+            List.of(new SqlParameter("@group", collectionGroup)));
+        return cartsContainer.queryItems(query, new CosmosQueryRequestOptions(), ObjectNode.class)
+            .iterator().hasNext();
+    }
+
     /** Returns true if the comic is in any active (non-FULFILLED, non-DELETED) cart. */
     public boolean isComicClaimed(String comicId) {
         SqlQuerySpec query = new SqlQuerySpec(

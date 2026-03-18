@@ -17,4 +17,5 @@ public class ArchivedOrderItem {
     private String comicTitle;
     private double price;
     private String claimedAt;
+    private Integer collectionGroup;
 }

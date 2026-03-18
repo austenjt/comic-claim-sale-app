@@ -57,6 +57,7 @@ export class AdminOrdersComponent implements OnInit {
 
   pendingFulfillId: string | null = null;
   pendingDeleteId: string | null = null;
+  pendingFullDeleteId: string | null = null;
 
   fulfill(cart: Cart) {
     if (this.pendingFulfillId !== cart.id) {
@@ -85,6 +86,7 @@ export class AdminOrdersComponent implements OnInit {
   deleteArchivedOrder(order: ArchivedOrder) {
     if (this.pendingDeleteId !== order.id) {
       this.pendingDeleteId = order.id;
+      this.pendingFullDeleteId = null;
       return;
     }
     this.pendingDeleteId = null;
@@ -92,6 +94,23 @@ export class AdminOrdersComponent implements OnInit {
       next: () => { this.archivedOrders = this.archivedOrders.filter(o => o.id !== order.id); },
       error: () => { this.archivedError = 'Failed to delete archived order.'; }
     });
+  }
+
+  fullDeleteArchivedOrder(order: ArchivedOrder) {
+    if (this.pendingFullDeleteId !== order.id) {
+      this.pendingFullDeleteId = order.id;
+      this.pendingDeleteId = null;
+      return;
+    }
+    this.pendingFullDeleteId = null;
+    this.cartService.fullDeleteArchivedOrder(order.id).subscribe({
+      next: () => { this.archivedOrders = this.archivedOrders.filter(o => o.id !== order.id); },
+      error: () => { this.archivedError = 'Failed to fully delete archived order.'; }
+    });
+  }
+
+  hasSetItems(order: ArchivedOrder): boolean {
+    return order.items.some(i => i.collectionGroup != null && i.collectionGroup > 0);
   }
 
   cartTotal(cart: Cart): number {

@@ -78,6 +78,25 @@ public class ArchiveService {
         log.info("Deleted archived order {}", orderId);
     }
 
+    /** Returns a single archived order by ID, or empty if not found. */
+    public java.util.Optional<ArchivedOrder> getArchivedOrderById(String orderId) {
+        try {
+            ObjectNode node = archivedOrdersContainer.readItem(orderId, new PartitionKey(orderId), ObjectNode.class).getItem();
+            return java.util.Optional.ofNullable(OBJECT_MAPPER.treeToValue(node, ArchivedOrder.class));
+        } catch (Exception e) {
+            return java.util.Optional.empty();
+        }
+    }
+
+    /** Returns true if any archived order contains an item with the given collectionGroup. */
+    public boolean hasArchivedOrderForGroup(int collectionGroup) {
+        SqlQuerySpec query = new SqlQuerySpec(
+            "SELECT c.id FROM c JOIN item IN c.items WHERE item.collectionGroup = @group",
+            List.of(new SqlParameter("@group", collectionGroup)));
+        return archivedOrdersContainer.queryItems(query, new CosmosQueryRequestOptions(), ObjectNode.class)
+            .iterator().hasNext();
+    }
+
     /** Migrate any fulfilled carts that are not yet in archived-orders (one-time safe call). */
     public void migrateAll(List<Cart> fulfilledCarts) {
         for (Cart cart : fulfilledCarts) {
@@ -108,6 +127,7 @@ public class ArchiveService {
                 .comicTitle(i.getComicTitle())
                 .price(i.getPrice())
                 .claimedAt(i.getClaimedAt())
+                .collectionGroup(i.getCollectionGroup())
                 .build())
             .collect(Collectors.toList());
 

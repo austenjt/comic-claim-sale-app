@@ -80,6 +80,10 @@ export class CartService {
     return this.http.delete<void>(`${this.apiBase}/orders/archived/${orderId}`, { responseType: 'text' as 'json' });
   }
 
+  fullDeleteArchivedOrder(orderId: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiBase}/orders/archived/${orderId}/full`, { responseType: 'text' as 'json' });
+  }
+
   awardComic(comicId: string, userId: string): Observable<Cart> {
     return this.http.post<Cart>(`${this.apiBase}/awards`, { comicId, userId });
   }

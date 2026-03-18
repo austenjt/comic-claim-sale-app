@@ -82,10 +82,42 @@
         <strong>Comics in your own cart</strong> show a green <em>In Your Cart</em> label so you
         can see at a glance what you've already claimed.
       </li>
+      <li>
+        <strong>Sets</strong> appear as their own card with an orange <em>Set N</em> badge. Clicking
+        a set card takes you to the set's detail page rather than a single-comic detail page.
+      </li>
     </ul>
     <p>
       You can also use the search bar at the top of the dashboard to filter comics by title, series,
       or other details.
+    </p>
+  </section>
+
+  <!-- ── Sets ──────────────────────────────────────────────────────────── -->
+  <section class="hiw-section">
+    <h2>Sets</h2>
+    <p>
+      A <strong>Set</strong> is a bundle of comics sold together as a single unit. Sets are ideal
+      for runs, lots, or curated groups the seller wants to keep together. You cannot buy individual
+      books out of a set — it's all-or-nothing.
+    </p>
+    <p>
+      Clicking a set card on the dashboard opens the <strong>Set Detail page</strong>, which shows:
+    </p>
+    <ul>
+      <li>A cover image and description for the set</li>
+      <li>The full list of member books with their individual grades and prices</li>
+      <li>The combined total price for the whole set</li>
+      <li>A <em>Claim Set</em> button (if you're an approved buyer and the set is available)</li>
+    </ul>
+    <p>
+      When you claim a set, every book in the bundle is added to your cart at once, each tagged with
+      the orange <em>Set N</em> badge. If you want to remove the set from your cart, clicking
+      <em>Remove Set</em> on any member book removes the entire set in one action — you cannot
+      remove just one book from a set while keeping the others.
+    </p>
+    <p>
+      All books in a set must be priced before the <em>Claim Set</em> button appears.
     </p>
   </section>
 
@@ -123,14 +155,14 @@
         your cart is open.
       </li>
       <li>
-        <strong>Submitted (24-hour window)</strong> — when you're done shopping, click
-        <em>Submit Order</em>. This starts a 24-hour review period. During this window you can
-        still remove items but you cannot add new ones. Any applicable sale discounts are
-        calculated and shown at this point.
+        <strong>Submitted (review window)</strong> — when you're done shopping, click
+        <em>Submit Order</em>. This starts a short review period set by the seller. During this
+        window you can still remove items but you cannot add new ones. Any applicable sale discounts
+        are calculated and shown at this point.
       </li>
       <li>
-        <strong>Finalized</strong> — after 24 hours, your cart locks automatically. The seller
-        is notified and will reach out to arrange payment and shipping.
+        <strong>Finalized</strong> — once the review window expires, your cart locks automatically.
+        The seller will reach out to arrange payment and shipping.
       </li>
       <li>
         <strong>Fulfilled</strong> — once the seller marks your order as fulfilled, the cart is
@@ -141,6 +173,11 @@
       If a discount applies to your order, you'll see a <em>Discount</em> line in your cart summary
       with the amount saved and a description of which rule was applied. Discounts are automatically
       recalculated if you remove items from a submitted cart.
+    </p>
+    <p>
+      Items that belong to a set are grouped and tagged with an orange <em>Set N</em> badge. The
+      <em>Remove Set</em> button removes all books in the set at once — individual set members
+      cannot be removed one at a time.
     </p>
   </section>
 
@@ -204,6 +241,26 @@
     </p>
   </section>
 
+  <!-- ── Contact ───────────────────────────────────────────────────────── -->
+  <section class="hiw-section">
+    <h2>Contact</h2>
+    <p>
+      The <a routerLink="/contact">Contact page</a> is the best way to reach the seller outside of
+      a formal order. Use it to:
+    </p>
+    <ul>
+      <li>Ask a question about a specific listing</li>
+      <li>Make an offer on something you've seen</li>
+      <li>Inquire about a book not currently in the catalogue</li>
+      <li>Say hello</li>
+    </ul>
+    <p>
+      Fill in your name, email address, and message, then hit <em>Send Message</em>. The seller
+      typically responds within 1–2 business days. You do not need to be logged in to use the
+      contact form.
+    </p>
+  </section>
+
   <!-- ── Admin Section ─────────────────────────────────────────────────── -->
   <div class="hiw-admin-divider">
     <span>Admin Reference</span>
@@ -243,7 +300,7 @@
       </li>
       <li>
         <strong>Mark as Fulfilled</strong> — only enabled once a cart reaches <em>Finalized</em>
-        status (after the 24-hour window). Uses a two-click confirmation: first click reloads the
+        status (after the review window). Uses a two-click confirmation: first click reloads the
         latest order data, then the button turns orange showing <em>Confirm Fulfill?</em>. The
         second click permanently archives the order, stamps each comic with the buyer's name and
         sold date, and removes it from the active list. Fulfilled comics no longer appear on the
@@ -252,11 +309,30 @@
     </ul>
     <p>
       Carts transition from <em>Submitted</em> to <em>Finalized</em> lazily — the next time the
-      Orders page loads after the 24-hour window passes.
+      Orders page loads after the review window expires.
+    </p>
+    <p>
+      The review window length is controlled by the <code>FINALIZE_HOURS</code> environment variable
+      on the Azure Function App. The default is 20 hours if not set. Adjust it via the Azure portal
+      or <code>az functionapp config appsettings set</code>.
     </p>
     <p>
       The <strong>Order Archive</strong> section at the bottom shows all permanently fulfilled
-      orders. These records are never deleted, even by a database reset, so the full sales history
+      orders. Each archived order has two delete options:
+    </p>
+    <ul>
+      <li>
+        <strong>Delete</strong> — removes only the archived order record. The comics that were in
+        that order remain in the database (useful if you want to keep the comic records).
+      </li>
+      <li>
+        <strong>Full Delete</strong> — only appears on orders that contained a set. Removes the
+        archived order record <em>and</em> permanently deletes all comics in the associated set
+        from the database. Use this when you want to fully clean up a sold set.
+      </li>
+    </ul>
+    <p>
+      Order Archive records are never touched by a database reset, so the full sales history
       is always preserved.
     </p>
   </section>
@@ -377,6 +453,30 @@
       <li>
         <strong>Sorting and filtering</strong> — click any column header to sort, or use the
         filter icon to narrow the list by any field.
+      </li>
+    </ul>
+
+    <h3>Sets Management</h3>
+    <p>
+      The toolbar also contains set-specific actions:
+    </p>
+    <ul>
+      <li>
+        <strong>Add Set</strong> — creates a new set container comic. Give it a title, series,
+        cover image, and public notes that describe the bundle. The container itself is priced at
+        $0; the total displayed to buyers is the sum of the member books' sale prices.
+      </li>
+      <li>
+        <strong>Add to Set</strong> — assigns an existing standalone comic to a set. Select the
+        target set and then the comic to add. The comic becomes a member of that set and will no
+        longer appear as a standalone item on the dashboard.
+      </li>
+      <li>
+        <strong>Delete Set</strong> — removes the set container and ungroups its member comics,
+        making them standalone again. This is only allowed <em>before</em> the set has been
+        claimed. If any member is currently in a user's cart, or if the set appears in a fulfilled
+        archived order, the delete will be blocked with an explanatory message. To remove a
+        fulfilled set, use <strong>Full Delete</strong> on the corresponding archived order instead.
       </li>
     </ul>
   </section>

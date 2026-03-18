@@ -17,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.example.functions.model.ComicBook;
 import org.example.functions.model.User;
+import org.example.functions.service.ArchiveService;
 import org.example.functions.service.CartService;
 import org.example.functions.service.ComicService;
 import org.example.functions.service.ImageService;
@@ -284,6 +285,18 @@ public class ComicTriggers {
         }
         try {
             int collectionGroup = Integer.parseInt(collectionGroupStr);
+            if (CartService.getServiceInstance().isSetClaimed(collectionGroup)) {
+                return request.createResponseBuilder(HttpStatus.CONFLICT)
+                    .header("Access-Control-Allow-Origin", "*")
+                    .body("This set is currently claimed by a user. Release all items before deleting.")
+                    .build();
+            }
+            if (ArchiveService.getServiceInstance().hasArchivedOrderForGroup(collectionGroup)) {
+                return request.createResponseBuilder(HttpStatus.CONFLICT)
+                    .header("Access-Control-Allow-Origin", "*")
+                    .body("This set has a fulfilled archived order. Use 'Full Delete' on the archived order to remove the set.")
+                    .build();
+            }
             ComicService.getServiceInstance().deleteSet(collectionGroup);
             return request.createResponseBuilder(HttpStatus.OK)
                 .header("Access-Control-Allow-Origin", "*")
