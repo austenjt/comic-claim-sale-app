@@ -201,6 +201,12 @@ h2 {
   pointer-events: none;
 }
 
+.card-deleting {
+  opacity: 0.3;
+  pointer-events: none;
+  filter: grayscale(100%);
+}
+
 .sold-label {
   margin-top: 8px;
   font-size: 0.82rem;

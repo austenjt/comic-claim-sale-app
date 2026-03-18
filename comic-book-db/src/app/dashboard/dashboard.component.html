@@ -68,7 +68,7 @@
 
     <!-- NORMAL CARD -->
     <ng-template #normalCard>
-      <a routerLink="/detail/{{comic.id}}" [class.card-sold]="comic.soldTo">
+      <a routerLink="/detail/{{comic.id}}" [class.card-sold]="comic.soldTo" [class.card-deleting]="deletingId === comic.id">
         <div class="image-container" [class.two-images]="comic.smallBackImageId">
             <img [src]="getFullImageURLByName(comic.smallCachedImageId) | async" alt="Front Cover" loading="lazy"
                  [style.filter]="comic.soldTo ? 'grayscale(80%)' : null">

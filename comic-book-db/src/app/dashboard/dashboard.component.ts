@@ -34,6 +34,7 @@ export class DashboardComponent implements OnInit {
   awardError = '';
 
   pendingDeleteId: number | null = null;
+  deletingId: number | null = null;
 
 
   constructor(
@@ -224,12 +225,14 @@ export class DashboardComponent implements OnInit {
       return;
     }
     this.pendingDeleteId = null;
+    this.deletingId = comic.id;
     this.comicService.deleteComic(comic.id).subscribe({
       next: () => {
         this.comics = this.comics.filter(c => c.id !== comic.id);
         this.comicService.refreshComics();
+        this.deletingId = null;
       },
-      error: () => {}
+      error: () => { this.deletingId = null; }
     });
   }
 
