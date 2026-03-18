@@ -147,6 +147,14 @@ export class ComicService {
     );
   }
 
+  /** DELETE: delete the set container and clear collectionGroup from all members */
+  deleteSet(collectionGroup: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseServiceUrl}/sets/${collectionGroup}`, { responseType: 'text' as 'json' }).pipe(
+      tap(_ => this.log(`deleted set with collectionGroup=${collectionGroup}`)),
+      catchError(this.handleError<void>('deleteSet'))
+    );
+  }
+
   /** DELETE: delete the comic from the server */
   deleteComic(id: number): Observable<Comic> {
     const url = `${this.comicsUrl}/${id}`;

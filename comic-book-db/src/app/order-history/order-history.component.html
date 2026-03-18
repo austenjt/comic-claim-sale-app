@@ -23,7 +23,7 @@
       </thead>
       <tbody>
         <tr *ngFor="let item of order.items">
-          <td>{{ item.comicTitle }}{{ item.comicNumber ? ' ' + item.comicNumber : '' }}</td>
+          <td>{{ item.comicTitle }}{{ item.comicNumber ? ' ' + item.comicNumber : '' }}<span *ngIf="item.collectionGroup && item.collectionGroup > 0" class="set-tag">Set {{ item.collectionGroup }}</span></td>
           <td>{{ item.price | currency }}</td>
           <td>{{ item.claimedAt | date:'mediumDate' }}</td>
         </tr>

@@ -124,6 +124,7 @@
   <div class="add-set-buttons">
     <button class="toolbar-btn add-btn" (click)="openAddSet()">Add Set</button>
     <button class="toolbar-btn add-btn" (click)="openAddToSet()">Add To Set</button>
+    <button class="toolbar-btn delete-btn" (click)="openDeleteSet()">Delete Set</button>
   </div>
 </div>
 <!-- ───────────────────────────────────────────────────────────────────────── -->
@@ -195,6 +196,50 @@
         <button class="qa-btn qa-btn-back" (click)="addToSetStep = 1" [disabled]="addToSetSaving">← Back</button>
         <button class="qa-btn qa-btn-reset" (click)="showAddToSetModal = false">Cancel</button>
         <span *ngIf="addToSetSaving" class="sl-saving-hint">Saving…</span>
+      </div>
+    </ng-container>
+
+  </div>
+</div>
+<!-- ───────────────────────────────────────────────────────────────────────── -->
+
+<!-- ── Delete Set Modal ───────────────────────────────────────────────────── -->
+<div class="sl-modal-overlay" *ngIf="showDeleteSetModal" (click)="cancelDeleteSet()">
+  <div class="sl-modal sl-modal-wide" (click)="$event.stopPropagation()">
+
+    <!-- No set selected yet: pick a set -->
+    <ng-container *ngIf="!deleteSetSelected">
+      <h3 class="sl-modal-title">Delete Set — Select a Set</h3>
+      <p class="sl-modal-subtitle" *ngIf="deleteSetAvailableSets.length === 0">
+        No sets found.
+      </p>
+      <ul class="sl-item-list" *ngIf="deleteSetAvailableSets.length > 0">
+        <li *ngFor="let set of deleteSetAvailableSets"
+            class="sl-item-row"
+            (click)="selectSetForDelete(set)">
+          <span class="sl-item-badge">Group {{ set.collectionGroup }}</span>
+          <span class="sl-item-name">{{ set.title }}</span>
+        </li>
+      </ul>
+      <div class="sl-modal-actions">
+        <button class="qa-btn qa-btn-reset" (click)="cancelDeleteSet()">Cancel</button>
+      </div>
+    </ng-container>
+
+    <!-- Set selected: confirm deletion -->
+    <ng-container *ngIf="deleteSetSelected">
+      <h3 class="sl-modal-title">Confirm Delete Set</h3>
+      <p class="sl-modal-subtitle">
+        This will permanently delete the set container <strong>"{{ deleteSetSelected.title }}"</strong>
+        (Group {{ deleteSetSelected.collectionGroup }}) and release all its member comics back to the dashboard as individual items.
+      </p>
+      <div *ngIf="deleteSetError" class="qa-error">{{ deleteSetError }}</div>
+      <div class="sl-modal-actions">
+        <button class="qa-btn qa-btn-save" style="background:#c0392b" (click)="confirmDeleteSet()" [disabled]="deleteSetSaving">
+          {{ deleteSetSaving ? 'Deleting…' : 'Delete Set' }}
+        </button>
+        <button class="qa-btn qa-btn-back" (click)="deleteSetSelected = null" [disabled]="deleteSetSaving">← Back</button>
+        <button class="qa-btn qa-btn-reset" (click)="cancelDeleteSet()" [disabled]="deleteSetSaving">Cancel</button>
       </div>
     </ng-container>
 

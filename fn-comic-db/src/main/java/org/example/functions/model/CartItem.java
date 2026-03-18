@@ -1,6 +1,7 @@
 package org.example.functions.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CartItem {
@@ -10,6 +11,8 @@ public class CartItem {
     private double price;
     private String claimedAt;
     private Integer collectionGroup;
+    @JsonProperty("isSetContainer")
+    private boolean isSetContainer;
 
     public CartItem() {}
 
@@ -30,4 +33,7 @@ public class CartItem {
 
     public Integer getCollectionGroup() { return collectionGroup; }
     public void setCollectionGroup(Integer collectionGroup) { this.collectionGroup = collectionGroup; }
+
+    public boolean isSetContainer() { return isSetContainer; }
+    public void setSetContainer(boolean setContainer) { isSetContainer = setContainer; }
 }

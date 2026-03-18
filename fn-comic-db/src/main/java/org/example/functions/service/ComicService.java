@@ -262,6 +262,20 @@ public class ComicService {
         comicsContainer.deleteItem(idStr, new PartitionKey(idStr), new CosmosItemRequestOptions());
     }
 
+    /** Deletes the isSet=true container and clears collectionGroup from all member comics. */
+    public void deleteSet(int collectionGroup) {
+        List<ComicBook> all = getComicsByCollectionGroup(collectionGroup);
+        log.info("Deleting set with collectionGroup={}, affecting {} comics", collectionGroup, all.size());
+        for (ComicBook comic : all) {
+            if (Boolean.TRUE.equals(comic.getIsSet())) {
+                deleteComic(comic.getId());
+            } else {
+                comic.setCollectionGroup(null);
+                updateComic(comic);
+            }
+        }
+    }
+
     private ObjectNode comicBookToNode(ComicBook comic) {
         ObjectNode node = OBJECT_MAPPER.valueToTree(comic);
         node.put("id", String.valueOf(comic.getId()));

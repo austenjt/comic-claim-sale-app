@@ -5,6 +5,7 @@ export interface CartItem {
   price: number;
   claimedAt: string;
   collectionGroup: number | null;
+  isSetContainer?: boolean;
 }
 
 export interface Cart {

@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.extern.slf4j.Slf4j;
 import org.example.functions.client.CosmosDbClient;
+import org.example.functions.util.EnvHelper;
 import org.example.functions.model.Cart;
 import org.example.functions.model.CartItem;
 import org.example.functions.model.ClaimNotification;
@@ -124,8 +125,9 @@ public class CartService {
             throw new IllegalArgumentException("No comics found in collection group: " + collectionGroup);
         }
 
-        // Pre-validate: none of the set members are already in an active cart
+        // Pre-validate: none of the actual set members (non-container) are already in an active cart
         for (ComicBook member : setMembers) {
+            if (Boolean.TRUE.equals(member.getIsSet())) continue; // skip the container entry
             String memberId = String.valueOf(member.getId());
             if (isComicClaimed(memberId)) {
                 throw new IllegalStateException("Comic " + memberId + " in the set is already claimed.");
@@ -138,18 +140,26 @@ public class CartService {
         }
 
         String claimedAt = Instant.now().toString();
+        long memberCount = 0;
         for (ComicBook member : setMembers) {
             CartItem item = new CartItem();
             item.setComicId(String.valueOf(member.getId()));
             item.setComicTitle(member.getTitle());
             item.setComicNumber(formatComicNumber(member.getNumber()));
-            item.setPrice(member.getTargetPrice() != null ? member.getTargetPrice().doubleValue() : 1.00);
             item.setClaimedAt(claimedAt);
             item.setCollectionGroup(collectionGroup);
+            if (Boolean.TRUE.equals(member.getIsSet())) {
+                // Container row: kept in cart for reference but priced at $0 and flagged
+                item.setPrice(0.0);
+                item.setSetContainer(true);
+            } else {
+                item.setPrice(member.getTargetPrice() != null ? member.getTargetPrice().doubleValue() : 1.00);
+                memberCount++;
+            }
             cart.getItems().add(item);
         }
         save(cart);
-        log.info("User {} claimed set (collectionGroup={}) with {} items", user.getId(), collectionGroup, setMembers.size());
+        log.info("User {} claimed set (collectionGroup={}) with {} items", user.getId(), collectionGroup, memberCount);
         return cart;
     }
 
@@ -220,7 +230,7 @@ public class CartService {
         return cart;
     }
 
-    /** Start the 20-hour finalization countdown. Cart must be OPEN with at least one item. */
+    /** Start the configurable finalization countdown (FINALIZE_HOURS env var, default 20). Cart must be OPEN with at least one item. */
     public Cart submitOrder(String userId) {
         Cart cart = getActiveCart(userId)
             .orElseThrow(() -> new IllegalStateException("No active cart found."));
@@ -234,7 +244,8 @@ public class CartService {
         cart.setDiscountAmount(discountResult.getAmount());
         cart.setDiscountDescription(discountResult.getDescription());
         cart.setStatus("FINALIZING");
-        cart.setFinalizeAfter(Instant.now().plus(20, ChronoUnit.HOURS).toString());
+        int finalizeHours = EnvHelper.getFinalizeHours();
+        cart.setFinalizeAfter(Instant.now().plus(finalizeHours, ChronoUnit.HOURS).toString());
         save(cart);
         log.info("Cart {} submitted, finalizes after {}", cart.getId(), cart.getFinalizeAfter());
         return cart;
@@ -254,9 +265,10 @@ public class CartService {
                 save(cart);
                 log.info("Cart {} marked as FULFILLED", cartId);
                 ArchiveService.getServiceInstance().archiveCart(cart);
-                // Stamp soldTo/dateSold on each comic
+                // Stamp soldTo/dateSold on each comic (skip set container rows)
                 String soldDate = Instant.now().toString();
                 for (CartItem item : cart.getItems()) {
+                    if (item.isSetContainer()) continue;
                     try {
                         ComicService.getServiceInstance().getComicById(Integer.parseInt(item.getComicId()))
                             .ifPresent(comic -> {

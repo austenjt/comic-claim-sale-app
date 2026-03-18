@@ -23,6 +23,15 @@
   background-color: #059669;
 }
 
+.delete-btn {
+  background-color: #c0392b;
+  color: #fff;
+}
+
+.delete-btn:hover {
+  background-color: #a93226;
+}
+
 .refresh-btn {
   background-color: #10b981;
   color: #1e2a38;

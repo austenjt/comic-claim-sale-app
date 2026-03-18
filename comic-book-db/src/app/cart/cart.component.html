@@ -16,7 +16,7 @@
       </span>
     </div>
 
-    <table *ngIf="cart.items.length > 0">
+    <table *ngIf="visibleItems.length > 0">
       <thead>
         <tr>
           <th>Comic</th>
@@ -26,12 +26,12 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let item of cart.items">
+        <tr *ngFor="let item of visibleItems">
           <td>
             <a [routerLink]="item.collectionGroup && item.collectionGroup > 0 ? ['/set', item.comicId] : ['/detail', item.comicId]">
               {{ item.comicTitle }}{{ item.comicNumber ? ' ' + item.comicNumber : '' }}
             </a>
-            <span *ngIf="item.collectionGroup && item.collectionGroup > 0" class="set-tag">Set</span>
+            <span *ngIf="item.collectionGroup && item.collectionGroup > 0" class="set-tag">Set {{ item.collectionGroup }}</span>
           </td>
           <td>{{ item.price | currency }}</td>
           <td>{{ item.claimedAt | date:'short' }}</td>
@@ -60,7 +60,7 @@
       </tfoot>
     </table>
 
-    <div *ngIf="cart.items.length === 0" class="empty-cart">
+    <div *ngIf="visibleItems.length === 0" class="empty-cart">
       Your cart is empty. <a routerLink="/dashboard">Browse comics</a> to start claiming.
     </div>
 

@@ -266,6 +266,38 @@ public class ComicTriggers {
             .build();
     }
 
+    @FunctionName("deleteSet")
+    public HttpResponseMessage deleteSet(
+        @HttpTrigger(
+            name = "deleteSet",
+            route = "sets/{collectionGroup}",
+            methods = {HttpMethod.DELETE},
+            authLevel = AuthorizationLevel.ANONYMOUS)
+        HttpRequestMessage<Optional<String>> request, @BindingName("collectionGroup") String collectionGroupStr)
+    {
+        log.info("Processing deleteSet function for collectionGroup={}", collectionGroupStr);
+        if (!isAdminRequest(request)) {
+            return request.createResponseBuilder(HttpStatus.FORBIDDEN)
+                .header("Access-Control-Allow-Origin", "*")
+                .body("Admin access required.")
+                .build();
+        }
+        try {
+            int collectionGroup = Integer.parseInt(collectionGroupStr);
+            ComicService.getServiceInstance().deleteSet(collectionGroup);
+            return request.createResponseBuilder(HttpStatus.OK)
+                .header("Access-Control-Allow-Origin", "*")
+                .header("Content-Type", "application/json")
+                .body(String.format("{ \"deleted\": true, \"collectionGroup\": %d }", collectionGroup))
+                .build();
+        } catch (Exception e) {
+            return request.createResponseBuilder(HttpStatus.I_AM_A_TEAPOT)
+                .header("Access-Control-Allow-Origin", "*")
+                .body(ExceptionUtils.getMessage(e))
+                .build();
+        }
+    }
+
     // ─── Helpers ──────────────────────────────────────────────────────────────
 
     /** Returns true if the request carries a valid admin session token. */

@@ -32,7 +32,7 @@ export class CartComponent implements OnInit {
     const item = this.cart?.items.find(i => i.comicId === comicId);
     const isSetItem = item?.collectionGroup != null && item.collectionGroup > 0;
     const setCount = isSetItem
-      ? (this.cart?.items.filter(i => i.collectionGroup === item!.collectionGroup).length ?? 0)
+      ? (this.cart?.items.filter(i => i.collectionGroup === item!.collectionGroup && !i.isSetContainer).length ?? 0)
       : 0;
 
     if (this.cart?.status === 'FINALIZING') {
@@ -69,8 +69,12 @@ export class CartComponent implements OnInit {
     });
   }
 
+  get visibleItems() {
+    return this.cart?.items.filter(i => !i.isSetContainer) ?? [];
+  }
+
   get cartTotal(): number {
-    return this.cart?.items.reduce((sum, item) => sum + item.price, 0) ?? 0;
+    return this.visibleItems.reduce((sum, item) => sum + item.price, 0);
   }
 
   get discountedTotal(): number {
@@ -97,7 +101,7 @@ export class CartComponent implements OnInit {
   }
 
   canSubmit(): boolean {
-    return this.cart?.status === 'OPEN' && (this.cart?.items?.length ?? 0) > 0;
+    return this.cart?.status === 'OPEN' && this.visibleItems.length > 0;
   }
 
 }

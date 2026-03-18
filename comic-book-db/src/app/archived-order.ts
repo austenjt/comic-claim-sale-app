@@ -3,6 +3,7 @@ export interface ArchivedOrderItem {
   comicNumber: string | null;
   price: number;
   claimedAt: string;
+  collectionGroup?: number | null;
 }
 
 export interface ArchivedOrder {

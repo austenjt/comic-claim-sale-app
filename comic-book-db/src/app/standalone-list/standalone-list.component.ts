@@ -575,6 +575,13 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
   addSetSaving = false;
   addSetError = '';
 
+  // ── Delete Set modal ──────────────────────────────────────────────────────
+  showDeleteSetModal = false;
+  deleteSetAvailableSets: Comic[] = [];
+  deleteSetSelected: Comic | null = null;
+  deleteSetSaving = false;
+  deleteSetError = '';
+
   // ── Add To Set modal ──────────────────────────────────────────────────────
   showAddToSetModal = false;
   addToSetStep = 1;
@@ -962,6 +969,45 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
         this.addToSetSaving = false;
       }
     });
+  }
+
+  openDeleteSet(): void {
+    this.comicService.getCachedComics().pipe(take(1)).subscribe(allComics => {
+      this.deleteSetAvailableSets = allComics.filter(c => c.isSet === true);
+      this.deleteSetSelected = null;
+      this.deleteSetError = '';
+      this.showDeleteSetModal = true;
+    });
+  }
+
+  selectSetForDelete(set: Comic): void {
+    this.deleteSetSelected = set;
+    this.deleteSetError = '';
+  }
+
+  confirmDeleteSet(): void {
+    if (!this.deleteSetSelected?.collectionGroup) return;
+    this.deleteSetSaving = true;
+    this.deleteSetError = '';
+    this.comicService.deleteSet(this.deleteSetSelected.collectionGroup).subscribe({
+      next: () => {
+        this.comicService.refreshComics();
+        this.comics = this.comics.filter(c => c.collectionGroup !== this.deleteSetSelected!.collectionGroup);
+        this.deleteSetSaving = false;
+        this.showDeleteSetModal = false;
+        this.deleteSetSelected = null;
+      },
+      error: () => {
+        this.deleteSetError = 'Failed to delete set. Please try again.';
+        this.deleteSetSaving = false;
+      }
+    });
+  }
+
+  cancelDeleteSet(): void {
+    this.showDeleteSetModal = false;
+    this.deleteSetSelected = null;
+    this.deleteSetError = '';
   }
 
   comicNumberLabel(comic: Comic): string {

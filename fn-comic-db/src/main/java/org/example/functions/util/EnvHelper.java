@@ -18,6 +18,12 @@ public class EnvHelper {
         return val == null || Boolean.parseBoolean(val); // defaults to true if not set
     }
 
+    public static int getFinalizeHours() {
+        String val = getProp("FINALIZE_HOURS");
+        if (val == null || val.isBlank()) return 20; // default: 20 hours
+        try { return Integer.parseInt(val.trim()); } catch (NumberFormatException e) { return 20; }
+    }
+
     public static boolean isAwardModeEnabled() {
         String val = getProp("AWARD_MODE_ENABLED");
         return val == null || Boolean.parseBoolean(val); // defaults to true if not set
