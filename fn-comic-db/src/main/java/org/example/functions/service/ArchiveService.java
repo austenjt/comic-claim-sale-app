@@ -124,7 +124,9 @@ public class ArchiveService {
     private ArchivedOrder toArchivedOrder(Cart cart) {
         List<ArchivedOrderItem> items = cart.getItems().stream()
             .map(i -> ArchivedOrderItem.builder()
+                .comicId(i.getComicId())
                 .comicTitle(i.getComicTitle())
+                .comicNumber(i.getComicNumber())
                 .price(i.getPrice())
                 .claimedAt(i.getClaimedAt())
                 .collectionGroup(i.getCollectionGroup())

@@ -14,7 +14,9 @@ import lombok.Setter;
 @Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ArchivedOrderItem {
+    private String comicId;
     private String comicTitle;
+    private String comicNumber;
     private double price;
     private String claimedAt;
     private Integer collectionGroup;

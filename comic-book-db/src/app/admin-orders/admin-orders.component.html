@@ -141,7 +141,7 @@
       </thead>
       <tbody>
         <tr *ngFor="let item of order.items">
-          <td>{{ item.comicTitle }}</td>
+          <td>{{ item.comicTitle }}{{ item.comicNumber ? ' ' + item.comicNumber : '' }}</td>
           <td>{{ item.price | currency }}</td>
           <td>{{ item.claimedAt | date:'short' }}</td>
         </tr>

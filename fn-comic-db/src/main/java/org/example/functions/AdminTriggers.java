@@ -14,6 +14,7 @@ import com.microsoft.azure.functions.annotation.FunctionName;
 import com.microsoft.azure.functions.annotation.HttpTrigger;
 import lombok.extern.slf4j.Slf4j;
 import org.example.functions.model.ArchivedOrder;
+import org.example.functions.model.ArchivedOrderItem;
 import org.example.functions.model.Cart;
 import org.example.functions.model.User;
 import org.example.functions.service.ArchiveService;
@@ -220,8 +221,41 @@ public class AdminTriggers {
     {
         if (requireAdmin(request) == null) return unauthorized(request);
         try {
+            ArchivedOrder order = ArchiveService.getServiceInstance().getArchivedOrderById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("Archived order not found: " + orderId));
+
+            List<Integer> groups = order.getItems().stream()
+                .map(ArchivedOrderItem::getCollectionGroup)
+                .filter(g -> g != null && g > 0)
+                .distinct()
+                .collect(Collectors.toList());
+
+            List<String> individualIds = order.getItems().stream()
+                .filter(i -> (i.getCollectionGroup() == null || i.getCollectionGroup() <= 0) && i.getComicId() != null)
+                .map(ArchivedOrderItem::getComicId)
+                .collect(Collectors.toList());
+
             ArchiveService.getServiceInstance().deleteArchivedOrder(orderId);
+
+            for (Integer group : groups) {
+                try {
+                    ComicService.getServiceInstance().deleteSetFully(group);
+                } catch (Exception e) {
+                    log.warn("deleteArchivedOrder: could not delete set group {}: {}", group, e.getMessage());
+                }
+            }
+
+            for (String comicId : individualIds) {
+                try {
+                    ComicService.getServiceInstance().deleteComic(Integer.parseInt(comicId));
+                } catch (Exception e) {
+                    log.warn("deleteArchivedOrder: could not delete comic {}: {}", comicId, e.getMessage());
+                }
+            }
+
             return cors(request.createResponseBuilder(HttpStatus.NO_CONTENT)).build();
+        } catch (IllegalArgumentException e) {
+            return cors(request.createResponseBuilder(HttpStatus.NOT_FOUND)).body(e.getMessage()).build();
         } catch (Exception e) {
             log.error("deleteArchivedOrder error", e);
             return serverError(request, e);

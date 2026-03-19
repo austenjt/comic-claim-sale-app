@@ -111,6 +111,22 @@ export class DashboardComponent implements OnInit {
     });
   }
 
+  private refreshMyCart(): void {
+    this.cartService.getMyCart().subscribe({ next: cart => this.myCart = cart, error: () => {} });
+  }
+
+  private handleClaimError(err: any): void {
+    // Always refresh cart so the UI reflects the real status (hides Claim buttons if cart is locked)
+    this.refreshMyCart();
+    const msg: string = typeof err?.error === 'string' ? err.error : '';
+    if (msg.toLowerCase().includes('not open') || msg.toLowerCase().includes('status:')) {
+      this.toastService.show('Your order has already been submitted — new claims are not allowed.');
+    } else {
+      // Likely beaten to it by another user — refresh claimed map so button updates to "Claimed"
+      this.loadClaimedMap();
+    }
+  }
+
   comicNumberLabel(comic: Comic): string {
     const n = comic.number;
     if (!n) return '';
@@ -134,8 +150,8 @@ export class DashboardComponent implements OnInit {
         const price = comic.salePrice != null ? ` — $${comic.salePrice.toFixed(2)}` : '';
         this.toastService.show(`"${comic.title}${num}" added to your cart.${price}`);
       },
-      error: () => {
-        this.loadClaimedMap();
+      error: (err) => {
+        this.handleClaimError(err);
       }
     });
   }
@@ -153,8 +169,8 @@ export class DashboardComponent implements OnInit {
         }
         this.toastService.show(`"${container.title}" set (${members.length} books) added to your cart.`);
       },
-      error: () => {
-        this.loadClaimedMap();
+      error: (err) => {
+        this.handleClaimError(err);
       }
     });
   }
