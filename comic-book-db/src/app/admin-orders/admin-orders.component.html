@@ -58,7 +58,7 @@
       <button
         class="btn-fulfill"
         [class.btn-fulfill-confirm]="pendingFulfillId === order.id"
-        [disabled]="order.status !== 'FINALIZED'"
+        [disabled]="!canFulfill(order)"
         (click)="fulfill(order)"
         [title]="fulfillTitle(order)">
         {{ pendingFulfillId === order.id ? 'Confirm Fulfill?' : 'Mark as Fulfilled' }}

@@ -28,6 +28,7 @@ import { OrderHistoryComponent } from './order-history/order-history.component';
 import { AdminSalesComponent } from './admin-sales/admin-sales.component';
 import { ContactComponent } from './contact/contact.component';
 import { SetDetailComponent } from './set-detail/set-detail.component';
+import { DashboardHeaderComponent } from './dashboard-header/dashboard-header.component';
 
 @NgModule({
   declarations: [
@@ -48,7 +49,8 @@ import { SetDetailComponent } from './set-detail/set-detail.component';
     OrderHistoryComponent,
     AdminSalesComponent,
     ContactComponent,
-    SetDetailComponent
+    SetDetailComponent,
+    DashboardHeaderComponent
   ],
   imports: [
     BrowserModule,

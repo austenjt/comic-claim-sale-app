@@ -36,14 +36,23 @@ export class DashboardComponent implements OnInit {
   pendingDeleteId: number | null = null;
   deletingId: number | null = null;
   excludeClaimed = false;
+  showPricedOnly = false;
 
   get displayComics(): Comic[] {
-    if (!this.excludeClaimed) return this.comics;
-    return this.comics.filter(c =>
-      c.isSet
-        ? !this.isSetClaimedByOther(c) && !this.isSetInMyCart(c)
-        : !this.isClaimedByOther(c.id) && !this.isInMyCart(c.id)
-    );
+    let result = this.comics;
+    if (this.excludeClaimed) {
+      result = result.filter(c =>
+        c.isSet
+          ? !this.isSetClaimedByOther(c) && !this.isSetInMyCart(c)
+          : !this.isClaimedByOther(c.id) && !this.isInMyCart(c.id)
+      );
+    }
+    if (this.showPricedOnly) {
+      result = result.filter(c =>
+        c.isSet ? this.getSetPrice(c) > 0 : c.salePrice != null
+      );
+    }
+    return result;
   }
 
 

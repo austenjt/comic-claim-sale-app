@@ -1,14 +1,8 @@
-<div class="dashboard-toolbar">
-  <div class="search-row">
-    <app-comic-search></app-comic-search>
-    <button class="btn-exclude-claimed"
-            [class.btn-exclude-claimed-active]="excludeClaimed"
-            (click)="excludeClaimed = !excludeClaimed">
-      {{ excludeClaimed ? 'Show All' : 'Exclude Claimed' }}
-    </button>
-  </div>
-  <span class="items-count">{{ displayComics.length }} items</span>
-</div>
+<app-dashboard-header
+  [itemCount]="displayComics.length"
+  [(excludeClaimed)]="excludeClaimed"
+  [(showPricedOnly)]="showPricedOnly">
+</app-dashboard-header>
 
 <!-- Award modal -->
 <div *ngIf="awardingComic" class="award-modal-overlay" (click)="closeAwardModal()">

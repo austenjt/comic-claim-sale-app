@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CartService } from '../cart.service';
 import { Cart } from '../cart';
 import { ArchivedOrder } from '../archived-order';
+import { ConfigService } from '../config.service';
 
 @Component({
   selector: 'app-admin-orders',
@@ -18,7 +19,7 @@ export class AdminOrdersComponent implements OnInit {
   error = '';
   fulfilledCartId: string | null = null;
 
-  constructor(private cartService: CartService) {}
+  constructor(private cartService: CartService, private configService: ConfigService) {}
 
   ngOnInit() {
     this.loadOrders();
@@ -122,17 +123,27 @@ export class AdminOrdersComponent implements OnInit {
   }
 
   statusLabel(status: string): string {
+    const hours = this.configService.finalizeHours;
     const labels: Record<string, string> = {
-      OPEN: 'Open', FINALIZING: 'Submitted (20h)', FINALIZED: 'Finalized'
+      OPEN: 'Open', FINALIZING: `Submitted (${hours}h)`, FINALIZED: 'Finalized'
     };
     return labels[status] ?? status;
   }
 
+  canFulfill(order: Cart): boolean {
+    if (order.status === 'FINALIZED') return true;
+    if (order.status === 'FINALIZING' && order.finalizeAfter) {
+      return Date.now() > new Date(order.finalizeAfter).getTime();
+    }
+    return false;
+  }
+
   fulfillTitle(order: Cart): string {
-    if (order.status === 'FINALIZED') return '';
+    if (this.canFulfill(order)) return '';
     if (order.status === 'FINALIZING' && order.finalizeAfter) {
       const deadline = new Date(order.finalizeAfter);
-      return `Still in 20h review window — unlocks ${deadline.toLocaleString()}`;
+      const hours = this.configService.finalizeHours;
+      return `Still in ${hours}h review window — unlocks ${deadline.toLocaleString()}`;
     }
     return 'Order must be finalized before fulfillment';
   }
