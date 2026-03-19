@@ -77,9 +77,20 @@
         Ready to order? Submitting starts a {{ configService.finalizeHours }}-hour review window before your order is finalized.
         You can still remove items during this window, but not add new ones.
       </p>
+      <div class="notes-group">
+        <label for="customerNotes" class="notes-label">Notes for seller <span class="notes-optional">(optional)</span></label>
+        <textarea id="customerNotes" class="notes-textarea" rows="3"
+                  [(ngModel)]="customerNotes"
+                  placeholder="e.g. shipping preferences, payment method, questions…"></textarea>
+      </div>
       <button class="btn-submit" (click)="submitOrder()" [disabled]="submitting">
         {{ submitting ? 'Submitting…' : 'Submit Order' }}
       </button>
+    </div>
+
+    <div class="cart-actions customer-notes-display" *ngIf="cart.customerNotes && cart.status !== 'OPEN'">
+      <p class="notes-label">Your notes:</p>
+      <p class="notes-value">{{ cart.customerNotes }}</p>
     </div>
 
     <div class="cart-actions" *ngIf="cart.status === 'FINALIZED'">

@@ -30,10 +30,11 @@ public class EmailService {
      *
      * @param toAddresses list of recipient email addresses
      * @param replyTo     reply-to address (may be null)
+     * @param bccAddress  single BCC address (may be null)
      * @param subject     email subject
      * @param body        plain-text body
      */
-    public void send(List<String> toAddresses, String replyTo, String subject, String body) {
+    public void send(List<String> toAddresses, String replyTo, String bccAddress, String subject, String body) {
         String host     = EnvHelper.getSmtpHost();
         String username = EnvHelper.getSmtpUsername();
         String password = EnvHelper.getSmtpPassword();
@@ -67,6 +68,9 @@ public class EmailService {
             }
             if (replyTo != null) {
                 email.setReplyTo(new jakarta.mail.Address[]{new InternetAddress(replyTo)});
+            }
+            if (bccAddress != null) {
+                email.addRecipient(Message.RecipientType.BCC, new InternetAddress(bccAddress));
             }
             email.setSubject("LightningComics.Rocks: " + subject);
             email.setText(body);

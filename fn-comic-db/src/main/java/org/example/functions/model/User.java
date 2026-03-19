@@ -19,6 +19,8 @@ public class User {
     private String approvedDate;
     @JsonProperty("isAdmin")
     private boolean isAdmin;
+    private int failedLoginAttempts;
+    private String lockedUntil; // ISO-8601 timestamp; null means not locked
 
     public User() {}
 
@@ -60,4 +62,10 @@ public class User {
 
     public boolean isAdmin() { return isAdmin; }
     public void setAdmin(boolean admin) { isAdmin = admin; }
+
+    public int getFailedLoginAttempts() { return failedLoginAttempts; }
+    public void setFailedLoginAttempts(int failedLoginAttempts) { this.failedLoginAttempts = failedLoginAttempts; }
+
+    public String getLockedUntil() { return lockedUntil; }
+    public void setLockedUntil(String lockedUntil) { this.lockedUntil = lockedUntil; }
 }

@@ -29,6 +29,17 @@ public class EnvHelper {
         return val == null || Boolean.parseBoolean(val); // defaults to true if not set
     }
 
+    public static int getCartExpiryDays() {
+        String val = getProp("CART_EXPIRY_DAYS");
+        if (val == null || val.isBlank()) return 7;
+        try { return Integer.parseInt(val.trim()); } catch (NumberFormatException e) { return 7; }
+    }
+
+    public static String getSiteUrl() {
+        String val = getProp("SITE_URL");
+        return val != null ? val : "the site";
+    }
+
     public static String getSmtpHost() {
         return getProp("SMTP_HOST");
     }

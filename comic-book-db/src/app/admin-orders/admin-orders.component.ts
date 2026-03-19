@@ -117,6 +117,64 @@ export class AdminOrdersComponent implements OnInit {
     });
   }
 
+  readonly paymentStatuses = ['UNPAID', 'PARTIAL', 'PAID'];
+
+  adminNoteDrafts: Record<string, string> = {};
+
+  saveAdminNotes(cartId: string) {
+    const notes = this.adminNoteDrafts[cartId] ?? null;
+    this.cartService.updateAdminNotes(cartId, notes || null).subscribe({
+      next: updated => {
+        const order = this.orders.find(o => o.id === cartId);
+        if (order) order.adminNotes = updated.adminNotes;
+      },
+      error: () => this.error = 'Failed to save admin notes.'
+    });
+  }
+
+  saveArchivedAdminNotes(orderId: string) {
+    const notes = this.adminNoteDrafts[orderId] ?? null;
+    this.cartService.updateArchivedAdminNotes(orderId, notes || null).subscribe({
+      next: updated => {
+        const order = this.archivedOrders.find(o => o.id === orderId);
+        if (order) order.adminNotes = updated.adminNotes;
+      },
+      error: () => this.archivedError = 'Failed to save admin notes.'
+    });
+  }
+
+  initNoteDraft(id: string, existing: string | null | undefined): string {
+    if (!(id in this.adminNoteDrafts)) {
+      this.adminNoteDrafts[id] = existing ?? '';
+    }
+    return this.adminNoteDrafts[id];
+  }
+
+  setPaymentStatus(cartId: string, status: string) {
+    this.cartService.updatePaymentStatus(cartId, status).subscribe({
+      next: updated => {
+        const order = this.orders.find(o => o.id === cartId);
+        if (order) order.paymentStatus = updated.paymentStatus;
+      },
+      error: () => this.error = 'Failed to update payment status.'
+    });
+  }
+
+  setArchivedPaymentStatus(orderId: string, status: string) {
+    this.cartService.updateArchivedPaymentStatus(orderId, status).subscribe({
+      next: updated => {
+        const order = this.archivedOrders.find(o => o.id === orderId);
+        if (order) order.paymentStatus = updated.paymentStatus;
+      },
+      error: () => this.archivedError = 'Failed to update payment status.'
+    });
+  }
+
+  paymentLabel(status: string | null | undefined): string {
+    const labels: Record<string, string> = { UNPAID: 'Unpaid', PARTIAL: 'Partial', PAID: 'Paid' };
+    return status ? (labels[status] ?? status) : 'Unpaid';
+  }
+
   hasSetItems(order: ArchivedOrder): boolean {
     return order.items.some(i => i.collectionGroup != null && i.collectionGroup > 0);
   }

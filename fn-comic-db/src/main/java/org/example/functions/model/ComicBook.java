@@ -3,7 +3,9 @@ package org.example.functions.model;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.example.functions.util.Views;
 import lombok.AllArgsConstructor;
 import org.example.functions.util.MoneySerializer;
 import lombok.Builder;
@@ -52,6 +54,7 @@ public class ComicBook {
     private String defects;
 
     // Purchase info
+    @JsonView(Views.Admin.class)
     @JsonSerialize(using = MoneySerializer.class)
     private BigDecimal pricePaid;
     private String dateAcquired;

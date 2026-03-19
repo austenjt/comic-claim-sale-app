@@ -20,6 +20,9 @@ public class Cart {
     private String fulfilledAt;
     private double discountAmount;       // snapshotted at submit time
     private String discountDescription;  // human-readable summary of applied discounts
+    private String paymentStatus;        // UNPAID | PARTIAL | PAID — set by admin
+    private String customerNotes;        // optional message from user, captured at submit time
+    private String adminNotes;           // internal notes from admin
 
     public Cart() {}
 
@@ -58,4 +61,13 @@ public class Cart {
 
     public String getDiscountDescription() { return discountDescription; }
     public void setDiscountDescription(String discountDescription) { this.discountDescription = discountDescription; }
+
+    public String getPaymentStatus() { return paymentStatus; }
+    public void setPaymentStatus(String paymentStatus) { this.paymentStatus = paymentStatus; }
+
+    public String getCustomerNotes() { return customerNotes; }
+    public void setCustomerNotes(String customerNotes) { this.customerNotes = customerNotes; }
+
+    public String getAdminNotes() { return adminNotes; }
+    public void setAdminNotes(String adminNotes) { this.adminNotes = adminNotes; }
 }

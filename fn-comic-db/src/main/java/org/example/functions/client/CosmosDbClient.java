@@ -23,6 +23,7 @@ public class CosmosDbClient {
     private static final String DISCOUNTS_CONTAINER = "discounts";
     private static final String ARCHIVED_ORDERS_CONTAINER = "archived-orders";
     private static final String RETURN_EVENTS_CONTAINER = "return-events";
+    private static final String AUDIT_LOGS_CONTAINER = "audit-logs";
 
     private static CosmosDbClient INSTANCE;
 
@@ -34,6 +35,7 @@ public class CosmosDbClient {
     private final CosmosContainer discountsContainer;
     private final CosmosContainer archivedOrdersContainer;
     private final CosmosContainer returnEventsContainer;
+    private final CosmosContainer auditLogsContainer;
 
     private CosmosDbClient() {
         CosmosClient client = new CosmosClientBuilder()
@@ -49,6 +51,7 @@ public class CosmosDbClient {
         this.discountsContainer = database.getContainer(DISCOUNTS_CONTAINER);
         this.archivedOrdersContainer = database.getContainer(ARCHIVED_ORDERS_CONTAINER);
         this.returnEventsContainer = database.getContainer(RETURN_EVENTS_CONTAINER);
+        this.auditLogsContainer = database.getContainer(AUDIT_LOGS_CONTAINER);
     }
 
     public static CosmosDbClient getInstance() {
@@ -66,4 +69,5 @@ public class CosmosDbClient {
     public CosmosContainer getDiscountsContainer() { return discountsContainer; }
     public CosmosContainer getArchivedOrdersContainer() { return archivedOrdersContainer; }
     public CosmosContainer getReturnEventsContainer() { return returnEventsContainer; }
+    public CosmosContainer getAuditLogsContainer() { return auditLogsContainer; }
 }

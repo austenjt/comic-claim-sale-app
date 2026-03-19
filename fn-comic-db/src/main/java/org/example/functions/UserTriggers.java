@@ -18,6 +18,7 @@ import org.example.functions.model.User;
 import org.example.functions.service.EmailService;
 import org.example.functions.service.SessionService;
 import org.example.functions.service.UserService;
+import org.example.functions.util.AuthHelper;
 import org.example.functions.util.EnvHelper;
 
 import java.util.List;
@@ -79,7 +80,7 @@ public class UserTriggers {
                     + (address != null ? "Address: " + address + "\n" : "")
                     + (phone   != null ? "Phone:   " + phone   + "\n" : "")
                     + "\nLog in to approve or reject this request.";
-                EmailService.getServiceInstance().send(List.of(adminEmail), email, subject, emailBody);
+                EmailService.getServiceInstance().send(List.of(adminEmail), email, null, subject, emailBody);
             }
 
             ObjectNode resp = OBJECT_MAPPER.createObjectNode();
@@ -129,7 +130,15 @@ public class UserTriggers {
                     .body("Account suspended")
                     .build();
             }
-            if (!userService.verifyPin(email, pin)) {
+            boolean valid;
+            try {
+                valid = userService.verifyPin(email, pin);
+            } catch (IllegalStateException lockout) {
+                return cors(request.createResponseBuilder(HttpStatus.TOO_MANY_REQUESTS))
+                    .body(lockout.getMessage())
+                    .build();
+            }
+            if (!valid) {
                 return cors(request.createResponseBuilder(HttpStatus.UNAUTHORIZED))
                     .body("Invalid credentials")
                     .build();
@@ -455,16 +464,11 @@ public class UserTriggers {
     // ─── Helpers ─────────────────────────────────────────────────────────────
 
     private User requireSession(HttpRequestMessage<?> request) {
-        String token = request.getHeaders().get("x-session-token");
-        String userId = SessionService.getServiceInstance().validateSession(token);
-        if (userId == null) return null;
-        return UserService.getServiceInstance().findById(userId).orElse(null);
+        return AuthHelper.requireSession(request);
     }
 
     private User requireAdmin(HttpRequestMessage<?> request) {
-        User user = requireSession(request);
-        if (user == null || !user.isAdmin()) return null;
-        return user;
+        return AuthHelper.requireAdmin(request);
     }
 
     private ObjectNode safeUserNode(User user) {

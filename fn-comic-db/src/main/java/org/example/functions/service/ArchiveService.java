@@ -72,6 +72,28 @@ public class ArchiveService {
         return queryOrders(query);
     }
 
+    /** Admin: update internal notes on an archived order. */
+    public ArchivedOrder updateAdminNotes(String orderId, String adminNotes) {
+        ArchivedOrder order = getArchivedOrderById(orderId)
+            .orElseThrow(() -> new IllegalArgumentException("Archived order not found: " + orderId));
+        order.setAdminNotes(adminNotes != null && !adminNotes.isBlank() ? adminNotes.trim() : null);
+        ObjectNode node = OBJECT_MAPPER.valueToTree(order);
+        archivedOrdersContainer.replaceItem(node, orderId, new PartitionKey(orderId), new CosmosItemRequestOptions());
+        log.info("Admin notes updated for archived order {}", orderId);
+        return order;
+    }
+
+    /** Admin: update the payment status on an archived order. Valid values: UNPAID, PARTIAL, PAID. */
+    public ArchivedOrder updatePaymentStatus(String orderId, String status) {
+        ArchivedOrder order = getArchivedOrderById(orderId)
+            .orElseThrow(() -> new IllegalArgumentException("Archived order not found: " + orderId));
+        order.setPaymentStatus(status);
+        ObjectNode node = OBJECT_MAPPER.valueToTree(order);
+        archivedOrdersContainer.replaceItem(node, orderId, new PartitionKey(orderId), new CosmosItemRequestOptions());
+        log.info("Payment status for archived order {} set to {}", orderId, status);
+        return order;
+    }
+
     /** Permanently deletes an archived order by ID. */
     public void deleteArchivedOrder(String orderId) {
         archivedOrdersContainer.deleteItem(orderId, new PartitionKey(orderId), new CosmosItemRequestOptions());
@@ -143,6 +165,9 @@ public class ArchiveService {
             .discountDescription(cart.getDiscountDescription())
             .createdAt(cart.getCreatedAt())
             .fulfilledAt(cart.getFulfilledAt())
+            .paymentStatus(cart.getPaymentStatus())
+            .customerNotes(cart.getCustomerNotes())
+            .adminNotes(cart.getAdminNotes())
             .build();
     }
 }

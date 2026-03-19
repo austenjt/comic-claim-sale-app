@@ -150,6 +150,25 @@ public class UserService {
         ObjectNode node = OBJECT_MAPPER.valueToTree(user);
         usersContainer.replaceItem(node, userId, new PartitionKey(userId), new CosmosItemRequestOptions());
         log.info("Approved user: {}", userId);
+
+        if (EnvHelper.isEmailEnabled()) {
+            String siteUrl = EnvHelper.getSiteUrl();
+            String adminEmail = EnvHelper.getAdminEmail();
+            String subject = "Your account has been approved!";
+            String body = "Hi " + user.getName() + ",\n\n"
+                + "Your account request has been approved. You can now log in using the details below.\n\n"
+                + "Email: " + user.getEmail() + "\n"
+                + "PIN:   " + pin + "\n\n"
+                + "Log in at: " + siteUrl + "\n\n"
+                + "Keep your PIN private. If you ever need it reset, contact the seller.\n\n"
+                + "Happy collecting!";
+            try {
+                EmailService.getServiceInstance().send(List.of(user.getEmail()), adminEmail, adminEmail, subject, body);
+            } catch (Exception e) {
+                log.warn("Failed to send approval email to {}: {}", user.getEmail(), e.getMessage());
+            }
+        }
+
         return pin;
     }
 
@@ -170,13 +189,54 @@ public class UserService {
         return user;
     }
 
+    private static final int MAX_FAILED_ATTEMPTS = 10;
+    private static final int LOCKOUT_MINUTES = 15;
+
     public boolean verifyPin(String email, String pin) {
         Optional<User> optUser = findByEmail(email);
         if (optUser.isEmpty()) return false;
         User user = optUser.get();
         if (!"APPROVED".equals(user.getStatus())) return false;
+
+        // Check lockout
+        if (user.getLockedUntil() != null) {
+            java.time.Instant lockExpiry = java.time.Instant.parse(user.getLockedUntil());
+            if (java.time.Instant.now().isBefore(lockExpiry)) {
+                throw new IllegalStateException("Account temporarily locked due to too many failed attempts. "
+                    + "Try again after " + java.time.ZonedDateTime.ofInstant(lockExpiry, java.time.ZoneOffset.UTC)
+                        .format(java.time.format.DateTimeFormatter.ofPattern("HH:mm 'UTC'")) + ".");
+            }
+            // Lockout has expired — clear it
+            user.setLockedUntil(null);
+            user.setFailedLoginAttempts(0);
+        }
+
         String hash = hashPin(pin, user.getPinSalt());
-        return hash.equals(user.getPinHash());
+        if (hash.equals(user.getPinHash())) {
+            // Successful login — reset counters
+            if (user.getFailedLoginAttempts() > 0) {
+                user.setFailedLoginAttempts(0);
+                user.setLockedUntil(null);
+                saveUser(user);
+            }
+            return true;
+        }
+
+        // Failed login — increment counter
+        int attempts = user.getFailedLoginAttempts() + 1;
+        user.setFailedLoginAttempts(attempts);
+        if (attempts >= MAX_FAILED_ATTEMPTS) {
+            user.setLockedUntil(java.time.Instant.now()
+                .plus(LOCKOUT_MINUTES, java.time.temporal.ChronoUnit.MINUTES).toString());
+            log.warn("User {} locked out after {} failed login attempts", email, attempts);
+        }
+        saveUser(user);
+        return false;
+    }
+
+    private void saveUser(User user) {
+        ObjectNode node = OBJECT_MAPPER.valueToTree(user);
+        usersContainer.replaceItem(node, user.getId(), new PartitionKey(user.getId()), new CosmosItemRequestOptions());
     }
 
     /** Generates a new PIN for the user, stores hash+salt, returns plain PIN. */
@@ -191,6 +251,24 @@ public class UserService {
         ObjectNode node = OBJECT_MAPPER.valueToTree(user);
         usersContainer.replaceItem(node, userId, new PartitionKey(userId), new CosmosItemRequestOptions());
         log.info("Reset PIN for user: {}", userId);
+
+        if (EnvHelper.isEmailEnabled()) {
+            String siteUrl = EnvHelper.getSiteUrl();
+            String adminEmail = EnvHelper.getAdminEmail();
+            String subject = "Your PIN has been reset";
+            String body = "Hi " + user.getName() + ",\n\n"
+                + "Your PIN has been reset. Use the details below to log in.\n\n"
+                + "Email: " + user.getEmail() + "\n"
+                + "PIN:   " + pin + "\n\n"
+                + "Log in at: " + siteUrl + "\n\n"
+                + "If you did not request a PIN reset, please contact the seller immediately.";
+            try {
+                EmailService.getServiceInstance().send(List.of(user.getEmail()), adminEmail, adminEmail, subject, body);
+            } catch (Exception e) {
+                log.warn("Failed to send PIN reset email to {}: {}", user.getEmail(), e.getMessage());
+            }
+        }
+
         return pin;
     }
 

@@ -19,8 +19,7 @@ import org.example.functions.model.ClaimNotification;
 import org.example.functions.model.User;
 import org.example.functions.service.ArchiveService;
 import org.example.functions.service.CartService;
-import org.example.functions.service.SessionService;
-import org.example.functions.service.UserService;
+import org.example.functions.util.AuthHelper;
 
 import java.util.Optional;
 
@@ -149,7 +148,9 @@ public class CartTriggers {
         User user = requireApproved(request);
         if (user == null) return unauthorized(request);
         try {
-            Cart cart = CartService.getServiceInstance().submitOrder(user.getId());
+            JsonNode body = OBJECT_MAPPER.readTree(request.getBody().orElse("{}"));
+            String customerNotes = getString(body, "customerNotes");
+            Cart cart = CartService.getServiceInstance().submitOrder(user.getId(), customerNotes);
             return cors(request.createResponseBuilder(HttpStatus.OK))
                 .header("Content-Type", "application/json")
                 .body(OBJECT_MAPPER.writeValueAsString(cart)).build();
@@ -249,17 +250,11 @@ public class CartTriggers {
     // ─── Helpers ──────────────────────────────────────────────────────────────
 
     private User requireSession(HttpRequestMessage<?> request) {
-        String token = request.getHeaders().get("x-session-token");
-        String userId = SessionService.getServiceInstance().validateSession(token);
-        if (userId == null) return null;
-        return UserService.getServiceInstance().findById(userId).orElse(null);
+        return AuthHelper.requireSession(request);
     }
 
     private User requireApproved(HttpRequestMessage<?> request) {
-        User user = requireSession(request);
-        if (user == null) return null;
-        if (!"APPROVED".equals(user.getStatus()) && !user.isAdmin()) return null;
-        return user;
+        return AuthHelper.requireApproved(request);
     }
 
     private HttpResponseMessage.Builder cors(HttpResponseMessage.Builder b) {

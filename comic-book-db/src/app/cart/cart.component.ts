@@ -14,6 +14,7 @@ export class CartComponent implements OnInit {
   loading = false;
   error = '';
   submitting = false;
+  customerNotes = '';
 
   constructor(private cartService: CartService, private toastService: ToastService, public configService: ConfigService) {}
 
@@ -61,7 +62,7 @@ export class CartComponent implements OnInit {
 
   submitOrder() {
     this.submitting = true;
-    this.cartService.submitOrder().subscribe({
+    this.cartService.submitOrder(this.customerNotes || undefined).subscribe({
       next: cart => { this.cart = cart; this.submitting = false; },
       error: (err) => {
         this.error = err?.error || 'Failed to submit order.';

@@ -21,12 +21,9 @@ import org.example.functions.service.ArchiveService;
 import org.example.functions.service.CartService;
 import org.example.functions.service.ComicService;
 import org.example.functions.service.ImageService;
-import org.example.functions.service.SessionService;
-import org.example.functions.service.UserService;
+import org.example.functions.util.AuthHelper;
 import org.example.functions.util.CsvToJsonConverter;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.example.functions.util.Views;
 
 import java.util.List;
 import java.util.Optional;
@@ -64,7 +61,7 @@ public class ComicTriggers {
             }
             String body = admin
                 ? OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(comicBookData)
-                : serializeComicsStripped(comicBookData);
+                : OBJECT_MAPPER.writerWithView(Views.Public.class).writeValueAsString(comicBookData);
             return request.createResponseBuilder(HttpStatus.OK)
                 .header("Access-Control-Allow-Origin", "*")
                 .header("Access-Control-Allow-Methods", "*")
@@ -114,7 +111,7 @@ public class ComicTriggers {
         try {
             String body = admin
                 ? OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(matchingComic.get())
-                : serializeComicStripped(matchingComic.get());
+                : OBJECT_MAPPER.writerWithView(Views.Public.class).writeValueAsString(matchingComic.get());
             return request.createResponseBuilder(HttpStatus.OK)
                 .header("Access-Control-Allow-Origin", "*")
                 .header("Access-Control-Allow-Methods", "*")
@@ -142,6 +139,7 @@ public class ComicTriggers {
         HttpRequestMessage<Optional<String>> request)
     {
         log.info("Processing updateComic function.");
+        User admin = AuthHelper.requireAdmin(request);
         ComicService comicService = ComicService.getServiceInstance();
         String requestBody = request.getBody().orElse(null);
         ComicBook updatedComicBook = null;
@@ -155,7 +153,8 @@ public class ComicTriggers {
                 .body("Failed update: " + e.getMessage())
                 .build();
         }
-        ComicBook successfulUpdate = comicService.updateComic(updatedComicBook);
+        String editedBy = admin != null ? admin.getEmail() : null;
+        ComicBook successfulUpdate = comicService.updateComic(updatedComicBook, editedBy);
         return request.createResponseBuilder(HttpStatus.OK)
             .header("Access-Control-Allow-Origin", "*")
             .header("Access-Control-Allow-Methods", "*")
@@ -315,40 +314,7 @@ public class ComicTriggers {
 
     /** Returns true if the request carries a valid admin session token. */
     private boolean isAdminRequest(HttpRequestMessage<?> request) {
-        String token = request.getHeaders().get("x-session-token");
-        if (token == null || token.isBlank()) return false;
-        String userId = SessionService.getServiceInstance().validateSession(token);
-        if (userId == null) return false;
-        User user = UserService.getServiceInstance().findById(userId).orElse(null);
-        return user != null && user.isAdmin();
-    }
-
-    /** Serializes a list of comics, removing pricePaid from each item and its nested set members. */
-    private String serializeComicsStripped(List<ComicBook> comics) throws JsonProcessingException {
-        ArrayNode array = OBJECT_MAPPER.createArrayNode();
-        for (ComicBook comic : comics) {
-            ObjectNode node = OBJECT_MAPPER.valueToTree(comic);
-            stripPricePaid(node);
-            array.add(node);
-        }
-        return OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(array);
-    }
-
-    /** Serializes a single comic, removing pricePaid. */
-    private String serializeComicStripped(ComicBook comic) throws JsonProcessingException {
-        ObjectNode node = OBJECT_MAPPER.valueToTree(comic);
-        stripPricePaid(node);
-        return OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(node);
-    }
-
-    /** Removes pricePaid from a comic node and recursively from any nested items. */
-    private void stripPricePaid(ObjectNode node) {
-        node.remove("pricePaid");
-        if (node.has("items")) {
-            for (JsonNode item : node.get("items")) {
-                ((ObjectNode) item).remove("pricePaid");
-            }
-        }
+        return AuthHelper.isAdminRequest(request);
     }
 
     /* URI: /comics/data */

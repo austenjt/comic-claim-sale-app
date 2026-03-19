@@ -50,6 +50,50 @@ tfoot td { font-weight: bold; background: #1e2a38; }
   line-height: 1.6;
 }
 
+.notes-group {
+  margin-bottom: 12px;
+}
+
+.notes-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  margin-bottom: 6px;
+}
+
+.notes-optional {
+  font-weight: 400;
+  color: var(--color-text-muted);
+}
+
+.notes-textarea {
+  width: 100%;
+  padding: 8px 10px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  color: var(--color-text);
+  font-size: 0.9rem;
+  font-family: inherit;
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+.customer-notes-display {
+  background: rgba(96,165,250,0.06);
+  border-left: 3px solid #60a5fa;
+  padding: 10px 14px;
+  border-radius: 4px;
+}
+
+.notes-value {
+  margin: 4px 0 0;
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+  white-space: pre-wrap;
+}
+
 .btn-unsubmit {
   margin-top: 12px;
   padding: 8px 20px;

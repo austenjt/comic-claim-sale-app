@@ -231,7 +231,7 @@ public class CartService {
     }
 
     /** Start the configurable finalization countdown (FINALIZE_HOURS env var, default 20). Cart must be OPEN with at least one item. */
-    public Cart submitOrder(String userId) {
+    public Cart submitOrder(String userId, String customerNotes) {
         Cart cart = getActiveCart(userId)
             .orElseThrow(() -> new IllegalStateException("No active cart found."));
         if (!"OPEN".equals(cart.getStatus())) {
@@ -244,11 +244,53 @@ public class CartService {
         cart.setDiscountAmount(discountResult.getAmount());
         cart.setDiscountDescription(discountResult.getDescription());
         cart.setStatus("FINALIZING");
+        cart.setPaymentStatus("UNPAID");
+        if (customerNotes != null && !customerNotes.isBlank()) {
+            cart.setCustomerNotes(customerNotes.trim());
+        }
         int finalizeHours = EnvHelper.getFinalizeHours();
         cart.setFinalizeAfter(Instant.now().plus(finalizeHours, ChronoUnit.HOURS).toString());
         save(cart);
         log.info("Cart {} submitted, finalizes after {}", cart.getId(), cart.getFinalizeAfter());
         return cart;
+    }
+
+    /** Admin: update internal notes on an active cart. */
+    public Cart updateAdminNotes(String cartId, String adminNotes) {
+        SqlQuerySpec query = new SqlQuerySpec(
+            "SELECT * FROM c WHERE c.id = @cartId",
+            List.of(new SqlParameter("@cartId", cartId)));
+        for (ObjectNode node : cartsContainer.queryItems(query, new CosmosQueryRequestOptions(), ObjectNode.class)) {
+            try {
+                Cart cart = OBJECT_MAPPER.treeToValue(node, Cart.class);
+                cart.setAdminNotes(adminNotes != null && !adminNotes.isBlank() ? adminNotes.trim() : null);
+                save(cart);
+                log.info("Admin notes updated for cart {}", cartId);
+                return cart;
+            } catch (Exception e) {
+                throw new RuntimeException("Failed to update admin notes for cart: " + cartId, e);
+            }
+        }
+        throw new IllegalArgumentException("Cart not found: " + cartId);
+    }
+
+    /** Admin: update the payment status of an active cart. Valid values: UNPAID, PARTIAL, PAID. */
+    public Cart updatePaymentStatus(String cartId, String status) {
+        SqlQuerySpec query = new SqlQuerySpec(
+            "SELECT * FROM c WHERE c.id = @cartId",
+            List.of(new SqlParameter("@cartId", cartId)));
+        for (ObjectNode node : cartsContainer.queryItems(query, new CosmosQueryRequestOptions(), ObjectNode.class)) {
+            try {
+                Cart cart = OBJECT_MAPPER.treeToValue(node, Cart.class);
+                cart.setPaymentStatus(status);
+                save(cart);
+                log.info("Payment status for cart {} set to {}", cartId, status);
+                return cart;
+            } catch (Exception e) {
+                throw new RuntimeException("Failed to update payment status for cart: " + cartId, e);
+            }
+        }
+        throw new IllegalArgumentException("Cart not found: " + cartId);
     }
 
     /** Admin: revert a submitted cart back to OPEN so the user can add more items. */
@@ -303,7 +345,7 @@ public class CartService {
                             .ifPresent(comic -> {
                                 comic.setSoldTo(cart.getUserName());
                                 comic.setDateSold(soldDate);
-                                ComicService.getServiceInstance().updateComic(comic);
+                                ComicService.getServiceInstance().updateComic(comic, "system:fulfill");
                             });
                     } catch (Exception e) {
                         log.warn("Could not stamp soldTo on comic {}: {}", item.getComicId(), e.getMessage());
@@ -414,6 +456,58 @@ public class CartService {
             }
         }
         return result;
+    }
+
+    /** Sweeps all FINALIZING carts and transitions any past their deadline to FINALIZED. Returns count finalized. */
+    public int finalizeOverdueCarts() {
+        SqlQuerySpec query = new SqlQuerySpec(
+            "SELECT * FROM c WHERE c.status = 'FINALIZING'");
+        int count = 0;
+        for (ObjectNode node : cartsContainer.queryItems(query, new CosmosQueryRequestOptions(), ObjectNode.class)) {
+            try {
+                Cart cart = OBJECT_MAPPER.treeToValue(node, Cart.class);
+                String before = cart.getStatus();
+                checkAndFinalize(cart);
+                if ("FINALIZED".equals(cart.getStatus()) && !"FINALIZED".equals(before)) {
+                    count++;
+                }
+            } catch (Exception e) {
+                log.error("Error during finalization sweep: {}", e.getMessage());
+            }
+        }
+        return count;
+    }
+
+    /** Expires OPEN carts older than CART_EXPIRY_DAYS, returning all claimed comics to available inventory. */
+    public int expireAbandonedCarts() {
+        String cutoff = Instant.now()
+            .minus(EnvHelper.getCartExpiryDays(), java.time.temporal.ChronoUnit.DAYS)
+            .toString();
+        SqlQuerySpec query = new SqlQuerySpec(
+            "SELECT * FROM c WHERE c.status = 'OPEN' AND c.createdAt <= @cutoff",
+            List.of(new SqlParameter("@cutoff", cutoff)));
+        int expired = 0;
+        for (ObjectNode node : cartsContainer.queryItems(query, new CosmosQueryRequestOptions(), ObjectNode.class)) {
+            try {
+                Cart cart = OBJECT_MAPPER.treeToValue(node, Cart.class);
+                if (cart.getItems().isEmpty()) {
+                    cart.setStatus("DELETED");
+                    save(cart);
+                    continue;
+                }
+                for (CartItem item : cart.getItems()) {
+                    writeReturnEvent(item);
+                }
+                cart.setStatus("DELETED");
+                save(cart);
+                log.info("Expired abandoned cart {} for user {} ({} items returned)",
+                    cart.getId(), cart.getUserId(), cart.getItems().size());
+                expired++;
+            } catch (Exception e) {
+                log.error("Error expiring cart in node: {}", e.getMessage());
+            }
+        }
+        return expired;
     }
 
     /** Deletes every document in the carts container. Used during database reset. */
@@ -539,6 +633,29 @@ public class CartService {
         if (n.getNumber() != null) return "#" + n.getNumber();
         if (n.getSentinel() != null) return "#" + n.getSentinel().toString();
         return null;
+    }
+
+    /**
+     * Deletes return events older than the given number of days.
+     * @return number of events deleted
+     */
+    public int pruneOldReturnEvents(int daysOld) {
+        String cutoff = Instant.now().minus(daysOld, ChronoUnit.DAYS).toString();
+        SqlQuerySpec query = new SqlQuerySpec(
+            "SELECT c.id FROM c WHERE c.returnedAt < @cutoff",
+            List.of(new SqlParameter("@cutoff", cutoff)));
+        int count = 0;
+        for (ObjectNode node : returnEventsContainer.queryItems(query, new CosmosQueryRequestOptions(), ObjectNode.class)) {
+            try {
+                String id = node.get("id").asText();
+                returnEventsContainer.deleteItem(id, new PartitionKey(id), new CosmosItemRequestOptions());
+                count++;
+            } catch (Exception e) {
+                log.warn("Failed to delete return event {}: {}", node.get("id"), e.getMessage());
+            }
+        }
+        log.info("Pruned {} return events older than {} days", count, daysOld);
+        return count;
     }
 
     private void save(Cart cart) {

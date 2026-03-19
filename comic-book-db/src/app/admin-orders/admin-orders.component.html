@@ -54,7 +54,30 @@
       </tfoot>
     </table>
 
+    <div *ngIf="order.customerNotes" class="order-notes customer-notes">
+      <span class="notes-heading">Customer notes:</span> {{ order.customerNotes }}
+    </div>
+
+    <div class="order-notes admin-notes-row">
+      <span class="notes-heading">Admin notes:</span>
+      <textarea class="admin-notes-textarea"
+                rows="2"
+                placeholder="Internal notes…"
+                [value]="initNoteDraft(order.id, order.adminNotes)"
+                (input)="adminNoteDrafts[order.id] = $any($event.target).value"></textarea>
+      <button class="btn-save-notes" (click)="saveAdminNotes(order.id)">Save</button>
+    </div>
+
     <div class="order-actions">
+      <div class="payment-status-group">
+        <span class="payment-label">Payment:</span>
+        <select class="payment-select"
+                [ngClass]="'payment-' + (order.paymentStatus || 'UNPAID').toLowerCase()"
+                [value]="order.paymentStatus || 'UNPAID'"
+                (change)="setPaymentStatus(order.id, $any($event.target).value)">
+          <option *ngFor="let s of paymentStatuses" [value]="s">{{ paymentLabel(s) }}</option>
+        </select>
+      </div>
       <button
         class="btn-unsubmit"
         (click)="unsubmit(order)"
@@ -168,7 +191,30 @@
       </tfoot>
     </table>
 
+    <div *ngIf="order.customerNotes" class="order-notes customer-notes">
+      <span class="notes-heading">Customer notes:</span> {{ order.customerNotes }}
+    </div>
+
+    <div class="order-notes admin-notes-row">
+      <span class="notes-heading">Admin notes:</span>
+      <textarea class="admin-notes-textarea"
+                rows="2"
+                placeholder="Internal notes…"
+                [value]="initNoteDraft(order.id, order.adminNotes)"
+                (input)="adminNoteDrafts[order.id] = $any($event.target).value"></textarea>
+      <button class="btn-save-notes" (click)="saveArchivedAdminNotes(order.id)">Save</button>
+    </div>
+
     <div class="order-actions">
+      <div class="payment-status-group">
+        <span class="payment-label">Payment:</span>
+        <select class="payment-select"
+                [ngClass]="'payment-' + (order.paymentStatus || 'UNPAID').toLowerCase()"
+                [value]="order.paymentStatus || 'UNPAID'"
+                (change)="setArchivedPaymentStatus(order.id, $any($event.target).value)">
+          <option *ngFor="let s of paymentStatuses" [value]="s">{{ paymentLabel(s) }}</option>
+        </select>
+      </div>
       <button
         class="btn-delete"
         [class.btn-delete-confirm]="pendingDeleteId === order.id"

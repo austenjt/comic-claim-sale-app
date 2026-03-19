@@ -36,8 +36,8 @@ export class CartService {
     return this.http.delete<Cart>(`${this.apiBase}/cart/items/${comicId}`);
   }
 
-  submitOrder(): Observable<Cart> {
-    return this.http.post<Cart>(`${this.apiBase}/cart/submit`, {});
+  submitOrder(customerNotes?: string): Observable<Cart> {
+    return this.http.post<Cart>(`${this.apiBase}/cart/submit`, { customerNotes: customerNotes || null });
   }
 
   unsubmitMyOrder(): Observable<Cart> {
@@ -78,6 +78,22 @@ export class CartService {
 
   unsubmitOrder(cartId: string): Observable<Cart> {
     return this.http.post<Cart>(`${this.apiBase}/orders/${cartId}/unsubmit`, {});
+  }
+
+  updateAdminNotes(cartId: string, adminNotes: string | null): Observable<Cart> {
+    return this.http.post<Cart>(`${this.apiBase}/orders/${cartId}/notes`, { adminNotes });
+  }
+
+  updateArchivedAdminNotes(orderId: string, adminNotes: string | null): Observable<ArchivedOrder> {
+    return this.http.post<ArchivedOrder>(`${this.apiBase}/orders/archived/${orderId}/notes`, { adminNotes });
+  }
+
+  updatePaymentStatus(cartId: string, status: string): Observable<Cart> {
+    return this.http.post<Cart>(`${this.apiBase}/orders/${cartId}/payment`, { status });
+  }
+
+  updateArchivedPaymentStatus(orderId: string, status: string): Observable<ArchivedOrder> {
+    return this.http.post<ArchivedOrder>(`${this.apiBase}/orders/archived/${orderId}/payment`, { status });
   }
 
   adminUnclaim(comicId: string): Observable<void> {

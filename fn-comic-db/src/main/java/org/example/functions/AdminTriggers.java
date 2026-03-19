@@ -23,6 +23,7 @@ import org.example.functions.service.ComicService;
 import org.example.functions.service.DiscountService;
 import org.example.functions.service.SessionService;
 import org.example.functions.service.UserService;
+import org.example.functions.util.AuthHelper;
 
 import java.util.List;
 import java.util.Optional;
@@ -171,6 +172,121 @@ public class AdminTriggers {
             return cors(request.createResponseBuilder(HttpStatus.BAD_REQUEST)).body(e.getMessage()).build();
         } catch (Exception e) {
             log.error("awardComic error", e);
+            return serverError(request, e);
+        }
+    }
+
+    // ─── POST /api/orders/{cartId}/notes ─────────────────────────────────────
+
+    @FunctionName("updateOrderAdminNotes")
+    public HttpResponseMessage updateOrderAdminNotes(
+        @HttpTrigger(name = "updateOrderAdminNotes", route = "orders/{cartId}/notes",
+            methods = {HttpMethod.POST}, authLevel = AuthorizationLevel.ANONYMOUS)
+        HttpRequestMessage<Optional<String>> request,
+        @BindingName("cartId") String cartId)
+    {
+        if (requireAdmin(request) == null) return unauthorized(request);
+        try {
+            String body = request.getBody().orElse("{}");
+            ObjectNode payload = OBJECT_MAPPER.readValue(body, ObjectNode.class);
+            String notes = payload.has("adminNotes") ? payload.get("adminNotes").asText(null) : null;
+            Cart cart = CartService.getServiceInstance().updateAdminNotes(cartId, notes);
+            return cors(request.createResponseBuilder(HttpStatus.OK))
+                .header("Content-Type", "application/json")
+                .body(OBJECT_MAPPER.writeValueAsString(cart)).build();
+        } catch (IllegalArgumentException e) {
+            return cors(request.createResponseBuilder(HttpStatus.NOT_FOUND)).body(e.getMessage()).build();
+        } catch (Exception e) {
+            log.error("updateOrderAdminNotes error", e);
+            return serverError(request, e);
+        }
+    }
+
+    // ─── POST /api/orders/archived/{orderId}/notes ────────────────────────────
+
+    @FunctionName("updateArchivedOrderAdminNotes")
+    public HttpResponseMessage updateArchivedOrderAdminNotes(
+        @HttpTrigger(name = "updateArchivedOrderAdminNotes", route = "orders/archived/{orderId}/notes",
+            methods = {HttpMethod.POST}, authLevel = AuthorizationLevel.ANONYMOUS)
+        HttpRequestMessage<Optional<String>> request,
+        @BindingName("orderId") String orderId)
+    {
+        if (requireAdmin(request) == null) return unauthorized(request);
+        try {
+            String body = request.getBody().orElse("{}");
+            ObjectNode payload = OBJECT_MAPPER.readValue(body, ObjectNode.class);
+            String notes = payload.has("adminNotes") ? payload.get("adminNotes").asText(null) : null;
+            ArchivedOrder order = ArchiveService.getServiceInstance().updateAdminNotes(orderId, notes);
+            return cors(request.createResponseBuilder(HttpStatus.OK))
+                .header("Content-Type", "application/json")
+                .body(OBJECT_MAPPER.writeValueAsString(order)).build();
+        } catch (IllegalArgumentException e) {
+            return cors(request.createResponseBuilder(HttpStatus.NOT_FOUND)).body(e.getMessage()).build();
+        } catch (Exception e) {
+            log.error("updateArchivedOrderAdminNotes error", e);
+            return serverError(request, e);
+        }
+    }
+
+    // ─── POST /api/orders/{cartId}/payment ───────────────────────────────────
+
+    private static final java.util.Set<String> VALID_PAYMENT_STATUSES =
+        java.util.Set.of("UNPAID", "PARTIAL", "PAID");
+
+    @FunctionName("updatePaymentStatus")
+    public HttpResponseMessage updatePaymentStatus(
+        @HttpTrigger(name = "updatePaymentStatus", route = "orders/{cartId}/payment",
+            methods = {HttpMethod.POST}, authLevel = AuthorizationLevel.ANONYMOUS)
+        HttpRequestMessage<Optional<String>> request,
+        @BindingName("cartId") String cartId)
+    {
+        if (requireAdmin(request) == null) return unauthorized(request);
+        try {
+            String body = request.getBody().orElse("{}");
+            ObjectNode payload = OBJECT_MAPPER.readValue(body, ObjectNode.class);
+            String status = payload.has("status") ? payload.get("status").asText() : null;
+            if (status == null || !VALID_PAYMENT_STATUSES.contains(status)) {
+                return cors(request.createResponseBuilder(HttpStatus.BAD_REQUEST))
+                    .body("status must be one of: UNPAID, PARTIAL, PAID").build();
+            }
+            Cart cart = CartService.getServiceInstance().updatePaymentStatus(cartId, status);
+            return cors(request.createResponseBuilder(HttpStatus.OK))
+                .header("Content-Type", "application/json")
+                .body(OBJECT_MAPPER.writeValueAsString(cart)).build();
+        } catch (IllegalArgumentException e) {
+            return cors(request.createResponseBuilder(HttpStatus.NOT_FOUND)).body(e.getMessage()).build();
+        } catch (Exception e) {
+            log.error("updatePaymentStatus error", e);
+            return serverError(request, e);
+        }
+    }
+
+    // ─── POST /api/orders/archived/{orderId}/payment ──────────────────────────
+
+    @FunctionName("updateArchivedPaymentStatus")
+    public HttpResponseMessage updateArchivedPaymentStatus(
+        @HttpTrigger(name = "updateArchivedPaymentStatus", route = "orders/archived/{orderId}/payment",
+            methods = {HttpMethod.POST}, authLevel = AuthorizationLevel.ANONYMOUS)
+        HttpRequestMessage<Optional<String>> request,
+        @BindingName("orderId") String orderId)
+    {
+        if (requireAdmin(request) == null) return unauthorized(request);
+        try {
+            String body = request.getBody().orElse("{}");
+            ObjectNode payload = OBJECT_MAPPER.readValue(body, ObjectNode.class);
+            String status = payload.has("status") ? payload.get("status").asText() : null;
+            if (status == null || !VALID_PAYMENT_STATUSES.contains(status)) {
+                return cors(request.createResponseBuilder(HttpStatus.BAD_REQUEST))
+                    .body("status must be one of: UNPAID, PARTIAL, PAID").build();
+            }
+            ArchivedOrder order = ArchiveService.getServiceInstance().updatePaymentStatus(orderId, status);
+            return cors(request.createResponseBuilder(HttpStatus.OK))
+                .header("Content-Type", "application/json")
+                .body(OBJECT_MAPPER.writeValueAsString(order)).build();
+        } catch (IllegalArgumentException e) {
+            return cors(request.createResponseBuilder(HttpStatus.NOT_FOUND)).body(e.getMessage()).build();
+        } catch (Exception e) {
+            log.error("updateArchivedPaymentStatus error", e);
             return serverError(request, e);
         }
     }
@@ -329,12 +445,7 @@ public class AdminTriggers {
     // ─── Helpers ──────────────────────────────────────────────────────────────
 
     private User requireAdmin(HttpRequestMessage<?> request) {
-        String token = request.getHeaders().get("x-session-token");
-        String userId = SessionService.getServiceInstance().validateSession(token);
-        if (userId == null) return null;
-        User user = UserService.getServiceInstance().findById(userId).orElse(null);
-        if (user == null || !user.isAdmin()) return null;
-        return user;
+        return AuthHelper.requireAdmin(request);
     }
 
     private HttpResponseMessage.Builder cors(HttpResponseMessage.Builder b) {

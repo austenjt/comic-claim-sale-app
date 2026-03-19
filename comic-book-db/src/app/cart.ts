@@ -21,4 +21,7 @@ export interface Cart {
   fulfilledAt?: string;
   discountAmount?: number;
   discountDescription?: string | null;
+  paymentStatus?: 'UNPAID' | 'PARTIAL' | 'PAID' | null;
+  customerNotes?: string | null;
+  adminNotes?: string | null;
 }

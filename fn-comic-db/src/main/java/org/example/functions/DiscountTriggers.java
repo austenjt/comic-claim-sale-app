@@ -15,8 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.functions.model.Discount;
 import org.example.functions.model.User;
 import org.example.functions.service.DiscountService;
-import org.example.functions.service.SessionService;
-import org.example.functions.service.UserService;
+import org.example.functions.util.AuthHelper;
 
 import java.util.List;
 import java.util.Optional;
@@ -118,12 +117,7 @@ public class DiscountTriggers {
     // ─── Helpers ──────────────────────────────────────────────────────────────
 
     private User requireAdmin(HttpRequestMessage<?> request) {
-        String token = request.getHeaders().get("x-session-token");
-        String userId = SessionService.getServiceInstance().validateSession(token);
-        if (userId == null) return null;
-        User user = UserService.getServiceInstance().findById(userId).orElse(null);
-        if (user == null || !user.isAdmin()) return null;
-        return user;
+        return AuthHelper.requireAdmin(request);
     }
 
     private HttpResponseMessage.Builder cors(HttpResponseMessage.Builder b) {

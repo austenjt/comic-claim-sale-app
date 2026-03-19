@@ -68,7 +68,7 @@ public class ContactTriggers {
             String subject = "Contact Form: " + senderName;
             String text = "Name: " + senderName + "\nEmail: " + senderEmail + "\n\nMessage:\n" + message;
 
-            EmailService.getServiceInstance().send(List.of(adminEmail), senderEmail, subject, text);
+            EmailService.getServiceInstance().send(List.of(adminEmail), senderEmail, null, subject, text);
 
             log.info("Contact form submitted by {}", senderEmail);
             return cors(request.createResponseBuilder(HttpStatus.OK))

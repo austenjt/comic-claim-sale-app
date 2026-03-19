@@ -9,6 +9,7 @@ import com.azure.cosmos.models.SqlQuerySpec;
 import com.azure.cosmos.util.CosmosPagedIterable;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -18,15 +19,20 @@ import com.microsoft.azure.functions.HttpResponseMessage;
 import com.microsoft.azure.functions.HttpStatus;
 import lombok.extern.slf4j.Slf4j;
 import org.example.functions.client.CosmosDbClient;
+import org.example.functions.model.ComicAuditLog;
 import org.example.functions.model.ComicBook;
+import org.example.functions.model.FieldChange;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -220,6 +226,50 @@ public class ComicService {
         ObjectNode node = comicBookToNode(updatedComicBook);
         comicsContainer.replaceItem(node, idStr, new PartitionKey(idStr), new CosmosItemRequestOptions());
         return updatedComicBook;
+    }
+
+    /**
+     * Updates a comic and writes an audit log entry recording which fields changed and who changed them.
+     * @param updatedComicBook the new state of the comic
+     * @param editedBy         email of the admin, or a system label like "system:fulfill"
+     */
+    public ComicBook updateComic(ComicBook updatedComicBook, String editedBy) {
+        ComicBook oldComic = getComicById(updatedComicBook.getId()).orElse(null);
+        updateComic(updatedComicBook);
+        if (oldComic != null && editedBy != null) {
+            List<FieldChange> changes = diffComics(oldComic, updatedComicBook);
+            if (!changes.isEmpty()) {
+                ComicAuditLog entry = ComicAuditLog.builder()
+                    .id(UUID.randomUUID().toString())
+                    .comicId(String.valueOf(updatedComicBook.getId()))
+                    .comicTitle(updatedComicBook.getTitle())
+                    .editedBy(editedBy)
+                    .editedAt(Instant.now().toString())
+                    .changes(changes)
+                    .build();
+                AuditService.getServiceInstance().writeAuditLog(entry);
+            }
+        }
+        return updatedComicBook;
+    }
+
+    private List<FieldChange> diffComics(ComicBook oldComic, ComicBook newComic) {
+        ObjectNode oldNode = OBJECT_MAPPER.valueToTree(oldComic);
+        ObjectNode newNode = OBJECT_MAPPER.valueToTree(newComic);
+        List<FieldChange> changes = new ArrayList<>();
+        Iterator<String> fields = newNode.fieldNames();
+        while (fields.hasNext()) {
+            String field = fields.next();
+            if (field.startsWith("_") || field.equals("id") || field.equals("items")) continue;
+            JsonNode oldVal = oldNode.get(field);
+            JsonNode newVal = newNode.get(field);
+            String oldStr = (oldVal != null && !oldVal.isNull()) ? oldVal.toString() : null;
+            String newStr = (newVal != null && !newVal.isNull()) ? newVal.toString() : null;
+            if (!Objects.equals(oldStr, newStr)) {
+                changes.add(FieldChange.builder().field(field).oldValue(oldStr).newValue(newStr).build());
+            }
+        }
+        return changes;
     }
 
     public ComicBook createComic(ComicBook newComicBookObj) throws IOException {
