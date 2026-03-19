@@ -1,16 +1,21 @@
 <div class="dashboard-toolbar">
   <div class="search-row">
     <app-comic-search></app-comic-search>
-    <button class="btn-exclude-claimed"
-            [class.btn-exclude-claimed-active]="excludeClaimed"
-            (click)="excludeClaimedChange.emit(!excludeClaimed)">
-      {{ excludeClaimed ? 'Show All' : 'Exclude Claimed' }}
-    </button>
-    <button class="btn-exclude-claimed"
-            [class.btn-exclude-claimed-active]="showPricedOnly"
-            (click)="showPricedOnlyChange.emit(!showPricedOnly)">
-      {{ showPricedOnly ? 'Show Unpriced' : 'Priced Only' }}
-    </button>
+    <div class="filter-panel">
+      <span *ngIf="excludeClaimed && showPricedOnly" class="claim-sale-mode-label">Claim Sale Mode</span>
+      <span class="items-count">{{ itemCount }} items</span>
+      <div class="filter-buttons">
+        <button class="btn-exclude-claimed"
+                [class.btn-exclude-claimed-active]="excludeClaimed"
+                (click)="excludeClaimedChange.emit(!excludeClaimed)">
+          {{ excludeClaimed ? 'Show Claimed' : 'Exclude Claimed' }}
+        </button>
+        <button class="btn-exclude-claimed"
+                [class.btn-exclude-claimed-active]="showPricedOnly"
+                (click)="showPricedOnlyChange.emit(!showPricedOnly)">
+          {{ showPricedOnly ? 'Show Unpriced' : 'Exclude Unpriced' }}
+        </button>
+      </div>
+    </div>
   </div>
-  <span class="items-count">{{ itemCount }} items</span>
 </div>
