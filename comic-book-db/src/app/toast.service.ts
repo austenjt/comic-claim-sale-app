@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Subject, Subscription, timer } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { CartService, ClaimNotification } from './cart.service';
+import { ConfigService } from './config.service';
 
 export interface Toast {
   id: number;
@@ -19,7 +20,7 @@ export class ToastService {
   private firstPoll = true;
   private pollSub!: Subscription;
 
-  constructor(private cartService: CartService) {
+  constructor(private cartService: CartService, private configService: ConfigService) {
     this.startPolling();
   }
 
@@ -54,6 +55,7 @@ export class ToastService {
   }
 
   show(message: string): void {
+    if (this.configService.pauseNotifications) return;
     const id = ++this.toastCounter;
     this.toasts.push({ id, message });
     setTimeout(() => this.dismiss(id), 30000);

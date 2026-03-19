@@ -157,7 +157,7 @@
         </div>
         <div class="detail-item" *ngIf="!comic.comicCondition?.cgcCondition && !comic.comicCondition?.cbcsCondition && comic.comicCondition?.notCertifiedGrade">
           <span class="detail-label">Raw Grade</span>
-          <span class="detail-value">{{comic.comicCondition?.notCertifiedGrade}}</span>
+          <span class="detail-value">{{comic.comicCondition.notCertifiedGrade}}</span>
         </div>
 
         <!-- CGC -->
@@ -166,38 +166,38 @@
           <div class="detail-item" *ngIf="comic.comicCondition?.certificationId">
             <span class="detail-label">Cert ID</span>
             <span class="detail-value">
-              <a [href]="'https://www.cgccomics.com/certlookup/' + comic.comicCondition?.certificationId + '/'" target="_blank">
-                {{comic.comicCondition?.certificationId}}
+              <a [href]="'https://www.cgccomics.com/certlookup/' + comic.comicCondition!.certificationId + '/'" target="_blank">
+                {{comic.comicCondition!.certificationId}}
               </a>
             </span>
           </div>
           <div class="detail-item" *ngIf="comic.comicCondition?.cgcCondition?.label">
             <span class="detail-label">Label</span>
-            <span class="detail-value">{{comic.comicCondition?.cgcCondition?.label}}</span>
+            <span class="detail-value">{{comic.comicCondition!.cgcCondition!.label}}</span>
           </div>
           <div class="detail-item" *ngIf="comic.comicCondition?.cgcCondition?.grade">
             <span class="detail-label">Grade</span>
-            <span class="detail-value">{{comic.comicCondition?.cgcCondition?.grade}}</span>
+            <span class="detail-value">{{comic.comicCondition!.cgcCondition!.grade}}</span>
           </div>
           <div class="detail-item" *ngIf="comic.comicCondition?.cgcCondition?.pageQuality">
             <span class="detail-label">Page Quality</span>
-            <span class="detail-value">{{comic.comicCondition?.cgcCondition?.pageQuality}}</span>
+            <span class="detail-value">{{comic.comicCondition!.cgcCondition!.pageQuality}}</span>
           </div>
           <div class="detail-item" *ngIf="comic.comicCondition?.cgcCondition?.pedigree">
             <span class="detail-label">Pedigree</span>
-            <span class="detail-value">{{comic.comicCondition?.cgcCondition?.pedigree}}</span>
+            <span class="detail-value">{{comic.comicCondition!.cgcCondition!.pedigree}}</span>
           </div>
           <div class="detail-item" *ngIf="comic.comicCondition?.cgcCondition?.signature">
             <span class="detail-label">Signature</span>
-            <span class="detail-value">{{comic.comicCondition?.cgcCondition?.signature}}</span>
+            <span class="detail-value">{{comic.comicCondition!.cgcCondition!.signature}}</span>
           </div>
           <div class="detail-item" *ngIf="comic.comicCondition?.cgcCondition?.degreeOfRestoration">
             <span class="detail-label">Restoration</span>
-            <span class="detail-value">{{comic.comicCondition?.cgcCondition?.degreeOfRestoration}}</span>
+            <span class="detail-value">{{comic.comicCondition!.cgcCondition!.degreeOfRestoration}}</span>
           </div>
           <div class="detail-item" *ngIf="comic.comicCondition?.cgcCondition?.graderNotes">
             <span class="detail-label">Grader Notes</span>
-            <span class="detail-value">{{comic.comicCondition?.cgcCondition?.graderNotes}}</span>
+            <span class="detail-value">{{comic.comicCondition!.cgcCondition!.graderNotes}}</span>
           </div>
         </ng-container>
 
@@ -206,31 +206,31 @@
           <div class="detail-subsection-title">CBCS</div>
           <div class="detail-item" *ngIf="comic.comicCondition?.certificationId">
             <span class="detail-label">Cert ID</span>
-            <span class="detail-value">{{comic.comicCondition?.certificationId}}</span>
+            <span class="detail-value">{{comic.comicCondition!.certificationId}}</span>
           </div>
           <div class="detail-item" *ngIf="comic.comicCondition?.cbcsCondition?.label">
             <span class="detail-label">Label</span>
-            <span class="detail-value">{{comic.comicCondition?.cbcsCondition?.label}}</span>
+            <span class="detail-value">{{comic.comicCondition!.cbcsCondition!.label}}</span>
           </div>
           <div class="detail-item" *ngIf="comic.comicCondition?.cbcsCondition?.grade">
             <span class="detail-label">Grade</span>
-            <span class="detail-value">{{comic.comicCondition?.cbcsCondition?.grade}}</span>
+            <span class="detail-value">{{comic.comicCondition!.cbcsCondition!.grade}}</span>
           </div>
           <div class="detail-item" *ngIf="comic.comicCondition?.cbcsCondition?.pageQuality">
             <span class="detail-label">Page Quality</span>
-            <span class="detail-value">{{comic.comicCondition?.cbcsCondition?.pageQuality}}</span>
+            <span class="detail-value">{{comic.comicCondition!.cbcsCondition!.pageQuality}}</span>
           </div>
           <div class="detail-item" *ngIf="comic.comicCondition?.cbcsCondition?.pedigree">
             <span class="detail-label">Pedigree</span>
-            <span class="detail-value">{{comic.comicCondition?.cbcsCondition?.pedigree}}</span>
+            <span class="detail-value">{{comic.comicCondition!.cbcsCondition!.pedigree}}</span>
           </div>
           <div class="detail-item" *ngIf="comic.comicCondition?.cbcsCondition?.signature">
             <span class="detail-label">Signature</span>
-            <span class="detail-value">{{comic.comicCondition?.cbcsCondition?.signature}}</span>
+            <span class="detail-value">{{comic.comicCondition!.cbcsCondition!.signature}}</span>
           </div>
           <div class="detail-item" *ngIf="comic.comicCondition?.cbcsCondition?.degreeOfRestoration">
             <span class="detail-label">Restoration</span>
-            <span class="detail-value">{{comic.comicCondition?.cbcsCondition?.degreeOfRestoration}}</span>
+            <span class="detail-value">{{comic.comicCondition!.cbcsCondition!.degreeOfRestoration}}</span>
           </div>
         </ng-container>
 
@@ -239,27 +239,27 @@
           <div class="detail-subsection-title">Raw</div>
           <div class="detail-item" *ngIf="comic.comicCondition?.notCertifiedLabel">
             <span class="detail-label">Label</span>
-            <span class="detail-value">{{comic.comicCondition?.notCertifiedLabel}}</span>
+            <span class="detail-value">{{comic.comicCondition.notCertifiedLabel}}</span>
           </div>
           <div class="detail-item" *ngIf="comic.comicCondition?.notCertifiedGrade">
             <span class="detail-label">Grade</span>
-            <span class="detail-value">{{comic.comicCondition?.notCertifiedGrade}}</span>
+            <span class="detail-value">{{comic.comicCondition.notCertifiedGrade}}</span>
           </div>
           <div class="detail-item" *ngIf="comic.comicCondition?.notCertifiedPageQuality">
             <span class="detail-label">Page Quality</span>
-            <span class="detail-value">{{comic.comicCondition?.notCertifiedPageQuality}}</span>
+            <span class="detail-value">{{comic.comicCondition.notCertifiedPageQuality}}</span>
           </div>
           <div class="detail-item" *ngIf="comic.comicCondition?.notCertifiedPedigree">
             <span class="detail-label">Pedigree</span>
-            <span class="detail-value">{{comic.comicCondition?.notCertifiedPedigree}}</span>
+            <span class="detail-value">{{comic.comicCondition.notCertifiedPedigree}}</span>
           </div>
           <div class="detail-item" *ngIf="comic.comicCondition?.notCertifiedDegreeOfRestoration">
             <span class="detail-label">Restoration</span>
-            <span class="detail-value">{{comic.comicCondition?.notCertifiedDegreeOfRestoration}}</span>
+            <span class="detail-value">{{comic.comicCondition.notCertifiedDegreeOfRestoration}}</span>
           </div>
           <div class="detail-item" *ngIf="comic.comicCondition?.notCertifiedSignature">
             <span class="detail-label">Signature</span>
-            <span class="detail-value">{{comic.comicCondition?.notCertifiedSignature}}</span>
+            <span class="detail-value">{{comic.comicCondition.notCertifiedSignature}}</span>
           </div>
         </ng-container>
 

@@ -61,6 +61,14 @@ export class ConfigService {
     return this._config.finalizeHours ?? 20;
   }
 
+  get pauseNotifications(): boolean {
+    return localStorage.getItem('pauseNotifications') === 'true';
+  }
+
+  togglePauseNotifications(): void {
+    localStorage.setItem('pauseNotifications', String(!this.pauseNotifications));
+  }
+
   getEnums(): ComicEnums {
     return {
       coverVariants: this._config.coverVariants,

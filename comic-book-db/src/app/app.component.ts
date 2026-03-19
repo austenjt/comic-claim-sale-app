@@ -3,6 +3,7 @@ import { Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { AuthService } from './auth.service';
 import { ToastService } from './toast.service';
+import { ConfigService } from './config.service';
 
 @Component({
   selector: 'app-root',
@@ -15,6 +16,7 @@ export class AppComponent implements OnInit {
   constructor(
     public auth: AuthService,
     public toastService: ToastService,
+    public configService: ConfigService,
     private router: Router
   ) {}
 

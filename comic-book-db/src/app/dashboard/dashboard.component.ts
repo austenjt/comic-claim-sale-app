@@ -188,11 +188,22 @@ export class DashboardComponent implements OnInit {
     return !!this.claimedMap[String(comicId)] && !this.isInMyCart(comicId);
   }
 
-  canClaim(comic: Comic): boolean {
+  showClaimButton(comic: Comic): boolean {
     return !!comic.salePrice &&
            !this.isInMyCart(comic.id) &&
-           !this.isClaimedByOther(comic.id) &&
+           !this.isClaimedByOther(comic.id);
+  }
+
+  canClaim(comic: Comic): boolean {
+    return this.showClaimButton(comic) &&
            (this.myCart?.status === 'OPEN' || !this.myCart);
+  }
+
+  cartLockedTitle(): string {
+    const status = this.myCart?.status;
+    if (status === 'FINALIZING') return 'Your order has been submitted and is in the review window.';
+    if (status === 'FINALIZED') return 'Your order is finalized — wait for fulfillment before claiming again.';
+    return '';
   }
 
   claimedDate(comicId: number): string | null {
@@ -227,11 +238,15 @@ export class DashboardComponent implements OnInit {
     return this.isClaimedByOther(container.id) || members.some(m => this.isClaimedByOther(m.id));
   }
 
-  canClaimSet(container: Comic): boolean {
+  showClaimSetButton(container: Comic): boolean {
     const members = container.items ?? [];
     return members.length > 0 &&
            !this.isSetInMyCart(container) &&
-           !this.isSetClaimedByOther(container) &&
+           !this.isSetClaimedByOther(container);
+  }
+
+  canClaimSet(container: Comic): boolean {
+    return this.showClaimSetButton(container) &&
            (this.myCart?.status === 'OPEN' || !this.myCart);
   }
 

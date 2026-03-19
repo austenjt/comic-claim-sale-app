@@ -86,6 +86,36 @@ nav a.active {
   font-weight: 500;
 }
 
+.nav-pause-btn {
+  background: transparent;
+  color: rgba(255,255,255,0.55);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 4px;
+  padding: 0.3rem 0.75rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  margin-bottom: 0;
+  margin-right: 0;
+  transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+}
+
+.nav-pause-btn:hover {
+  background: rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.85);
+  border-color: rgba(255,255,255,0.35);
+}
+
+.nav-pause-btn-active {
+  background: rgba(251,191,36,0.15);
+  color: #fbbf24;
+  border-color: #fbbf24;
+}
+
+.nav-pause-btn-active:hover {
+  background: rgba(251,191,36,0.25);
+}
+
 .toast-stack {
   position: fixed;
   top: 110px;
