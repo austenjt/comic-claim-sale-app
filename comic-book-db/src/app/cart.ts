@@ -1,8 +1,6 @@
 export interface ShippingEstimate {
   bookCount: number;
-  packagingTier: 'FLAT_RATE' | 'GEMINI_MAILER' | 'COMIC_BOX' | 'FREE' | 'NONE';
-  packageWeightLbs: number;
-  shippingZone: number;
+  packagingTier: 'GEMINI_MAILER' | 'COMIC_BOX' | 'LARGE_BOX' | 'SHORT_BOX' | 'NONE';
   estimatedCost: number;
   notes: string;
   isFree: boolean;

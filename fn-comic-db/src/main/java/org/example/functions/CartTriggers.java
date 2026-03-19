@@ -21,7 +21,6 @@ import org.example.functions.model.User;
 import org.example.functions.service.ArchiveService;
 import org.example.functions.service.CartService;
 import org.example.functions.util.AuthHelper;
-import org.example.functions.util.EnvHelper;
 import org.example.functions.util.ShippingCalculator;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -52,8 +51,7 @@ public class CartTriggers {
             if (cart.isPresent()) {
                 Cart c = cart.get();
                 long bookCount = c.getItems().stream().filter(i -> !i.isSetContainer()).count();
-                ShippingEstimate shipping = ShippingCalculator.estimate(
-                    (int) bookCount, EnvHelper.getOriginState(), user.getAddress());
+                ShippingEstimate shipping = ShippingCalculator.estimate((int) bookCount);
                 ObjectNode cartNode = OBJECT_MAPPER.valueToTree(c);
                 cartNode.set("shippingEstimate", OBJECT_MAPPER.valueToTree(shipping));
                 body = OBJECT_MAPPER.writeValueAsString(cartNode);

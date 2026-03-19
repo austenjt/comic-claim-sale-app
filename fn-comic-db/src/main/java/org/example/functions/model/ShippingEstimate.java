@@ -16,16 +16,12 @@ import lombok.Setter;
 public class ShippingEstimate {
     /** Number of books in the cart (set containers excluded). */
     private int bookCount;
-    /** FLAT_RATE | GEMINI_MAILER | COMIC_BOX | FREE */
+    /** GEMINI_MAILER | COMIC_BOX | LARGE_BOX | SHORT_BOX | NONE */
     private String packagingTier;
-    /** Total estimated package weight in lbs. */
-    private double packageWeightLbs;
-    /** USPS zone used for the estimate (2–8), or 0 if flat/free. */
-    private int shippingZone;
-    /** Estimated shipping cost in USD. */
+    /** Flat shipping cost in USD. */
     private double estimatedCost;
     /** Human-readable note shown to the user. */
     private String notes;
-    /** True when shipping is free (29+ books). */
+    /** Always false — reserved for future free-shipping promotions. */
     private boolean isFree;
 }
