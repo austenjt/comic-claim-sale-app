@@ -1,10 +1,7 @@
 package org.example.functions;
 
-import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.microsoft.azure.functions.HttpMethod;
 import com.microsoft.azure.functions.HttpRequestMessage;
 import com.microsoft.azure.functions.HttpResponseMessage;
@@ -16,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.example.functions.model.ComicBook;
 import org.example.functions.service.ComicService;
+import org.example.functions.util.Mappers;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,10 +21,7 @@ import java.util.Optional;
 @Slf4j
 public class SearchTriggers {
 
-    private static final ObjectMapper OBJECT_MAPPER = JsonMapper.builder()
-        .addModule(new JavaTimeModule())
-        .enable(JsonGenerator.Feature.WRITE_BIGDECIMAL_AS_PLAIN)
-        .build();
+    private static final ObjectMapper OBJECT_MAPPER = Mappers.WITH_JAVA_TIME;
 
     @FunctionName("getComicsSearch")
     public HttpResponseMessage getComicsSearch(

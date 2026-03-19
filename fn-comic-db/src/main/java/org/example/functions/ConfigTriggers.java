@@ -1,6 +1,7 @@
 package org.example.functions;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.example.functions.util.Mappers;
 import com.microsoft.azure.functions.HttpMethod;
 import com.microsoft.azure.functions.HttpRequestMessage;
 import com.microsoft.azure.functions.HttpResponseMessage;
@@ -24,7 +25,7 @@ import java.util.Optional;
 @Slf4j
 public class ConfigTriggers {
 
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    private static final ObjectMapper OBJECT_MAPPER = Mappers.STANDARD;
     private static final String CORS_ORIGIN  = "*";
     private static final String CORS_HEADERS = "X-Session-Token, Content-Type";
 

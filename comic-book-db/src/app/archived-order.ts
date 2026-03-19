@@ -15,6 +15,7 @@ export interface ArchivedOrder {
   items: ArchivedOrderItem[];
   discountAmount: number;
   discountDescription?: string;
+  shippingCost?: number;
   createdAt: string;
   fulfilledAt: string;
   paymentStatus?: 'UNPAID' | 'PARTIAL' | 'PAID' | null;

@@ -1,9 +1,7 @@
 package org.example.functions;
 
-import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.microsoft.azure.functions.HttpMethod;
 import com.microsoft.azure.functions.HttpRequestMessage;
@@ -20,6 +18,8 @@ import org.example.functions.service.SessionService;
 import org.example.functions.service.UserService;
 import org.example.functions.util.AuthHelper;
 import org.example.functions.util.EnvHelper;
+import org.example.functions.util.HttpHelper;
+import org.example.functions.util.Mappers;
 
 import java.util.List;
 import java.util.Optional;
@@ -27,9 +27,7 @@ import java.util.Optional;
 @Slf4j
 public class UserTriggers {
 
-    private static final ObjectMapper OBJECT_MAPPER = JsonMapper.builder()
-        .enable(JsonGenerator.Feature.WRITE_BIGDECIMAL_AS_PLAIN)
-        .build();
+    private static final ObjectMapper OBJECT_MAPPER = Mappers.STANDARD;
 
     private static final String CORS_ORIGIN = "*";
     private static final String CORS_HEADERS = "X-Session-Token, Content-Type";
@@ -49,11 +47,11 @@ public class UserTriggers {
         try {
             String body = request.getBody().orElse("{}");
             JsonNode json = OBJECT_MAPPER.readTree(body);
-            String name = getString(json, "name");
-            String email = getString(json, "email");
-            String address = getString(json, "address");
-            String phone = getString(json, "phone");
-            String notes = getString(json, "notes");
+            String name = HttpHelper.getString(json, "name");
+            String email = HttpHelper.getString(json, "email");
+            String address = HttpHelper.getString(json, "address");
+            String phone = HttpHelper.getString(json, "phone");
+            String notes = HttpHelper.getString(json, "notes");
 
             if (name == null || email == null) {
                 return cors(request.createResponseBuilder(HttpStatus.BAD_REQUEST))
@@ -113,8 +111,8 @@ public class UserTriggers {
         try {
             String body = request.getBody().orElse("{}");
             JsonNode json = OBJECT_MAPPER.readTree(body);
-            String email = getString(json, "email");
-            String pin = getString(json, "pin");
+            String email = HttpHelper.getString(json, "email");
+            String pin = HttpHelper.getString(json, "pin");
 
             if (email == null || pin == null) {
                 return cors(request.createResponseBuilder(HttpStatus.BAD_REQUEST))
@@ -196,7 +194,7 @@ public class UserTriggers {
         HttpRequestMessage<Optional<String>> request)
     {
         log.info("Processing getCurrentUser.");
-        User user = requireSession(request);
+        User user = AuthHelper.requireSession(request);
         if (user == null) {
             return cors(request.createResponseBuilder(HttpStatus.UNAUTHORIZED))
                 .body("Invalid or expired session")
@@ -228,7 +226,7 @@ public class UserTriggers {
         HttpRequestMessage<Optional<String>> request)
     {
         log.info("Processing updateCurrentUser.");
-        User caller = requireSession(request);
+        User caller = AuthHelper.requireSession(request);
         if (caller == null) {
             return cors(request.createResponseBuilder(HttpStatus.UNAUTHORIZED))
                 .body("Invalid or expired session")
@@ -237,11 +235,11 @@ public class UserTriggers {
         try {
             String body = request.getBody().orElse("{}");
             JsonNode json = OBJECT_MAPPER.readTree(body);
-            String name = getString(json, "name");
-            String address = getString(json, "address");
-            String phone = getString(json, "phone");
-            String notes = getString(json, "notes");
-            String preferences = getString(json, "preferences");
+            String name = HttpHelper.getString(json, "name");
+            String address = HttpHelper.getString(json, "address");
+            String phone = HttpHelper.getString(json, "phone");
+            String notes = HttpHelper.getString(json, "notes");
+            String preferences = HttpHelper.getString(json, "preferences");
             User updated = UserService.getServiceInstance()
                 .updateContactDetails(caller.getId(), name, address, phone, notes, preferences);
             return cors(request.createResponseBuilder(HttpStatus.OK))
@@ -268,7 +266,7 @@ public class UserTriggers {
         HttpRequestMessage<Optional<String>> request)
     {
         log.info("Processing getPendingUsers.");
-        User caller = requireAdmin(request);
+        User caller = AuthHelper.requireAdmin(request);
         if (caller == null) {
             return cors(request.createResponseBuilder(HttpStatus.UNAUTHORIZED))
                 .body("Admin access required")
@@ -303,7 +301,7 @@ public class UserTriggers {
         @BindingName("id") String id)
     {
         log.info("Processing approveUser for id: {}", id);
-        User caller = requireAdmin(request);
+        User caller = AuthHelper.requireAdmin(request);
         if (caller == null) {
             return cors(request.createResponseBuilder(HttpStatus.UNAUTHORIZED))
                 .body("Admin access required")
@@ -342,7 +340,7 @@ public class UserTriggers {
         HttpRequestMessage<Optional<String>> request,
         @BindingName("id") String id)
     {
-        User caller = requireAdmin(request);
+        User caller = AuthHelper.requireAdmin(request);
         if (caller == null) {
             return cors(request.createResponseBuilder(HttpStatus.UNAUTHORIZED))
                 .body("Admin access required")
@@ -381,7 +379,7 @@ public class UserTriggers {
         HttpRequestMessage<Optional<String>> request,
         @BindingName("id") String id)
     {
-        User caller = requireAdmin(request);
+        User caller = AuthHelper.requireAdmin(request);
         if (caller == null) {
             return cors(request.createResponseBuilder(HttpStatus.UNAUTHORIZED))
                 .body("Admin access required")
@@ -410,7 +408,7 @@ public class UserTriggers {
         HttpRequestMessage<Optional<String>> request,
         @BindingName("id") String id)
     {
-        User caller = requireAdmin(request);
+        User caller = AuthHelper.requireAdmin(request);
         if (caller == null) {
             return cors(request.createResponseBuilder(HttpStatus.UNAUTHORIZED))
                 .body("Admin access required")
@@ -439,7 +437,7 @@ public class UserTriggers {
         HttpRequestMessage<Optional<String>> request)
     {
         log.info("Processing getApprovedUsers.");
-        User caller = requireAdmin(request);
+        User caller = AuthHelper.requireAdmin(request);
         if (caller == null) {
             return cors(request.createResponseBuilder(HttpStatus.UNAUTHORIZED))
                 .body("Admin access required")
@@ -462,14 +460,6 @@ public class UserTriggers {
     }
 
     // ─── Helpers ─────────────────────────────────────────────────────────────
-
-    private User requireSession(HttpRequestMessage<?> request) {
-        return AuthHelper.requireSession(request);
-    }
-
-    private User requireAdmin(HttpRequestMessage<?> request) {
-        return AuthHelper.requireAdmin(request);
-    }
 
     private ObjectNode safeUserNode(User user) {
         ObjectNode node = OBJECT_MAPPER.createObjectNode();
@@ -494,10 +484,4 @@ public class UserTriggers {
             .header("Access-Control-Allow-Methods", "*");
     }
 
-    private String getString(JsonNode node, String field) {
-        JsonNode val = node.get(field);
-        if (val == null || val.isNull()) return null;
-        String s = val.asText().trim();
-        return s.isEmpty() ? null : s;
-    }
 }

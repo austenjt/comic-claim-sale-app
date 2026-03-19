@@ -179,12 +179,16 @@ export class AdminOrdersComponent implements OnInit {
     return order.items.some(i => i.collectionGroup != null && i.collectionGroup > 0);
   }
 
+  itemsTotal(items: { price: number }[]): number {
+    return items.reduce((sum, item) => sum + item.price, 0);
+  }
+
   cartTotal(cart: Cart): number {
-    return cart.items.reduce((sum, item) => sum + item.price, 0);
+    return this.itemsTotal(cart.items) + (cart.shippingCost ?? 0);
   }
 
   archivedTotal(order: ArchivedOrder): number {
-    return order.items.reduce((sum, item) => sum + item.price, 0);
+    return this.itemsTotal(order.items) + (order.shippingCost ?? 0);
   }
 
   statusLabel(status: string): string {

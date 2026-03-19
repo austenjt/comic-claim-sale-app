@@ -45,9 +45,15 @@
           <td></td>
           <td></td>
         </tr>
+        <tr *ngIf="order.shippingCost && order.shippingCost > 0">
+          <td>Shipping</td>
+          <td>{{ order.shippingCost | currency }}</td>
+          <td></td>
+          <td></td>
+        </tr>
         <tr>
           <td><strong>Total</strong></td>
-          <td><strong>{{ (cartTotal(order) - (order.discountAmount || 0)) | currency }}</strong></td>
+          <td><strong>{{ (itemsTotal(order.items) - (order.discountAmount || 0) + (order.shippingCost || 0)) | currency }}</strong></td>
           <td></td>
           <td></td>
         </tr>
@@ -132,6 +138,12 @@
         </tr>
       </tbody>
       <tfoot>
+        <tr *ngIf="cart.shippingCost && cart.shippingCost > 0">
+          <td>Shipping</td>
+          <td>{{ cart.shippingCost | currency }}</td>
+          <td></td>
+          <td></td>
+        </tr>
         <tr>
           <td><strong>Total</strong></td>
           <td><strong>{{ cartTotal(cart) | currency }}</strong></td>
@@ -183,9 +195,14 @@
           </td>
           <td></td>
         </tr>
+        <tr *ngIf="order.shippingCost && order.shippingCost > 0">
+          <td>Shipping</td>
+          <td>{{ order.shippingCost | currency }}</td>
+          <td></td>
+        </tr>
         <tr>
           <td><strong>Total</strong></td>
-          <td><strong>{{ (archivedTotal(order) - (order.discountAmount || 0)) | currency }}</strong></td>
+          <td><strong>{{ (itemsTotal(order.items) - (order.discountAmount || 0) + (order.shippingCost || 0)) | currency }}</strong></td>
           <td></td>
         </tr>
       </tfoot>

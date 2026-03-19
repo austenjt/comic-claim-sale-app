@@ -6,13 +6,12 @@ import com.azure.cosmos.models.CosmosQueryRequestOptions;
 import com.azure.cosmos.models.PartitionKey;
 import com.azure.cosmos.models.SqlParameter;
 import com.azure.cosmos.models.SqlQuerySpec;
-import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.extern.slf4j.Slf4j;
 import org.example.functions.client.CosmosDbClient;
 import org.example.functions.model.ArchivedOrder;
+import org.example.functions.util.Mappers;
 import org.example.functions.model.ArchivedOrderItem;
 import org.example.functions.model.Cart;
 
@@ -24,9 +23,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ArchiveService {
 
-    private static final ObjectMapper OBJECT_MAPPER = JsonMapper.builder()
-        .enable(JsonGenerator.Feature.WRITE_BIGDECIMAL_AS_PLAIN)
-        .build();
+    private static final ObjectMapper OBJECT_MAPPER = Mappers.STANDARD;
     private final CosmosContainer archivedOrdersContainer;
     private static ArchiveService SERVICE_INSTANCE;
 
@@ -163,6 +160,7 @@ public class ArchiveService {
             .items(items)
             .discountAmount(cart.getDiscountAmount())
             .discountDescription(cart.getDiscountDescription())
+            .shippingCost(cart.getShippingCost())
             .createdAt(cart.getCreatedAt())
             .fulfilledAt(cart.getFulfilledAt())
             .paymentStatus(cart.getPaymentStatus())

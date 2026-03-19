@@ -1,8 +1,6 @@
 package org.example.functions;
 
-import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.microsoft.azure.functions.HttpMethod;
 import com.microsoft.azure.functions.HttpRequestMessage;
@@ -24,6 +22,7 @@ import org.example.functions.service.DiscountService;
 import org.example.functions.service.SessionService;
 import org.example.functions.service.UserService;
 import org.example.functions.util.AuthHelper;
+import org.example.functions.util.Mappers;
 
 import java.util.List;
 import java.util.Optional;
@@ -32,9 +31,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class AdminTriggers {
 
-    private static final ObjectMapper OBJECT_MAPPER = JsonMapper.builder()
-        .enable(JsonGenerator.Feature.WRITE_BIGDECIMAL_AS_PLAIN)
-        .build();
+    private static final ObjectMapper OBJECT_MAPPER = Mappers.STANDARD;
     private static final String CORS_ORIGIN = "*";
     private static final String CORS_HEADERS = "X-Session-Token, Content-Type";
 
@@ -46,7 +43,7 @@ public class AdminTriggers {
             methods = {HttpMethod.GET}, authLevel = AuthorizationLevel.ANONYMOUS)
         HttpRequestMessage<Optional<String>> request)
     {
-        if (requireAdmin(request) == null) return unauthorized(request);
+        if (AuthHelper.requireAdmin(request) == null) return unauthorized(request);
         try {
             List<Cart> carts = CartService.getServiceInstance().getAllActiveCarts();
             return cors(request.createResponseBuilder(HttpStatus.OK))
@@ -66,7 +63,7 @@ public class AdminTriggers {
             methods = {HttpMethod.GET}, authLevel = AuthorizationLevel.ANONYMOUS)
         HttpRequestMessage<Optional<String>> request)
     {
-        if (requireAdmin(request) == null) return unauthorized(request);
+        if (AuthHelper.requireAdmin(request) == null) return unauthorized(request);
         try {
             List<Cart> carts = CartService.getServiceInstance().getAllOpenCarts();
             return cors(request.createResponseBuilder(HttpStatus.OK))
@@ -87,7 +84,7 @@ public class AdminTriggers {
         HttpRequestMessage<Optional<String>> request,
         @BindingName("cartId") String cartId)
     {
-        if (requireAdmin(request) == null) return unauthorized(request);
+        if (AuthHelper.requireAdmin(request) == null) return unauthorized(request);
         try {
             Cart cart = CartService.getServiceInstance().fulfillCart(cartId);
             return cors(request.createResponseBuilder(HttpStatus.OK))
@@ -110,7 +107,7 @@ public class AdminTriggers {
         HttpRequestMessage<Optional<String>> request,
         @BindingName("cartId") String cartId)
     {
-        if (requireAdmin(request) == null) return unauthorized(request);
+        if (AuthHelper.requireAdmin(request) == null) return unauthorized(request);
         try {
             Cart cart = CartService.getServiceInstance().unsubmitOrder(cartId);
             return cors(request.createResponseBuilder(HttpStatus.OK))
@@ -135,7 +132,7 @@ public class AdminTriggers {
         HttpRequestMessage<Optional<String>> request,
         @BindingName("comicId") String comicId)
     {
-        if (requireAdmin(request) == null) return unauthorized(request);
+        if (AuthHelper.requireAdmin(request) == null) return unauthorized(request);
         try {
             CartService.getServiceInstance().removeItemAdmin(comicId);
             return cors(request.createResponseBuilder(HttpStatus.NO_CONTENT)).build();
@@ -155,7 +152,7 @@ public class AdminTriggers {
             methods = {HttpMethod.POST}, authLevel = AuthorizationLevel.ANONYMOUS)
         HttpRequestMessage<Optional<String>> request)
     {
-        if (requireAdmin(request) == null) return unauthorized(request);
+        if (AuthHelper.requireAdmin(request) == null) return unauthorized(request);
         try {
             String body = request.getBody().orElse("{}");
             ObjectNode payload = OBJECT_MAPPER.readValue(body, ObjectNode.class);
@@ -185,7 +182,7 @@ public class AdminTriggers {
         HttpRequestMessage<Optional<String>> request,
         @BindingName("cartId") String cartId)
     {
-        if (requireAdmin(request) == null) return unauthorized(request);
+        if (AuthHelper.requireAdmin(request) == null) return unauthorized(request);
         try {
             String body = request.getBody().orElse("{}");
             ObjectNode payload = OBJECT_MAPPER.readValue(body, ObjectNode.class);
@@ -211,7 +208,7 @@ public class AdminTriggers {
         HttpRequestMessage<Optional<String>> request,
         @BindingName("orderId") String orderId)
     {
-        if (requireAdmin(request) == null) return unauthorized(request);
+        if (AuthHelper.requireAdmin(request) == null) return unauthorized(request);
         try {
             String body = request.getBody().orElse("{}");
             ObjectNode payload = OBJECT_MAPPER.readValue(body, ObjectNode.class);
@@ -240,7 +237,7 @@ public class AdminTriggers {
         HttpRequestMessage<Optional<String>> request,
         @BindingName("cartId") String cartId)
     {
-        if (requireAdmin(request) == null) return unauthorized(request);
+        if (AuthHelper.requireAdmin(request) == null) return unauthorized(request);
         try {
             String body = request.getBody().orElse("{}");
             ObjectNode payload = OBJECT_MAPPER.readValue(body, ObjectNode.class);
@@ -270,7 +267,7 @@ public class AdminTriggers {
         HttpRequestMessage<Optional<String>> request,
         @BindingName("orderId") String orderId)
     {
-        if (requireAdmin(request) == null) return unauthorized(request);
+        if (AuthHelper.requireAdmin(request) == null) return unauthorized(request);
         try {
             String body = request.getBody().orElse("{}");
             ObjectNode payload = OBJECT_MAPPER.readValue(body, ObjectNode.class);
@@ -299,7 +296,7 @@ public class AdminTriggers {
             methods = {HttpMethod.GET}, authLevel = AuthorizationLevel.ANONYMOUS)
         HttpRequestMessage<Optional<String>> request)
     {
-        if (requireAdmin(request) == null) return unauthorized(request);
+        if (AuthHelper.requireAdmin(request) == null) return unauthorized(request);
         try {
             List<ArchivedOrder> orders = ArchiveService.getServiceInstance().getAllArchivedOrders();
             return cors(request.createResponseBuilder(HttpStatus.OK))
@@ -320,7 +317,7 @@ public class AdminTriggers {
         HttpRequestMessage<Optional<String>> request,
         @BindingName("orderId") String orderId)
     {
-        if (requireAdmin(request) == null) return unauthorized(request);
+        if (AuthHelper.requireAdmin(request) == null) return unauthorized(request);
         try {
             ArchivedOrder order = ArchiveService.getServiceInstance().getArchivedOrderById(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("Archived order not found: " + orderId));
@@ -360,7 +357,7 @@ public class AdminTriggers {
         HttpRequestMessage<Optional<String>> request,
         @BindingName("orderId") String orderId)
     {
-        if (requireAdmin(request) == null) return unauthorized(request);
+        if (AuthHelper.requireAdmin(request) == null) return unauthorized(request);
         try {
             ArchivedOrder order = ArchiveService.getServiceInstance().getArchivedOrderById(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("Archived order not found: " + orderId));
@@ -411,7 +408,7 @@ public class AdminTriggers {
             methods = {HttpMethod.POST}, authLevel = AuthorizationLevel.ANONYMOUS)
         HttpRequestMessage<Optional<String>> request)
     {
-        User admin = requireAdmin(request);
+        User admin = AuthHelper.requireAdmin(request);
         if (admin == null) return unauthorized(request);
         String adminToken = request.getHeaders().get("x-session-token");
         try {
@@ -443,10 +440,6 @@ public class AdminTriggers {
     }
 
     // ─── Helpers ──────────────────────────────────────────────────────────────
-
-    private User requireAdmin(HttpRequestMessage<?> request) {
-        return AuthHelper.requireAdmin(request);
-    }
 
     private HttpResponseMessage.Builder cors(HttpResponseMessage.Builder b) {
         return b.header("Access-Control-Allow-Origin", CORS_ORIGIN)

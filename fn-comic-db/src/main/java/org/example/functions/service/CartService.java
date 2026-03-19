@@ -7,13 +7,13 @@ import com.azure.cosmos.models.PartitionKey;
 import com.azure.cosmos.models.SqlParameter;
 import com.azure.cosmos.models.SqlQuerySpec;
 import com.azure.cosmos.util.CosmosPagedIterable;
-import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.extern.slf4j.Slf4j;
 import org.example.functions.client.CosmosDbClient;
 import org.example.functions.util.EnvHelper;
+import org.example.functions.util.Mappers;
+import org.example.functions.util.ShippingCalculator;
 import org.example.functions.model.Cart;
 import org.example.functions.model.CartItem;
 import org.example.functions.model.ClaimNotification;
@@ -32,9 +32,7 @@ import java.util.UUID;
 @Slf4j
 public class CartService {
 
-    private static final ObjectMapper OBJECT_MAPPER = JsonMapper.builder()
-        .enable(JsonGenerator.Feature.WRITE_BIGDECIMAL_AS_PLAIN)
-        .build();
+    private static final ObjectMapper OBJECT_MAPPER = Mappers.STANDARD;
     private final CosmosContainer cartsContainer;
     private final CosmosContainer returnEventsContainer;
     private static CartService SERVICE_INSTANCE;
@@ -243,6 +241,8 @@ public class CartService {
         DiscountService.DiscountResult discountResult = DiscountService.getServiceInstance().applyDiscounts(cart);
         cart.setDiscountAmount(discountResult.getAmount());
         cart.setDiscountDescription(discountResult.getDescription());
+        int bookCount = (int) cart.getItems().stream().filter(i -> !i.isSetContainer()).count();
+        cart.setShippingCost(ShippingCalculator.estimate(bookCount).getEstimatedCost());
         cart.setStatus("FINALIZING");
         cart.setPaymentStatus("UNPAID");
         if (customerNotes != null && !customerNotes.isBlank()) {
@@ -257,107 +257,63 @@ public class CartService {
 
     /** Admin: update internal notes on an active cart. */
     public Cart updateAdminNotes(String cartId, String adminNotes) {
-        SqlQuerySpec query = new SqlQuerySpec(
-            "SELECT * FROM c WHERE c.id = @cartId",
-            List.of(new SqlParameter("@cartId", cartId)));
-        for (ObjectNode node : cartsContainer.queryItems(query, new CosmosQueryRequestOptions(), ObjectNode.class)) {
-            try {
-                Cart cart = OBJECT_MAPPER.treeToValue(node, Cart.class);
-                cart.setAdminNotes(adminNotes != null && !adminNotes.isBlank() ? adminNotes.trim() : null);
-                save(cart);
-                log.info("Admin notes updated for cart {}", cartId);
-                return cart;
-            } catch (Exception e) {
-                throw new RuntimeException("Failed to update admin notes for cart: " + cartId, e);
-            }
-        }
-        throw new IllegalArgumentException("Cart not found: " + cartId);
+        Cart cart = findCartById(cartId);
+        cart.setAdminNotes(adminNotes != null && !adminNotes.isBlank() ? adminNotes.trim() : null);
+        save(cart);
+        log.info("Admin notes updated for cart {}", cartId);
+        return cart;
     }
 
     /** Admin: update the payment status of an active cart. Valid values: UNPAID, PARTIAL, PAID. */
     public Cart updatePaymentStatus(String cartId, String status) {
-        SqlQuerySpec query = new SqlQuerySpec(
-            "SELECT * FROM c WHERE c.id = @cartId",
-            List.of(new SqlParameter("@cartId", cartId)));
-        for (ObjectNode node : cartsContainer.queryItems(query, new CosmosQueryRequestOptions(), ObjectNode.class)) {
-            try {
-                Cart cart = OBJECT_MAPPER.treeToValue(node, Cart.class);
-                cart.setPaymentStatus(status);
-                save(cart);
-                log.info("Payment status for cart {} set to {}", cartId, status);
-                return cart;
-            } catch (Exception e) {
-                throw new RuntimeException("Failed to update payment status for cart: " + cartId, e);
-            }
-        }
-        throw new IllegalArgumentException("Cart not found: " + cartId);
+        Cart cart = findCartById(cartId);
+        cart.setPaymentStatus(status);
+        save(cart);
+        log.info("Payment status for cart {} set to {}", cartId, status);
+        return cart;
     }
 
     /** Admin: revert a submitted cart back to OPEN so the user can add more items. */
     public Cart unsubmitOrder(String cartId) {
-        SqlQuerySpec query = new SqlQuerySpec(
-            "SELECT * FROM c WHERE c.id = @cartId",
-            List.of(new SqlParameter("@cartId", cartId)));
-        for (ObjectNode node : cartsContainer.queryItems(query, new CosmosQueryRequestOptions(), ObjectNode.class)) {
-            try {
-                Cart cart = OBJECT_MAPPER.treeToValue(node, Cart.class);
-                if (!"FINALIZING".equals(cart.getStatus()) && !"FINALIZED".equals(cart.getStatus())) {
-                    throw new IllegalStateException("Can only unsubmit a FINALIZING or FINALIZED cart (current: " + cart.getStatus() + ").");
-                }
-                cart.setStatus("OPEN");
-                cart.setFinalizeAfter(null);
-                cart.setFinalizedAt(null);
-                cart.setDiscountAmount(0.0);
-                cart.setDiscountDescription(null);
-                save(cart);
-                log.info("Cart {} reverted to OPEN by admin", cartId);
-                return cart;
-            } catch (IllegalStateException e) {
-                throw e;
-            } catch (Exception e) {
-                log.error("Error unsubmitting cart", e);
-                throw new RuntimeException("Failed to unsubmit cart: " + cartId, e);
-            }
+        Cart cart = findCartById(cartId);
+        if (!"FINALIZING".equals(cart.getStatus()) && !"FINALIZED".equals(cart.getStatus())) {
+            throw new IllegalStateException("Can only unsubmit a FINALIZING or FINALIZED cart (current: " + cart.getStatus() + ").");
         }
-        throw new IllegalArgumentException("Cart not found: " + cartId);
+        cart.setStatus("OPEN");
+        cart.setFinalizeAfter(null);
+        cart.setFinalizedAt(null);
+        cart.setDiscountAmount(0.0);
+        cart.setDiscountDescription(null);
+        cart.setShippingCost(0.0);
+        save(cart);
+        log.info("Cart {} reverted to OPEN by admin", cartId);
+        return cart;
     }
 
     /** Admin: mark a cart as FULFILLED and stamp soldTo/dateSold on each comic. */
     public Cart fulfillCart(String cartId) {
-        // Cross-partition query since we only have cartId
-        SqlQuerySpec query = new SqlQuerySpec(
-            "SELECT * FROM c WHERE c.id = @cartId",
-            List.of(new SqlParameter("@cartId", cartId)));
-        for (ObjectNode node : cartsContainer.queryItems(query, new CosmosQueryRequestOptions(), ObjectNode.class)) {
+        Cart cart = findCartById(cartId);
+        cart.setStatus("FULFILLED");
+        cart.setFulfilledAt(Instant.now().toString());
+        save(cart);
+        log.info("Cart {} marked as FULFILLED", cartId);
+        ArchiveService.getServiceInstance().archiveCart(cart);
+        // Stamp soldTo/dateSold on each comic (skip set container rows)
+        String soldDate = Instant.now().toString();
+        for (CartItem item : cart.getItems()) {
+            if (item.isSetContainer()) continue;
             try {
-                Cart cart = OBJECT_MAPPER.treeToValue(node, Cart.class);
-                cart.setStatus("FULFILLED");
-                cart.setFulfilledAt(Instant.now().toString());
-                save(cart);
-                log.info("Cart {} marked as FULFILLED", cartId);
-                ArchiveService.getServiceInstance().archiveCart(cart);
-                // Stamp soldTo/dateSold on each comic (skip set container rows)
-                String soldDate = Instant.now().toString();
-                for (CartItem item : cart.getItems()) {
-                    if (item.isSetContainer()) continue;
-                    try {
-                        ComicService.getServiceInstance().getComicById(Integer.parseInt(item.getComicId()))
-                            .ifPresent(comic -> {
-                                comic.setSoldTo(cart.getUserName());
-                                comic.setDateSold(soldDate);
-                                ComicService.getServiceInstance().updateComic(comic, "system:fulfill");
-                            });
-                    } catch (Exception e) {
-                        log.warn("Could not stamp soldTo on comic {}: {}", item.getComicId(), e.getMessage());
-                    }
-                }
-                return cart;
+                ComicService.getServiceInstance().getComicById(Integer.parseInt(item.getComicId()))
+                    .ifPresent(comic -> {
+                        comic.setSoldTo(cart.getUserName());
+                        comic.setDateSold(soldDate);
+                        ComicService.getServiceInstance().updateComic(comic, "system:fulfill");
+                    });
             } catch (Exception e) {
-                log.error("Error fulfilling cart", e);
-                throw new RuntimeException("Failed to fulfill cart: " + cartId, e);
+                log.warn("Could not stamp soldTo on comic {}: {}", item.getComicId(), e.getMessage());
             }
         }
-        throw new IllegalArgumentException("Cart not found: " + cartId);
+        return cart;
     }
 
     /** Admin: all OPEN carts that have at least one item. */
@@ -656,6 +612,20 @@ public class CartService {
         }
         log.info("Pruned {} return events older than {} days", count, daysOld);
         return count;
+    }
+
+    private Cart findCartById(String cartId) {
+        SqlQuerySpec query = new SqlQuerySpec(
+            "SELECT * FROM c WHERE c.id = @cartId",
+            List.of(new SqlParameter("@cartId", cartId)));
+        for (ObjectNode node : cartsContainer.queryItems(query, new CosmosQueryRequestOptions(), ObjectNode.class)) {
+            try {
+                return OBJECT_MAPPER.treeToValue(node, Cart.class);
+            } catch (Exception e) {
+                throw new RuntimeException("Failed to parse cart: " + cartId, e);
+            }
+        }
+        throw new IllegalArgumentException("Cart not found: " + cartId);
     }
 
     private void save(Cart cart) {

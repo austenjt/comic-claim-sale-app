@@ -1,10 +1,7 @@
 package org.example.functions;
 
-import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.microsoft.azure.functions.HttpMethod;
 import com.microsoft.azure.functions.HttpRequestMessage;
 import com.microsoft.azure.functions.HttpResponseMessage;
@@ -23,6 +20,7 @@ import org.example.functions.service.ComicService;
 import org.example.functions.service.ImageService;
 import org.example.functions.util.AuthHelper;
 import org.example.functions.util.CsvToJsonConverter;
+import org.example.functions.util.Mappers;
 import org.example.functions.util.Views;
 
 import java.util.List;
@@ -31,10 +29,7 @@ import java.util.Optional;
 @Slf4j
 public class ComicTriggers {
 
-    private static final ObjectMapper OBJECT_MAPPER = JsonMapper.builder()
-        .addModule(new JavaTimeModule())
-        .enable(JsonGenerator.Feature.WRITE_BIGDECIMAL_AS_PLAIN)
-        .build();
+    private static final ObjectMapper OBJECT_MAPPER = Mappers.WITH_JAVA_TIME;
 
     @FunctionName("getAllComics")
     public HttpResponseMessage getAllComics(
@@ -48,7 +43,7 @@ public class ComicTriggers {
         log.info("Processing getAllComics function.");
         String pageNumberStr = request.getQueryParameters().get("pageNumber");
         String pageSizeStr = request.getQueryParameters().get("pageSize");
-        boolean admin = isAdminRequest(request);
+        boolean admin = AuthHelper.isAdminRequest(request);
         ComicService comicService = ComicService.getServiceInstance();
         List<ComicBook> comicBookData;
         try {
@@ -94,7 +89,7 @@ public class ComicTriggers {
         HttpRequestMessage<Optional<String>> request, @BindingName("id") String id)
     {
         log.info("Processing getComicById {} function.", id);
-        boolean admin = isAdminRequest(request);
+        boolean admin = AuthHelper.isAdminRequest(request);
         ComicService comicService = ComicService.getServiceInstance();
         List<ComicBook> comicBookData = comicService.getComicsList();
         Optional<ComicBook> matchingComic = comicBookData.stream()
@@ -276,7 +271,7 @@ public class ComicTriggers {
         HttpRequestMessage<Optional<String>> request, @BindingName("collectionGroup") String collectionGroupStr)
     {
         log.info("Processing deleteSet function for collectionGroup={}", collectionGroupStr);
-        if (!isAdminRequest(request)) {
+        if (!AuthHelper.isAdminRequest(request)) {
             return request.createResponseBuilder(HttpStatus.FORBIDDEN)
                 .header("Access-Control-Allow-Origin", "*")
                 .body("Admin access required.")
@@ -308,13 +303,6 @@ public class ComicTriggers {
                 .body(ExceptionUtils.getMessage(e))
                 .build();
         }
-    }
-
-    // ─── Helpers ──────────────────────────────────────────────────────────────
-
-    /** Returns true if the request carries a valid admin session token. */
-    private boolean isAdminRequest(HttpRequestMessage<?> request) {
-        return AuthHelper.isAdminRequest(request);
     }
 
     /* URI: /comics/data */

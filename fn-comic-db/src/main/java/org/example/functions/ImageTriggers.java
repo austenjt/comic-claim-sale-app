@@ -1,9 +1,6 @@
 package org.example.functions;
 
-import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.microsoft.azure.functions.HttpMethod;
 import com.microsoft.azure.functions.HttpRequestMessage;
 import com.microsoft.azure.functions.HttpResponseMessage;
@@ -20,6 +17,7 @@ import org.example.functions.model.ComicNumber;
 import org.example.functions.service.ComicService;
 import org.example.functions.service.ImageResizeService;
 import org.example.functions.service.ImageService;
+import org.example.functions.util.Mappers;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -32,10 +30,7 @@ import java.util.Optional;
 @Slf4j
 public class ImageTriggers {
 
-    private static final ObjectMapper OBJECT_MAPPER = JsonMapper.builder()
-        .addModule(new JavaTimeModule())
-        .enable(JsonGenerator.Feature.WRITE_BIGDECIMAL_AS_PLAIN)
-        .build();
+    private static final ObjectMapper OBJECT_MAPPER = Mappers.WITH_JAVA_TIME;
 
     @FunctionName("getAllImageNames")
     public HttpResponseMessage getAllImageNames(

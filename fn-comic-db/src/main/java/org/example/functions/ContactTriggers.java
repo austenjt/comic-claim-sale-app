@@ -1,9 +1,7 @@
 package org.example.functions;
 
-import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.microsoft.azure.functions.HttpMethod;
 import com.microsoft.azure.functions.HttpRequestMessage;
 import com.microsoft.azure.functions.HttpResponseMessage;
@@ -14,6 +12,8 @@ import com.microsoft.azure.functions.annotation.HttpTrigger;
 import lombok.extern.slf4j.Slf4j;
 import org.example.functions.service.EmailService;
 import org.example.functions.util.EnvHelper;
+import org.example.functions.util.HttpHelper;
+import org.example.functions.util.Mappers;
 
 import java.util.List;
 import java.util.Optional;
@@ -21,9 +21,7 @@ import java.util.Optional;
 @Slf4j
 public class ContactTriggers {
 
-    private static final ObjectMapper OBJECT_MAPPER = JsonMapper.builder()
-        .enable(JsonGenerator.Feature.WRITE_BIGDECIMAL_AS_PLAIN)
-        .build();
+    private static final ObjectMapper OBJECT_MAPPER = Mappers.STANDARD;
     private static final String CORS_ORIGIN = "*";
     private static final String CORS_HEADERS = "X-Session-Token, Content-Type";
 
@@ -42,9 +40,9 @@ public class ContactTriggers {
         try {
             String body = request.getBody().orElse("{}");
             JsonNode json = OBJECT_MAPPER.readTree(body);
-            String senderName = getString(json, "name");
-            String senderEmail = getString(json, "email");
-            String message = getString(json, "message");
+            String senderName = HttpHelper.getString(json, "name");
+            String senderEmail = HttpHelper.getString(json, "email");
+            String message = HttpHelper.getString(json, "message");
 
             if (senderName == null || senderEmail == null || message == null) {
                 return cors(request.createResponseBuilder(HttpStatus.BAD_REQUEST))
@@ -79,13 +77,6 @@ public class ContactTriggers {
             return cors(request.createResponseBuilder(HttpStatus.INTERNAL_SERVER_ERROR))
                 .body(e.getMessage()).build();
         }
-    }
-
-    private String getString(JsonNode node, String field) {
-        JsonNode n = node.get(field);
-        if (n == null || n.isNull()) return null;
-        String val = n.asText().trim();
-        return val.isEmpty() ? null : val;
     }
 
     private HttpResponseMessage.Builder cors(HttpResponseMessage.Builder b) {

@@ -1,5 +1,6 @@
 package org.example.functions.util;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.microsoft.azure.functions.HttpRequestMessage;
 import com.microsoft.azure.functions.HttpResponseMessage;
 import com.microsoft.azure.functions.HttpStatus;
@@ -22,6 +23,13 @@ public class HttpHelper {
             .header("Content-Type", "text/plain")
             .body(body)
             .build();
+    }
+
+    public static String getString(JsonNode node, String field) {
+        JsonNode val = node.get(field);
+        if (val == null || val.isNull()) return null;
+        String s = val.asText().trim();
+        return s.isEmpty() ? null : s;
     }
 
 }

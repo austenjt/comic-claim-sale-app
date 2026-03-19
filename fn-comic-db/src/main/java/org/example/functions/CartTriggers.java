@@ -1,9 +1,7 @@
 package org.example.functions;
 
-import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.microsoft.azure.functions.HttpMethod;
 import com.microsoft.azure.functions.HttpRequestMessage;
 import com.microsoft.azure.functions.HttpResponseMessage;
@@ -21,6 +19,8 @@ import org.example.functions.model.User;
 import org.example.functions.service.ArchiveService;
 import org.example.functions.service.CartService;
 import org.example.functions.util.AuthHelper;
+import org.example.functions.util.HttpHelper;
+import org.example.functions.util.Mappers;
 import org.example.functions.util.ShippingCalculator;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -29,9 +29,7 @@ import java.util.Optional;
 @Slf4j
 public class CartTriggers {
 
-    private static final ObjectMapper OBJECT_MAPPER = JsonMapper.builder()
-        .enable(JsonGenerator.Feature.WRITE_BIGDECIMAL_AS_PLAIN)
-        .build();
+    private static final ObjectMapper OBJECT_MAPPER = Mappers.STANDARD;
     private static final String CORS_ORIGIN = "*";
     private static final String CORS_HEADERS = "X-Session-Token, Content-Type";
 
@@ -43,7 +41,7 @@ public class CartTriggers {
             methods = {HttpMethod.GET}, authLevel = AuthorizationLevel.ANONYMOUS)
         HttpRequestMessage<Optional<String>> request)
     {
-        User user = requireApproved(request);
+        User user = AuthHelper.requireApproved(request);
         if (user == null) return unauthorized(request);
         try {
             Optional<Cart> cart = CartService.getServiceInstance().getActiveCart(user.getId());
@@ -74,11 +72,11 @@ public class CartTriggers {
             methods = {HttpMethod.POST}, authLevel = AuthorizationLevel.ANONYMOUS)
         HttpRequestMessage<Optional<String>> request)
     {
-        User user = requireApproved(request);
+        User user = AuthHelper.requireApproved(request);
         if (user == null) return unauthorized(request);
         try {
             JsonNode body = OBJECT_MAPPER.readTree(request.getBody().orElse("{}"));
-            String comicId = getString(body, "comicId");
+            String comicId = HttpHelper.getString(body, "comicId");
             if (comicId == null) return badRequest(request, "comicId is required");
 
             Cart cart = CartService.getServiceInstance().addItem(user, comicId);
@@ -103,11 +101,11 @@ public class CartTriggers {
             methods = {HttpMethod.POST}, authLevel = AuthorizationLevel.ANONYMOUS)
         HttpRequestMessage<Optional<String>> request)
     {
-        User user = requireApproved(request);
+        User user = AuthHelper.requireApproved(request);
         if (user == null) return unauthorized(request);
         try {
             JsonNode body = OBJECT_MAPPER.readTree(request.getBody().orElse("{}"));
-            String containerId = getString(body, "containerId");
+            String containerId = HttpHelper.getString(body, "containerId");
             if (containerId == null) return badRequest(request, "containerId is required");
 
             Cart cart = CartService.getServiceInstance().addSet(user, containerId);
@@ -133,7 +131,7 @@ public class CartTriggers {
         HttpRequestMessage<Optional<String>> request,
         @BindingName("comicId") String comicId)
     {
-        User user = requireApproved(request);
+        User user = AuthHelper.requireApproved(request);
         if (user == null) return unauthorized(request);
         try {
             Cart cart = CartService.getServiceInstance().removeItem(user.getId(), comicId);
@@ -156,11 +154,11 @@ public class CartTriggers {
             methods = {HttpMethod.POST}, authLevel = AuthorizationLevel.ANONYMOUS)
         HttpRequestMessage<Optional<String>> request)
     {
-        User user = requireApproved(request);
+        User user = AuthHelper.requireApproved(request);
         if (user == null) return unauthorized(request);
         try {
             JsonNode body = OBJECT_MAPPER.readTree(request.getBody().orElse("{}"));
-            String customerNotes = getString(body, "customerNotes");
+            String customerNotes = HttpHelper.getString(body, "customerNotes");
             Cart cart = CartService.getServiceInstance().submitOrder(user.getId(), customerNotes);
             return cors(request.createResponseBuilder(HttpStatus.OK))
                 .header("Content-Type", "application/json")
@@ -181,7 +179,7 @@ public class CartTriggers {
             methods = {HttpMethod.POST}, authLevel = AuthorizationLevel.ANONYMOUS)
         HttpRequestMessage<Optional<String>> request)
     {
-        User user = requireApproved(request);
+        User user = AuthHelper.requireApproved(request);
         if (user == null) return unauthorized(request);
         try {
             Cart cart = CartService.getServiceInstance().getActiveCart(user.getId())
@@ -206,7 +204,7 @@ public class CartTriggers {
             methods = {HttpMethod.GET}, authLevel = AuthorizationLevel.ANONYMOUS)
         HttpRequestMessage<Optional<String>> request)
     {
-        User user = requireApproved(request);
+        User user = AuthHelper.requireApproved(request);
         if (user == null) return unauthorized(request);
         try {
             java.util.List<ArchivedOrder> history = ArchiveService.getServiceInstance().getArchivedOrdersForUser(user.getId());
@@ -260,14 +258,6 @@ public class CartTriggers {
 
     // ─── Helpers ──────────────────────────────────────────────────────────────
 
-    private User requireSession(HttpRequestMessage<?> request) {
-        return AuthHelper.requireSession(request);
-    }
-
-    private User requireApproved(HttpRequestMessage<?> request) {
-        return AuthHelper.requireApproved(request);
-    }
-
     private HttpResponseMessage.Builder cors(HttpResponseMessage.Builder b) {
         return b.header("Access-Control-Allow-Origin", CORS_ORIGIN)
                 .header("Access-Control-Allow-Headers", CORS_HEADERS)
@@ -288,10 +278,4 @@ public class CartTriggers {
             .body(e.getMessage()).build();
     }
 
-    private String getString(JsonNode node, String field) {
-        JsonNode val = node.get(field);
-        if (val == null || val.isNull()) return null;
-        String s = val.asText().trim();
-        return s.isEmpty() ? null : s;
-    }
 }

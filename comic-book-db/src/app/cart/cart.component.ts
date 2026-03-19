@@ -79,8 +79,14 @@ export class CartComponent implements OnInit {
     return this.visibleItems.reduce((sum, item) => sum + item.price, 0);
   }
 
+  get shippingAmount(): number {
+    // After submit, use persisted shippingCost; before submit, use live estimate
+    if (this.cart?.shippingCost && this.cart.shippingCost > 0) return this.cart.shippingCost;
+    return this.cart?.shippingEstimate?.estimatedCost ?? 0;
+  }
+
   get discountedTotal(): number {
-    return Math.max(0, this.cartTotal - (this.cart?.discountAmount ?? 0));
+    return Math.max(0, this.cartTotal - (this.cart?.discountAmount ?? 0)) + this.shippingAmount;
   }
 
   get finalizeDeadline(): Date | null {

@@ -6,11 +6,11 @@ import com.azure.cosmos.models.CosmosQueryRequestOptions;
 import com.azure.cosmos.models.PartitionKey;
 import com.azure.cosmos.models.SqlQuerySpec;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.extern.slf4j.Slf4j;
 import org.example.functions.client.CosmosDbClient;
 import org.example.functions.model.Cart;
+import org.example.functions.util.Mappers;
 import org.example.functions.model.CartItem;
 import org.example.functions.model.Discount;
 
@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class DiscountService {
 
-    private static final ObjectMapper OBJECT_MAPPER = JsonMapper.builder().build();
+    private static final ObjectMapper OBJECT_MAPPER = Mappers.STANDARD;
     private final CosmosContainer discountsContainer;
     private static DiscountService SERVICE_INSTANCE;
 

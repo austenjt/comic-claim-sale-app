@@ -7,19 +7,17 @@ import com.azure.cosmos.models.PartitionKey;
 import com.azure.cosmos.models.SqlParameter;
 import com.azure.cosmos.models.SqlQuerySpec;
 import com.azure.cosmos.util.CosmosPagedIterable;
-import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.microsoft.azure.functions.HttpRequestMessage;
 import com.microsoft.azure.functions.HttpResponseMessage;
 import com.microsoft.azure.functions.HttpStatus;
 import lombok.extern.slf4j.Slf4j;
 import org.example.functions.client.CosmosDbClient;
 import org.example.functions.model.ComicAuditLog;
+import org.example.functions.util.Mappers;
 import org.example.functions.model.ComicBook;
 import org.example.functions.model.FieldChange;
 
@@ -39,10 +37,7 @@ import java.util.stream.Stream;
 @Slf4j
 public class ComicService {
 
-    private static final ObjectMapper OBJECT_MAPPER = JsonMapper.builder()
-        .addModule(new JavaTimeModule())
-        .enable(JsonGenerator.Feature.WRITE_BIGDECIMAL_AS_PLAIN)
-        .build();
+    private static final ObjectMapper OBJECT_MAPPER = Mappers.WITH_JAVA_TIME;
 
     private final CosmosContainer comicsContainer;
 

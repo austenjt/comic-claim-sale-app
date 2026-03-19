@@ -1,8 +1,6 @@
 package org.example.functions;
 
-import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.microsoft.azure.functions.HttpMethod;
 import com.microsoft.azure.functions.HttpRequestMessage;
 import com.microsoft.azure.functions.HttpResponseMessage;
@@ -13,9 +11,9 @@ import com.microsoft.azure.functions.annotation.FunctionName;
 import com.microsoft.azure.functions.annotation.HttpTrigger;
 import lombok.extern.slf4j.Slf4j;
 import org.example.functions.model.Discount;
-import org.example.functions.model.User;
 import org.example.functions.service.DiscountService;
 import org.example.functions.util.AuthHelper;
+import org.example.functions.util.Mappers;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,9 +21,7 @@ import java.util.Optional;
 @Slf4j
 public class DiscountTriggers {
 
-    private static final ObjectMapper OBJECT_MAPPER = JsonMapper.builder()
-        .enable(JsonGenerator.Feature.WRITE_BIGDECIMAL_AS_PLAIN)
-        .build();
+    private static final ObjectMapper OBJECT_MAPPER = Mappers.STANDARD;
     private static final String CORS_ORIGIN = "*";
     private static final String CORS_HEADERS = "X-Session-Token, Content-Type";
 
@@ -37,7 +33,7 @@ public class DiscountTriggers {
             methods = {HttpMethod.GET}, authLevel = AuthorizationLevel.ANONYMOUS)
         HttpRequestMessage<Optional<String>> request)
     {
-        if (requireAdmin(request) == null) return unauthorized(request);
+        if (AuthHelper.requireAdmin(request) == null) return unauthorized(request);
         try {
             List<Discount> discounts = DiscountService.getServiceInstance().getAllDiscounts();
             return cors(request.createResponseBuilder(HttpStatus.OK))
@@ -57,7 +53,7 @@ public class DiscountTriggers {
             methods = {HttpMethod.POST}, authLevel = AuthorizationLevel.ANONYMOUS)
         HttpRequestMessage<Optional<String>> request)
     {
-        if (requireAdmin(request) == null) return unauthorized(request);
+        if (AuthHelper.requireAdmin(request) == null) return unauthorized(request);
         try {
             String body = request.getBody().orElse("");
             Discount discount = OBJECT_MAPPER.readValue(body, Discount.class);
@@ -80,7 +76,7 @@ public class DiscountTriggers {
         HttpRequestMessage<Optional<String>> request,
         @BindingName("id") String id)
     {
-        if (requireAdmin(request) == null) return unauthorized(request);
+        if (AuthHelper.requireAdmin(request) == null) return unauthorized(request);
         try {
             String body = request.getBody().orElse("");
             Discount discount = OBJECT_MAPPER.readValue(body, Discount.class);
@@ -104,7 +100,7 @@ public class DiscountTriggers {
         HttpRequestMessage<Optional<String>> request,
         @BindingName("id") String id)
     {
-        if (requireAdmin(request) == null) return unauthorized(request);
+        if (AuthHelper.requireAdmin(request) == null) return unauthorized(request);
         try {
             DiscountService.getServiceInstance().deleteDiscount(id);
             return cors(request.createResponseBuilder(HttpStatus.NO_CONTENT)).build();
@@ -115,10 +111,6 @@ public class DiscountTriggers {
     }
 
     // ─── Helpers ──────────────────────────────────────────────────────────────
-
-    private User requireAdmin(HttpRequestMessage<?> request) {
-        return AuthHelper.requireAdmin(request);
-    }
 
     private HttpResponseMessage.Builder cors(HttpResponseMessage.Builder b) {
         return b.header("Access-Control-Allow-Origin", CORS_ORIGIN)

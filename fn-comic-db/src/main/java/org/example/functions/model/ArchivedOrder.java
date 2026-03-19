@@ -23,6 +23,7 @@ public class ArchivedOrder {
     private List<ArchivedOrderItem> items;
     private double discountAmount;
     private String discountDescription;
+    private double shippingCost;
     private String createdAt;
     private String fulfilledAt;
     private String paymentStatus; // UNPAID | PARTIAL | PAID
