@@ -14,7 +14,9 @@ export class LoginComponent {
   suspended = false;
   loading = false;
 
-  constructor(private auth: AuthService, private router: Router) {}
+  constructor(private auth: AuthService, private router: Router) {
+    this.email = localStorage.getItem('lastLoginEmail') ?? '';
+  }
 
   onSubmit() {
     this.error = '';
@@ -22,6 +24,7 @@ export class LoginComponent {
     this.loading = true;
     this.auth.login(this.email, this.pin).subscribe({
       next: () => {
+        localStorage.setItem('lastLoginEmail', this.email);
         this.loading = false;
         this.router.navigate(['/dashboard']);
       },
