@@ -11,7 +11,7 @@ export class AccountRequestComponent {
   email = '';
   address = '';
   phone = '';
-  paymentNotes = '';
+  notes = '';
   submitted = false;
   error = '';
   loading = false;
@@ -21,7 +21,7 @@ export class AccountRequestComponent {
   onSubmit() {
     this.error = '';
     this.loading = true;
-    this.userService.register(this.name, this.email, this.address, this.phone, this.paymentNotes).subscribe({
+    this.userService.register(this.name, this.email, this.address, this.phone, this.notes).subscribe({
       next: () => {
         this.submitted = true;
         this.loading = false;

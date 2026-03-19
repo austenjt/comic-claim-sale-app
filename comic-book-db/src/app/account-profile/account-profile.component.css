@@ -93,3 +93,38 @@
   color: #f87171;
   font-size: 0.875rem;
 }
+
+.notification-section {
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid var(--color-border);
+}
+
+.notification-section h3 {
+  margin: 0 0 12px;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.btn-pause-notif {
+  padding: 8px 20px;
+  background: transparent;
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  font-weight: 500;
+}
+.btn-pause-notif:hover { background: rgba(255,255,255,0.05); }
+.btn-pause-notif-active {
+  border-color: #fbbf24;
+  color: #fbbf24;
+}
+.btn-pause-notif-active:hover { background: rgba(251,191,36,0.08); }
+
+.notif-hint {
+  margin: 8px 0 0;
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+}

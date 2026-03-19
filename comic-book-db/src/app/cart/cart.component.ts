@@ -105,4 +105,15 @@ export class CartComponent implements OnInit {
     return this.cart?.status === 'OPEN' && this.visibleItems.length > 0;
   }
 
+  canUnsubmit(): boolean {
+    return this.cart?.status === 'FINALIZING' || this.cart?.status === 'FINALIZED';
+  }
+
+  unsubmit() {
+    this.cartService.unsubmitMyOrder().subscribe({
+      next: cart => { this.cart = cart; },
+      error: () => this.error = 'Failed to unsubmit order.'
+    });
+  }
+
 }

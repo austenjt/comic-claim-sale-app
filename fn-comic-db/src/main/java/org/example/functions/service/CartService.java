@@ -251,6 +251,35 @@ public class CartService {
         return cart;
     }
 
+    /** Admin: revert a submitted cart back to OPEN so the user can add more items. */
+    public Cart unsubmitOrder(String cartId) {
+        SqlQuerySpec query = new SqlQuerySpec(
+            "SELECT * FROM c WHERE c.id = @cartId",
+            List.of(new SqlParameter("@cartId", cartId)));
+        for (ObjectNode node : cartsContainer.queryItems(query, new CosmosQueryRequestOptions(), ObjectNode.class)) {
+            try {
+                Cart cart = OBJECT_MAPPER.treeToValue(node, Cart.class);
+                if (!"FINALIZING".equals(cart.getStatus()) && !"FINALIZED".equals(cart.getStatus())) {
+                    throw new IllegalStateException("Can only unsubmit a FINALIZING or FINALIZED cart (current: " + cart.getStatus() + ").");
+                }
+                cart.setStatus("OPEN");
+                cart.setFinalizeAfter(null);
+                cart.setFinalizedAt(null);
+                cart.setDiscountAmount(0.0);
+                cart.setDiscountDescription(null);
+                save(cart);
+                log.info("Cart {} reverted to OPEN by admin", cartId);
+                return cart;
+            } catch (IllegalStateException e) {
+                throw e;
+            } catch (Exception e) {
+                log.error("Error unsubmitting cart", e);
+                throw new RuntimeException("Failed to unsubmit cart: " + cartId, e);
+            }
+        }
+        throw new IllegalArgumentException("Cart not found: " + cartId);
+    }
+
     /** Admin: mark a cart as FULFILLED and stamp soldTo/dateSold on each comic. */
     public Cart fulfillCart(String cartId) {
         // Cross-partition query since we only have cartId

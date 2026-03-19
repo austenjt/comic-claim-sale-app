@@ -100,6 +100,31 @@ public class AdminTriggers {
         }
     }
 
+    // ─── POST /api/orders/{cartId}/unsubmit ──────────────────────────────────
+
+    @FunctionName("unsubmitOrder")
+    public HttpResponseMessage unsubmitOrder(
+        @HttpTrigger(name = "unsubmitOrder", route = "orders/{cartId}/unsubmit",
+            methods = {HttpMethod.POST}, authLevel = AuthorizationLevel.ANONYMOUS)
+        HttpRequestMessage<Optional<String>> request,
+        @BindingName("cartId") String cartId)
+    {
+        if (requireAdmin(request) == null) return unauthorized(request);
+        try {
+            Cart cart = CartService.getServiceInstance().unsubmitOrder(cartId);
+            return cors(request.createResponseBuilder(HttpStatus.OK))
+                .header("Content-Type", "application/json")
+                .body(OBJECT_MAPPER.writeValueAsString(cart)).build();
+        } catch (IllegalStateException e) {
+            return cors(request.createResponseBuilder(HttpStatus.BAD_REQUEST)).body(e.getMessage()).build();
+        } catch (IllegalArgumentException e) {
+            return cors(request.createResponseBuilder(HttpStatus.NOT_FOUND)).body(e.getMessage()).build();
+        } catch (Exception e) {
+            log.error("unsubmitOrder error", e);
+            return serverError(request, e);
+        }
+    }
+
     // ─── DELETE /api/orders/claim/{comicId} ──────────────────────────────────
 
     @FunctionName("adminUnclaim")

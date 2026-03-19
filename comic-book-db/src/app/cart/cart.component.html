@@ -69,6 +69,7 @@
         Until your order is finalized, you cannot claim more books for this order.
         Once this order is shipped or fulfilled, you can start a new claim cart.
       </p>
+      <button class="btn-unsubmit" (click)="unsubmit()">UnSubmit Order</button>
     </div>
 
     <div class="cart-actions" *ngIf="canSubmit()">
@@ -85,6 +86,7 @@
       <p class="finalized-note">
         Your order is finalized and with the seller. Payment details will be arranged directly.
       </p>
+      <button class="btn-unsubmit" (click)="unsubmit()">UnSubmit Order</button>
     </div>
   </ng-container>
 

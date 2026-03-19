@@ -9,8 +9,8 @@ export class UserService {
 
   constructor(private http: HttpClient) {}
 
-  register(name: string, email: string, address: string, phone: string, paymentNotes: string): Observable<any> {
-    return this.http.post(`${this.apiBase}/users/register`, { name, email, address, phone, paymentNotes });
+  register(name: string, email: string, address: string, phone: string, notes: string): Observable<any> {
+    return this.http.post(`${this.apiBase}/users/register`, { name, email, address, phone, notes });
   }
 
   getPendingUsers(): Observable<User[]> {

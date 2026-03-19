@@ -161,6 +161,31 @@ public class CartTriggers {
         }
     }
 
+    // ─── POST /api/cart/unsubmit ──────────────────────────────────────────────
+
+    @FunctionName("unsubmitMyOrder")
+    public HttpResponseMessage unsubmitMyOrder(
+        @HttpTrigger(name = "unsubmitMyOrder", route = "cart/unsubmit",
+            methods = {HttpMethod.POST}, authLevel = AuthorizationLevel.ANONYMOUS)
+        HttpRequestMessage<Optional<String>> request)
+    {
+        User user = requireApproved(request);
+        if (user == null) return unauthorized(request);
+        try {
+            Cart cart = CartService.getServiceInstance().getActiveCart(user.getId())
+                .orElseThrow(() -> new IllegalStateException("No active cart found."));
+            Cart updated = CartService.getServiceInstance().unsubmitOrder(cart.getId());
+            return cors(request.createResponseBuilder(HttpStatus.OK))
+                .header("Content-Type", "application/json")
+                .body(OBJECT_MAPPER.writeValueAsString(updated)).build();
+        } catch (IllegalStateException e) {
+            return badRequest(request, e.getMessage());
+        } catch (Exception e) {
+            log.error("unsubmitMyOrder error", e);
+            return serverError(request, e);
+        }
+    }
+
     // ─── GET /api/cart/history ────────────────────────────────────────────────
 
     @FunctionName("getCartHistory")

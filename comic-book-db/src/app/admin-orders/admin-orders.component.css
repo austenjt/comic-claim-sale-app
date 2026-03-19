@@ -56,6 +56,18 @@ tfoot td { font-weight: bold; }
 
 .order-actions { padding: 12px 16px; background: #1e2a38; border-top: 1px solid var(--color-border); }
 
+.btn-unsubmit {
+  padding: 8px 20px;
+  background: transparent;
+  color: #93c5fd;
+  border: 1px solid #93c5fd;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  font-weight: 600;
+}
+.btn-unsubmit:hover { background: rgba(147,197,253,0.1); }
+
 .btn-fulfill {
   padding: 8px 20px;
   background: transparent;

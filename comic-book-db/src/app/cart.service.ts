@@ -40,6 +40,10 @@ export class CartService {
     return this.http.post<Cart>(`${this.apiBase}/cart/submit`, {});
   }
 
+  unsubmitMyOrder(): Observable<Cart> {
+    return this.http.post<Cart>(`${this.apiBase}/cart/unsubmit`, {});
+  }
+
   getClaimedMap(): Observable<Record<string, string>> {
     return this.http.get<Record<string, string>>(`${this.apiBase}/cart/claimed-ids`);
   }
@@ -70,6 +74,10 @@ export class CartService {
 
   fulfillOrder(cartId: string): Observable<Cart> {
     return this.http.post<Cart>(`${this.apiBase}/orders/${cartId}/fulfill`, {});
+  }
+
+  unsubmitOrder(cartId: string): Observable<Cart> {
+    return this.http.post<Cart>(`${this.apiBase}/orders/${cartId}/unsubmit`, {});
   }
 
   adminUnclaim(comicId: string): Observable<void> {

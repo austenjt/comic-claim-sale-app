@@ -50,6 +50,19 @@ tfoot td { font-weight: bold; background: #1e2a38; }
   line-height: 1.6;
 }
 
+.btn-unsubmit {
+  margin-top: 12px;
+  padding: 8px 20px;
+  background: transparent;
+  color: #93c5fd;
+  border: 1px solid #93c5fd;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  font-weight: 600;
+}
+.btn-unsubmit:hover { background: rgba(147,197,253,0.1); }
+
 .btn-submit {
   padding: 10px 24px;
   background: #10b981;

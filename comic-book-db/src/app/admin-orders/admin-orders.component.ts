@@ -77,6 +77,13 @@ export class AdminOrdersComponent implements OnInit {
     });
   }
 
+  unsubmit(cart: Cart) {
+    this.cartService.unsubmitOrder(cart.id).subscribe({
+      next: () => { this.loadOrders(); this.loadOpenCarts(); },
+      error: () => this.error = 'Failed to unsubmit order.'
+    });
+  }
+
   unclaim(comicId: string) {
     this.cartService.adminUnclaim(comicId).subscribe({
       next: () => { this.loadOrders(); this.loadOpenCarts(); },

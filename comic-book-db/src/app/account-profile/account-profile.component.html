@@ -47,4 +47,14 @@
     <p *ngIf="saveSuccess" class="msg-success">&#10003; Changes saved.</p>
     <p *ngIf="saveError" class="msg-error">&#10007; {{ saveError }}</p>
   </form>
+
+  <div class="notification-section">
+    <h3>Notifications</h3>
+    <button class="btn-pause-notif"
+            [class.btn-pause-notif-active]="configService.pauseNotifications"
+            (click)="configService.togglePauseNotifications()">
+      {{ configService.pauseNotifications ? 'Resume Notifications' : 'Pause Notifications' }}
+    </button>
+    <p class="notif-hint">Toast notifications appear when other users claim or return comics.</p>
+  </div>
 </div>

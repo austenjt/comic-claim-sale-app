@@ -29,11 +29,6 @@
       </ng-container>
 
       <ng-container *ngIf="auth.isLoggedIn()">
-        <button class="nav-pause-btn"
-                [class.nav-pause-btn-active]="configService.pauseNotifications"
-                (click)="configService.togglePauseNotifications()">
-          {{ configService.pauseNotifications ? 'Resume Notifications' : 'Pause Notifications' }}
-        </button>
         <a routerLink="/profile" class="nav-user">{{ (auth.currentUser$ | async)?.name }}</a>
         <a href="#" (click)="$event.preventDefault(); logout()">Logout</a>
       </ng-container>

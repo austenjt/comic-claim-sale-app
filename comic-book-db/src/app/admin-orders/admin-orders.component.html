@@ -56,6 +56,12 @@
 
     <div class="order-actions">
       <button
+        class="btn-unsubmit"
+        (click)="unsubmit(order)"
+        title="Revert this order to Open so the user can add more items">
+        UnSubmit
+      </button>
+      <button
         class="btn-fulfill"
         [class.btn-fulfill-confirm]="pendingFulfillId === order.id"
         [disabled]="!canFulfill(order)"
