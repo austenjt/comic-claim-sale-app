@@ -1,10 +1,13 @@
 <div class="dashboard-toolbar">
-  <app-comic-search></app-comic-search>
-  <button class="btn-exclude-claimed"
-          [class.btn-exclude-claimed-active]="excludeClaimed"
-          (click)="excludeClaimed = !excludeClaimed">
-    {{ excludeClaimed ? 'Show All' : 'Exclude Claimed' }}
-  </button>
+  <div class="search-row">
+    <app-comic-search></app-comic-search>
+    <button class="btn-exclude-claimed"
+            [class.btn-exclude-claimed-active]="excludeClaimed"
+            (click)="excludeClaimed = !excludeClaimed">
+      {{ excludeClaimed ? 'Show All' : 'Exclude Claimed' }}
+    </button>
+  </div>
+  <span class="items-count">{{ displayComics.length }} items</span>
 </div>
 
 <!-- Award modal -->
@@ -38,7 +41,7 @@
 </div>
 
 <div class="comics-list">
-  <ng-container *ngFor="let comic of comics">
+  <ng-container *ngFor="let comic of displayComics">
 
     <!-- SET CARD -->
     <ng-container *ngIf="comic.isSet; else normalCard">

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { Subscription, timer } from 'rxjs';
+import { Subject, Subscription, timer } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
-import { CartService } from './cart.service';
+import { CartService, ClaimNotification } from './cart.service';
 
 export interface Toast {
   id: number;
@@ -11,6 +11,7 @@ export interface Toast {
 @Injectable({ providedIn: 'root' })
 export class ToastService {
   toasts: Toast[] = [];
+  newClaimEvent$ = new Subject<ClaimNotification>();
 
   private toastCounter = 0;
   private seenEventKeys = new Set<string>();
@@ -33,6 +34,7 @@ export class ToastService {
             this.seenEventKeys.add(key);
           } else if (!this.seenEventKeys.has(key)) {
             this.seenEventKeys.add(key);
+            this.newClaimEvent$.next(n);
             const numPart = n.comicNumber ? ` ${n.comicNumber}` : '';
             if (n.eventType === 'RETURN') {
               this.show(`"${n.comicTitle}${numPart}" Returned to sale`);

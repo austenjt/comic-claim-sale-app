@@ -40,7 +40,9 @@ export class DashboardComponent implements OnInit {
   get displayComics(): Comic[] {
     if (!this.excludeClaimed) return this.comics;
     return this.comics.filter(c =>
-      c.isSet ? !this.isSetClaimedByOther(c) : !this.isClaimedByOther(c.id)
+      c.isSet
+        ? !this.isSetClaimedByOther(c) && !this.isSetInMyCart(c)
+        : !this.isClaimedByOther(c.id) && !this.isInMyCart(c.id)
     );
   }
 
@@ -61,6 +63,13 @@ export class DashboardComponent implements OnInit {
     if (this.auth.isApproved()) {
       this.cartService.getMyCart().subscribe({ next: cart => this.myCart = cart, error: () => {} });
     }
+    this.toastService.newClaimEvent$.subscribe(n => {
+      if (n.eventType === 'RETURN') {
+        delete this.claimedMap[n.comicId];
+      } else {
+        this.claimedMap[n.comicId] = n.claimedAt;
+      }
+    });
   }
 
   getRemoteComics(): void {
@@ -116,8 +125,8 @@ export class DashboardComponent implements OnInit {
         const price = comic.salePrice != null ? ` — $${comic.salePrice.toFixed(2)}` : '';
         this.toastService.show(`"${comic.title}${num}" added to your cart.${price}`);
       },
-      error: (err) => {
-        this.claimError = err?.error || 'Failed to claim comic.';
+      error: () => {
+        this.loadClaimedMap();
       }
     });
   }
@@ -135,8 +144,8 @@ export class DashboardComponent implements OnInit {
         }
         this.toastService.show(`"${container.title}" set (${members.length} books) added to your cart.`);
       },
-      error: (err) => {
-        this.claimError = err?.error || 'Failed to claim set.';
+      error: () => {
+        this.loadClaimedMap();
       }
     });
   }
