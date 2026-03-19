@@ -120,6 +120,10 @@ tfoot td { font-weight: bold; background: #1e2a38; }
 .btn-submit:hover { background: #059669; }
 .btn-submit:disabled { opacity: 0.6; cursor: default; }
 
+.shipping-free { color: #34d399; font-weight: 500; }
+.shipping-cost { color: var(--color-text); font-weight: 500; }
+.shipping-note { display: block; font-size: 0.78rem; font-weight: 400; color: var(--color-text-muted); margin-top: 2px; }
+
 .discount-savings { color: #34d399; font-weight: 500; }
 .discount-desc { font-size: 0.85em; color: var(--color-text-muted); margin-left: 0.4rem; }
 

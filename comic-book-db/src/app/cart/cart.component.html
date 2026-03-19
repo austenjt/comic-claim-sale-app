@@ -51,6 +51,16 @@
           <td></td>
           <td *ngIf="canRemove()"></td>
         </tr>
+        <tr *ngIf="cart.shippingEstimate">
+          <td>Shipping</td>
+          <td [class.shipping-free]="cart.shippingEstimate.isFree"
+              [class.shipping-cost]="!cart.shippingEstimate.isFree">
+            {{ cart.shippingEstimate.isFree ? 'FREE' : (cart.shippingEstimate.estimatedCost | currency) }}
+            <span class="shipping-note">{{ cart.shippingEstimate.notes }}</span>
+          </td>
+          <td></td>
+          <td *ngIf="canRemove()"></td>
+        </tr>
         <tr>
           <td><strong>Total</strong></td>
           <td><strong>{{ discountedTotal | currency }}</strong></td>

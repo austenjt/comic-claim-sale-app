@@ -1,3 +1,13 @@
+export interface ShippingEstimate {
+  bookCount: number;
+  packagingTier: 'FLAT_RATE' | 'GEMINI_MAILER' | 'COMIC_BOX' | 'FREE' | 'NONE';
+  packageWeightLbs: number;
+  shippingZone: number;
+  estimatedCost: number;
+  notes: string;
+  isFree: boolean;
+}
+
 export interface CartItem {
   comicId: string;
   comicTitle: string;
@@ -24,4 +34,5 @@ export interface Cart {
   paymentStatus?: 'UNPAID' | 'PARTIAL' | 'PAID' | null;
   customerNotes?: string | null;
   adminNotes?: string | null;
+  shippingEstimate?: ShippingEstimate | null;
 }

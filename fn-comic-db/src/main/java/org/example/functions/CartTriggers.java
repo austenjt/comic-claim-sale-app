@@ -16,10 +16,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.functions.model.ArchivedOrder;
 import org.example.functions.model.Cart;
 import org.example.functions.model.ClaimNotification;
+import org.example.functions.model.ShippingEstimate;
 import org.example.functions.model.User;
 import org.example.functions.service.ArchiveService;
 import org.example.functions.service.CartService;
 import org.example.functions.util.AuthHelper;
+import org.example.functions.util.EnvHelper;
+import org.example.functions.util.ShippingCalculator;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import java.util.Optional;
 
@@ -44,9 +48,18 @@ public class CartTriggers {
         if (user == null) return unauthorized(request);
         try {
             Optional<Cart> cart = CartService.getServiceInstance().getActiveCart(user.getId());
-            String body = cart.isPresent()
-                ? OBJECT_MAPPER.writeValueAsString(cart.get())
-                : "null";
+            String body;
+            if (cart.isPresent()) {
+                Cart c = cart.get();
+                long bookCount = c.getItems().stream().filter(i -> !i.isSetContainer()).count();
+                ShippingEstimate shipping = ShippingCalculator.estimate(
+                    (int) bookCount, EnvHelper.getOriginState(), user.getAddress());
+                ObjectNode cartNode = OBJECT_MAPPER.valueToTree(c);
+                cartNode.set("shippingEstimate", OBJECT_MAPPER.valueToTree(shipping));
+                body = OBJECT_MAPPER.writeValueAsString(cartNode);
+            } else {
+                body = "null";
+            }
             return cors(request.createResponseBuilder(HttpStatus.OK))
                 .header("Content-Type", "application/json").body(body).build();
         } catch (Exception e) {

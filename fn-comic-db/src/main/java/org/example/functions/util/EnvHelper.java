@@ -35,6 +35,12 @@ public class EnvHelper {
         try { return Integer.parseInt(val.trim()); } catch (NumberFormatException e) { return 7; }
     }
 
+    /** Seller's 2-letter origin state for shipping zone estimation (default "TN"). */
+    public static String getOriginState() {
+        String val = getProp("ORIGIN_STATE");
+        return (val != null && !val.isBlank()) ? val.trim().toUpperCase() : "TN";
+    }
+
     public static String getSiteUrl() {
         String val = getProp("SITE_URL");
         return val != null ? val : "the site";
