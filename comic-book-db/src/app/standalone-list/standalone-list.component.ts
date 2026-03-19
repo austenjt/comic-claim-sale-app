@@ -600,18 +600,35 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
   qaSuccess = false;
   qaError = '';
 
+  readonly ERA_OPTIONS = ['Golden Age', 'Silver Age', 'Bronze Age', 'Copper Age', 'Modern Age'];
+
   qa = {
-    series: '',
+    // Step 1 — identity
     title: '',
+    series: '',
     number: '',
     publisher: '',
+    era: '',
+    publishedDate: '',
     variant: '',
     barCode: '',
+    printRun: null as number | null,
+    keyIssue: '',
+    writer: '',
+    artist: '',
+    // Step 2 — pricing / acquisition / notes
     isForSale: true,
     salePrice: null as number | null,
+    targetPrice: null as number | null,
     personalEstimate: null as number | null,
     pricePaid: null as number | null,
     dateAcquired: '',
+    purchasedFrom: '',
+    purchaseReferenceURL: '',
+    storageLocation: '',
+    defects: '',
+    publicNotes: '',
+    personalNotes: '',
     // Step 3 — grading
     gradingCompany: '',
     grade: null as number | null,
@@ -635,8 +652,11 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
     this.qaSuccess = false;
     this.qaError = '';
     this.qa = {
-      series: '', title: '', number: '', publisher: '', variant: '', barCode: '',
-      isForSale: true, salePrice: null, personalEstimate: null, pricePaid: null, dateAcquired: '',
+      title: '', series: '', number: '', publisher: '', era: '', publishedDate: '',
+      variant: '', barCode: '', printRun: null, keyIssue: '', writer: '', artist: '',
+      isForSale: true, salePrice: null, targetPrice: null, personalEstimate: null,
+      pricePaid: null, dateAcquired: '', purchasedFrom: '', purchaseReferenceURL: '',
+      storageLocation: '', defects: '', publicNotes: '', personalNotes: '',
       gradingCompany: '', grade: null, certificationId: '', pageQuality: '', pedigree: null, signed: false
     };
   }
@@ -702,43 +722,45 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
       };
     }
 
+    const splitList = (s: string) => s.split(',').map(x => x.trim()).filter(x => x.length > 0);
+
     const newComic: Comic = {
       id: -1,
       title: this.qa.title.trim() || '- Enter Title Name -',
       series: this.qa.series.trim() || '- Enter Series Name -',
       number: comicNumber,
       publisher: this.qa.publisher.trim() || null,
-      publishedDate: null,
-      era: null,
+      publishedDate: this.qa.publishedDate.trim() || null,
+      era: this.qa.era || null,
       variant: this.qa.variant.trim() || null,
-      printRun: null,
+      printRun: this.qa.printRun,
       barCode: this.qa.barCode.trim() || null,
-      keyIssue: null,
-      writer: [],
-      artist: [],
+      keyIssue: this.qa.keyIssue.trim() || null,
+      writer: splitList(this.qa.writer),
+      artist: splitList(this.qa.artist),
       comicCondition,
-      defects: null,
+      defects: this.qa.defects.trim() || null,
       pricePaid: this.qa.pricePaid,
-      dateAcquired: this.qa.dateAcquired || null,
-      purchasedFrom: null,
-      purchaseReferenceURL: null,
+      dateAcquired: this.qa.dateAcquired.trim() || null,
+      purchasedFrom: this.qa.purchasedFrom.trim() || null,
+      purchaseReferenceURL: this.qa.purchaseReferenceURL.trim() || null,
       salePrice: this.qa.salePrice,
       dateSold: null,
       soldTo: null,
       isForSale: this.qa.isForSale,
       personalEstimate: this.qa.personalEstimate,
-      targetPrice: null,
+      targetPrice: this.qa.targetPrice,
       collectionGroup: null,
       isSet: null,
-      storageLocation: null,
+      storageLocation: this.qa.storageLocation.trim() || null,
       goCollectInfo: null,
       grandComicDBInfo: null,
       smallCachedImageId: null,
       largeCachedImageId: null,
       smallBackImageId: null,
       largeBackImageId: null,
-      personalNotes: null,
-      publicNotes: null
+      personalNotes: this.qa.personalNotes.trim() || null,
+      publicNotes: this.qa.publicNotes.trim() || null
     };
 
     this.comicService.addComic(newComic).subscribe({

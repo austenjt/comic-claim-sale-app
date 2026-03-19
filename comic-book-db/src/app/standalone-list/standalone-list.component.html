@@ -9,7 +9,7 @@
   <div *ngIf="qaSuccess" class="qa-success">Saved! Ready for next entry.</div>
   <div *ngIf="qaError" class="qa-error">{{ qaError }}</div>
 
-  <!-- Step 1 -->
+  <!-- Step 1 — Identity -->
   <div *ngIf="qaStep === 1" class="qa-fields">
     <div class="qa-field">
       <label>Title</label>
@@ -28,6 +28,17 @@
       <input type="text" [(ngModel)]="qa.publisher" placeholder="e.g. Marvel" />
     </div>
     <div class="qa-field">
+      <label>Era</label>
+      <select [(ngModel)]="qa.era">
+        <option value="">— select —</option>
+        <option *ngFor="let e of ERA_OPTIONS" [value]="e">{{ e }}</option>
+      </select>
+    </div>
+    <div class="qa-field">
+      <label>Published Date</label>
+      <input type="text" [(ngModel)]="qa.publishedDate" placeholder="yyyy-MM-dd" />
+    </div>
+    <div class="qa-field">
       <label>Variant</label>
       <select [(ngModel)]="qa.variant">
         <option value="">— select —</option>
@@ -38,13 +49,33 @@
       <label>Bar Code</label>
       <input type="text" [(ngModel)]="qa.barCode" placeholder="e.g. 75960608628600111" />
     </div>
+    <div class="qa-field">
+      <label>Print Run</label>
+      <input type="number" [(ngModel)]="qa.printRun" min="1" placeholder="optional" />
+    </div>
+    <div class="qa-field">
+      <label>Key Issue</label>
+      <input type="text" [(ngModel)]="qa.keyIssue" placeholder="e.g. 1st app. Wolverine" />
+    </div>
+    <div class="qa-field">
+      <label>Writer(s)</label>
+      <input type="text" [(ngModel)]="qa.writer" placeholder="comma-separated" />
+    </div>
+    <div class="qa-field">
+      <label>Artist(s)</label>
+      <input type="text" [(ngModel)]="qa.artist" placeholder="comma-separated" />
+    </div>
   </div>
 
-  <!-- Step 2 -->
+  <!-- Step 2 — Pricing / Acquisition / Notes -->
   <div *ngIf="qaStep === 2" class="qa-fields">
     <div class="qa-field">
       <label>Sale Price ($)</label>
       <input type="number" [(ngModel)]="qa.salePrice" min="0" step="0.25" placeholder="leave blank if not priced" />
+    </div>
+    <div class="qa-field">
+      <label>Target Price ($)</label>
+      <input type="number" [(ngModel)]="qa.targetPrice" min="0" step="0.25" placeholder="internal reference" />
     </div>
     <div class="qa-field">
       <label>Personal Estimate ($)</label>
@@ -57,6 +88,30 @@
     <div class="qa-field">
       <label>Date Acquired</label>
       <input type="text" [(ngModel)]="qa.dateAcquired" placeholder="yyyy-MM-dd" pattern="\d{4}-\d{2}-\d{2}" />
+    </div>
+    <div class="qa-field">
+      <label>Purchased From</label>
+      <input type="text" [(ngModel)]="qa.purchasedFrom" placeholder="e.g. eBay, comics show" />
+    </div>
+    <div class="qa-field">
+      <label>Purchase Reference URL</label>
+      <input type="text" [(ngModel)]="qa.purchaseReferenceURL" placeholder="e.g. eBay listing URL" />
+    </div>
+    <div class="qa-field">
+      <label>Storage Location</label>
+      <input type="text" [(ngModel)]="qa.storageLocation" placeholder="e.g. Box 3, Shelf A" />
+    </div>
+    <div class="qa-field">
+      <label>Defects</label>
+      <input type="text" [(ngModel)]="qa.defects" placeholder="e.g. spine stress, tape" />
+    </div>
+    <div class="qa-field">
+      <label>Public Notes</label>
+      <input type="text" [(ngModel)]="qa.publicNotes" placeholder="visible to buyers" />
+    </div>
+    <div class="qa-field">
+      <label>Personal Notes</label>
+      <input type="text" [(ngModel)]="qa.personalNotes" placeholder="private" />
     </div>
     <div class="qa-field qa-field-checkbox">
       <label>For Sale</label>
@@ -103,6 +158,7 @@
 
   <div class="qa-actions">
     <button *ngIf="qaStep > 1" class="qa-btn qa-btn-back" (click)="qaBack()">&#8592; Back</button>
+    <button class="qa-btn qa-btn-reset" (click)="qaReset()">Clear</button>
     <button *ngIf="qaStep === 1" class="qa-btn qa-btn-next" (click)="qaNext()">Next &#8594;</button>
     <button *ngIf="qaStep === 2" class="qa-btn qa-btn-save" (click)="qaSave()" [disabled]="qaSaving">
       {{ qaSaving ? 'Saving…' : 'Save' }}
@@ -111,7 +167,6 @@
     <button *ngIf="qaStep === 3" class="qa-btn qa-btn-save" (click)="qaSave()" [disabled]="qaSaving">
       {{ qaSaving ? 'Saving…' : 'Save' }}
     </button>
-    <button class="qa-btn qa-btn-reset" (click)="qaReset()">Clear</button>
   </div>
 </div>
 <!-- ───────────────────────────────────────────────────────────────────────── -->

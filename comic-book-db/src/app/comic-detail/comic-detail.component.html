@@ -330,7 +330,7 @@
       </ng-container><!-- end admin-only -->
 
       <!-- Collection & Storage -->
-      <div class="detail-section" *ngIf="(comic.collectionGroup && comic.collectionGroup !== -1) || comic.storageLocation">
+      <div class="detail-section" *ngIf="auth.isAdmin() && ((comic.collectionGroup && comic.collectionGroup !== -1) || comic.storageLocation)">
         <div class="detail-section-title">Collection</div>
         <div class="detail-item" *ngIf="comic.collectionGroup && comic.collectionGroup !== -1">
           <span class="detail-label">Collection Group</span>
@@ -364,9 +364,9 @@
       </div>
 
       <!-- Notes -->
-      <div class="detail-section" *ngIf="comic.personalNotes || comic.publicNotes">
+      <div class="detail-section" *ngIf="comic.publicNotes || (auth.isAdmin() && comic.personalNotes)">
         <div class="detail-section-title">Notes</div>
-        <div class="detail-item" *ngIf="comic.personalNotes">
+        <div class="detail-item" *ngIf="auth.isAdmin() && comic.personalNotes">
           <span class="detail-label">Personal Notes</span>
           <span class="detail-value">{{comic.personalNotes}}</span>
         </div>

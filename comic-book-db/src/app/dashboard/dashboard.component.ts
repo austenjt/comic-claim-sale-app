@@ -35,6 +35,14 @@ export class DashboardComponent implements OnInit {
 
   pendingDeleteId: number | null = null;
   deletingId: number | null = null;
+  excludeClaimed = false;
+
+  get displayComics(): Comic[] {
+    if (!this.excludeClaimed) return this.comics;
+    return this.comics.filter(c =>
+      c.isSet ? !this.isSetClaimedByOther(c) : !this.isClaimedByOther(c.id)
+    );
+  }
 
 
   constructor(

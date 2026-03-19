@@ -1,4 +1,11 @@
-<app-comic-search></app-comic-search>
+<div class="dashboard-toolbar">
+  <app-comic-search></app-comic-search>
+  <button class="btn-exclude-claimed"
+          [class.btn-exclude-claimed-active]="excludeClaimed"
+          (click)="excludeClaimed = !excludeClaimed">
+    {{ excludeClaimed ? 'Show All' : 'Exclude Claimed' }}
+  </button>
+</div>
 
 <!-- Award modal -->
 <div *ngIf="awardingComic" class="award-modal-overlay" (click)="closeAwardModal()">
