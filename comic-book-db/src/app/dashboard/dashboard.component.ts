@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Comic } from '../comic';
 import { ComicService } from '../comic.service';
 import { ImageService } from '../image.service';
@@ -16,7 +16,7 @@ import { Observable, of } from 'rxjs';
   templateUrl: './dashboard.component.html',
   styleUrls: [ './dashboard.component.css' ]
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent implements OnInit, OnDestroy {
 
   comics: Comic[] = [];
   claimedMap: Record<string, string> = {}; // comicId → claimedAt
@@ -38,6 +38,10 @@ export class DashboardComponent implements OnInit {
   claimingSetId: number | null = null;
   excludeClaimed = false;
   showPricedOnly = false;
+
+  // Bidding state: comicId → seconds remaining
+  bidCountdowns: Record<string, number> = {};
+  private bidTimerInterval: any = null;
 
   get displayComics(): Comic[] {
     let result = this.comics;
@@ -82,6 +86,116 @@ export class DashboardComponent implements OnInit {
     });
   }
 
+  ngOnDestroy(): void {
+    if (this.bidTimerInterval) clearInterval(this.bidTimerInterval);
+  }
+
+  // ─── Bidding helpers ───────────────────────────────────────────────────────
+
+  isBiddingActive(comic: Comic): boolean {
+    return !!comic.bidStartedAt && this.bidSecondsRemaining(comic) > 0;
+  }
+
+  bidSecondsRemaining(comic: Comic): number {
+    if (!comic.bidStartedAt) return 0;
+    const endsAt = new Date(comic.bidStartedAt).getTime() +
+                   this.configService.biddingCycleMins * 60000;
+    return Math.max(0, Math.floor((endsAt - Date.now()) / 1000));
+  }
+
+  bidCountdownLabel(comicId: number): string {
+    const secs = this.bidCountdowns[String(comicId)] ?? 0;
+    const m = Math.floor(secs / 60);
+    const s = secs % 60;
+    return `${m}:${s.toString().padStart(2, '0')}`;
+  }
+
+  private startBidTimer(): void {
+    if (this.bidTimerInterval) return;
+    this.bidTimerInterval = setInterval(() => {
+      let anyActive = false;
+      for (const comic of this.comics) {
+        if (comic.bidStartedAt) {
+          const secs = this.bidSecondsRemaining(comic);
+          this.bidCountdowns[String(comic.id)] = secs;
+          if (secs > 0) {
+            anyActive = true;
+          } else if (secs === 0 && comic.bidStartedAt) {
+            // Timer just expired — call finalize
+            this.finalizeBidExpiry(comic);
+          }
+        }
+      }
+      if (!anyActive) {
+        clearInterval(this.bidTimerInterval);
+        this.bidTimerInterval = null;
+      }
+    }, 1000);
+  }
+
+  private finalizeBidExpiry(comic: Comic): void {
+    // Clear bidStartedAt locally to prevent repeated calls
+    comic.bidStartedAt = null;
+    this.cartService.finalizeBid(String(comic.id)).subscribe({
+      next: cart => {
+        this.myCart = cart;
+        this.claimedMap[String(comic.id)] = new Date().toISOString();
+        this.toastService.show(`Bidding ended for "${comic.title}" — added to winner's cart.`);
+      },
+      error: () => {
+        // Already finalized or no winner — just refresh claimed map
+        this.loadClaimedMap();
+      }
+    });
+  }
+
+  startBidding(comic: Comic): void {
+    this.cartService.startBid(String(comic.id)).subscribe({
+      next: updatedComic => {
+        // Merge bidding state into the local comic
+        const idx = this.comics.findIndex(c => c.id === comic.id);
+        if (idx >= 0) {
+          this.comics[idx] = { ...this.comics[idx], ...updatedComic };
+        }
+        this.bidCountdowns[String(comic.id)] = this.bidSecondsRemaining(updatedComic);
+        this.startBidTimer();
+        this.toastService.show(`Bidding started on "${comic.title}" — ${this.configService.biddingCycleMins} min window open!`);
+      },
+      error: err => {
+        const msg: string = typeof err?.error === 'string' ? err.error : '';
+        this.toastService.show(msg || 'Failed to start bidding.');
+      }
+    });
+  }
+
+  placeBid(comic: Comic): void {
+    const currentHigh = comic.highBid ?? 0;
+    const input = window.prompt(
+      `Current high bid: $${currentHigh.toFixed(2)}\n` +
+      `Bidder: ${comic.currentBidderName ?? 'none'}\n\n` +
+      `Enter your bid amount (must be greater than $${currentHigh.toFixed(2)}):`
+    );
+    if (input === null) return;
+    const amount = parseFloat(input);
+    if (isNaN(amount) || amount <= currentHigh) {
+      this.toastService.show(`Bid must be greater than $${currentHigh.toFixed(2)}.`);
+      return;
+    }
+    this.cartService.placeBid(String(comic.id), amount).subscribe({
+      next: updatedComic => {
+        const idx = this.comics.findIndex(c => c.id === comic.id);
+        if (idx >= 0) {
+          this.comics[idx] = { ...this.comics[idx], ...updatedComic };
+        }
+        this.toastService.show(`Bid of $${amount.toFixed(2)} placed on "${comic.title}"!`);
+      },
+      error: err => {
+        const msg: string = typeof err?.error === 'string' ? err.error : '';
+        this.toastService.show(msg || 'Bid failed.');
+      }
+    });
+  }
+
   getRemoteComics(): void {
     this.loading = true;
     this.comicService.getRemoteNestedComics().subscribe({
@@ -93,6 +207,7 @@ export class DashboardComponent implements OnInit {
             next: cached => {
               this.comics = cached.filter(c => c.isForSale !== false && !c.dateSold);
               this.loading = false;
+              this.initBidCountdowns();
             },
             error: () => { this.loading = false; }
           });
@@ -100,9 +215,21 @@ export class DashboardComponent implements OnInit {
         }
         this.comics = comics.filter(c => c.isForSale !== false && !c.dateSold);
         this.loading = false;
+        this.initBidCountdowns();
       },
       error: () => { this.loading = false; }
     });
+  }
+
+  private initBidCountdowns(): void {
+    let anyActive = false;
+    for (const comic of this.comics) {
+      if (comic.bidStartedAt) {
+        this.bidCountdowns[String(comic.id)] = this.bidSecondsRemaining(comic);
+        if (this.bidSecondsRemaining(comic) > 0) anyActive = true;
+      }
+    }
+    if (anyActive) this.startBidTimer();
   }
 
   loadClaimedMap(): void {

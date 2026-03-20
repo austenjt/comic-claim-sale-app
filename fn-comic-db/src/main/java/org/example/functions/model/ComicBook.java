@@ -95,6 +95,20 @@ public class ComicBook {
     private String personalNotes;
     private String publicNotes;
 
+    // Bidding
+    @JsonProperty("enableBid")
+    private Boolean enableBid;
+
+    @JsonSerialize(using = MoneySerializer.class)
+    private BigDecimal highBid;
+
+    private String bidStartedAt;
+    private String currentBidderId;
+    private String currentBidderName;
+
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private List<BidEntry> bidHistory;
+
     // Set members — populated at response-time when docType="SET"; not persisted in Cosmos
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<ComicBook> items;

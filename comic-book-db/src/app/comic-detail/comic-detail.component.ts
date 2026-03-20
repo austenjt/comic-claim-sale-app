@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Location } from '@angular/common';
 
@@ -9,6 +9,7 @@ import { ImageService } from '../image.service';
 import { CartService } from '../cart.service';
 import { ToastService } from '../toast.service';
 import { AuthService } from '../auth.service';
+import { ConfigService } from '../config.service';
 import { Observable, of, map } from 'rxjs';
 
 @Component({
@@ -16,7 +17,7 @@ import { Observable, of, map } from 'rxjs';
   templateUrl: './comic-detail.component.html',
   styleUrls: [ './comic-detail.component.css' ]
 })
-export class ComicDetailComponent implements OnInit {
+export class ComicDetailComponent implements OnInit, OnDestroy {
 
   comic: Comic | undefined;
   activeImage: 'front' | 'back' = 'front';
@@ -25,6 +26,8 @@ export class ComicDetailComponent implements OnInit {
   myCart: Cart | null = null;
   claimError = '';
   actionLoading = false;
+  bidSecondsRemaining = 0;
+  private bidTimerInterval: any = null;
   imageUploading = false;
   imageUploadError = '';
   backImageUploading = false;
@@ -38,6 +41,7 @@ export class ComicDetailComponent implements OnInit {
     private cartService: CartService,
     private toastService: ToastService,
     public auth: AuthService,
+    public configService: ConfigService,
     private location: Location
   ) {}
 
@@ -117,10 +121,123 @@ export class ComicDetailComponent implements OnInit {
     });
   }
 
+  get bidHistoryDesc() {
+    return [...(this.comic?.bidHistory ?? [])].reverse();
+  }
+
+  ngOnDestroy(): void {
+    if (this.bidTimerInterval) clearInterval(this.bidTimerInterval);
+  }
+
+  isBiddingActive(): boolean {
+    if (!this.comic?.bidStartedAt) return false;
+    return this.bidSecondsRemaining > 0;
+  }
+
+  get bidCountdownLabel(): string {
+    const m = Math.floor(this.bidSecondsRemaining / 60);
+    const s = this.bidSecondsRemaining % 60;
+    return `${m}:${s.toString().padStart(2, '0')}`;
+  }
+
+  private startBidTimer(): void {
+    if (this.bidTimerInterval) return;
+    this.bidTimerInterval = setInterval(() => {
+      if (!this.comic?.bidStartedAt) {
+        clearInterval(this.bidTimerInterval);
+        this.bidTimerInterval = null;
+        return;
+      }
+      const endsAt = new Date(this.comic.bidStartedAt).getTime() +
+                     this.configService.biddingCycleMins * 60000;
+      this.bidSecondsRemaining = Math.max(0, Math.floor((endsAt - Date.now()) / 1000));
+      if (this.bidSecondsRemaining === 0) {
+        clearInterval(this.bidTimerInterval);
+        this.bidTimerInterval = null;
+        this.onBidExpired();
+      }
+    }, 1000);
+  }
+
+  private onBidExpired(): void {
+    if (!this.comic) return;
+    const comicId = String(this.comic.id);
+    this.comic.bidStartedAt = null;
+    this.cartService.finalizeBid(comicId).subscribe({
+      next: cart => {
+        this.myCart = cart;
+        this.claimedMap[comicId] = new Date().toISOString();
+        this.toastService.show('Bidding ended — comic added to winner\'s cart.');
+      },
+      error: () => { this.loadClaimedMap(); }
+    });
+  }
+
+  private loadClaimedMap(): void {
+    this.cartService.getClaimedMap().subscribe({ next: m => this.claimedMap = m, error: () => {} });
+  }
+
+  startBidding(): void {
+    if (!this.comic) return;
+    this.actionLoading = true;
+    this.cartService.startBid(String(this.comic.id)).subscribe({
+      next: updatedComic => {
+        this.comic = { ...this.comic!, ...updatedComic };
+        const endsAt = new Date(this.comic.bidStartedAt!).getTime() +
+                       this.configService.biddingCycleMins * 60000;
+        this.bidSecondsRemaining = Math.max(0, Math.floor((endsAt - Date.now()) / 1000));
+        this.startBidTimer();
+        this.actionLoading = false;
+        this.toastService.show(`Bidding started — ${this.configService.biddingCycleMins} min window open!`);
+      },
+      error: err => {
+        this.claimError = err?.error || 'Failed to start bidding.';
+        this.actionLoading = false;
+      }
+    });
+  }
+
+  placeBid(): void {
+    if (!this.comic) return;
+    const currentHigh = this.comic.highBid ?? 0;
+    const input = window.prompt(
+      `Current high bid: $${currentHigh.toFixed(2)}\n` +
+      `Bidder: ${this.comic.currentBidderName ?? 'none'}\n\n` +
+      `Enter your bid (must be greater than $${currentHigh.toFixed(2)}):`
+    );
+    if (input === null) return;
+    const amount = parseFloat(input);
+    if (isNaN(amount) || amount <= currentHigh) {
+      this.claimError = `Bid must be greater than $${currentHigh.toFixed(2)}.`;
+      return;
+    }
+    this.actionLoading = true;
+    this.cartService.placeBid(String(this.comic.id), amount).subscribe({
+      next: updatedComic => {
+        this.comic = { ...this.comic!, ...updatedComic };
+        this.actionLoading = false;
+        this.claimError = '';
+        this.toastService.show(`Bid of $${amount.toFixed(2)} placed!`);
+      },
+      error: err => {
+        this.claimError = err?.error || 'Bid failed.';
+        this.actionLoading = false;
+      }
+    });
+  }
+
   getComic(): void {
     const id = parseInt(this.route.snapshot.paramMap.get('id')!, 10);
     this.comicService.getComic(id)
-      .subscribe(comic => this.comic = comic);
+      .subscribe(comic => {
+        this.comic = comic;
+        if (comic?.bidStartedAt) {
+          const endsAt = new Date(comic.bidStartedAt).getTime() +
+                         this.configService.biddingCycleMins * 60000;
+          this.bidSecondsRemaining = Math.max(0, Math.floor((endsAt - Date.now()) / 1000));
+          if (this.bidSecondsRemaining > 0) this.startBidTimer();
+        }
+      });
   }
 
   toggleZoom(): void {

@@ -19,12 +19,16 @@ export interface AppConfig extends ComicEnums {
   emailEnabled: boolean;
   awardModeEnabled: boolean;
   finalizeHours: number;
+  biddingMode: boolean;
+  biddingCycleMins: number;
 }
 
 const DEFAULT_CONFIG: AppConfig = {
   emailEnabled: true,
   awardModeEnabled: true,
   finalizeHours: 20,
+  biddingMode: false,
+  biddingCycleMins: 10,
   coverVariants: [],
   gradingCompanies: [],
   grades: [],
@@ -59,6 +63,14 @@ export class ConfigService {
 
   get finalizeHours(): number {
     return this._config.finalizeHours ?? 20;
+  }
+
+  get biddingMode(): boolean {
+    return this._config.biddingMode ?? false;
+  }
+
+  get biddingCycleMins(): number {
+    return this._config.biddingCycleMins ?? 10;
   }
 
   get pauseNotifications(): boolean {

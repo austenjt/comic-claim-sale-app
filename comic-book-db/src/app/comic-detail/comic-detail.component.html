@@ -438,15 +438,47 @@
         <ng-container *ngIf="!comic.soldTo && !claimedDate(comic.id)">
           <div class="detail-item">
             <span class="detail-label">Status</span>
-            <span class="detail-value claim-status-available">Available</span>
+            <span class="detail-value" [class.claim-status-available]="!isBiddingActive()" [class.claim-status-bidding]="isBiddingActive()">
+              {{ isBiddingActive() ? 'Bidding' : 'Available' }}
+            </span>
           </div>
-          <div class="detail-item" *ngIf="auth.isApproved() && !auth.isAdmin()">
+
+          <!-- Active bidding state -->
+          <ng-container *ngIf="configService.biddingMode && comic.enableBid && isBiddingActive()">
+            <div class="detail-item">
+              <span class="detail-label">Time Left</span>
+              <span class="detail-value bid-timer-value">⏱ {{ bidCountdownLabel }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">High Bid</span>
+              <span class="detail-value">${{ (comic.highBid ?? 0).toFixed(2) }} by {{ comic.currentBidderName ?? '—' }}</span>
+            </div>
+            <div class="detail-item" *ngIf="auth.isApproved() && !auth.isAdmin()">
+              <span class="detail-label"></span>
+              <span class="detail-value">
+                <div *ngIf="claimError" class="claim-error">{{ claimError }}</div>
+                <button class="btn-bid-detail" (click)="placeBid()" [disabled]="actionLoading">
+                  {{ actionLoading ? 'Placing…' : 'Place Bid' }}
+                </button>
+              </span>
+            </div>
+          </ng-container>
+
+          <!-- Normal claim or bid start -->
+          <div class="detail-item" *ngIf="auth.isApproved() && !auth.isAdmin() && !isBiddingActive()">
             <span class="detail-label"></span>
             <span class="detail-value">
               <div *ngIf="claimError" class="claim-error">{{ claimError }}</div>
-              <button *ngIf="canClaim(comic.id)" class="btn-claim-detail" (click)="claim()" [disabled]="actionLoading">
-                {{ actionLoading ? 'Claiming…' : 'Claim' }}
-              </button>
+              <ng-container *ngIf="configService.biddingMode && comic.enableBid; else normalClaim">
+                <button *ngIf="canClaim(comic.id)" class="btn-claim-detail" (click)="startBidding()" [disabled]="actionLoading">
+                  {{ actionLoading ? 'Starting…' : 'Claim (starts bidding)' }}
+                </button>
+              </ng-container>
+              <ng-template #normalClaim>
+                <button *ngIf="canClaim(comic.id)" class="btn-claim-detail" (click)="claim()" [disabled]="actionLoading">
+                  {{ actionLoading ? 'Claiming…' : 'Claim' }}
+                </button>
+              </ng-template>
               <span *ngIf="!comic.salePrice" class="claim-blocked">
                 This item can't be claimed until it is priced.
               </span>
@@ -457,6 +489,27 @@
           </div>
         </ng-container>
 
+      </div>
+
+      <!-- Bid History -->
+      <div class="detail-section" *ngIf="comic.bidHistory && comic.bidHistory.length > 0">
+        <div class="detail-section-title">Bid History</div>
+        <table class="bid-history-table">
+          <thead>
+            <tr>
+              <th>Bidder</th>
+              <th>Amount</th>
+              <th>Time</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let bid of bidHistoryDesc" [class.bid-row-winner]="bid.userId === comic.currentBidderId">
+              <td>{{ bid.userName }}</td>
+              <td>${{ bid.amount.toFixed(2) }}</td>
+              <td>{{ bid.placedAt | date:'shortTime' }}</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
 
     </div>

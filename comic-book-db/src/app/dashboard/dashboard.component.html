@@ -114,10 +114,34 @@
               </span>
               <ng-container *ngIf="auth.isApproved() && !auth.isAdmin()">
                 <button *ngIf="isInMyCart(comic.id)" class="btn-in-cart" disabled>In Your Cart</button>
-                <button *ngIf="showClaimButton(comic)" class="btn-claim"
-                  [disabled]="!canClaim(comic)"
-                  [title]="canClaim(comic) ? '' : cartLockedTitle()"
-                  (click)="$event.preventDefault(); $event.stopPropagation(); claim(comic)">Claim</button>
+
+                <!-- Bidding: active cycle -->
+                <ng-container *ngIf="configService.biddingMode && comic.enableBid && isBiddingActive(comic)">
+                  <div class="bid-countdown">⏱ {{ bidCountdownLabel(comic.id) }}</div>
+                  <div class="bid-leader" *ngIf="comic.currentBidderName">
+                    High bid: ${{ (comic.highBid ?? 0).toFixed(2) }} by {{ comic.currentBidderName }}
+                  </div>
+                  <button class="btn-bid"
+                    (click)="$event.preventDefault(); $event.stopPropagation(); placeBid(comic)">
+                    BID ${{ (comic.highBid ?? 0).toFixed(2) }}
+                  </button>
+                </ng-container>
+
+                <!-- Bidding: start (Claim triggers bidding) -->
+                <ng-container *ngIf="configService.biddingMode && comic.enableBid && !isBiddingActive(comic) && showClaimButton(comic)">
+                  <button class="btn-claim"
+                    [disabled]="!canClaim(comic)"
+                    [title]="canClaim(comic) ? '' : cartLockedTitle()"
+                    (click)="$event.preventDefault(); $event.stopPropagation(); startBidding(comic)">Claim</button>
+                </ng-container>
+
+                <!-- Normal claim (no bidding) -->
+                <ng-container *ngIf="!(configService.biddingMode && comic.enableBid)">
+                  <button *ngIf="showClaimButton(comic)" class="btn-claim"
+                    [disabled]="!canClaim(comic)"
+                    [title]="canClaim(comic) ? '' : cartLockedTitle()"
+                    (click)="$event.preventDefault(); $event.stopPropagation(); claim(comic)">Claim</button>
+                </ng-container>
               </ng-container>
               <button *ngIf="auth.isAdmin() && configService.awardModeEnabled && !claimedDate(comic.id) && !comic.comicCondition?.cgcCondition?.grade && !comic.comicCondition?.cbcsCondition?.grade"
                 class="btn-award"

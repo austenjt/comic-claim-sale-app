@@ -45,6 +45,8 @@ public class ConfigTriggers {
             response.put("emailEnabled", EnvHelper.isEmailEnabled());
             response.put("awardModeEnabled", EnvHelper.isAwardModeEnabled());
             response.put("finalizeHours", EnvHelper.getFinalizeHours());
+            response.put("biddingMode", EnvHelper.isBiddingModeEnabled());
+            response.put("biddingCycleMins", EnvHelper.getBiddingCycleMins());
 
             List<String> coverVariants = new ArrayList<>();
             for (CoverVariant cv : CoverVariant.values()) {
