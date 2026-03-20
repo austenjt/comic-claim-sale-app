@@ -88,6 +88,7 @@
         <td class="action-cell">
           <ng-container *ngIf="user.isAdmin; else userActions">
             <span class="admin-label">Admin</span>
+            <button (click)="resetPin(user)">Reset PIN</button>
           </ng-container>
           <ng-template #userActions>
             <button (click)="resetPin(user)">Reset PIN</button>
