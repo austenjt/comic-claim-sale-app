@@ -3,7 +3,10 @@
     <app-comic-search></app-comic-search>
     <div class="filter-panel">
       <span *ngIf="excludeClaimed && showPricedOnly" class="claim-sale-mode-label">Claim Sale Mode</span>
-      <span class="items-count">{{ itemCount }} items</span>
+      <span class="items-count">
+        <ng-container *ngIf="isFiltered; else noFilter">{{ itemCount }} of {{ totalCount }} items</ng-container>
+        <ng-template #noFilter>{{ itemCount }} items</ng-template>
+      </span>
       <div class="filter-buttons">
         <button class="btn-exclude-claimed"
                 [class.btn-exclude-claimed-active]="excludeClaimed"

@@ -2,6 +2,38 @@ button {
   margin-bottom: 1rem;
 }
 
+.page-nav {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 0;
+}
+
+.page-nav button {
+  margin-bottom: 1rem;
+}
+
+.btn-share {
+  padding: 5px 14px;
+  background: transparent;
+  color: #10b981;
+  border: 1px solid #10b981;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.btn-share:hover {
+  background: rgba(16, 185, 129, 0.12);
+}
+
+.btn-share.copied {
+  color: #34d399;
+  border-color: #34d399;
+}
+
 .comic-heading {
   display: flex;
   align-items: center;
@@ -36,9 +68,51 @@ button {
 .images-column {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 10px;
   flex-shrink: 0;
   width: 380px;
+}
+
+.thumbnail-strip {
+  display: flex;
+  gap: 8px;
+}
+
+.thumb {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  border: 2px solid transparent;
+  border-radius: 6px;
+  padding: 4px;
+  background: #1e2a38;
+  transition: border-color 0.15s;
+}
+
+.thumb:hover {
+  border-color: #4a5c70;
+}
+
+.thumb-active {
+  border-color: #10b981;
+}
+
+.thumb img {
+  height: 72px;
+  width: auto;
+  max-width: 80px;
+  object-fit: contain;
+  display: block;
+}
+
+.thumb-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
 }
 
 .large-image {
@@ -46,7 +120,6 @@ button {
   border: 1px solid var(--color-border);
   border-radius: 8px;
   overflow: hidden;
-  overflow-x: auto;
   background-color: #1e2a38;
 }
 

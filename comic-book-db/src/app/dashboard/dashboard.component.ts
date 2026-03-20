@@ -42,14 +42,14 @@ export class DashboardComponent implements OnInit {
     let result = this.comics;
     if (this.excludeClaimed) {
       result = result.filter(c =>
-        c.isSet
+        c.docType === 'SET'
           ? !this.isSetClaimedByOther(c) && !this.isSetInMyCart(c)
           : !this.isClaimedByOther(c.id) && !this.isInMyCart(c.id)
       );
     }
     if (this.showPricedOnly) {
       result = result.filter(c =>
-        c.isSet ? this.getSetPrice(c) > 0 : c.salePrice != null
+        c.docType === 'SET' ? this.getSetPrice(c) > 0 : c.salePrice != null
       );
     }
     return result;
@@ -137,7 +137,7 @@ export class DashboardComponent implements OnInit {
 
   claim(comic: Comic): void {
     this.claimError = '';
-    if (comic.isSet) {
+    if (comic.docType === 'SET') {
       this.claimSet(comic);
       return;
     }

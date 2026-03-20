@@ -240,8 +240,13 @@ public class UserTriggers {
             String phone = HttpHelper.getString(json, "phone");
             String notes = HttpHelper.getString(json, "notes");
             String preferences = HttpHelper.getString(json, "preferences");
+            String venmoHandle = HttpHelper.getString(json, "venmoHandle");
+            String paypalHandle = HttpHelper.getString(json, "paypalHandle");
+            String ebayUsername = HttpHelper.getString(json, "ebayUsername");
+            String cashAppHandle = HttpHelper.getString(json, "cashAppHandle");
             User updated = UserService.getServiceInstance()
-                .updateContactDetails(caller.getId(), name, address, phone, notes, preferences);
+                .updateContactDetails(caller.getId(), name, address, phone, notes, preferences,
+                    venmoHandle, paypalHandle, ebayUsername, cashAppHandle);
             return cors(request.createResponseBuilder(HttpStatus.OK))
                 .header("Content-Type", "application/json")
                 .body(OBJECT_MAPPER.writeValueAsString(safeUserNode(updated)))
@@ -470,6 +475,10 @@ public class UserTriggers {
         node.put("phone", user.getPhone());
         node.put("notes", user.getNotes());
         node.put("preferences", user.getPreferences());
+        node.put("venmoHandle", user.getVenmoHandle());
+        node.put("paypalHandle", user.getPaypalHandle());
+        node.put("ebayUsername", user.getEbayUsername());
+        node.put("cashAppHandle", user.getCashAppHandle());
         node.put("status", user.getStatus());
         node.put("isAdmin", user.isAdmin());
         node.put("createdDate", user.getCreatedDate());

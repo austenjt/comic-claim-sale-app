@@ -15,6 +15,10 @@ export class AccountProfileComponent implements OnInit {
   phone = '';
   notes = '';
   preferences = '';
+  venmoHandle = '';
+  paypalHandle = '';
+  ebayUsername = '';
+  cashAppHandle = '';
 
   saving = false;
   saveSuccess = false;
@@ -30,6 +34,10 @@ export class AccountProfileComponent implements OnInit {
       this.phone = user.phone ?? '';
       this.notes = user.notes ?? '';
       this.preferences = user.preferences ?? '';
+      this.venmoHandle = user.venmoHandle ?? '';
+      this.paypalHandle = user.paypalHandle ?? '';
+      this.ebayUsername = user.ebayUsername ?? '';
+      this.cashAppHandle = user.cashAppHandle ?? '';
     }
   }
 
@@ -37,7 +45,10 @@ export class AccountProfileComponent implements OnInit {
     this.saving = true;
     this.saveSuccess = false;
     this.saveError = '';
-    this.userService.updateProfile(this.name, this.address, this.phone, this.notes, this.preferences).subscribe({
+    this.userService.updateProfile(
+      this.name, this.address, this.phone, this.notes, this.preferences,
+      this.venmoHandle, this.paypalHandle, this.ebayUsername, this.cashAppHandle
+    ).subscribe({
       next: (updated: User) => {
         this.saving = false;
         this.saveSuccess = true;

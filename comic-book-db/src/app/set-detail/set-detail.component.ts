@@ -21,6 +21,7 @@ export class SetDetailComponent implements OnInit {
 
   container: Comic | undefined;
   setMembers: Comic[] = [];
+  activeImage: 'front' | 'back' = 'front';
   claimedMap: Record<string, string> = {};
   myCart: Cart | null = null;
   claimError = '';
@@ -30,6 +31,7 @@ export class SetDetailComponent implements OnInit {
   imageUploadError = '';
   backImageUploading = false;
   backImageUploadError = '';
+  linkCopied = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -63,8 +65,16 @@ export class SetDetailComponent implements OnInit {
     return this.setMembers.reduce((sum, m) => sum + (m.salePrice ?? 0), 0);
   }
 
+  get activeLargeImageId(): string | null | undefined {
+    return this.activeImage === 'front' ? this.container?.largeCachedImageId : this.container?.largeBackImageId;
+  }
+
+  selectImage(which: 'front' | 'back'): void {
+    this.activeImage = which;
+  }
+
   get displayMembers(): Comic[] {
-    return this.setMembers.filter(m => !m.isSet);
+    return this.setMembers.filter(m => m.docType !== 'SET');
   }
 
   comicNumberLabel(comic: Comic): string {
@@ -174,8 +184,20 @@ export class SetDetailComponent implements OnInit {
     this.location.back();
   }
 
+  copyShareLink(): void {
+    navigator.clipboard.writeText(window.location.href).then(() => {
+      this.linkCopied = true;
+      setTimeout(() => this.linkCopied = false, 2000);
+    });
+  }
+
   getImageURL(imageName: string | null | undefined): Observable<string> {
     if (!imageName) return of('assets/comic-book-large.png');
+    return of(this.imageService.getRemoteImageURLByName(imageName));
+  }
+
+  getSmallImageURL(imageName: string | null | undefined): Observable<string> {
+    if (!imageName) return of('assets/comic-book-small.png');
     return of(this.imageService.getRemoteImageURLByName(imageName));
   }
 

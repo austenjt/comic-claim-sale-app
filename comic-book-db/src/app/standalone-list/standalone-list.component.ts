@@ -237,14 +237,14 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
       }
     },
     {
-      headerName: "Is Set",
-      field: "isSet",
+      headerName: "Type",
+      field: "docType",
       filter: true,
       sortable: true,
       editable: true,
       maxWidth: 120,
-      cellEditor: 'agCheckboxCellEditor',
-      cellRenderer: 'agCheckboxCellRenderer'
+      cellEditor: 'agTextCellEditor',
+      cellEditorParams: { maxLength: 10 }
     },
     {
       headerName: "Estimate",
@@ -575,6 +575,7 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
   addSetCollectionGroup: number | null = null;
   addSetSaving = false;
   addSetError = '';
+  addSetExistingGroups: number[] = [];
 
   // ── Delete Set modal ──────────────────────────────────────────────────────
   showDeleteSetModal = false;
@@ -582,6 +583,7 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
   deleteSetSelected: Comic | null = null;
   deleteSetSaving = false;
   deleteSetError = '';
+  deleteSetConfirmFull = false;
 
   // ── Add To Set modal ──────────────────────────────────────────────────────
   showAddToSetModal = false;
@@ -751,7 +753,7 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
       personalEstimate: this.qa.personalEstimate,
       targetPrice: this.qa.targetPrice,
       collectionGroup: null,
-      isSet: null,
+      docType: 'COMIC',
       storageLocation: this.qa.storageLocation.trim() || null,
       goCollectInfo: null,
       grandComicDBInfo: null,
@@ -837,7 +839,7 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
       personalEstimate: 0,
       targetPrice: 0,
       collectionGroup: -1,
-      isSet: null,
+      docType: 'COMIC',
       storageLocation: null,
       goCollectInfo: null,
       grandComicDBInfo: null,
@@ -859,9 +861,24 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
     // update of table is implicit i think
   }
 
+  get addSetGroupConflict(): boolean {
+    return this.addSetCollectionGroup != null &&
+           this.addSetExistingGroups.includes(this.addSetCollectionGroup);
+  }
+
+  get addSetGroupInvalid(): boolean {
+    const v = this.addSetCollectionGroup;
+    return v == null || v < 1 || v > 9999;
+  }
+
   openAddSet(): void {
     this.addSetCollectionGroup = null;
     this.addSetError = '';
+    this.comicService.getCachedComics().pipe(take(1)).subscribe(allComics => {
+      this.addSetExistingGroups = allComics
+        .filter(c => c.docType === 'SET' && c.collectionGroup != null)
+        .map(c => c.collectionGroup!);
+    });
     this.showAddSetModal = true;
   }
 
@@ -869,10 +886,11 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
     this.showAddSetModal = false;
     this.addSetCollectionGroup = null;
     this.addSetError = '';
+    this.addSetExistingGroups = [];
   }
 
   confirmAddSet(): void {
-    if (!this.addSetCollectionGroup) return;
+    if (!this.addSetCollectionGroup || this.addSetGroupInvalid || this.addSetGroupConflict) return;
     this.addSetSaving = true;
     this.addSetError = '';
     const setComic: Comic = {
@@ -914,7 +932,7 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
       personalEstimate: null,
       targetPrice: null,
       collectionGroup: this.addSetCollectionGroup,
-      isSet: true,
+      docType: 'SET',
       storageLocation: null,
       goCollectInfo: null,
       grandComicDBInfo: null,
@@ -932,6 +950,7 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
         this.dataLoaded = true;
         this.showAddSetModal = false;
         this.addSetCollectionGroup = null;
+        this.addSetExistingGroups = [];
       },
       error: () => {
         this.addSetError = 'Failed to create set. Please try again.';
@@ -942,9 +961,9 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
 
   openAddToSet(): void {
     this.comicService.getCachedComics().pipe(take(1)).subscribe(allComics => {
-      this.addToSetAvailableSets = allComics.filter(c => c.isSet === true);
+      this.addToSetAvailableSets = allComics.filter(c => c.docType === 'SET');
       this.addToSetUnassigned = allComics.filter(c =>
-        !c.isSet && (c.collectionGroup == null || c.collectionGroup <= 0)
+        c.docType !== 'SET' && (c.collectionGroup == null || c.collectionGroup <= 0)
       );
       this.addToSetStep = 1;
       this.addToSetSelectedSet = null;
@@ -996,9 +1015,10 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
 
   openDeleteSet(): void {
     this.comicService.getCachedComics().pipe(take(1)).subscribe(allComics => {
-      this.deleteSetAvailableSets = allComics.filter(c => c.isSet === true);
+      this.deleteSetAvailableSets = allComics.filter(c => c.docType === 'SET');
       this.deleteSetSelected = null;
       this.deleteSetError = '';
+      this.deleteSetConfirmFull = false;
       this.showDeleteSetModal = true;
     });
   }
@@ -1006,6 +1026,12 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
   selectSetForDelete(set: Comic): void {
     this.deleteSetSelected = set;
     this.deleteSetError = '';
+    this.deleteSetConfirmFull = false;
+  }
+
+  requestFullDelete(): void {
+    this.deleteSetError = '';
+    this.deleteSetConfirmFull = true;
   }
 
   confirmDeleteSet(): void {
@@ -1027,10 +1053,32 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
     });
   }
 
+  confirmDeleteSetFully(): void {
+    if (!this.deleteSetSelected?.collectionGroup) return;
+    this.deleteSetSaving = true;
+    this.deleteSetError = '';
+    this.comicService.deleteSetFully(this.deleteSetSelected.collectionGroup).subscribe({
+      next: () => {
+        this.comicService.refreshComics();
+        this.comics = this.comics.filter(c => c.collectionGroup !== this.deleteSetSelected!.collectionGroup);
+        this.deleteSetSaving = false;
+        this.showDeleteSetModal = false;
+        this.deleteSetSelected = null;
+        this.deleteSetConfirmFull = false;
+      },
+      error: (err: any) => {
+        this.deleteSetError = err?.error || 'Failed to fully delete set. Please try again.';
+        this.deleteSetSaving = false;
+        this.deleteSetConfirmFull = false;
+      }
+    });
+  }
+
   cancelDeleteSet(): void {
     this.showDeleteSetModal = false;
     this.deleteSetSelected = null;
     this.deleteSetError = '';
+    this.deleteSetConfirmFull = false;
   }
 
   comicNumberLabel(comic: Comic): string {

@@ -169,7 +169,9 @@ public class UserService {
         return pin;
     }
 
-    public User updateContactDetails(String userId, String name, String address, String phone, String notes, String preferences) {
+    public User updateContactDetails(String userId, String name, String address, String phone, String notes,
+                                      String preferences, String venmoHandle, String paypalHandle,
+                                      String ebayUsername, String cashAppHandle) {
         Optional<User> optUser = findById(userId);
         if (optUser.isEmpty()) {
             throw new IllegalArgumentException("User not found: " + userId);
@@ -180,6 +182,10 @@ public class UserService {
         if (phone != null) user.setPhone(phone);
         if (notes != null) user.setNotes(notes);
         if (preferences != null) user.setPreferences(preferences);
+        if (venmoHandle != null) user.setVenmoHandle(venmoHandle);
+        if (paypalHandle != null) user.setPaypalHandle(paypalHandle);
+        if (ebayUsername != null) user.setEbayUsername(ebayUsername);
+        if (cashAppHandle != null) user.setCashAppHandle(cashAppHandle);
         ObjectNode node = OBJECT_MAPPER.valueToTree(user);
         usersContainer.replaceItem(node, userId, new PartitionKey(userId), new CosmosItemRequestOptions());
         log.info("Updated contact details for user: {}", userId);

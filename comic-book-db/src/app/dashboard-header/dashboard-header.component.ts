@@ -7,6 +7,11 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 })
 export class DashboardHeaderComponent {
   @Input() itemCount: number = 0;
+  @Input() totalCount: number = 0;
+
+  get isFiltered(): boolean {
+    return this.excludeClaimed || this.showPricedOnly;
+  }
   @Input() excludeClaimed: boolean = false;
   @Output() excludeClaimedChange = new EventEmitter<boolean>();
   @Input() showPricedOnly: boolean = false;

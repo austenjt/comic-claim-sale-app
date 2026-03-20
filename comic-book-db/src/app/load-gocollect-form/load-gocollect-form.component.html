@@ -2,12 +2,23 @@
   <div class="form-section-title">Upload GoCollect CSV Data</div>
   <div class="csv-row">
     <input type="file" (change)="onFileChange($event)" accept=".csv" [disabled]="status === 'processing'" />
-    <button (click)="processFile()" [disabled]="!selectedFile || status === 'processing'">
+    <button (click)="processFile()" [disabled]="!canProcess || status === 'processing'">
       <span *ngIf="status !== 'processing'">Process CSV</span>
       <span *ngIf="status === 'processing'" class="btn-processing">
         <span class="csv-spinner"></span> Processing…
       </span>
     </button>
+  </div>
+  <label class="csv-set-toggle">
+    <input type="checkbox" [(ngModel)]="importAsSet" (ngModelChange)="onImportAsSetChange()" [disabled]="status === 'processing'" />
+    Import as Set
+  </label>
+  <div *ngIf="importAsSet" class="csv-set-picker">
+    <select [(ngModel)]="selectedSet" [disabled]="status === 'processing'">
+      <option [ngValue]="null">— select a set —</option>
+      <option *ngFor="let s of availableSets" [ngValue]="s">Group {{ s.collectionGroup }} — {{ s.title }}</option>
+    </select>
+    <span *ngIf="availableSets.length === 0" class="msg-error">No sets found. Create a set first.</span>
   </div>
   <p *ngIf="fileError" class="msg-error">Please upload a valid .csv file.</p>
   <p *ngIf="status === 'success'" class="msg-success">&#10003; {{ statusMessage }}</p>

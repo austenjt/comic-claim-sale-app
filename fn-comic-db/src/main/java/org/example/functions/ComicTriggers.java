@@ -305,6 +305,44 @@ public class ComicTriggers {
         }
     }
 
+    @FunctionName("deleteSetFully")
+    public HttpResponseMessage deleteSetFully(
+        @HttpTrigger(
+            name = "deleteSetFully",
+            route = "sets/{collectionGroup}/full",
+            methods = {HttpMethod.DELETE},
+            authLevel = AuthorizationLevel.ANONYMOUS)
+        HttpRequestMessage<Optional<String>> request, @BindingName("collectionGroup") String collectionGroupStr)
+    {
+        log.info("Processing deleteSetFully function for collectionGroup={}", collectionGroupStr);
+        if (!AuthHelper.isAdminRequest(request)) {
+            return request.createResponseBuilder(HttpStatus.FORBIDDEN)
+                .header("Access-Control-Allow-Origin", "*")
+                .body("Admin access required.")
+                .build();
+        }
+        try {
+            int collectionGroup = Integer.parseInt(collectionGroupStr);
+            if (CartService.getServiceInstance().isSetClaimed(collectionGroup)) {
+                return request.createResponseBuilder(HttpStatus.CONFLICT)
+                    .header("Access-Control-Allow-Origin", "*")
+                    .body("This set is currently claimed by a user. Release all items before deleting.")
+                    .build();
+            }
+            ComicService.getServiceInstance().deleteSetFully(collectionGroup);
+            return request.createResponseBuilder(HttpStatus.OK)
+                .header("Access-Control-Allow-Origin", "*")
+                .header("Content-Type", "application/json")
+                .body(String.format("{ \"deleted\": true, \"collectionGroup\": %d }", collectionGroup))
+                .build();
+        } catch (Exception e) {
+            return request.createResponseBuilder(HttpStatus.I_AM_A_TEAPOT)
+                .header("Access-Control-Allow-Origin", "*")
+                .body(ExceptionUtils.getMessage(e))
+                .build();
+        }
+    }
+
     /* URI: /comics/data */
 
     @FunctionName("pruneImages")
@@ -332,8 +370,13 @@ public class ComicTriggers {
         log.info("Processing loadData function.");
         ComicService comicService = ComicService.getServiceInstance();
         CsvToJsonConverter csvToJsonConverter = new CsvToJsonConverter(request.getBody().orElseThrow(), comicService);
+        String collectionGroupStr = request.getQueryParameters().get("collectionGroup");
+        Integer collectionGroup = null;
+        if (collectionGroupStr != null) {
+            try { collectionGroup = Integer.parseInt(collectionGroupStr); } catch (NumberFormatException ignored) {}
+        }
         try {
-            return csvToJsonConverter.loadGoCollectCsvData(request);
+            return csvToJsonConverter.loadGoCollectCsvData(request, collectionGroup);
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Data load failed to return results.", e);
         }

@@ -106,11 +106,11 @@ public class CartService {
         return cart;
     }
 
-    /** Add all comics in a set to the user's cart. containerId must reference an isSet=true comic. */
+    /** Add all comics in a set to the user's cart. containerId must reference a docType="SET" comic. */
     public Cart addSet(User user, String containerId) {
         ComicBook container = ComicService.getServiceInstance().getComicById(Integer.parseInt(containerId))
             .orElseThrow(() -> new IllegalArgumentException("Container comic not found: " + containerId));
-        if (!Boolean.TRUE.equals(container.getIsSet())) {
+        if (!"SET".equals(container.getDocType())) {
             throw new IllegalArgumentException("Comic " + containerId + " is not a set container.");
         }
         Integer collectionGroup = container.getCollectionGroup();
@@ -125,7 +125,7 @@ public class CartService {
 
         // Pre-validate: none of the actual set members (non-container) are already in an active cart
         for (ComicBook member : setMembers) {
-            if (Boolean.TRUE.equals(member.getIsSet())) continue; // skip the container entry
+            if ("SET".equals(member.getDocType())) continue; // skip the container entry
             String memberId = String.valueOf(member.getId());
             if (isComicClaimed(memberId)) {
                 throw new IllegalStateException("Comic " + memberId + " in the set is already claimed.");
@@ -146,7 +146,7 @@ public class CartService {
             item.setComicNumber(formatComicNumber(member.getNumber()));
             item.setClaimedAt(claimedAt);
             item.setCollectionGroup(collectionGroup);
-            if (Boolean.TRUE.equals(member.getIsSet())) {
+            if ("SET".equals(member.getDocType())) {
                 // Container row: kept in cart for reference but priced at $0 and flagged
                 item.setPrice(0.0);
                 item.setSetContainer(true);

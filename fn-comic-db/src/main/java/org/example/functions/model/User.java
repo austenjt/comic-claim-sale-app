@@ -12,6 +12,10 @@ public class User {
     private String phone;
     private String notes;
     private String preferences;
+    private String venmoHandle;
+    private String paypalHandle;
+    private String ebayUsername;
+    private String cashAppHandle;
     private String status; // "PENDING" | "APPROVED"
     private String pinHash;
     private String pinSalt;
@@ -44,6 +48,18 @@ public class User {
 
     public String getPreferences() { return preferences; }
     public void setPreferences(String preferences) { this.preferences = preferences; }
+
+    public String getVenmoHandle() { return venmoHandle; }
+    public void setVenmoHandle(String venmoHandle) { this.venmoHandle = venmoHandle; }
+
+    public String getPaypalHandle() { return paypalHandle; }
+    public void setPaypalHandle(String paypalHandle) { this.paypalHandle = paypalHandle; }
+
+    public String getEbayUsername() { return ebayUsername; }
+    public void setEbayUsername(String ebayUsername) { this.ebayUsername = ebayUsername; }
+
+    public String getCashAppHandle() { return cashAppHandle; }
+    public void setCashAppHandle(String cashAppHandle) { this.cashAppHandle = cashAppHandle; }
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Location } from '@angular/common';
 
@@ -16,9 +16,10 @@ import { Observable, of, map } from 'rxjs';
   templateUrl: './comic-detail.component.html',
   styleUrls: [ './comic-detail.component.css' ]
 })
-export class ComicDetailComponent implements OnInit, AfterViewInit {
+export class ComicDetailComponent implements OnInit {
 
   comic: Comic | undefined;
+  activeImage: 'front' | 'back' = 'front';
   zoomOpen = false;
   claimedMap: Record<string, string> = {};
   myCart: Cart | null = null;
@@ -28,6 +29,7 @@ export class ComicDetailComponent implements OnInit, AfterViewInit {
   imageUploadError = '';
   backImageUploading = false;
   backImageUploadError = '';
+  linkCopied = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -39,7 +41,13 @@ export class ComicDetailComponent implements OnInit, AfterViewInit {
     private location: Location
   ) {}
 
-  @ViewChild('largeImageContainer') largeImageContainer!: ElementRef;
+  get activeLargeImageId(): string | null | undefined {
+    return this.activeImage === 'front' ? this.comic?.largeCachedImageId : this.comic?.largeBackImageId;
+  }
+
+  selectImage(which: 'front' | 'back'): void {
+    this.activeImage = which;
+  }
 
   get comicHeading(): string {
     if (!this.comic) return '';
@@ -48,16 +56,6 @@ export class ComicDetailComponent implements OnInit, AfterViewInit {
     if (n.number != null) return `${this.comic.title} #${n.number}`;
     if (n.sentinel) return `${this.comic.title} #${n.sentinel}`;
     return this.comic.title;
-  }
-
-  ngAfterViewInit() {
-    // delay needed to allow page to link ViewChild ref
-    setTimeout(() => this.scrollImageToLeft(), 500);
-  }
-
-  private scrollImageToLeft(): void {
-    const container = this.largeImageContainer.nativeElement;
-    container.scrollLeft = container.scrollWidth;
   }
 
   ngOnInit(): void {
@@ -177,6 +175,18 @@ export class ComicDetailComponent implements OnInit, AfterViewInit {
 
   goBack(): void {
     this.location.back();
+  }
+
+  copyShareLink(): void {
+    navigator.clipboard.writeText(window.location.href).then(() => {
+      this.linkCopied = true;
+      setTimeout(() => this.linkCopied = false, 2000);
+    });
+  }
+
+  getSmallImageURLByName(imageName: string | null | undefined): Observable<string> {
+    if (!imageName) return of('assets/comic-book-small.png');
+    return of(this.imageService.getRemoteImageURLByName(imageName));
   }
 
   getFullImageURLByName(imageName: string | null | undefined): Observable<string> {

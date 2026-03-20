@@ -155,6 +155,14 @@ export class ComicService {
     );
   }
 
+  /** DELETE: permanently delete the set container AND all member comics */
+  deleteSetFully(collectionGroup: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseServiceUrl}/sets/${collectionGroup}/full`, { responseType: 'text' as 'json' }).pipe(
+      tap(_ => this.log(`fully deleted set with collectionGroup=${collectionGroup}`)),
+      catchError(this.handleError<void>('deleteSetFully'))
+    );
+  }
+
   /** DELETE: delete the comic from the server */
   deleteComic(id: number): Observable<Comic> {
     const url = `${this.comicsUrl}/${id}`;
@@ -189,7 +197,7 @@ export class ComicService {
    * Reads a CSV file and POSTs its text content to the data load endpoint.
    * Returns an Observable so callers can track progress and handle errors.
    */
-  public uploadCSVFile(csvFile: File): Observable<CsvUploadResult> {
+  public uploadCSVFile(csvFile: File, collectionGroup?: number): Observable<CsvUploadResult> {
     const readFile = new Promise<string>((resolve, reject) => {
       const reader = new FileReader();
       reader.onload = () => resolve(reader.result as string);
@@ -197,10 +205,13 @@ export class ComicService {
       reader.readAsText(csvFile);
     });
 
+    const url = collectionGroup != null
+      ? `${this.dataLoadUrl}?collectionGroup=${collectionGroup}`
+      : this.dataLoadUrl;
     const headers = new HttpHeaders({ 'Content-Type': 'text/plain' });
     const empty: CsvUploadResult = { succeeded: [], failed: [], duplicates: [] };
     return from(readFile).pipe(
-      switchMap(csvContent => this.http.post<CsvUploadResult>(this.dataLoadUrl, csvContent, { headers })),
+      switchMap(csvContent => this.http.post<CsvUploadResult>(url, csvContent, { headers })),
       tap(() => this.log('CSV uploaded successfully')),
       catchError(this.handleError('uploadCSVFile', empty))
     );

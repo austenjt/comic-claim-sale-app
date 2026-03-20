@@ -170,7 +170,7 @@ public class CsvToJsonConverter {
    * @return an HTTP response with succeeded/failed/duplicate results
    * @throws JsonProcessingException if JSON serialization fails
    */
-  public HttpResponseMessage loadGoCollectCsvData(HttpRequestMessage<Optional<String>> request) throws JsonProcessingException {
+  public HttpResponseMessage loadGoCollectCsvData(HttpRequestMessage<Optional<String>> request, Integer targetCollectionGroup) throws JsonProcessingException {
     log.info("Attempting to parse GoCollect CSV data...");
     List<ComicBook> loaded = new ArrayList<>();
     List<ComicBook> failedToLoad = new ArrayList<>();
@@ -216,8 +216,8 @@ public class CsvToJsonConverter {
 
           // Defaults
           comicBook.setBarCode("");
-          comicBook.setCollectionGroup(-1);
-          comicBook.setIsSet(false);
+          comicBook.setCollectionGroup(targetCollectionGroup != null ? targetCollectionGroup : -1);
+          comicBook.setDocType("COMIC");
 
           // Financial
           comicBook.setPersonalEstimate(parseBigDecimal(record.get(GoCollectFields.PERSONAL_ESTIMATE.col())));

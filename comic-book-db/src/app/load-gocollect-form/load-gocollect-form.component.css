@@ -34,6 +34,42 @@
     to { transform: rotate(360deg); }
 }
 
+.csv-set-toggle {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin-top: 10px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-text);
+    cursor: pointer;
+    user-select: none;
+}
+
+.csv-set-toggle input[type="checkbox"] {
+    width: 15px;
+    height: 15px;
+    cursor: pointer;
+}
+
+.csv-set-picker {
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.csv-set-picker select {
+    padding: 5px 8px;
+    border: 1px solid #4a5c70;
+    border-radius: 4px;
+    background: #3a4a5c;
+    color: #e8eef4;
+    font-size: 0.875rem;
+    min-width: 240px;
+}
+
 .msg-success {
     margin: 8px 0 0;
     color: #2e7d32;

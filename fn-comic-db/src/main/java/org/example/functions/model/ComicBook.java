@@ -77,8 +77,7 @@ public class ComicBook {
 
     // Collection & storage
     private Integer collectionGroup;
-    @JsonProperty("isSet")
-    private Boolean isSet;
+    private String docType;
     private String storageLocation;
 
     // Metadata from externally supported sites
@@ -95,7 +94,7 @@ public class ComicBook {
     private String personalNotes;
     private String publicNotes;
 
-    // Set members — populated at response-time when isSet=true; not persisted in Cosmos
+    // Set members — populated at response-time when docType="SET"; not persisted in Cosmos
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<ComicBook> items;
 

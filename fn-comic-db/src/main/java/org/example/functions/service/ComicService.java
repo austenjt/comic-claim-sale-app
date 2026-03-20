@@ -134,7 +134,7 @@ public class ComicService {
     /**
      * Fetches all comics and returns a top-level list where set containers have their
      * member comics embedded in the {@code items} field. Set members are excluded from
-     * the top-level list — only containers (isSet=true) and standalone comics appear.
+     * the top-level list — only containers (docType="SET") and standalone comics appear.
      * One Cosmos query; the grouping is done in memory.
      */
     public List<ComicBook> getComicsListEnriched() {
@@ -144,12 +144,12 @@ public class ComicService {
         Map<Integer, List<ComicBook>> membersByGroup = all.stream()
             .filter(c -> c.getCollectionGroup() != null
                       && c.getCollectionGroup() > 0
-                      && !Boolean.TRUE.equals(c.getIsSet()))
+                      && !"SET".equals(c.getDocType()))
             .collect(Collectors.groupingBy(ComicBook::getCollectionGroup));
 
         List<ComicBook> topLevel = new ArrayList<>();
         for (ComicBook comic : all) {
-            boolean isRealSet = Boolean.TRUE.equals(comic.getIsSet())
+            boolean isRealSet = "SET".equals(comic.getDocType())
                 && comic.getCollectionGroup() != null
                 && comic.getCollectionGroup() > 0;
             boolean isStandalone = comic.getCollectionGroup() == null
@@ -161,7 +161,7 @@ public class ComicService {
             } else if (isStandalone) {
                 topLevel.add(comic);
             }
-            // Members (collectionGroup > 0 && !isSet) are embedded in their container
+            // Members (collectionGroup > 0 && docType != "SET") are embedded in their container
         }
         return topLevel;
     }
@@ -307,12 +307,12 @@ public class ComicService {
         comicsContainer.deleteItem(idStr, new PartitionKey(idStr), new CosmosItemRequestOptions());
     }
 
-    /** Deletes the isSet=true container and clears collectionGroup from all member comics. */
+    /** Deletes the docType="SET" container and clears collectionGroup from all member comics. */
     public void deleteSet(int collectionGroup) {
         List<ComicBook> all = getComicsByCollectionGroup(collectionGroup);
         log.info("Deleting set with collectionGroup={}, affecting {} comics", collectionGroup, all.size());
         for (ComicBook comic : all) {
-            if (Boolean.TRUE.equals(comic.getIsSet())) {
+            if ("SET".equals(comic.getDocType())) {
                 deleteComic(comic.getId());
             } else {
                 comic.setCollectionGroup(null);

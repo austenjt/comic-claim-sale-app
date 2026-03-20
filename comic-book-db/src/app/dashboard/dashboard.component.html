@@ -1,5 +1,6 @@
 <app-dashboard-header
   [itemCount]="displayComics.length"
+  [totalCount]="comics.length"
   [(excludeClaimed)]="excludeClaimed"
   [(showPricedOnly)]="showPricedOnly">
 </app-dashboard-header>
@@ -38,7 +39,7 @@
   <ng-container *ngFor="let comic of displayComics">
 
     <!-- SET CARD -->
-    <ng-container *ngIf="comic.isSet; else normalCard">
+    <ng-container *ngIf="comic.docType === 'SET'; else normalCard">
       <a routerLink="/set/{{comic.id}}">
         <div class="image-container" [class.two-images]="comic.smallBackImageId">
           <img [src]="getFullImageURLByName(comic.smallCachedImageId) | async" alt="Set Cover" loading="lazy">

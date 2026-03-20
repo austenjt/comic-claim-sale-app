@@ -4,7 +4,12 @@
 </div>
 
 <div *ngIf="!loading && container">
-  <button type="button" (click)="goBack()">go back</button>
+  <div class="page-nav">
+    <button type="button" (click)="goBack()">go back</button>
+    <button class="btn-share" (click)="copyShareLink()">
+      {{ linkCopied ? '✓ Link Copied!' : '&#128279; Share' }}
+    </button>
+  </div>
 
   <div class="set-heading">
     <span class="set-badge-lg">Set {{ container.collectionGroup }}</span>
@@ -16,31 +21,44 @@
     <!-- Images from the container comic -->
     <div class="images-column">
 
-      <!-- Front Cover -->
+      <!-- Single large image viewer -->
       <div class="large-image">
-        <img [src]="getImageURL(container.largeCachedImageId) | async" alt="Set Cover" loading="lazy">
+        <img [src]="getImageURL(activeLargeImageId) | async" alt="Set Cover" loading="lazy">
         <div *ngIf="auth.isAdmin()" class="img-update-bar">
-          <button class="img-update-btn" (click)="imageFileInput.click()" [disabled]="imageUploading">
-            {{ imageUploading ? 'Uploading...' : 'Update Image' }}
-          </button>
-          <div *ngIf="imageUploadError" class="img-upload-error">{{ imageUploadError }}</div>
+          <ng-container *ngIf="activeImage === 'front'">
+            <button class="img-update-btn" (click)="imageFileInput.click()" [disabled]="imageUploading">
+              {{ imageUploading ? 'Uploading...' : 'Update Front Cover' }}
+            </button>
+            <div *ngIf="imageUploadError" class="img-upload-error">{{ imageUploadError }}</div>
+          </ng-container>
+          <ng-container *ngIf="activeImage === 'back'">
+            <button class="img-update-btn" (click)="backImageFileInput.click()" [disabled]="backImageUploading">
+              {{ backImageUploading ? 'Uploading...' : 'Update Back Cover' }}
+            </button>
+            <div *ngIf="backImageUploadError" class="img-upload-error">{{ backImageUploadError }}</div>
+          </ng-container>
         </div>
-        <input #imageFileInput type="file" accept="image/png,image/jpeg" style="display:none"
-               (change)="onImageFileSelected($event)">
       </div>
 
-      <!-- Back Cover (admin always sees it to upload; others only if back image exists) -->
-      <div class="large-image" *ngIf="container.largeCachedImageId && (auth.isAdmin() || container.largeBackImageId)">
-        <img [src]="getImageURL(container.largeBackImageId) | async" alt="Set Back Cover" loading="lazy">
-        <div *ngIf="auth.isAdmin()" class="img-update-bar">
-          <button class="img-update-btn" (click)="backImageFileInput.click()" [disabled]="backImageUploading">
-            {{ backImageUploading ? 'Uploading...' : 'Update Back Cover' }}
-          </button>
-          <div *ngIf="backImageUploadError" class="img-upload-error">{{ backImageUploadError }}</div>
+      <!-- Thumbnail strip -->
+      <div class="thumbnail-strip">
+        <div class="thumb" [class.thumb-active]="activeImage === 'front'" (click)="selectImage('front')">
+          <img [src]="getSmallImageURL(container.smallCachedImageId) | async" alt="Front Cover">
+          <span class="thumb-label">Front</span>
         </div>
-        <input #backImageFileInput type="file" accept="image/png,image/jpeg" style="display:none"
-               (change)="onBackImageFileSelected($event)">
+        <div class="thumb"
+             *ngIf="container.largeCachedImageId && (auth.isAdmin() || container.largeBackImageId)"
+             [class.thumb-active]="activeImage === 'back'"
+             (click)="selectImage('back')">
+          <img [src]="getSmallImageURL(container.smallBackImageId) | async" alt="Back Cover">
+          <span class="thumb-label">Back</span>
+        </div>
       </div>
+
+      <input #imageFileInput type="file" accept="image/png,image/jpeg" style="display:none"
+             (change)="onImageFileSelected($event)">
+      <input #backImageFileInput type="file" accept="image/png,image/jpeg" style="display:none"
+             (change)="onBackImageFileSelected($event)">
 
     </div>
 

@@ -37,7 +37,12 @@ export class UserService {
     return this.http.post(`${this.apiBase}/users/${id}/reactivate`, {}, { responseType: 'text' });
   }
 
-  updateProfile(name: string, address: string, phone: string, notes: string, preferences: string): Observable<User> {
-    return this.http.put<User>(`${this.apiBase}/users/me`, { name, address, phone, notes, preferences });
+  updateProfile(name: string, address: string, phone: string, notes: string, preferences: string,
+                venmoHandle: string, paypalHandle: string, ebayUsername: string,
+                cashAppHandle: string): Observable<User> {
+    return this.http.put<User>(`${this.apiBase}/users/me`, {
+      name, address, phone, notes, preferences,
+      venmoHandle, paypalHandle, ebayUsername, cashAppHandle
+    });
   }
 }

@@ -57,6 +57,10 @@
         <th>Address</th>
         <th>Phone</th>
         <th>Notes</th>
+        <th>Venmo</th>
+        <th>PayPal</th>
+        <th>Cash App</th>
+        <th>eBay</th>
         <th>Approved</th>
         <th>Status</th>
         <th>Actions</th>
@@ -69,6 +73,10 @@
         <td class="address-cell">{{ user.address }}</td>
         <td>{{ user.phone }}</td>
         <td>{{ user.notes }}</td>
+        <td>{{ user.venmoHandle ? '@' + user.venmoHandle : '' }}</td>
+        <td>{{ user.paypalHandle ? '@' + user.paypalHandle : '' }}</td>
+        <td>{{ user.cashAppHandle ? '$' + user.cashAppHandle : '' }}</td>
+        <td>{{ user.ebayUsername }}</td>
         <td>{{ user.approvedDate | date:'short' }}</td>
         <td>
           <span class="status-badge"

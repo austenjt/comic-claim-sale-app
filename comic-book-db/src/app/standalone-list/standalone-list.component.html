@@ -188,14 +188,17 @@
 <div class="sl-modal-overlay" *ngIf="showAddSetModal" (click)="cancelAddSet()">
   <div class="sl-modal" (click)="$event.stopPropagation()">
     <h3 class="sl-modal-title">New Set — Collection Group ID</h3>
-    <p class="sl-modal-subtitle">Enter a unique number to identify this set. All books in the set will share this ID.</p>
+    <p class="sl-modal-subtitle">Enter a unique number (1–9999) to identify this set. All books in the set will share this ID.</p>
     <div class="sl-modal-field">
       <label>Collection Group ID</label>
-      <input type="number" [(ngModel)]="addSetCollectionGroup" min="1" placeholder="e.g. 5" />
+      <input type="number" [(ngModel)]="addSetCollectionGroup" min="1" max="9999" placeholder="e.g. 5" />
     </div>
+    <div *ngIf="addSetGroupConflict" class="qa-error">Group {{ addSetCollectionGroup }} already exists. Choose a different number.</div>
+    <div *ngIf="addSetCollectionGroup != null && addSetGroupInvalid && !addSetGroupConflict" class="qa-error">Number must be between 1 and 9999.</div>
     <div *ngIf="addSetError" class="qa-error">{{ addSetError }}</div>
     <div class="sl-modal-actions">
-      <button class="qa-btn qa-btn-save" (click)="confirmAddSet()" [disabled]="!addSetCollectionGroup || addSetSaving">
+      <button class="qa-btn qa-btn-save" (click)="confirmAddSet()"
+        [disabled]="addSetGroupInvalid || addSetGroupConflict || addSetSaving">
         {{ addSetSaving ? 'Saving…' : 'Create Set' }}
       </button>
       <button class="qa-btn qa-btn-reset" (click)="cancelAddSet()">Cancel</button>
@@ -281,20 +284,37 @@
       </div>
     </ng-container>
 
-    <!-- Set selected: confirm deletion -->
-    <ng-container *ngIf="deleteSetSelected">
-      <h3 class="sl-modal-title">Confirm Delete Set</h3>
-      <p class="sl-modal-subtitle">
-        This will permanently delete the set container <strong>"{{ deleteSetSelected.title }}"</strong>
-        (Group {{ deleteSetSelected.collectionGroup }}) and release all its member comics back to the dashboard as individual items.
+    <!-- Set selected: action buttons -->
+    <ng-container *ngIf="deleteSetSelected && !deleteSetConfirmFull">
+      <h3 class="sl-modal-title">Delete "{{ deleteSetSelected.title }}"</h3>
+      <p class="sl-modal-subtitle">Group {{ deleteSetSelected.collectionGroup }}</p>
+      <div *ngIf="deleteSetError" class="qa-error">{{ deleteSetError }}</div>
+      <div class="sl-modal-actions">
+        <button class="qa-btn qa-btn-back" (click)="deleteSetSelected = null" [disabled]="deleteSetSaving">← Back</button>
+        <button class="qa-btn qa-btn-reset" (click)="cancelDeleteSet()" [disabled]="deleteSetSaving">Cancel</button>
+        <button class="qa-btn qa-btn-save" style="background:#e67e22;color:#fff" (click)="confirmDeleteSet()" [disabled]="deleteSetSaving">
+          {{ deleteSetSaving ? 'Deleting…' : 'Return to Dashboard' }}
+        </button>
+        <button class="qa-btn" style="background:#c0392b;color:#fff" (click)="requestFullDelete()" [disabled]="deleteSetSaving">
+          Full Delete
+        </button>
+      </div>
+    </ng-container>
+
+    <!-- Full Delete confirmation -->
+    <ng-container *ngIf="deleteSetSelected && deleteSetConfirmFull">
+      <h3 class="sl-modal-title">Confirm Full Delete</h3>
+      <p class="sl-modal-subtitle">Group {{ deleteSetSelected.collectionGroup }} — "{{ deleteSetSelected.title }}"</p>
+      <p class="sl-modal-hint" style="color:#f87171">
+        This will permanently delete the set container <strong>and all member comics</strong> from the database. This cannot be undone.
       </p>
       <div *ngIf="deleteSetError" class="qa-error">{{ deleteSetError }}</div>
       <div class="sl-modal-actions">
-        <button class="qa-btn qa-btn-save" style="background:#c0392b" (click)="confirmDeleteSet()" [disabled]="deleteSetSaving">
-          {{ deleteSetSaving ? 'Deleting…' : 'Delete Set' }}
-        </button>
-        <button class="qa-btn qa-btn-back" (click)="deleteSetSelected = null" [disabled]="deleteSetSaving">← Back</button>
+        <button class="qa-btn qa-btn-back" (click)="deleteSetConfirmFull = false" [disabled]="deleteSetSaving">← Back</button>
         <button class="qa-btn qa-btn-reset" (click)="cancelDeleteSet()" [disabled]="deleteSetSaving">Cancel</button>
+        <button class="qa-btn" style="background:#c0392b;color:#fff" (click)="confirmDeleteSetFully()" [disabled]="deleteSetSaving">
+          {{ deleteSetSaving ? 'Deleting…' : 'Yes, Delete Everything' }}
+        </button>
       </div>
     </ng-container>
 

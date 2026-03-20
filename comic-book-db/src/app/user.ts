@@ -6,6 +6,10 @@ export interface User {
   phone?: string;
   notes?: string;
   preferences?: string;
+  venmoHandle?: string;
+  paypalHandle?: string;
+  ebayUsername?: string;
+  cashAppHandle?: string;
   status: 'PENDING' | 'APPROVED' | 'SUSPENDED';
   isAdmin: boolean;
   createdDate?: string;

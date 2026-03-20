@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
+import { take } from 'rxjs/operators';
 import { ComicService, CsvUploadResult } from '../comic.service';
+import { Comic } from '../comic';
 
 @Component({
   selector: 'app-load-gocollect-form',
@@ -12,6 +14,10 @@ export class LoadGoCollectFormComponent {
   selectedFile?: File;
   status: 'idle' | 'processing' | 'success' | 'error' = 'idle';
   statusMessage = '';
+
+  importAsSet = false;
+  availableSets: Comic[] = [];
+  selectedSet: Comic | null = null;
 
   constructor(private comicService: ComicService) {}
 
@@ -28,16 +34,35 @@ export class LoadGoCollectFormComponent {
     }
   }
 
+  onImportAsSetChange(): void {
+    if (this.importAsSet && this.availableSets.length === 0) {
+      this.comicService.getCachedComics().pipe(take(1)).subscribe(comics => {
+        this.availableSets = comics.filter(c => c.docType === 'SET');
+      });
+    }
+    if (!this.importAsSet) {
+      this.selectedSet = null;
+    }
+  }
+
+  get canProcess(): boolean {
+    return !!this.selectedFile && (!this.importAsSet || this.selectedSet != null);
+  }
+
   processFile() {
-    if (!this.selectedFile) return;
+    if (!this.canProcess) return;
     this.status = 'processing';
     this.statusMessage = '';
-    this.comicService.uploadCSVFile(this.selectedFile).subscribe({
+    const collectionGroup = this.importAsSet && this.selectedSet?.collectionGroup != null
+      ? this.selectedSet.collectionGroup
+      : undefined;
+    this.comicService.uploadCSVFile(this.selectedFile!, collectionGroup).subscribe({
       next: (result: CsvUploadResult) => {
         this.status = 'success';
         this.statusMessage =
-          `${result.succeeded.length} added, ` +
-          `${result.duplicates.length} duplicate${result.duplicates.length !== 1 ? 's' : ''}, ` +
+          `${result.succeeded.length} added` +
+          (collectionGroup != null ? ` to Set ${collectionGroup}` : '') +
+          `, ${result.duplicates.length} duplicate${result.duplicates.length !== 1 ? 's' : ''}, ` +
           `${result.failed.length} failed.`;
         this.selectedFile = undefined;
       },
