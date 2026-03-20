@@ -36,6 +36,9 @@
   </div>
 </header>
 <div class="toast-stack">
+  <div *ngIf="toastService.toasts.length > 0" class="app-toast toast-close-all" (click)="toastService.clearAll()">
+    Dismiss All
+  </div>
   <div *ngFor="let t of toastService.toasts" class="app-toast">
     <span>{{ t.message }}</span>
     <button class="toast-close" (click)="toastService.dismiss(t.id)">&#x2715;</button>

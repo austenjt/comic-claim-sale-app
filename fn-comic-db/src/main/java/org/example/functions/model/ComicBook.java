@@ -42,6 +42,7 @@ public class ComicBook {
     private Era era;
     private CoverVariant variant;
     private Integer printRun;
+    private Integer numCopies;
     private String barCode;
     private String keyIssue;
 

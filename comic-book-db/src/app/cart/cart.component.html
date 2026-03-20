@@ -43,6 +43,12 @@
         </tr>
       </tbody>
       <tfoot>
+        <tr *ngIf="cart.status !== 'OPEN'">
+          <td>Subtotal <span class="item-count-label">({{ visibleItems.length }} book{{ visibleItems.length !== 1 ? 's' : '' }})</span></td>
+          <td>{{ cartTotal | currency }}</td>
+          <td></td>
+          <td *ngIf="canRemove()"></td>
+        </tr>
         <tr *ngIf="cart.discountAmount && cart.discountAmount > 0">
           <td>Discount</td>
           <td class="discount-savings">-{{ cart.discountAmount | currency }}
@@ -51,7 +57,7 @@
           <td></td>
           <td *ngIf="canRemove()"></td>
         </tr>
-        <tr *ngIf="cart.shippingEstimate">
+        <tr *ngIf="cart.status !== 'OPEN' && cart.shippingEstimate">
           <td>Shipping</td>
           <td [class.shipping-free]="cart.shippingEstimate.isFree"
               [class.shipping-cost]="!cart.shippingEstimate.isFree">

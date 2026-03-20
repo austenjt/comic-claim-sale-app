@@ -35,6 +35,7 @@ export class DashboardComponent implements OnInit {
 
   pendingDeleteId: number | null = null;
   deletingId: number | null = null;
+  claimingSetId: number | null = null;
   excludeClaimed = false;
   showPricedOnly = false;
 
@@ -157,6 +158,7 @@ export class DashboardComponent implements OnInit {
   }
 
   claimSet(container: Comic): void {
+    this.claimingSetId = container.id;
     this.cartService.addSet(String(container.id)).subscribe({
       next: cart => {
         this.myCart = cart;
@@ -167,9 +169,12 @@ export class DashboardComponent implements OnInit {
           this.claimedMap[String(m.id)] = new Date().toISOString();
           this.toastService.markActed(String(m.id));
         }
+        this.comics = this.comics.filter(c => c.id !== container.id);
+        this.claimingSetId = null;
         this.toastService.show(`"${container.title}" set (${members.length} books) added to your cart.`);
       },
       error: (err) => {
+        this.claimingSetId = null;
         this.handleClaimError(err);
       }
     });

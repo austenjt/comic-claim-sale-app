@@ -1,5 +1,11 @@
 .cart-container { max-width: 800px; margin: 0 auto; padding: 24px 16px; }
 
+.item-count-label {
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: var(--color-text-muted);
+}
+
 .set-tag {
   display: inline-block;
   margin-left: 6px;

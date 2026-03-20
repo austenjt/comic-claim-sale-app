@@ -1,5 +1,11 @@
 .orders-container { padding: 24px; max-width: 900px; margin: 0 auto; }
 
+.item-count-label {
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: var(--color-text-muted);
+}
+
 .set-tag {
   display: inline-block;
   margin-left: 6px;

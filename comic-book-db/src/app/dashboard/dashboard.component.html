@@ -63,10 +63,12 @@
             <span *ngIf="isSetClaimedByOther(comic)" class="comic-claimed-status">Claimed</span>
             <ng-container *ngIf="auth.isApproved() && !auth.isAdmin()">
               <button *ngIf="isSetInMyCart(comic)" class="btn-in-cart" disabled>In Your Cart</button>
-              <button *ngIf="showClaimSetButton(comic)" class="btn-claim"
-                [disabled]="!canClaimSet(comic)"
+              <button *ngIf="showClaimSetButton(comic) || claimingSetId === comic.id" class="btn-claim"
+                [disabled]="!canClaimSet(comic) || claimingSetId === comic.id"
                 [title]="canClaimSet(comic) ? '' : cartLockedTitle()"
-                (click)="$event.preventDefault(); $event.stopPropagation(); claim(comic)">Claim Set</button>
+                (click)="$event.preventDefault(); $event.stopPropagation(); claim(comic)">
+                {{ claimingSetId === comic.id ? 'Adding…' : 'Claim Set' }}
+              </button>
             </ng-container>
           </div>
         </div>

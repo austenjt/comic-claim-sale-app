@@ -155,6 +155,24 @@ nav a.active {
   flex-shrink: 0;
 }
 
+.toast-close-all {
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #94a3b8;
+  background: #2a3a4c;
+  border-color: #4a5c70;
+  padding: 7px 16px;
+}
+
+.toast-close-all:hover {
+  color: #e8eef4;
+  border-color: #94a3b8;
+}
+
 @keyframes toast-in {
   from { opacity: 0; transform: translateX(40px); }
   to   { opacity: 1; transform: translateX(0); }

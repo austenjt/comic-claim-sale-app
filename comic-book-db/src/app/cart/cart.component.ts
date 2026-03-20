@@ -86,7 +86,8 @@ export class CartComponent implements OnInit {
   }
 
   get discountedTotal(): number {
-    return Math.max(0, this.cartTotal - (this.cart?.discountAmount ?? 0)) + this.shippingAmount;
+    const shipping = this.cart?.status !== 'OPEN' ? this.shippingAmount : 0;
+    return Math.max(0, this.cartTotal - (this.cart?.discountAmount ?? 0)) + shipping;
   }
 
   get finalizeDeadline(): Date | null {
