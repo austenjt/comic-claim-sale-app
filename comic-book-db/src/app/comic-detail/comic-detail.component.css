@@ -16,8 +16,8 @@ button {
 .btn-share {
   padding: 5px 14px;
   background: transparent;
-  color: #10b981;
-  border: 1px solid #10b981;
+  color: #7b8f4b;
+  border: 1px solid #7b8f4b;
   border-radius: 4px;
   font-size: 0.85rem;
   font-weight: 600;
@@ -26,12 +26,12 @@ button {
 }
 
 .btn-share:hover {
-  background: rgba(16, 185, 129, 0.12);
+  background: rgba(123,143,75,0.12);
 }
 
 .btn-share.copied {
-  color: #34d399;
-  border-color: #34d399;
+  color: #adc178;
+  border-color: #adc178;
 }
 
 .comic-heading {
@@ -46,8 +46,8 @@ button {
 }
 
 .graded-badge-lg {
-  background: #10b981;
-  color: #1e2a38;
+  background: #7b8f4b;
+  color: #f0ead2;
   font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.1em;
@@ -87,16 +87,16 @@ button {
   border: 2px solid transparent;
   border-radius: 6px;
   padding: 4px;
-  background: #1e2a38;
+  background: #c8d4a8;
   transition: border-color 0.15s;
 }
 
 .thumb:hover {
-  border-color: #4a5c70;
+  border-color: #b8c89a;
 }
 
 .thumb-active {
-  border-color: #10b981;
+  border-color: #7b8f4b;
 }
 
 .thumb img {
@@ -120,7 +120,7 @@ button {
   border: 1px solid var(--color-border);
   border-radius: 8px;
   overflow: hidden;
-  background-color: #1e2a38;
+  background-color: #c8d4a8;
 }
 
 .large-image img {
@@ -167,8 +167,8 @@ button {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.09em;
-  color: #10b981;
-  border-bottom: 2px solid #10b981;
+  color: #7b8f4b;
+  border-bottom: 2px solid #7b8f4b;
   padding-bottom: 4px;
   margin-bottom: 6px;
 }
@@ -197,7 +197,7 @@ button {
 .detail-subsection-title {
   font-size: 0.75rem;
   font-weight: 600;
-  color: #94a3b8;
+  color: #79675c;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   margin-top: 10px;
@@ -207,14 +207,14 @@ button {
 }
 
 .detail-item a {
-  color: #10b981;
+  color: #7b8f4b;
   text-decoration: underline;
   font-size: 0.9rem;
   transition: color 0.2s;
 }
 
 .detail-item a:hover {
-  color: #059669;
+  color: #6b7e3e;
 }
 
 /* Responsive */
@@ -241,65 +241,65 @@ button {
   align-items: center;
   justify-content: center;
   height: 300px;
-  background-color: #1e2a38;
+  background-color: #c8d4a8;
 }
 
 .img-upload-btn {
   padding: 10px 20px;
-  background-color: #10b981;
-  color: #1e2a38;
+  background-color: #7b8f4b;
+  color: #f0ead2;
   border: none;
   border-radius: 6px;
   font-size: 0.95rem;
   cursor: pointer;
 }
 
-.img-upload-btn:hover:not(:disabled) { background-color: #059669; }
+.img-upload-btn:hover:not(:disabled) { background-color: #6b7e3e; }
 .img-upload-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
 .img-update-bar {
   padding: 8px;
-  background-color: #1e2a38;
+  background-color: #c8d4a8;
   border-top: 1px solid var(--color-border);
   text-align: center;
 }
 
 .img-update-btn {
   padding: 5px 16px;
-  background-color: #10b981;
-  color: #1e2a38;
+  background-color: #7b8f4b;
+  color: #f0ead2;
   border: none;
   border-radius: 4px;
   font-size: 0.85rem;
   cursor: pointer;
 }
 
-.img-update-btn:hover:not(:disabled) { background-color: #059669; }
+.img-update-btn:hover:not(:disabled) { background-color: #6b7e3e; }
 .img-update-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
 .img-upload-error {
   margin-top: 6px;
   font-size: 0.78rem;
-  color: #f87171;
+  color: #c0634c;
 }
 
 .claim-status-claimed {
-  color: #94a3b8;
+  color: #79675c;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
 
 .claim-status-available {
-  color: #10b981;
+  color: #7b8f4b;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
 
 .claim-status-mine {
-  background: rgba(16, 185, 129, 0.15);
-  color: #34d399;
+  background: rgba(123,143,75,0.15);
+  color: #adc178;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -309,7 +309,7 @@ button {
 }
 
 .claim-status-sold {
-  color: #f87171;
+  color: #c0634c;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -317,37 +317,37 @@ button {
 
 .btn-claim-detail {
   padding: 7px 20px;
-  background: #10b981;
-  color: #1e2a38;
+  background: #7b8f4b;
+  color: #f0ead2;
   border: none;
   border-radius: 4px;
   font-size: 0.9rem;
   font-weight: 700;
   cursor: pointer;
 }
-.btn-claim-detail:hover:not(:disabled) { background: #059669; }
+.btn-claim-detail:hover:not(:disabled) { background: #6b7e3e; }
 .btn-claim-detail:disabled { opacity: 0.6; cursor: default; }
 
 .btn-release-detail {
   padding: 7px 20px;
   background: transparent;
-  color: #f87171;
-  border: 1px solid #f87171;
+  color: #c0634c;
+  border: 1px solid #c0634c;
   border-radius: 4px;
   font-size: 0.9rem;
   font-weight: 700;
   cursor: pointer;
 }
-.btn-release-detail:hover:not(:disabled) { background: rgba(248,113,113,0.1); }
+.btn-release-detail:hover:not(:disabled) { background: rgba(192,99,76,0.1); }
 .btn-release-detail:disabled { opacity: 0.6; cursor: default; }
 
 .claim-error {
-  color: #f87171;
+  color: #c0634c;
   font-size: 0.85rem;
   margin-bottom: 6px;
 }
 
 .claim-blocked {
-  color: #94a3b8;
+  color: #79675c;
   font-size: 0.85rem;
 }

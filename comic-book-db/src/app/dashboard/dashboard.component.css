@@ -21,14 +21,14 @@ h2 {
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  box-shadow: 0 2px 6px rgba(108,88,76,0.1);
   width: calc(33.333% - 12px);
   overflow: hidden;
   transition: box-shadow 0.2s, transform 0.2s;
 }
 
 .comics-list a:hover {
-  box-shadow: 0 6px 18px rgba(16,185,129,0.15);
+  box-shadow: 0 6px 18px rgba(123,143,75,0.15);
   transform: translateY(-2px);
   background-color: var(--color-surface);
   text-decoration: none;
@@ -52,7 +52,7 @@ h2 {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #1e2a38;
+  background-color: #c8d4a8;
   padding: 14px;
   border-bottom: 1px solid var(--color-border);
   min-height: 80px;
@@ -140,7 +140,7 @@ h2 {
 
 .comic-key-issue {
   font-size: 0.8rem;
-  color: #f87171;
+  color: #c0634c;
   font-weight: 600;
   margin-bottom: 3px;
 }
@@ -149,7 +149,7 @@ h2 {
 .comic-price {
   font-size: 0.85rem;
   margin-top: 8px;
-  color: #10b981;
+  color: #7b8f4b;
   font-weight: 600;
 }
 
@@ -162,28 +162,28 @@ h2 {
 }
 
 .btn-claim {
-  background: #10b981;
-  color: #1e2a38;
+  background: #7b8f4b;
+  color: #f0ead2;
   border: none;
 }
-.btn-claim:hover { background: #059669; }
+.btn-claim:hover { background: #6b7e3e; }
 
 .btn-in-cart {
   background: transparent;
-  color: #10b981;
-  border: 1px solid #10b981;
+  color: #7b8f4b;
+  border: 1px solid #7b8f4b;
   cursor: default;
 }
 
 .btn-claimed {
-  background: #4a5c70;
-  color: #94a3b8;
+  background: #c8d4a8;
+  color: #79675c;
   border: none;
   cursor: default;
 }
 
 .claim-error {
-  color: #f87171;
+  color: #c0634c;
   text-align: center;
   margin-bottom: 12px;
 }
@@ -192,7 +192,7 @@ h2 {
   margin-top: 8px;
   font-size: 0.8rem;
   font-weight: 600;
-  color: #94a3b8;
+  color: #79675c;
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
@@ -212,7 +212,7 @@ h2 {
   margin-top: 8px;
   font-size: 0.82rem;
   font-weight: 700;
-  color: #f87171;
+  color: #c0634c;
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
@@ -236,17 +236,17 @@ h2 {
   font-weight: 600;
   cursor: pointer;
   background: transparent;
-  color: #f87171;
-  border: 1px solid #f87171;
+  color: #c0634c;
+  border: 1px solid #c0634c;
 }
-.btn-delete-card:hover { background: rgba(248,113,113,0.1); }
-.btn-delete-card-confirm { border-color: #ef4444; color: #ef4444; background: rgba(239,68,68,0.12); }
-.btn-delete-card-confirm:hover { background: rgba(239,68,68,0.2); }
+.btn-delete-card:hover { background: rgba(192,99,76,0.1); }
+.btn-delete-card-confirm { border-color: #c0634c; color: #c0634c; background: rgba(192,99,76,0.12); }
+.btn-delete-card-confirm:hover { background: rgba(192,99,76,0.2); }
 
 .award-modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.7);
+  background: rgba(0,0,0,0.5);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -254,25 +254,25 @@ h2 {
 }
 
 .award-modal {
-  background: #3a4a5c;
-  border: 1px solid #4a5c70;
+  background: #dde5b6;
+  border: 1px solid #b8c89a;
   border-radius: 10px;
   padding: 28px 32px;
   min-width: 320px;
   max-width: 480px;
   width: 90%;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  box-shadow: 0 8px 32px rgba(108,88,76,0.25);
 }
 
 .award-modal h3 {
   margin: 0 0 6px;
   font-size: 1.1rem;
-  color: #e8eef4;
+  color: #6c584c;
 }
 
 .award-subtitle {
   font-size: 0.88rem;
-  color: #94a3b8;
+  color: #79675c;
   margin-bottom: 16px;
 }
 
@@ -288,7 +288,7 @@ h2 {
 }
 
 .award-user-row {
-  border: 1px solid #4a5c70;
+  border: 1px solid #b8c89a;
   border-radius: 6px;
   overflow: hidden;
 }
@@ -299,19 +299,19 @@ h2 {
   gap: 10px;
   padding: 10px 14px;
   cursor: pointer;
-  background: #2d3a4a;
-  color: #e8eef4;
+  background: #f0ead2;
+  color: #6c584c;
   font-size: 0.9rem;
   transition: background 0.15s;
 }
-.award-radio-label:hover { background: #4a5c70; }
+.award-radio-label:hover { background: #c8d4a8; }
 .award-radio-label input[type="radio"] { cursor: pointer; flex-shrink: 0; }
 
-.award-user-name { font-weight: 500; color: #e8eef4; }
+.award-user-name { font-weight: 500; color: #6c584c; }
 
 .award-user-email {
   font-size: 0.78rem;
-  color: #94a3b8;
+  color: #79675c;
 }
 
 .award-modal-actions {
@@ -323,34 +323,34 @@ h2 {
   padding: 8px 22px;
   border-radius: 4px;
   border: none;
-  background: #10b981;
-  color: #1e2a38;
+  background: #7b8f4b;
+  color: #f0ead2;
   cursor: pointer;
   font-size: 0.9rem;
   font-weight: 600;
 }
-.award-confirm-btn:hover:not(:disabled) { background: #059669; }
-.award-confirm-btn:disabled { background: #4a5c70; color: #94a3b8; cursor: not-allowed; }
+.award-confirm-btn:hover:not(:disabled) { background: #6b7e3e; }
+.award-confirm-btn:disabled { background: #c8d4a8; color: #79675c; cursor: not-allowed; }
 
 .award-cancel-btn {
   padding: 8px 22px;
   border-radius: 4px;
-  border: 1px solid #4a5c70;
+  border: 1px solid #b8c89a;
   background: transparent;
-  color: #94a3b8;
+  color: #79675c;
   cursor: pointer;
   font-size: 0.9rem;
 }
-.award-cancel-btn:hover { background: #4a5c70; }
+.award-cancel-btn:hover { background: #c8d4a8; }
 
 .award-error {
-  color: #f87171;
+  color: #c0634c;
   font-size: 0.88rem;
   margin-bottom: 10px;
 }
 
 .award-loading {
-  color: #94a3b8;
+  color: #79675c;
   font-size: 0.88rem;
   margin-bottom: 10px;
 }
@@ -361,15 +361,15 @@ h2 {
   justify-content: center;
   gap: 12px;
   padding: 48px 0;
-  color: #94a3b8;
+  color: #79675c;
   font-size: 1rem;
 }
 
 .warming-up-spinner {
   width: 22px;
   height: 22px;
-  border: 3px solid #4a5c70;
-  border-top-color: #10b981;
+  border: 3px solid #b8c89a;
+  border-top-color: #7b8f4b;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
@@ -393,11 +393,11 @@ h2 {
 }
 
 .badge-graded {
-  background: #10b981;
-  color: #1e2a38;
+  background: #7b8f4b;
+  color: #f0ead2;
 }
 
 .badge-set {
-  background: #f59e0b;
-  color: #1e2a38;
+  background: #a98467;
+  color: #f0ead2;
 }

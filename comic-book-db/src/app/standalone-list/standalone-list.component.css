@@ -10,7 +10,7 @@
   padding: 5px 10px;
   border: 1px solid var(--color-border);
   border-radius: 4px;
-  background: #1e2a38;
+  background: var(--color-surface);
   color: var(--color-text);
   font-size: 13px;
   width: 220px;
@@ -26,31 +26,31 @@
 }
 
 .add-btn {
-  background-color: #10b981;
-  color: #1e2a38;
-  border-color: #10b981;
+  background-color: #7b8f4b;
+  color: #f0ead2;
+  border-color: #7b8f4b;
 }
 
 .add-btn:hover {
-  background-color: #059669;
+  background-color: #6b7e3e;
 }
 
 .delete-btn {
-  background-color: #c0392b;
-  color: #fff;
+  background-color: #c0634c;
+  color: #f0ead2;
 }
 
 .delete-btn:hover {
-  background-color: #a93226;
+  background-color: #a8553f;
 }
 
 .refresh-btn {
-  background-color: #10b981;
-  color: #1e2a38;
+  background-color: #7b8f4b;
+  color: #f0ead2;
 }
 
 .refresh-btn:hover:not(:disabled) {
-  background-color: #059669;
+  background-color: #6b7e3e;
 }
 
 .refresh-btn:disabled {
@@ -63,11 +63,11 @@
   align-items: center;
   justify-content: center;
   height: 160px;
-  border: 2px dashed #4a5c70;
+  border: 2px dashed #b8c89a;
   border-radius: 6px;
-  color: #94a3b8;
+  color: #79675c;
   font-size: 0.95rem;
-  background: #1e2a38;
+  background: var(--color-surface);
 }
 
 
@@ -85,7 +85,7 @@
 .sl-modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -93,8 +93,8 @@
 }
 
 .sl-modal {
-  background: #1e2a38;
-  border: 1px solid #4a5c70;
+  background: #f0ead2;
+  border: 1px solid #b8c89a;
   border-radius: 8px;
   padding: 24px;
   min-width: 320px;
@@ -109,19 +109,19 @@
 .sl-modal-title {
   font-size: 1rem;
   font-weight: 700;
-  color: #e8eef4;
+  color: #6c584c;
   margin: 0 0 6px;
 }
 
 .sl-modal-subtitle {
   font-size: 0.82rem;
-  color: #94a3b8;
+  color: #79675c;
   margin: 0 0 14px;
 }
 
 .sl-modal-hint {
   font-size: 0.82rem;
-  color: #94a3b8;
+  color: #79675c;
   margin: 4px 0 8px;
 }
 
@@ -135,15 +135,15 @@
 .sl-modal-field label {
   font-size: 0.78rem;
   font-weight: 600;
-  color: #10b981;
+  color: #7b8f4b;
 }
 
 .sl-modal-field input {
   padding: 6px 10px;
-  border: 1px solid #4a5c70;
+  border: 1px solid #b8c89a;
   border-radius: 4px;
-  background: #3a4a5c;
-  color: #e8eef4;
+  background: #dde5b6;
+  color: #6c584c;
   font-size: 0.88rem;
 }
 
@@ -157,7 +157,7 @@
 
 .sl-saving-hint {
   font-size: 0.82rem;
-  color: #94a3b8;
+  color: #79675c;
   font-style: italic;
 }
 
@@ -165,16 +165,16 @@
   width: 100%;
   box-sizing: border-box;
   padding: 7px 10px;
-  border: 1px solid #4a5c70;
+  border: 1px solid #b8c89a;
   border-radius: 4px;
-  background: #3a4a5c;
-  color: #e8eef4;
+  background: #dde5b6;
+  color: #6c584c;
   font-size: 0.88rem;
   margin-bottom: 8px;
 }
 
 .sl-search-input:focus {
-  border-color: #10b981;
+  border-color: #7b8f4b;
   outline: none;
 }
 
@@ -184,7 +184,7 @@
   margin: 0 0 4px;
   max-height: 260px;
   overflow-y: auto;
-  border: 1px solid #4a5c70;
+  border: 1px solid #b8c89a;
   border-radius: 4px;
 }
 
@@ -194,13 +194,13 @@
   gap: 10px;
   padding: 8px 12px;
   cursor: pointer;
-  border-bottom: 1px solid #2d3f52;
+  border-bottom: 1px solid #b8c89a;
   transition: background 0.12s;
 }
 
 .sl-item-row:last-child { border-bottom: none; }
 
-.sl-item-row:hover { background: #2d3f52; }
+.sl-item-row:hover { background: #c8d4a8; }
 
 .sl-item-row-disabled {
   pointer-events: none;
@@ -209,22 +209,22 @@
 
 .sl-item-name {
   font-size: 0.88rem;
-  color: #e8eef4;
+  color: #6c584c;
 }
 
 .sl-item-badge {
   font-size: 0.75rem;
   font-weight: 700;
-  color: #10b981;
+  color: #7b8f4b;
   white-space: nowrap;
 }
 
 /* ── Quick Add ──────────────────────────────────────────────────────────── */
 
 .qa-section {
-  border: 1px solid #4a5c70;
+  border: 1px solid #b8c89a;
   border-radius: 6px;
-  background: #1e2a38;
+  background: #f0ead2;
   padding: 14px 18px 10px;
   margin-bottom: 14px;
 }
@@ -239,12 +239,12 @@
 .qa-title {
   font-weight: 700;
   font-size: 1.1rem;
-  color: #10b981;
+  color: #7b8f4b;
 }
 
 .qa-step-indicator {
   font-size: 0.8rem;
-  color: #94a3b8;
+  color: #79675c;
 }
 
 .qa-fields {
@@ -263,7 +263,7 @@
 .qa-field label {
   font-size: 0.78rem;
   font-weight: 600;
-  color: #10b981;
+  color: #7b8f4b;
 }
 
 .qa-field input[type="text"],
@@ -271,11 +271,11 @@
 .qa-field input[type="date"],
 .qa-field select {
   padding: 5px 8px;
-  border: 1px solid #4a5c70;
+  border: 1px solid #b8c89a;
   border-radius: 4px;
   font-size: 0.88rem;
-  background: #3a4a5c;
-  color: #e8eef4;
+  background: #dde5b6;
+  color: #6c584c;
 }
 
 .qa-field-checkbox {
@@ -305,35 +305,35 @@
   cursor: pointer;
   font-size: 0.88rem;
   font-weight: 600;
-  color: #1e2a38;
+  color: #f0ead2;
   margin: 0;
 }
 
-.qa-btn-next  { background: #10b981; }
-.qa-btn-next:hover  { background: #059669; }
+.qa-btn-next  { background: #7b8f4b; }
+.qa-btn-next:hover  { background: #6b7e3e; }
 
-.qa-btn-back  { background: #3d5068; color: #94a3b8; }
-.qa-btn-back:hover  { background: #4a5c70; }
+.qa-btn-back  { background: #c8d4a8; color: #79675c; }
+.qa-btn-back:hover  { background: #b8c89a; }
 
 .qa-btn-graded { background: #7c3aed; color: white; }
 .qa-btn-graded:hover { background: #6d28d9; }
 
-.qa-btn-save  { background: #10b981; }
-.qa-btn-save:hover:not(:disabled)  { background: #059669; }
-.qa-btn-save:disabled { background: #4a5c70; color: #94a3b8; cursor: not-allowed; }
+.qa-btn-save  { background: #7b8f4b; }
+.qa-btn-save:hover:not(:disabled)  { background: #6b7e3e; }
+.qa-btn-save:disabled { background: #c8d4a8; color: #79675c; cursor: not-allowed; }
 
-.qa-btn-reset { background: transparent; border: 1px solid #4a5c70; color: #94a3b8; }
-.qa-btn-reset:hover { background: #4a5c70; }
+.qa-btn-reset { background: transparent; border: 1px solid #b8c89a; color: #79675c; }
+.qa-btn-reset:hover { background: #c8d4a8; }
 
 .qa-success {
-  color: #34d399;
+  color: #7b8f4b;
   font-size: 0.85rem;
   font-weight: 600;
   margin-bottom: 8px;
 }
 
 .qa-error {
-  color: #f87171;
+  color: #c0634c;
   font-size: 0.85rem;
   margin-bottom: 8px;
 }

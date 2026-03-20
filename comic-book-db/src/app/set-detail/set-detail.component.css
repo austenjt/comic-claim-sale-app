@@ -16,8 +16,8 @@ button {
 .btn-share {
   padding: 5px 14px;
   background: transparent;
-  color: #f59e0b;
-  border: 1px solid #f59e0b;
+  color: #a98467;
+  border: 1px solid #a98467;
   border-radius: 4px;
   font-size: 0.85rem;
   font-weight: 600;
@@ -26,7 +26,7 @@ button {
 }
 
 .btn-share:hover {
-  background: rgba(245, 158, 11, 0.12);
+  background: rgba(169,132,103,0.12);
 }
 
 .warming-up {
@@ -35,15 +35,15 @@ button {
   justify-content: center;
   gap: 12px;
   padding: 48px 0;
-  color: #94a3b8;
+  color: #79675c;
   font-size: 1rem;
 }
 
 .warming-up-spinner {
   width: 22px;
   height: 22px;
-  border: 3px solid #4a5c70;
-  border-top-color: #f59e0b;
+  border: 3px solid #b8c89a;
+  border-top-color: #a98467;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
@@ -64,8 +64,8 @@ button {
 }
 
 .set-badge-lg {
-  background: #f59e0b;
-  color: #1e2a38;
+  background: #a98467;
+  color: #f0ead2;
   font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.1em;
@@ -107,16 +107,16 @@ button {
   border: 2px solid transparent;
   border-radius: 6px;
   padding: 4px;
-  background: #1e2a38;
+  background: #c8d4a8;
   transition: border-color 0.15s;
 }
 
 .thumb:hover {
-  border-color: #4a5c70;
+  border-color: #b8c89a;
 }
 
 .thumb-active {
-  border-color: #f59e0b;
+  border-color: #a98467;
 }
 
 .thumb img {
@@ -140,7 +140,7 @@ button {
   border: 1px solid var(--color-border);
   border-radius: 8px;
   overflow: hidden;
-  background-color: #1e2a38;
+  background-color: #c8d4a8;
 }
 
 .large-image img {
@@ -151,28 +151,28 @@ button {
 
 .img-update-bar {
   padding: 8px;
-  background-color: #1e2a38;
+  background-color: #c8d4a8;
   border-top: 1px solid var(--color-border);
   text-align: center;
 }
 
 .img-update-btn {
   padding: 5px 16px;
-  background-color: #f59e0b;
-  color: #1e2a38;
+  background-color: #a98467;
+  color: #f0ead2;
   border: none;
   border-radius: 4px;
   font-size: 0.85rem;
   cursor: pointer;
 }
 
-.img-update-btn:hover:not(:disabled) { background-color: #d97706; }
+.img-update-btn:hover:not(:disabled) { background-color: #8f6e52; }
 .img-update-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
 .img-upload-error {
   margin-top: 6px;
   font-size: 0.78rem;
-  color: #f87171;
+  color: #c0634c;
 }
 
 .details {
@@ -189,8 +189,8 @@ button {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.09em;
-  color: #f59e0b;
-  border-bottom: 2px solid #f59e0b;
+  color: #a98467;
+  border-bottom: 2px solid #a98467;
   padding-bottom: 4px;
   margin-bottom: 6px;
 }
@@ -217,15 +217,15 @@ button {
 }
 
 .claim-status-available {
-  color: #10b981;
+  color: #7b8f4b;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
 
 .claim-status-mine {
-  background: rgba(16, 185, 129, 0.15);
-  color: #34d399;
+  background: rgba(123,143,75,0.15);
+  color: #adc178;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -235,7 +235,7 @@ button {
 }
 
 .claim-status-claimed {
-  color: #94a3b8;
+  color: #79675c;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -243,25 +243,25 @@ button {
 
 .btn-claim-detail {
   padding: 7px 20px;
-  background: #10b981;
-  color: #1e2a38;
+  background: #7b8f4b;
+  color: #f0ead2;
   border: none;
   border-radius: 4px;
   font-size: 0.9rem;
   font-weight: 700;
   cursor: pointer;
 }
-.btn-claim-detail:hover:not(:disabled) { background: #059669; }
+.btn-claim-detail:hover:not(:disabled) { background: #6b7e3e; }
 .btn-claim-detail:disabled { opacity: 0.6; cursor: default; }
 
 .claim-error {
-  color: #f87171;
+  color: #c0634c;
   font-size: 0.85rem;
   margin-bottom: 6px;
 }
 
 .claim-blocked {
-  color: #94a3b8;
+  color: #79675c;
   font-size: 0.85rem;
 }
 
@@ -276,8 +276,8 @@ button {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.09em;
-  color: #f59e0b;
-  border-bottom: 2px solid #f59e0b;
+  color: #a98467;
+  border-bottom: 2px solid #a98467;
   padding-bottom: 4px;
   margin-bottom: 16px;
 }
@@ -299,14 +299,14 @@ button {
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  box-shadow: 0 2px 6px rgba(108,88,76,0.1);
   width: calc(33.333% - 12px);
   overflow: hidden;
   transition: box-shadow 0.2s, transform 0.2s;
 }
 
 .comics-list a:hover {
-  box-shadow: 0 6px 18px rgba(245,158,11,0.15);
+  box-shadow: 0 6px 18px rgba(169,132,103,0.15);
   transform: translateY(-2px);
 }
 
@@ -314,7 +314,7 @@ button {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #1e2a38;
+  background-color: #c8d4a8;
   padding: 14px;
   border-bottom: 1px solid var(--color-border);
   min-height: 80px;
@@ -363,8 +363,8 @@ button {
 
 .badge-graded {
   display: inline-block;
-  background: #10b981;
-  color: #1e2a38;
+  background: #7b8f4b;
+  color: #f0ead2;
   font-size: 0.65rem;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -401,7 +401,7 @@ button {
 .comic-price {
   font-size: 0.85rem;
   margin-top: 8px;
-  color: #10b981;
+  color: #7b8f4b;
   font-weight: 600;
 }
 

@@ -26,6 +26,6 @@ button {
   font-size: 1rem;
   cursor: pointer;
 }
-.success-message { color: #34d399; font-size: 1.1rem; }
-.error-message { color: #f87171; margin-bottom: 12px; }
+.success-message { color: #7b8f4b; font-size: 1.1rem; }
+.error-message { color: #c0634c; margin-bottom: 12px; }
 .auth-link { margin-top: 16px; }

@@ -30,7 +30,7 @@ app-comic-search {
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #10b981;
+  color: #7b8f4b;
 }
 
 .items-count {
@@ -57,11 +57,11 @@ app-comic-search {
 }
 
 .btn-exclude-claimed-active {
-  background: rgba(16, 185, 129, 0.15);
-  color: #10b981;
-  border-color: #10b981;
+  background: rgba(123,143,75,0.15);
+  color: #7b8f4b;
+  border-color: #7b8f4b;
 }
 
 .btn-exclude-claimed-active:hover {
-  background: rgba(16, 185, 129, 0.25);
+  background: rgba(123,143,75,0.25);
 }

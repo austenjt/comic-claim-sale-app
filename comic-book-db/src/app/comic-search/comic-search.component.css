@@ -22,8 +22,8 @@ input {
 
 input:focus {
   outline: none;
-  border-color: #10b981;
-  box-shadow: 0 0 0 3px rgba(16,185,129,0.2);
+  border-color: #7b8f4b;
+  box-shadow: 0 0 0 3px rgba(123,143,75,0.2);
 }
 
 li {
@@ -44,25 +44,25 @@ li {
 }
 
 .search-result li a:hover {
-  background-color: #10b981;
-  color: #1e2a38;
+  background-color: #7b8f4b;
+  color: #f0ead2;
 }
 
 .search-result li a.sold {
-  color: #f87171;
+  color: #c0634c;
 }
 
 .search-result li a.sold .search-result-number {
-  color: #f87171;
+  color: #c0634c;
 }
 
 .search-result li a.sold:hover {
-  background-color: #dc2626;
-  color: #fff;
+  background-color: #c0634c;
+  color: #f0ead2;
 }
 
 .search-result li a.sold:hover .search-result-number {
-  color: rgba(255,255,255,0.75);
+  color: rgba(240,234,210,0.75);
 }
 
 ul.search-result {
@@ -77,7 +77,7 @@ ul.search-result {
 }
 
 .search-result li a:hover .search-result-number {
-  color: rgba(7,16,32,0.75);
+  color: rgba(240,234,210,0.75);
 }
 
 

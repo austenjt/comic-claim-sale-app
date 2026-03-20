@@ -125,6 +125,10 @@ When a cart is fulfilled, it is permanently snapshotted into the `archived-order
 ### Return events
 When any user removes a comic from their cart, a short-lived `ReturnEvent` document (120-second TTL) is written to the `return-events` Cosmos container. The `/api/notifications` endpoint merges these with recent claim/award events and returns them to the frontend for polling-based broadcast.
 
+## Color Scheme
+
+https://coolors.co/palette/f0ead2-dde5b6-adc178-7b8f4b-a98467-6c584c-79675c
+
 ---
 
 ## Navigation

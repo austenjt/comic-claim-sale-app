@@ -7,7 +7,7 @@
 h1 {
   font-size: 1.8rem;
   margin-bottom: 32px;
-  color: #10b981;
+  color: #7b8f4b;
 }
 
 .hiw-section {
@@ -18,9 +18,9 @@ h1 {
   font-size: 1.2rem;
   font-weight: 700;
   margin-bottom: 10px;
-  border-bottom: 2px solid #10b981;
+  border-bottom: 2px solid #7b8f4b;
   padding-bottom: 4px;
-  color: #e8eef4;
+  color: var(--color-text);
 }
 
 .hiw-section p, .hiw-section li {
@@ -34,7 +34,7 @@ h1 {
 }
 
 .hiw-section a {
-  color: #10b981;
+  color: #7b8f4b;
   font-weight: 500;
 }
 
@@ -54,24 +54,24 @@ h1 {
 }
 
 .hiw-btn-primary {
-  background: #10b981;
-  color: #1e2a38;
+  background: #7b8f4b;
+  color: #f0ead2;
 }
 
 .hiw-btn-primary:hover {
-  background: #059669;
-  color: #1e2a38;
+  background: #6b7e3e;
+  color: #f0ead2;
 }
 
 .hiw-btn-secondary {
-  background: #10b981;
-  color: #1e2a38;
+  background: #7b8f4b;
+  color: #f0ead2;
   border: none;
 }
 
 .hiw-btn-secondary:hover {
-  background: #059669;
-  color: #1e2a38;
+  background: #6b7e3e;
+  color: #f0ead2;
 }
 
 .hiw-admin-divider {
@@ -94,13 +94,13 @@ h1 {
 }
 
 .hiw-admin {
-  background: #1e2a38;
-  border-left: 3px solid #10b981;
+  background: #dde5b6;
+  border-left: 3px solid #7b8f4b;
   border-radius: 0 6px 6px 0;
   padding: 16px 20px;
   margin-bottom: 20px;
 }
 
 .hiw-admin h2 {
-  border-bottom-color: #10b981;
+  border-bottom-color: #7b8f4b;
 }

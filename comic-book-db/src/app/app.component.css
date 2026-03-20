@@ -1,26 +1,32 @@
 .app-header {
-  background-color: #1e2a38;
-  color: white;
-  padding: 0 2rem;
+  background-color: #6c584c;
+  color: #f0ead2;
   height: 98px;
+  box-shadow: 0 2px 8px rgba(108,88,76,0.3);
+}
+
+.header-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  height: 100%;
   display: flex;
   align-items: stretch;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
 }
 
 .header-logo {
   display: flex;
   align-items: center;
-  justify-content: center;
   padding-right: 1.5rem;
-  border-right: 1px solid rgba(255,255,255,0.1);
+  border-right: 1px solid rgba(240,234,210,0.2);
   margin-right: 1.5rem;
-  min-width: 80px;
+  flex-shrink: 0;
 }
 
 .logo-img {
   height: 100%;
   width: auto;
+  display: block;
 }
 
 .header-right {
@@ -35,7 +41,7 @@
 .header-title {
   font-size: 1.2rem;
   font-weight: 700;
-  color: #10b981;
+  color: #adc178;
   letter-spacing: 0.02em;
   line-height: 1;
 }
@@ -46,26 +52,26 @@ nav {
 }
 
 nav a {
-  color: rgba(255,255,255,0.75);
+  color: rgba(240,234,210,0.85);
   text-decoration: none;
   padding: 0.35rem 0.85rem;
   border-radius: 4px;
   font-size: 0.9rem;
   font-weight: 500;
   transition: background-color 0.2s, color 0.2s;
-  background-color: rgba(16, 185, 129, 0.08);
+  background-color: rgba(173,193,120,0.12);
   margin: 0;
 }
 
 nav a:hover {
-  background-color: rgba(16, 185, 129, 0.18);
-  color: #10b981;
+  background-color: rgba(173,193,120,0.22);
+  color: #adc178;
   text-decoration: none;
 }
 
 nav a.active {
-  background-color: rgba(16, 185, 129, 0.22);
-  color: #10b981;
+  background-color: rgba(173,193,120,0.28);
+  color: #adc178;
 }
 
 .app-main {
@@ -75,12 +81,12 @@ nav a.active {
 }
 
 .nav-start-here {
-  background-color: rgba(16, 185, 129, 0.2) !important;
+  background-color: rgba(173,193,120,0.25) !important;
   font-weight: 700 !important;
 }
 
 .nav-user {
-  color: rgba(255,255,255,0.75);
+  color: rgba(240,234,210,0.85);
   padding: 0.35rem 0.85rem;
   font-size: 0.9rem;
   font-weight: 500;
@@ -88,8 +94,8 @@ nav a.active {
 
 .nav-pause-btn {
   background: transparent;
-  color: rgba(255,255,255,0.55);
-  border: 1px solid rgba(255,255,255,0.2);
+  color: rgba(240,234,210,0.65);
+  border: 1px solid rgba(240,234,210,0.3);
   border-radius: 4px;
   padding: 0.3rem 0.75rem;
   font-size: 0.8rem;
@@ -101,19 +107,19 @@ nav a.active {
 }
 
 .nav-pause-btn:hover {
-  background: rgba(255,255,255,0.08);
-  color: rgba(255,255,255,0.85);
-  border-color: rgba(255,255,255,0.35);
+  background: rgba(240,234,210,0.1);
+  color: rgba(240,234,210,0.95);
+  border-color: rgba(240,234,210,0.5);
 }
 
 .nav-pause-btn-active {
-  background: rgba(251,191,36,0.15);
-  color: #fbbf24;
-  border-color: #fbbf24;
+  background: rgba(169,132,103,0.2);
+  color: #a98467;
+  border-color: #a98467;
 }
 
 .nav-pause-btn-active:hover {
-  background: rgba(251,191,36,0.25);
+  background: rgba(169,132,103,0.3);
 }
 
 .toast-stack {
@@ -128,18 +134,18 @@ nav a.active {
 }
 
 .app-toast {
-  background: #3a4a5c;
-  border: 1px solid #10b981;
-  color: #e8eef4;
+  background: #dde5b6;
+  border: 1px solid #7b8f4b;
+  color: #6c584c;
   padding: 12px 16px;
   border-radius: 6px;
   font-size: 0.9rem;
   font-weight: 500;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  box-shadow: 0 4px 12px rgba(108,88,76,0.2);
   display: flex;
   align-items: center;
   gap: 12px;
-  pointer-events: all;
+  pointer-events: none;
   animation: toast-in 0.3s ease;
   max-width: 360px;
 }
@@ -147,12 +153,13 @@ nav a.active {
 .toast-close {
   background: transparent;
   border: none;
-  color: #94a3b8;
+  color: #79675c;
   font-size: 1rem;
   cursor: pointer;
   padding: 0;
   line-height: 1;
   flex-shrink: 0;
+  pointer-events: all;
 }
 
 .toast-close-all {
@@ -162,15 +169,16 @@ nav a.active {
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: #94a3b8;
-  background: #2a3a4c;
-  border-color: #4a5c70;
+  color: #79675c;
+  background: #e8dfc4;
+  border-color: #b8c89a;
   padding: 7px 16px;
+  pointer-events: all;
 }
 
 .toast-close-all:hover {
-  color: #e8eef4;
-  border-color: #94a3b8;
+  color: #6c584c;
+  border-color: #79675c;
 }
 
 @keyframes toast-in {
