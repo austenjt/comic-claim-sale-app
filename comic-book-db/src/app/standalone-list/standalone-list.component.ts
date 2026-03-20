@@ -535,6 +535,16 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
       cellRenderer: 'agCheckboxCellRenderer'
     },
     {
+      headerName: "Enable Bid",
+      field: "enableBid",
+      filter: true,
+      sortable: true,
+      editable: true,
+      maxWidth: 110,
+      cellEditor: 'agCheckboxCellEditor',
+      cellRenderer: 'agCheckboxCellRenderer'
+    },
+    {
       headerName: "Small Image Id",
       field: "smallCachedImageId",
       resizable: true,

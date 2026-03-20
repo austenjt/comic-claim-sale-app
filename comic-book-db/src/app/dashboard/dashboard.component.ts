@@ -42,6 +42,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   // Bidding state: comicId → seconds remaining
   bidCountdowns: Record<string, number> = {};
   private bidTimerInterval: any = null;
+  private bidPollInterval: any = null;
 
   get displayComics(): Comic[] {
     let result = this.comics;
@@ -83,11 +84,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
       } else {
         this.claimedMap[n.comicId] = n.claimedAt;
       }
+      // Refresh bid state for the affected comic so buttons and countdown stay current
+      this.refreshComicBidState(n.comicId);
     });
   }
 
   ngOnDestroy(): void {
     if (this.bidTimerInterval) clearInterval(this.bidTimerInterval);
+    if (this.bidPollInterval) clearInterval(this.bidPollInterval);
   }
 
   // ─── Bidding helpers ───────────────────────────────────────────────────────
@@ -131,6 +135,24 @@ export class DashboardComponent implements OnInit, OnDestroy {
         this.bidTimerInterval = null;
       }
     }, 1000);
+    this.startBidPolling();
+  }
+
+  private startBidPolling(): void {
+    if (this.bidPollInterval) return;
+    this.bidPollInterval = setInterval(() => {
+      let anyActive = false;
+      for (const comic of this.comics) {
+        if (comic.bidStartedAt && this.bidSecondsRemaining(comic) > 0) {
+          anyActive = true;
+          this.refreshComicBidState(String(comic.id));
+        }
+      }
+      if (!anyActive) {
+        clearInterval(this.bidPollInterval);
+        this.bidPollInterval = null;
+      }
+    }, 5000);
   }
 
   private finalizeBidExpiry(comic: Comic): void {
@@ -146,6 +168,26 @@ export class DashboardComponent implements OnInit, OnDestroy {
         // Already finalized or no winner — just refresh claimed map
         this.loadClaimedMap();
       }
+    });
+  }
+
+  private refreshComicBidState(comicId: string): void {
+    const idx = this.comics.findIndex(c => String(c.id) === comicId);
+    if (idx < 0 || !this.comics[idx].enableBid) return;
+    this.comicService.getComic(this.comics[idx].id).subscribe({
+      next: latestComic => {
+        if (!latestComic) return;
+        const wasActive = this.isBiddingActive(this.comics[idx]);
+        this.comics[idx] = { ...this.comics[idx], ...latestComic };
+        if (!wasActive && this.comics[idx].bidStartedAt) {
+          this.bidCountdowns[String(this.comics[idx].id)] =
+            this.bidSecondsRemaining(this.comics[idx]);
+          this.startBidTimer();
+        }
+        // If already active, the running timer self-corrects via bidSecondsRemaining()
+        // which reads comic.bidStartedAt live from the updated comics array entry.
+      },
+      error: () => {}
     });
   }
 
@@ -187,7 +229,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
         if (idx >= 0) {
           this.comics[idx] = { ...this.comics[idx], ...updatedComic };
         }
-        this.toastService.show(`Bid of $${amount.toFixed(2)} placed on "${comic.title}"!`);
       },
       error: err => {
         const msg: string = typeof err?.error === 'string' ? err.error : '';

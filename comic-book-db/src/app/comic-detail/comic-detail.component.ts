@@ -10,7 +10,7 @@ import { CartService } from '../cart.service';
 import { ToastService } from '../toast.service';
 import { AuthService } from '../auth.service';
 import { ConfigService } from '../config.service';
-import { Observable, of, map } from 'rxjs';
+import { Observable, of, map, Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-comic-detail',
@@ -28,6 +28,8 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
   actionLoading = false;
   bidSecondsRemaining = 0;
   private bidTimerInterval: any = null;
+  private bidPollInterval: any = null;
+  private claimEventSub: Subscription | null = null;
   imageUploading = false;
   imageUploadError = '';
   backImageUploading = false;
@@ -127,6 +129,8 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     if (this.bidTimerInterval) clearInterval(this.bidTimerInterval);
+    if (this.bidPollInterval) clearInterval(this.bidPollInterval);
+    if (this.claimEventSub) this.claimEventSub.unsubscribe();
   }
 
   isBiddingActive(): boolean {
@@ -189,6 +193,8 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
         this.startBidTimer();
         this.actionLoading = false;
         this.toastService.show(`Bidding started — ${this.configService.biddingCycleMins} min window open!`);
+        // Ensure all viewers start getting live updates from this point on
+        this.setupBidRefresh();
       },
       error: err => {
         this.claimError = err?.error || 'Failed to start bidding.';
@@ -215,6 +221,14 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
     this.cartService.placeBid(String(this.comic.id), amount).subscribe({
       next: updatedComic => {
         this.comic = { ...this.comic!, ...updatedComic };
+        // bidStartedAt was reset on the server — restart the timer if it had stopped
+        if (this.comic.bidStartedAt && !this.bidTimerInterval) {
+          const endsAt = new Date(this.comic.bidStartedAt).getTime() +
+                         this.configService.biddingCycleMins * 60000;
+          this.bidSecondsRemaining = Math.max(0, Math.floor((endsAt - Date.now()) / 1000));
+          if (this.bidSecondsRemaining > 0) this.startBidTimer();
+        }
+        // If the timer is still running it will self-correct on the next 1s tick
         this.actionLoading = false;
         this.claimError = '';
         this.toastService.show(`Bid of $${amount.toFixed(2)} placed!`);
@@ -237,7 +251,50 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
           this.bidSecondsRemaining = Math.max(0, Math.floor((endsAt - Date.now()) / 1000));
           if (this.bidSecondsRemaining > 0) this.startBidTimer();
         }
+        // Start polling/event subscription so other users' bids push updates here
+        if (comic?.enableBid) {
+          this.setupBidRefresh();
+        }
       });
+  }
+
+  /** Subscribe to claim events and poll so bid state stays current for all viewers. */
+  private setupBidRefresh(): void {
+    // Event-driven: react immediately when a bid notification arrives for this comic
+    if (!this.claimEventSub) {
+      this.claimEventSub = this.toastService.newClaimEvent$.subscribe(n => {
+        if (this.comic && n.comicId === String(this.comic.id)) {
+          this.refreshBidState();
+        }
+      });
+    }
+    // Polling fallback: catch anything the notification stream may have missed
+    if (!this.bidPollInterval) {
+      this.bidPollInterval = setInterval(() => this.refreshBidState(), 5000);
+    }
+  }
+
+  /** Re-fetch the comic and update bid state without disrupting an already-running timer. */
+  private refreshBidState(): void {
+    if (!this.comic || this.actionLoading) return;
+    const wasActive = this.isBiddingActive();
+    this.comicService.getComic(this.comic.id).subscribe({
+      next: latestComic => {
+        if (!latestComic) return;
+        this.comic = { ...this.comic!, ...latestComic };
+        // If bidding just became visible (another user started it), kick off the timer
+        if (!wasActive && this.comic.bidStartedAt) {
+          const endsAt = new Date(this.comic.bidStartedAt).getTime() +
+                         this.configService.biddingCycleMins * 60000;
+          this.bidSecondsRemaining = Math.max(0, Math.floor((endsAt - Date.now()) / 1000));
+          if (this.bidSecondsRemaining > 0) this.startBidTimer();
+        }
+        // If bidding was already active, the running timer self-corrects each tick
+        // because it reads this.comic.bidStartedAt live — so a bid reset is picked
+        // up automatically on the very next 1-second tick.
+      },
+      error: () => {}
+    });
   }
 
   toggleZoom(): void {

@@ -102,6 +102,8 @@ public class BidService {
         comic.setHighBid(amount);
         comic.setCurrentBidderId(user.getId());
         comic.setCurrentBidderName(user.getName());
+        // Reset the clock so each bid gets a fresh countdown window
+        comic.setBidStartedAt(now);
 
         if (comic.getBidHistory() == null) {
             comic.setBidHistory(new ArrayList<>());
@@ -151,6 +153,19 @@ public class BidService {
         if (comic.getHighBid() != null && comic.getHighBid().compareTo(BigDecimal.ZERO) > 0) {
             comic.setTargetPrice(comic.getHighBid());
         }
+
+        // Log the win event in bid history
+        String finalizedAt = Instant.now().toString();
+        if (comic.getBidHistory() == null) {
+            comic.setBidHistory(new ArrayList<>());
+        }
+        comic.getBidHistory().add(BidEntry.builder()
+            .userId(comic.getCurrentBidderId())
+            .userName(comic.getCurrentBidderName())
+            .amount(comic.getHighBid())
+            .placedAt(finalizedAt)
+            .note("WON")
+            .build());
 
         // Clear active bidding state (keep bidHistory)
         comic.setBidStartedAt(null);

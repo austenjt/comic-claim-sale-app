@@ -23,4 +23,5 @@ public class BidEntry {
     @JsonSerialize(using = MoneySerializer.class)
     private BigDecimal amount;
     private String placedAt;
+    private String note;
 }

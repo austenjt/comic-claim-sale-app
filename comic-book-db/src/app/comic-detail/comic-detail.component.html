@@ -471,7 +471,7 @@
               <div *ngIf="claimError" class="claim-error">{{ claimError }}</div>
               <ng-container *ngIf="configService.biddingMode && comic.enableBid; else normalClaim">
                 <button *ngIf="canClaim(comic.id)" class="btn-claim-detail" (click)="startBidding()" [disabled]="actionLoading">
-                  {{ actionLoading ? 'Starting…' : 'Claim (starts bidding)' }}
+                  {{ actionLoading ? 'Starting…' : 'Bid' }}
                 </button>
               </ng-container>
               <ng-template #normalClaim>

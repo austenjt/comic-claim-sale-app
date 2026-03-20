@@ -337,20 +337,22 @@
     <span>Click <strong>Refresh</strong> to load the latest data before making edits.</span>
   </div>
 
-  <ag-grid-angular
-        *ngIf="dataLoaded"
-        pagination
-        class="ag-theme-alpine"
-        style="height: 600px;"
-        [rowData]="comics"
-        [columnDefs]="columnDefs"
-        [getRowId]="getRowId"
-        (cellClicked)="onCellClicked($event)"
-        rowSelection="single"
-        (rowClicked)="onRowClicked($event)"
-        (cellValueChanged)="onCellValueChanged($event)"
-        [stopEditingWhenCellsLoseFocus]="true"
-        [quickFilterText]="gridSearch"
-  >
-  </ag-grid-angular>
+  <div class="grid-resize-wrapper">
+    <ag-grid-angular
+          *ngIf="dataLoaded"
+          pagination
+          class="ag-theme-alpine"
+          style="height: 100%; width: 100%;"
+          [rowData]="comics"
+          [columnDefs]="columnDefs"
+          [getRowId]="getRowId"
+          (cellClicked)="onCellClicked($event)"
+          rowSelection="single"
+          (rowClicked)="onRowClicked($event)"
+          (cellValueChanged)="onCellValueChanged($event)"
+          [stopEditingWhenCellsLoseFocus]="true"
+          [quickFilterText]="gridSearch"
+    >
+    </ag-grid-angular>
+  </div>
 </div>
