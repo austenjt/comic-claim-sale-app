@@ -162,7 +162,7 @@ public class BidService {
         User winner = UserService.getServiceInstance().findById(winnerId)
             .orElseThrow(() -> new IllegalStateException("Winning bidder not found: " + winnerId));
 
-        Cart cart = CartService.getServiceInstance().addItem(winner, comicId);
+        Cart cart = CartService.getServiceInstance().addBidWonItem(winner, comicId);
         log.info("Bid finalized for comic {} — winner: {} at ${}", comicId, winner.getName(), comic.getHighBid());
         return cart;
     }

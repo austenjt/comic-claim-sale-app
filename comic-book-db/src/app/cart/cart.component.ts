@@ -109,6 +109,12 @@ export class CartComponent implements OnInit {
     return this.cart?.status === 'OPEN' || this.cart?.status === 'FINALIZING';
   }
 
+  canRemoveItem(comicId: string): boolean {
+    if (!this.canRemove()) return false;
+    const item = this.cart?.items.find(i => i.comicId === comicId);
+    return !item?.wonViaBid;
+  }
+
   canSubmit(): boolean {
     return this.cart?.status === 'OPEN' && this.visibleItems.length > 0;
   }

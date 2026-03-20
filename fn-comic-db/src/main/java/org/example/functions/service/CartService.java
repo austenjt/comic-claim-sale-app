@@ -82,8 +82,18 @@ public class CartService {
         return cart;
     }
 
-    /** Add a comic to the user's cart. Throws if comic is already claimed or cart is not OPEN. */
+    /** Add a comic to the user's cart via a normal claim. Throws if comic is already claimed or cart is not OPEN. */
     public Cart addItem(User user, String comicId) {
+        return addItemInternal(user, comicId, false);
+    }
+
+    /** Add a comic to the user's cart as the winner of a completed bid cycle.
+     *  The item will be marked {@code wonViaBid=true} and cannot be returned by the user. */
+    public Cart addBidWonItem(User user, String comicId) {
+        return addItemInternal(user, comicId, true);
+    }
+
+    private Cart addItemInternal(User user, String comicId, boolean wonViaBid) {
         if (isComicClaimed(comicId)) {
             throw new IllegalStateException("Comic " + comicId + " is already claimed.");
         }
@@ -100,6 +110,7 @@ public class CartService {
         item.setComicNumber(formatComicNumber(comic.getNumber()));
         item.setPrice(comic.getTargetPrice() != null ? comic.getTargetPrice().doubleValue() : 1.00);
         item.setClaimedAt(Instant.now().toString());
+        item.setWonViaBid(wonViaBid);
 
         cart.getItems().add(item);
         save(cart);
@@ -172,6 +183,11 @@ public class CartService {
 
         CartItem target = cart.getItems().stream()
             .filter(i -> comicId.equals(i.getComicId())).findFirst().orElse(null);
+
+        // Bid-won items cannot be returned by the user
+        if (target != null && target.isWonViaBid()) {
+            throw new IllegalStateException("Items won via bidding cannot be returned.");
+        }
 
         // Collect all items to remove (cascade for set members, single for standalone)
         List<CartItem> toRemove;

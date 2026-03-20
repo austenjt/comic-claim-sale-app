@@ -15,7 +15,11 @@ export class LoginComponent {
   loading = false;
 
   constructor(private auth: AuthService, private router: Router) {
-    this.email = localStorage.getItem('lastLoginEmail') ?? '';
+    try {
+      this.email = localStorage.getItem('lastLoginEmail') ?? '';
+    } catch {
+      this.email = '';
+    }
   }
 
   onSubmit() {
@@ -24,7 +28,7 @@ export class LoginComponent {
     this.loading = true;
     this.auth.login(this.email, this.pin).subscribe({
       next: () => {
-        localStorage.setItem('lastLoginEmail', this.email);
+        try { localStorage.setItem('lastLoginEmail', this.email); } catch { /* ignore */ }
         this.loading = false;
         this.router.navigate(['/dashboard']);
       },

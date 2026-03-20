@@ -127,12 +127,12 @@
                   </button>
                 </ng-container>
 
-                <!-- Bidding: start (Claim triggers bidding) -->
+                <!-- Bidding: start (Bid button triggers bidding) -->
                 <ng-container *ngIf="configService.biddingMode && comic.enableBid && !isBiddingActive(comic) && showClaimButton(comic)">
                   <button class="btn-claim"
                     [disabled]="!canClaim(comic)"
                     [title]="canClaim(comic) ? '' : cartLockedTitle()"
-                    (click)="$event.preventDefault(); $event.stopPropagation(); startBidding(comic)">Claim</button>
+                    (click)="$event.preventDefault(); $event.stopPropagation(); startBidding(comic)">Bid</button>
                 </ng-container>
 
                 <!-- Normal claim (no bidding) -->

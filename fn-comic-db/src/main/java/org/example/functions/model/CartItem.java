@@ -14,6 +14,10 @@ public class CartItem {
     @JsonProperty("isSetContainer")
     private boolean isSetContainer;
 
+    /** True when this item was added to the cart as the winner of a bidding cycle. */
+    @JsonProperty("wonViaBid")
+    private boolean wonViaBid;
+
     public CartItem() {}
 
     public String getComicId() { return comicId; }
@@ -36,4 +40,7 @@ public class CartItem {
 
     public boolean isSetContainer() { return isSetContainer; }
     public void setSetContainer(boolean setContainer) { isSetContainer = setContainer; }
+
+    public boolean isWonViaBid() { return wonViaBid; }
+    public void setWonViaBid(boolean wonViaBid) { this.wonViaBid = wonViaBid; }
 }

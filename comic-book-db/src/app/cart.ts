@@ -14,6 +14,8 @@ export interface CartItem {
   claimedAt: string;
   collectionGroup: number | null;
   isSetContainer?: boolean;
+  /** True when this item was won through a bidding cycle — cannot be returned. */
+  wonViaBid?: boolean;
 }
 
 export interface Cart {

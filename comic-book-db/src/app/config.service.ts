@@ -74,11 +74,11 @@ export class ConfigService {
   }
 
   get pauseNotifications(): boolean {
-    return localStorage.getItem('pauseNotifications') === 'true';
+    try { return localStorage.getItem('pauseNotifications') === 'true'; } catch { return false; }
   }
 
   togglePauseNotifications(): void {
-    localStorage.setItem('pauseNotifications', String(!this.pauseNotifications));
+    try { localStorage.setItem('pauseNotifications', String(!this.pauseNotifications)); } catch { /* ignore */ }
   }
 
   getEnums(): ComicEnums {
