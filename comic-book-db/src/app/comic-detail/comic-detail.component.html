@@ -411,7 +411,7 @@
             <span class="detail-label">Date Claimed</span>
             <span class="detail-value">{{ claimedDate(comic.id) | date:'medium' }}</span>
           </div>
-          <div class="detail-item" *ngIf="auth.isApproved() && !auth.isAdmin() && myCart?.status === 'OPEN'">
+          <div class="detail-item" *ngIf="auth.isApproved() && !auth.isAdmin() && myCart?.status === 'OPEN' && !isWonViaBid(comic.id)">
             <span class="detail-label"></span>
             <span class="detail-value">
               <div *ngIf="claimError" class="claim-error">{{ claimError }}</div>
