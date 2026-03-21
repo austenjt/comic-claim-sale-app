@@ -2,6 +2,7 @@ package org.example.functions.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.example.functions.model.BidEntry;
+import org.example.functions.model.BiddingState;
 import org.example.functions.model.Cart;
 import org.example.functions.model.ComicBook;
 import org.example.functions.model.User;
@@ -40,23 +41,26 @@ public class BidService {
         if (!Boolean.TRUE.equals(comic.getEnableBid())) {
             throw new IllegalArgumentException("Comic " + comicId + " does not have bidding enabled.");
         }
-        if (comic.getBidStartedAt() != null) {
+
+        BiddingState bid = comic.getBiddingState();
+
+        if (bid.getBidStartedAt() != null) {
             // Bidding already in progress — return current state
             return comic;
         }
 
         String now = Instant.now().toString();
-        comic.setBidStartedAt(now);
-        comic.setCurrentBidderId(user.getId());
-        comic.setCurrentBidderName(user.getName());
+        bid.setBidStartedAt(now);
+        bid.setCurrentBidderId(user.getId());
+        bid.setCurrentBidderName(user.getName());
 
-        BigDecimal startingBid = comic.getHighBid() != null ? comic.getHighBid() : BigDecimal.ZERO;
-        comic.setHighBid(startingBid);
+        BigDecimal startingBid = comic.getSalePrice() != null ? comic.getSalePrice() : BigDecimal.ZERO;
+        bid.setHighBid(startingBid);
 
-        if (comic.getBidHistory() == null) {
-            comic.setBidHistory(new ArrayList<>());
+        if (bid.getBidHistory() == null) {
+            bid.setBidHistory(new ArrayList<>());
         }
-        comic.getBidHistory().add(BidEntry.builder()
+        bid.getBidHistory().add(BidEntry.builder()
             .userId(user.getId())
             .userName(user.getName())
             .amount(startingBid)
@@ -82,33 +86,36 @@ public class BidService {
         if (!Boolean.TRUE.equals(comic.getEnableBid())) {
             throw new IllegalArgumentException("Comic " + comicId + " does not have bidding enabled.");
         }
-        if (comic.getBidStartedAt() == null) {
+
+        BiddingState bid = comic.getBiddingState();
+
+        if (bid.getBidStartedAt() == null) {
             throw new IllegalStateException("Bidding has not started for comic " + comicId + ".");
         }
 
-        Instant bidEnd = Instant.parse(comic.getBidStartedAt())
+        Instant bidEnd = Instant.parse(bid.getBidStartedAt())
             .plus(EnvHelper.getBiddingCycleMins(), ChronoUnit.MINUTES);
         if (Instant.now().isAfter(bidEnd)) {
             throw new IllegalStateException("Bidding period has ended for comic " + comicId + ".");
         }
 
-        BigDecimal currentHigh = comic.getHighBid() != null ? comic.getHighBid() : BigDecimal.ZERO;
+        BigDecimal currentHigh = bid.getHighBid() != null ? bid.getHighBid() : BigDecimal.ZERO;
         if (amount.compareTo(currentHigh) <= 0) {
             throw new IllegalArgumentException(
                 "Bid must be greater than the current high bid of $" + currentHigh + ".");
         }
 
         String now = Instant.now().toString();
-        comic.setHighBid(amount);
-        comic.setCurrentBidderId(user.getId());
-        comic.setCurrentBidderName(user.getName());
+        bid.setHighBid(amount);
+        bid.setCurrentBidderId(user.getId());
+        bid.setCurrentBidderName(user.getName());
         // Reset the clock so each bid gets a fresh countdown window
-        comic.setBidStartedAt(now);
+        bid.setBidStartedAt(now);
 
-        if (comic.getBidHistory() == null) {
-            comic.setBidHistory(new ArrayList<>());
+        if (bid.getBidHistory() == null) {
+            bid.setBidHistory(new ArrayList<>());
         }
-        comic.getBidHistory().add(BidEntry.builder()
+        bid.getBidHistory().add(BidEntry.builder()
             .userId(user.getId())
             .userName(user.getName())
             .amount(amount)
@@ -129,48 +136,50 @@ public class BidService {
         ComicBook comic = ComicService.getServiceInstance().getComicById(Integer.parseInt(comicId))
             .orElseThrow(() -> new IllegalArgumentException("Comic not found: " + comicId));
 
-        if (comic.getBidStartedAt() == null) {
+        BiddingState bid = comic.getBiddingState();
+
+        if (bid.getBidStartedAt() == null) {
             throw new IllegalStateException("No active bidding found for comic " + comicId + ".");
         }
 
-        Instant bidEnd = Instant.parse(comic.getBidStartedAt())
+        Instant bidEnd = Instant.parse(bid.getBidStartedAt())
             .plus(EnvHelper.getBiddingCycleMins(), ChronoUnit.MINUTES);
         if (Instant.now().isBefore(bidEnd)) {
             throw new IllegalStateException("Bidding period has not yet ended for comic " + comicId + ".");
         }
 
-        String winnerId = comic.getCurrentBidderId();
+        String winnerId = bid.getCurrentBidderId();
         if (winnerId == null) {
             // Nobody bid — just clear bidding state
-            comic.setBidStartedAt(null);
-            comic.setCurrentBidderId(null);
-            comic.setCurrentBidderName(null);
+            bid.setBidStartedAt(null);
+            bid.setCurrentBidderId(null);
+            bid.setCurrentBidderName(null);
             ComicService.getServiceInstance().updateComic(comic, "system:bid-expire-no-winner");
             throw new IllegalStateException("No bids were placed; bidding cancelled for comic " + comicId + ".");
         }
 
         // Stamp targetPrice with the winning bid so CartService picks it up
-        if (comic.getHighBid() != null && comic.getHighBid().compareTo(BigDecimal.ZERO) > 0) {
-            comic.setTargetPrice(comic.getHighBid());
+        if (bid.getHighBid() != null && bid.getHighBid().compareTo(BigDecimal.ZERO) > 0) {
+            comic.setTargetPrice(bid.getHighBid());
         }
 
         // Log the win event in bid history
         String finalizedAt = Instant.now().toString();
-        if (comic.getBidHistory() == null) {
-            comic.setBidHistory(new ArrayList<>());
+        if (bid.getBidHistory() == null) {
+            bid.setBidHistory(new ArrayList<>());
         }
-        comic.getBidHistory().add(BidEntry.builder()
-            .userId(comic.getCurrentBidderId())
-            .userName(comic.getCurrentBidderName())
-            .amount(comic.getHighBid())
+        bid.getBidHistory().add(BidEntry.builder()
+            .userId(bid.getCurrentBidderId())
+            .userName(bid.getCurrentBidderName())
+            .amount(bid.getHighBid())
             .placedAt(finalizedAt)
             .note("WON")
             .build());
 
         // Clear active bidding state (keep bidHistory)
-        comic.setBidStartedAt(null);
-        comic.setCurrentBidderId(null);
-        comic.setCurrentBidderName(null);
+        bid.setBidStartedAt(null);
+        bid.setCurrentBidderId(null);
+        bid.setCurrentBidderName(null);
         ComicService.getServiceInstance().updateComic(comic, "system:bid-finalized");
 
         // Add to winner's cart
@@ -178,7 +187,7 @@ public class BidService {
             .orElseThrow(() -> new IllegalStateException("Winning bidder not found: " + winnerId));
 
         Cart cart = CartService.getServiceInstance().addBidWonItem(winner, comicId);
-        log.info("Bid finalized for comic {} — winner: {} at ${}", comicId, winner.getName(), comic.getHighBid());
+        log.info("Bid finalized for comic {} — winner: {} at ${}", comicId, winner.getName(), bid.getHighBid());
         return cart;
     }
 }

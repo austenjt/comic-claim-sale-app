@@ -506,7 +506,7 @@
             <tr *ngFor="let bid of bidHistoryDesc" [class.bid-row-winner]="bid.userId === comic.currentBidderId">
               <td>{{ bid.userName }}</td>
               <td>${{ bid.amount.toFixed(2) }}</td>
-              <td>{{ bid.placedAt | date:'shortTime' }}</td>
+              <td>{{ bid.placedAt | date:'h:mm:ss a' }}</td>
             </tr>
           </tbody>
         </table>

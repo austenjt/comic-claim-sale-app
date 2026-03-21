@@ -141,16 +141,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
   private startBidPolling(): void {
     if (this.bidPollInterval) return;
     this.bidPollInterval = setInterval(() => {
-      let anyActive = false;
-      for (const comic of this.comics) {
-        if (comic.bidStartedAt && this.bidSecondsRemaining(comic) > 0) {
-          anyActive = true;
-          this.refreshComicBidState(String(comic.id));
-        }
-      }
-      if (!anyActive) {
+      const bidEnabled = this.comics.filter(c => c.enableBid);
+      if (bidEnabled.length === 0) {
         clearInterval(this.bidPollInterval);
         this.bidPollInterval = null;
+        return;
+      }
+      for (const comic of bidEnabled) {
+        this.refreshComicBidState(String(comic.id));
       }
     }, 5000);
   }
@@ -271,6 +269,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       }
     }
     if (anyActive) this.startBidTimer();
+    if (this.comics.some(c => c.enableBid)) this.startBidPolling();
   }
 
   loadClaimedMap(): void {

@@ -115,7 +115,7 @@ export class ComicService {
   /** GET comic by id. Will 404 if id not found */
   getComic(id: number): Observable<Comic> {
     const url = `${this.comicsUrl}/${id}`;
-    return this.http.get<Comic>(url).pipe(
+    return this.http.get<Comic>(url, { params: { _t: Date.now().toString() } }).pipe(
       tap(_ => this.log(`fetched comic id=${id}`)),
       catchError(this.handleError<Comic>(`getComic id=${id}`))
     );

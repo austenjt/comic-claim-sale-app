@@ -3,9 +3,11 @@ package org.example.functions.model;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.example.functions.util.Views;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import org.example.functions.util.MoneySerializer;
 import lombok.Builder;
@@ -99,15 +101,14 @@ public class ComicBook {
     @JsonProperty("enableBid")
     private Boolean enableBid;
 
-    @JsonSerialize(using = MoneySerializer.class)
-    private BigDecimal highBid;
+    @JsonUnwrapped
+    @Getter(AccessLevel.NONE)
+    private BiddingState biddingState;
 
-    private String bidStartedAt;
-    private String currentBidderId;
-    private String currentBidderName;
-
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    private List<BidEntry> bidHistory;
+    public BiddingState getBiddingState() {
+        if (this.biddingState == null) this.biddingState = new BiddingState();
+        return this.biddingState;
+    }
 
     // Set members — populated at response-time when docType="SET"; not persisted in Cosmos
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
