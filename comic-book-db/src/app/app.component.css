@@ -74,6 +74,15 @@ nav a.active {
   color: #adc178;
 }
 
+.storage-warning-banner {
+  background: #fff3cd;
+  border-bottom: 2px solid #e6a817;
+  color: #7d5a00;
+  padding: 10px 24px;
+  font-size: 0.875rem;
+  text-align: center;
+}
+
 .app-main {
   max-width: 1200px;
   margin: 0 auto;

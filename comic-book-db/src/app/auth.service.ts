@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { tap, catchError } from 'rxjs/operators';
 import { User, SessionInfo } from './user';
@@ -10,6 +10,18 @@ const SESSION_KEY = 'session_token';
 export class AuthService {
   private readonly apiBase = 'https://fn-comicBook-db-1703810588398.azurewebsites.net/api';
   currentUser$ = new BehaviorSubject<User | null>(null);
+
+  /** False when localStorage is unavailable (Safari Private Browsing, "Block All Cookies"). */
+  readonly storageAvailable: boolean = (() => {
+    try {
+      localStorage.setItem('__test__', '1');
+      const ok = localStorage.getItem('__test__') === '1';
+      localStorage.removeItem('__test__');
+      return ok;
+    } catch {
+      return false;
+    }
+  })();
 
   // In-memory fallback for environments where localStorage is blocked (e.g. Safari
   // with "Block All Cookies" or Private Browsing).  The token lives here for the
@@ -56,9 +68,13 @@ export class AuthService {
     this._memoryToken = token;               // sync memory from storage on startup
     this.http.get<User>(`${this.apiBase}/users/me`).pipe(
       tap(user => this.currentUser$.next(user)),
-      catchError(() => {
-        this._memoryToken = null;
-        this.safeRemoveStorage(SESSION_KEY);
+      catchError((err) => {
+        // Only invalidate the stored token when the server explicitly rejects it (401).
+        // Network errors, cold-start timeouts, etc. should not wipe a valid session.
+        if (err instanceof HttpErrorResponse && err.status === 401) {
+          this._memoryToken = null;
+          this.safeRemoveStorage(SESSION_KEY);
+        }
         return of(null);
       })
     ).subscribe();

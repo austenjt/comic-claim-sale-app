@@ -80,6 +80,10 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
     return this.myCart?.items.some(i => i.comicId === String(comicId)) ?? false;
   }
 
+  isWonViaBid(comicId: number): boolean {
+    return this.myCart?.items.some(i => i.comicId === String(comicId) && i.wonViaBid) ?? false;
+  }
+
   canClaim(comicId: number): boolean {
     return !this.claimedDate(comicId) &&
            !this.comic?.soldTo &&
