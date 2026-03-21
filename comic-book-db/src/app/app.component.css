@@ -150,6 +150,12 @@ nav a.active {
   max-width: 360px;
 }
 
+.app-toast.app-toast-error {
+  background: #fde8e8;
+  border-color: #c0392b;
+  color: #c0392b;
+}
+
 .toast-close {
   background: transparent;
   border: none;

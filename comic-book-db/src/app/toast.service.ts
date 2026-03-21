@@ -7,6 +7,7 @@ import { ConfigService } from './config.service';
 export interface Toast {
   id: number;
   message: string;
+  isError?: boolean;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -54,10 +55,10 @@ export class ToastService {
     });
   }
 
-  show(message: string): void {
+  show(message: string, isError = false): void {
     if (this.configService.pauseNotifications) return;
     const id = ++this.toastCounter;
-    this.toasts.push({ id, message });
+    this.toasts.push({ id, message, isError });
     setTimeout(() => this.dismiss(id), 30000);
   }
 

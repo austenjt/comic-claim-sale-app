@@ -218,7 +218,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     if (input === null) return;
     const amount = parseFloat(input);
     if (isNaN(amount) || amount <= currentHigh) {
-      this.toastService.show(`Bid must be greater than $${currentHigh.toFixed(2)}.`);
+      this.toastService.show(`Bid must be greater than $${currentHigh.toFixed(2)}.`, true);
       return;
     }
     this.cartService.placeBid(String(comic.id), amount).subscribe({
