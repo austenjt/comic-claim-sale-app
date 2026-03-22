@@ -39,6 +39,7 @@
 }
 
 .order-buyer { display: flex; flex-direction: column; }
+.order-buyer strong { color: #ffffff; }
 .buyer-email { color: rgba(240,234,210,0.7); font-size: 0.88rem; }
 
 .order-meta { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }

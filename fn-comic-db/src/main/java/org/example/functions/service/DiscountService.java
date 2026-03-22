@@ -109,10 +109,14 @@ public class DiscountService {
             return new DiscountResult(0.0, null);
         }
 
-        double subtotal = cart.getItems().stream()
+        List<CartItem> discountableItems = cart.getItems().stream()
+            .filter(i -> !i.isAwarded())
+            .collect(Collectors.toList());
+
+        double subtotal = discountableItems.stream()
             .mapToDouble(CartItem::getPrice)
             .sum();
-        int itemCount = cart.getItems().size();
+        int itemCount = discountableItems.size();
 
         double totalSavings = 0.0;
         List<String> descriptions = new ArrayList<>();
@@ -128,7 +132,7 @@ public class DiscountService {
                 case "BUY_X_GET_ONE_FREE": {
                     int freeCount = itemCount / (d.getXBooks() + 1);
                     if (freeCount > 0) {
-                        List<Double> prices = cart.getItems().stream()
+                        List<Double> prices = discountableItems.stream()
                             .map(CartItem::getPrice)
                             .sorted(Comparator.naturalOrder())
                             .collect(Collectors.toList());

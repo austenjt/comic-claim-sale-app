@@ -219,13 +219,14 @@ public class CartService {
         return cart;
     }
 
-    /** Admin: award a comic to a user's cart at $0.00. Works for OPEN or FINALIZING carts; creates a new cart if needed. */
+    /** Admin: award a comic to a user's cart at $0.00. Works for OPEN, FINALIZING, or FINALIZED carts; creates a new cart if needed.
+     *  Awarded items are flagged {@code isAwarded=true} and excluded from discount calculations. */
     public Cart awardItem(User user, String comicId) {
         if (isComicClaimed(comicId)) {
             throw new IllegalStateException("Comic " + comicId + " is already claimed by another user.");
         }
         Cart cart = getOrCreateCart(user);
-        if (!"OPEN".equals(cart.getStatus()) && !"FINALIZING".equals(cart.getStatus())) {
+        if (!"OPEN".equals(cart.getStatus()) && !"FINALIZING".equals(cart.getStatus()) && !"FINALIZED".equals(cart.getStatus())) {
             throw new IllegalStateException("Cannot award to a cart with status: " + cart.getStatus());
         }
         ComicBook comic = ComicService.getServiceInstance().getComicById(Integer.parseInt(comicId))
@@ -237,10 +238,11 @@ public class CartService {
         item.setComicNumber(formatComicNumber(comic.getNumber()));
         item.setPrice(0.0);
         item.setClaimedAt(Instant.now().toString());
+        item.setAwarded(true);
 
         cart.getItems().add(item);
         save(cart);
-        log.info("Awarded comic {} to user {} at $0", comicId, user.getId());
+        log.info("Awarded comic {} to user {} at $0 (cart status: {})", comicId, user.getId(), cart.getStatus());
         return cart;
     }
 

@@ -18,6 +18,10 @@ public class CartItem {
     @JsonProperty("wonViaBid")
     private boolean wonViaBid;
 
+    /** True when this item was awarded by an admin at $0 — excluded from discount calculations. */
+    @JsonProperty("isAwarded")
+    private boolean isAwarded;
+
     public CartItem() {}
 
     public String getComicId() { return comicId; }
@@ -43,4 +47,7 @@ public class CartItem {
 
     public boolean isWonViaBid() { return wonViaBid; }
     public void setWonViaBid(boolean wonViaBid) { this.wonViaBid = wonViaBid; }
+
+    public boolean isAwarded() { return isAwarded; }
+    public void setAwarded(boolean awarded) { isAwarded = awarded; }
 }
