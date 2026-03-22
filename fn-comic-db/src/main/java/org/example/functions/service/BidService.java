@@ -27,8 +27,55 @@ public class BidService {
     }
 
     /**
+     * Admin: cancel an opened bid before any user has placed a bid.
+     * Clears bidOpenedAt so the comic returns to its pre-opened state.
+     * Throws if bidding has already started (first user bid placed).
+     */
+    public ComicBook cancelBid(String comicId) {
+        ComicBook comic = ComicService.getServiceInstance().getComicById(Integer.parseInt(comicId))
+            .orElseThrow(() -> new IllegalArgumentException("Comic not found: " + comicId));
+
+        BiddingState bid = comic.getBiddingState();
+        if (bid.getBidStartedAt() != null) {
+            throw new IllegalStateException("Cannot cancel — bidding is already in progress for comic " + comicId + ".");
+        }
+
+        bid.setBidOpenedAt(null);
+        ComicService.getServiceInstance().updateComic(comic, "system:bid-cancel");
+        log.info("Bidding cancelled (before first bid) on comic {} by admin", comicId);
+        return comic;
+    }
+
+    /**
+     * Admin: open a bid-enabled comic for bidding. Sets bidOpenedAt so users can see the Bid button.
+     * The countdown timer does not start until the first user actually places a bid.
+     */
+    public ComicBook openBid(String comicId) {
+        if (!EnvHelper.isBiddingModeEnabled()) {
+            throw new IllegalStateException("Bidding mode is not enabled.");
+        }
+        ComicBook comic = ComicService.getServiceInstance().getComicById(Integer.parseInt(comicId))
+            .orElseThrow(() -> new IllegalArgumentException("Comic not found: " + comicId));
+
+        if (!Boolean.TRUE.equals(comic.getEnableBid())) {
+            throw new IllegalArgumentException("Comic " + comicId + " does not have bidding enabled.");
+        }
+
+        BiddingState bid = comic.getBiddingState();
+        if (bid.getBidOpenedAt() != null) {
+            return comic; // Already opened — idempotent
+        }
+
+        bid.setBidOpenedAt(Instant.now().toString());
+        ComicService.getServiceInstance().updateComic(comic, "system:bid-open");
+        log.info("Bidding opened on comic {} by admin", comicId);
+        return comic;
+    }
+
+    /**
      * Start bidding on an enableBid comic. Sets the first user as the initial leader
-     * at the comic's existing highBid (or $0 if none). If bidding is already in progress,
+     * at the comic's existing highBid (or $0 if none). Requires admin to have opened
+     * bidding first (bidOpenedAt must be set). If bidding is already in progress,
      * returns the current comic state without modification.
      */
     public ComicBook startBidding(User user, String comicId) {
@@ -43,6 +90,10 @@ public class BidService {
         }
 
         BiddingState bid = comic.getBiddingState();
+
+        if (bid.getBidOpenedAt() == null) {
+            throw new IllegalStateException("Admin has not opened bidding for comic " + comicId + " yet.");
+        }
 
         if (bid.getBidStartedAt() != null) {
             // Bidding already in progress — return current state
@@ -150,7 +201,8 @@ public class BidService {
 
         String winnerId = bid.getCurrentBidderId();
         if (winnerId == null) {
-            // Nobody bid — just clear bidding state
+            // Nobody bid — clear all bidding state including bidOpenedAt
+            bid.setBidOpenedAt(null);
             bid.setBidStartedAt(null);
             bid.setCurrentBidderId(null);
             bid.setCurrentBidderName(null);
@@ -177,6 +229,7 @@ public class BidService {
             .build());
 
         // Clear active bidding state (keep bidHistory)
+        bid.setBidOpenedAt(null);
         bid.setBidStartedAt(null);
         bid.setCurrentBidderId(null);
         bid.setCurrentBidderName(null);

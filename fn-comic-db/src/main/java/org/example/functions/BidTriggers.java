@@ -28,8 +28,75 @@ public class BidTriggers {
     private static final String CORS_ORIGIN  = "*";
     private static final String CORS_HEADERS = "X-Session-Token, Content-Type";
 
+    // ─── POST /api/bid/cancel ─────────────────────────────────────────────────
+    // Admin-only: cancel an opened bid before any user has bid. Resets to pre-opened state.
+
+    @FunctionName("cancelBid")
+    public HttpResponseMessage cancelBid(
+        @HttpTrigger(name = "cancelBid", route = "bid/cancel",
+            methods = {HttpMethod.POST, HttpMethod.OPTIONS},
+            authLevel = AuthorizationLevel.ANONYMOUS)
+        HttpRequestMessage<Optional<String>> request)
+    {
+        if (request.getHttpMethod() == HttpMethod.OPTIONS) {
+            return cors(request.createResponseBuilder(HttpStatus.OK)).build();
+        }
+        if (AuthHelper.requireAdmin(request) == null) return unauthorized(request);
+        try {
+            JsonNode body = OBJECT_MAPPER.readTree(request.getBody().orElse("{}"));
+            String comicId = HttpHelper.getString(body, "comicId");
+            if (comicId == null) return badRequest(request, "comicId is required");
+
+            ComicBook comic = BidService.getServiceInstance().cancelBid(comicId);
+            return cors(request.createResponseBuilder(HttpStatus.OK))
+                .header("Content-Type", "application/json")
+                .body(OBJECT_MAPPER.writeValueAsString(comic)).build();
+        } catch (IllegalStateException e) {
+            return cors(request.createResponseBuilder(HttpStatus.CONFLICT)).body(e.getMessage()).build();
+        } catch (IllegalArgumentException e) {
+            return badRequest(request, e.getMessage());
+        } catch (Exception e) {
+            log.error("cancelBid error", e);
+            return serverError(request, e);
+        }
+    }
+
+    // ─── POST /api/bid/open ───────────────────────────────────────────────────
+    // Admin-only: open a bid-enabled comic for bidding. Users will see the Bid button.
+    // The countdown does not start until the first user bids.
+
+    @FunctionName("openBid")
+    public HttpResponseMessage openBid(
+        @HttpTrigger(name = "openBid", route = "bid/open",
+            methods = {HttpMethod.POST, HttpMethod.OPTIONS},
+            authLevel = AuthorizationLevel.ANONYMOUS)
+        HttpRequestMessage<Optional<String>> request)
+    {
+        if (request.getHttpMethod() == HttpMethod.OPTIONS) {
+            return cors(request.createResponseBuilder(HttpStatus.OK)).build();
+        }
+        if (AuthHelper.requireAdmin(request) == null) return unauthorized(request);
+        try {
+            JsonNode body = OBJECT_MAPPER.readTree(request.getBody().orElse("{}"));
+            String comicId = HttpHelper.getString(body, "comicId");
+            if (comicId == null) return badRequest(request, "comicId is required");
+
+            ComicBook comic = BidService.getServiceInstance().openBid(comicId);
+            return cors(request.createResponseBuilder(HttpStatus.OK))
+                .header("Content-Type", "application/json")
+                .body(OBJECT_MAPPER.writeValueAsString(comic)).build();
+        } catch (IllegalStateException e) {
+            return cors(request.createResponseBuilder(HttpStatus.CONFLICT)).body(e.getMessage()).build();
+        } catch (IllegalArgumentException e) {
+            return badRequest(request, e.getMessage());
+        } catch (Exception e) {
+            log.error("openBid error", e);
+            return serverError(request, e);
+        }
+    }
+
     // ─── POST /api/bid/start ──────────────────────────────────────────────────
-    // Start a bidding cycle on an enableBid comic. Called when user clicks "Claim".
+    // Start a bidding cycle on an enableBid comic. Called when user clicks "Bid".
 
     @FunctionName("startBid")
     public HttpResponseMessage startBid(

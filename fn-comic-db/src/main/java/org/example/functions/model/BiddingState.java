@@ -24,6 +24,9 @@ public class BiddingState {
     @JsonSerialize(using = MoneySerializer.class)
     private BigDecimal highBid;
 
+    /** Set by admin to open the item for bidding. Users see the Bid button only after this is set. */
+    private String bidOpenedAt;
+    /** Set when the first user places a bid, starting the inactivity countdown. */
     private String bidStartedAt;
     private String currentBidderId;
     private String currentBidderName;

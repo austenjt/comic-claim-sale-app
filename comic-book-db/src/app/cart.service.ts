@@ -113,6 +113,14 @@ export class CartService {
     return this.http.post<Cart>(`${this.apiBase}/awards`, { comicId, userId });
   }
 
+  openBid(comicId: string): Observable<Comic> {
+    return this.http.post<Comic>(`${this.apiBase}/bid/open`, { comicId });
+  }
+
+  cancelBid(comicId: string): Observable<Comic> {
+    return this.http.post<Comic>(`${this.apiBase}/bid/cancel`, { comicId });
+  }
+
   startBid(comicId: string): Observable<Comic> {
     return this.http.post<Comic>(`${this.apiBase}/bid/start`, { comicId });
   }

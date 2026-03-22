@@ -147,6 +147,62 @@
     </p>
   </section>
 
+  <!-- ── Bidding ───────────────────────────────────────────────────────── -->
+  <section class="hiw-section">
+    <h2>Bidding</h2>
+    <p>
+      Some comics are offered through a <strong>bidding format</strong> instead of a fixed-price
+      claim. These are easy to spot — they show a <em>Bid</em> button on the dashboard card and
+      detail page rather than a <em>Claim</em> button.
+    </p>
+    <p>
+      The bidding format used here is a <strong>soft-close English auction</strong>. That means:
+    </p>
+    <ul>
+      <li>
+        <strong>Ascending price</strong> — each bid must be higher than the current high bid.
+        The highest bidder at the end wins.
+      </li>
+      <li>
+        <strong>Open bids</strong> — the full bid history (bidder names, amounts, and timestamps)
+        is visible to everyone on the comic's detail page.
+      </li>
+      <li>
+        <strong>Inactivity close</strong> — there is no fixed end time. The countdown timer resets
+        to the full window every time a new bid is placed. The auction only closes after the entire
+        window passes with no new bids. This prevents last-second sniping — if you get outbid,
+        you always have time to respond.
+      </li>
+    </ul>
+    <h3>How to participate</h3>
+    <ol>
+      <li>
+        <strong>Start the cycle</strong> — click <em>Bid</em> on any eligible comic. This opens
+        the bidding cycle at the opening price and makes you the current high bidder. The countdown
+        timer starts immediately and is visible to all buyers.
+      </li>
+      <li>
+        <strong>Place bids</strong> — if another buyer outbids you during the window, you'll see the
+        live high bid and their name update on both the dashboard card and the detail page. Enter a
+        higher amount on the detail page and click <em>Place Bid</em> to retake the lead.
+        Each bid resets the timer to the full window.
+      </li>
+      <li>
+        <strong>Winning</strong> — when the timer runs out with no new bids, the comic is
+        automatically added to the winner's cart at the final high-bid price. A toast notification
+        announces the result to everyone on the dashboard.
+      </li>
+    </ol>
+    <p>
+      Items won via bidding show a <em>Won via bid</em> tag in your cart and
+      <strong>cannot be removed</strong>. Contact the seller directly if there is an issue with a
+      bid-won item.
+    </p>
+    <p>
+      There is no minimum bid increment — any amount strictly above the current high bid is valid.
+    </p>
+  </section>
+
   <!-- ── Comic Detail Pages ─────────────────────────────────────────────── -->
   <section class="hiw-section">
     <h2>Comic Detail Pages</h2>
@@ -306,6 +362,43 @@
         created for them. Already-claimed comics do not show the Award button.
       </li>
     </ul>
+  </section>
+
+  <section class="hiw-section hiw-admin">
+    <h2>Bidding (Admin)</h2>
+    <p>
+      Bidding is controlled at two levels: a global on/off switch and a per-comic opt-in.
+    </p>
+    <ul>
+      <li>
+        <strong>Global switch</strong> — set the <code>BIDDING_MODE</code> environment variable
+        to <code>true</code> on the Azure Function App to enable the bidding API. When
+        <code>false</code> (or unset), all bid endpoints are disabled and the dashboard shows
+        normal Claim buttons even on bid-enabled comics.
+      </li>
+      <li>
+        <strong>Per-comic opt-in</strong> — check the <em>Enable Bid</em> checkbox on a comic
+        row in Comics Management to mark that comic for bidding. Only comics with this flag set
+        will show a Bid button to buyers (when global bidding is also on).
+      </li>
+      <li>
+        <strong>Window length</strong> — set <code>BIDDING_CYCLE</code> (in minutes, default 10)
+        to control how long the inactivity window is. Each new bid resets the full window.
+        Shorter windows create faster, more urgent cycles; longer windows give buyers more time to
+        respond to an outbid.
+      </li>
+    </ul>
+    <p>
+      <strong>No manual action is needed to close a cycle.</strong> When the countdown timer on
+      the dashboard hits zero, the browser automatically calls the finalize API, adds the comic to
+      the winner's cart at the high-bid price, and shows a toast notification to all online users.
+      The comic then shows as claimed on the dashboard and is locked out of further bidding.
+    </p>
+    <p>
+      Bid-won items carry a <code>wonViaBid</code> flag on the cart item. They are priced at the
+      winning bid amount and are excluded from the buyer's ability to remove items, but they are
+      included in discount calculations when the buyer submits their order.
+    </p>
   </section>
 
   <section class="hiw-section hiw-admin">

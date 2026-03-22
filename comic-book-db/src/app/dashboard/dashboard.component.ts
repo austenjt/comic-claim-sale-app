@@ -176,16 +176,51 @@ export class DashboardComponent implements OnInit, OnDestroy {
       next: latestComic => {
         if (!latestComic) return;
         const wasActive = this.isBiddingActive(this.comics[idx]);
+        const wasOpened = !!this.comics[idx].bidOpenedAt;
         this.comics[idx] = { ...this.comics[idx], ...latestComic };
+        // Detect when admin just opened bidding — notify non-admin users
+        if (!wasOpened && this.comics[idx].bidOpenedAt && !this.auth.isAdmin()) {
+          this.toastService.show(`Bidding is now open for "${this.comics[idx].title}" — place your bid!`);
+        }
         if (!wasActive && this.comics[idx].bidStartedAt) {
           this.bidCountdowns[String(this.comics[idx].id)] =
             this.bidSecondsRemaining(this.comics[idx]);
           this.startBidTimer();
         }
-        // If already active, the running timer self-corrects via bidSecondsRemaining()
-        // which reads comic.bidStartedAt live from the updated comics array entry.
       },
       error: () => {}
+    });
+  }
+
+  cancelBid(comic: Comic): void {
+    this.cartService.cancelBid(String(comic.id)).subscribe({
+      next: updatedComic => {
+        const idx = this.comics.findIndex(c => c.id === comic.id);
+        if (idx >= 0) {
+          this.comics[idx] = { ...this.comics[idx], ...updatedComic };
+        }
+        this.toastService.show(`Bidding cancelled for "${comic.title}".`);
+      },
+      error: err => {
+        const msg: string = typeof err?.error === 'string' ? err.error : '';
+        this.toastService.show(msg || 'Failed to cancel bidding.', true);
+      }
+    });
+  }
+
+  openBid(comic: Comic): void {
+    this.cartService.openBid(String(comic.id)).subscribe({
+      next: updatedComic => {
+        const idx = this.comics.findIndex(c => c.id === comic.id);
+        if (idx >= 0) {
+          this.comics[idx] = { ...this.comics[idx], ...updatedComic };
+        }
+        this.toastService.show(`Bidding opened for "${comic.title}" — waiting for first bid.`);
+      },
+      error: err => {
+        const msg: string = typeof err?.error === 'string' ? err.error : '';
+        this.toastService.show(msg || 'Failed to open bidding.', true);
+      }
     });
   }
 

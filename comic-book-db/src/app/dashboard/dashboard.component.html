@@ -127,8 +127,8 @@
                   </button>
                 </ng-container>
 
-                <!-- Bidding: start (Bid button triggers bidding) -->
-                <ng-container *ngIf="configService.biddingMode && comic.enableBid && !isBiddingActive(comic) && showClaimButton(comic)">
+                <!-- Bidding: start (Bid button — only visible after admin has opened it) -->
+                <ng-container *ngIf="configService.biddingMode && comic.enableBid && comic.bidOpenedAt && !isBiddingActive(comic)">
                   <button class="btn-claim"
                     [disabled]="!canClaim(comic)"
                     [title]="canClaim(comic) ? '' : cartLockedTitle()"
@@ -143,6 +143,33 @@
                     (click)="$event.preventDefault(); $event.stopPropagation(); claim(comic)">Claim</button>
                 </ng-container>
               </ng-container>
+
+              <!-- Admin bid controls -->
+              <ng-container *ngIf="auth.isAdmin() && configService.biddingMode && comic.enableBid && !claimedDate(comic.id)">
+                <!-- Not yet opened: show Start Bid button -->
+                <ng-container *ngIf="!comic.bidOpenedAt && !isBiddingActive(comic)">
+                  <button class="btn-start-bid"
+                    (click)="$event.preventDefault(); $event.stopPropagation(); openBid(comic)">
+                    Start Bid
+                  </button>
+                </ng-container>
+                <!-- Opened, waiting for first bid -->
+                <ng-container *ngIf="comic.bidOpenedAt && !isBiddingActive(comic)">
+                  <div class="bid-open-label">Bidding Open</div>
+                  <div class="bid-open-sub">Waiting for first bid…</div>
+                  <button class="btn-cancel-bid"
+                    (click)="$event.preventDefault(); $event.stopPropagation(); cancelBid(comic)">
+                    Cancel
+                  </button>
+                </ng-container>
+                <!-- Active: show countdown + high bid (same info users see) -->
+                <ng-container *ngIf="isBiddingActive(comic)">
+                  <div class="bid-countdown">⏱ {{ bidCountdownLabel(comic.id) }}</div>
+                  <div class="bid-leader" *ngIf="comic.currentBidderName">by {{ comic.currentBidderName }}</div>
+                  <div class="bid-leader">${{ (comic.highBid ?? 0).toFixed(2) }}</div>
+                </ng-container>
+              </ng-container>
+
               <button *ngIf="auth.isAdmin() && configService.awardModeEnabled && !claimedDate(comic.id) && !comic.comicCondition?.cgcCondition?.grade && !comic.comicCondition?.cbcsCondition?.grade"
                 class="btn-award"
                 (click)="$event.preventDefault(); $event.stopPropagation(); openAwardModal(comic)">Award</button>
