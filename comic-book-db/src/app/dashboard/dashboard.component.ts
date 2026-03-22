@@ -38,6 +38,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   claimingSetId: number | null = null;
   excludeClaimed = false;
   showPricedOnly = false;
+  sortOrder = 'date-added';
 
   // Bidding state: comicId → seconds remaining
   bidCountdowns: Record<string, number> = {};
@@ -57,6 +58,40 @@ export class DashboardComponent implements OnInit, OnDestroy {
       result = result.filter(c =>
         c.docType === 'SET' ? this.getSetPrice(c) > 0 : c.salePrice != null
       );
+    }
+    if (this.sortOrder !== 'date-added') {
+      result = [...result];
+      switch (this.sortOrder) {
+        case 'a-z':
+          result.sort((a, b) => a.title.localeCompare(b.title));
+          break;
+        case 'z-a':
+          result.sort((a, b) => b.title.localeCompare(a.title));
+          break;
+        case 'priced-first':
+          result.sort((a, b) => {
+            const aP = a.docType === 'SET' ? this.getSetPrice(a) : (a.salePrice ?? 0);
+            const bP = b.docType === 'SET' ? this.getSetPrice(b) : (b.salePrice ?? 0);
+            if (aP > 0 && bP === 0) return -1;
+            if (aP === 0 && bP > 0) return 1;
+            return 0;
+          });
+          break;
+        case 'claimed-first':
+          result.sort((a, b) => {
+            const aClaimed = !!this.claimedDate(a.id) ? 1 : 0;
+            const bClaimed = !!this.claimedDate(b.id) ? 1 : 0;
+            return bClaimed - aClaimed;
+          });
+          break;
+        case 'bidding-first':
+          result.sort((a, b) => {
+            const aBid = (a.bidOpenedAt || a.bidStartedAt) ? 1 : 0;
+            const bBid = (b.bidOpenedAt || b.bidStartedAt) ? 1 : 0;
+            return bBid - aBid;
+          });
+          break;
+      }
     }
     return result;
   }

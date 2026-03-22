@@ -16,4 +16,6 @@ export class DashboardHeaderComponent {
   @Output() excludeClaimedChange = new EventEmitter<boolean>();
   @Input() showPricedOnly: boolean = false;
   @Output() showPricedOnlyChange = new EventEmitter<boolean>();
+  @Input() sortOrder: string = 'date-added';
+  @Output() sortOrderChange = new EventEmitter<string>();
 }

@@ -712,8 +712,9 @@ public class CartService {
                 + itemsText
                 + "\nThank you for your business. We hope you enjoy your comics!\n\n"
                 + "Lightning Comics\n";
+            String adminEmail = EnvHelper.getAdminEmail();
             EmailService.getServiceInstance().send(
-                List.of(cart.getUserEmail()), null, null,
+                List.of(cart.getUserEmail()), adminEmail, adminEmail,
                 "Your Order Has Shipped", body);
         } catch (Exception e) {
             log.warn("Failed to send fulfillment email to {}: {}", cart.getUserEmail(), e.getMessage());
