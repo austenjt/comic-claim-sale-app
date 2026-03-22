@@ -268,6 +268,7 @@ public class CartService {
         cart.setFinalizeAfter(Instant.now().plus(finalizeHours, ChronoUnit.HOURS).toString());
         save(cart);
         log.info("Cart {} submitted, finalizes after {}", cart.getId(), cart.getFinalizeAfter());
+        sendOrderSubmittedEmail(cart);
         return cart;
     }
 
@@ -286,6 +287,9 @@ public class CartService {
         cart.setPaymentStatus(status);
         save(cart);
         log.info("Payment status for cart {} set to {}", cartId, status);
+        if ("PAID".equals(status)) {
+            sendPaymentReceivedEmail(cart);
+        }
         return cart;
     }
 
@@ -314,6 +318,7 @@ public class CartService {
         save(cart);
         log.info("Cart {} marked as FULFILLED", cartId);
         ArchiveService.getServiceInstance().archiveCart(cart);
+        sendFulfillmentEmail(cart);
         // Stamp soldTo/dateSold on each comic (skip set container rows)
         String soldDate = Instant.now().toString();
         for (CartItem item : cart.getItems()) {
@@ -628,6 +633,89 @@ public class CartService {
         }
         log.info("Pruned {} return events older than {} days", count, daysOld);
         return count;
+    }
+
+    private static String buildOrderItemsText(Cart cart) {
+        StringBuilder sb = new StringBuilder();
+        double subtotal = 0;
+        for (CartItem item : cart.getItems()) {
+            if (item.isSetContainer()) continue;
+            String num = item.getComicNumber() != null ? " " + item.getComicNumber() : "";
+            sb.append(String.format("  %s%s — $%.2f%n", item.getComicTitle(), num, item.getPrice()));
+            subtotal += item.getPrice();
+        }
+        sb.append(String.format("%nSubtotal: $%.2f%n", subtotal));
+        if (cart.getShippingCost() > 0) {
+            sb.append(String.format("Shipping: $%.2f%n", cart.getShippingCost()));
+        }
+        if (cart.getDiscountAmount() > 0) {
+            String desc = cart.getDiscountDescription() != null ? " (" + cart.getDiscountDescription() + ")" : "";
+            sb.append(String.format("Discount%s: -$%.2f%n", desc, cart.getDiscountAmount()));
+        }
+        double total = subtotal + cart.getShippingCost() - cart.getDiscountAmount();
+        sb.append(String.format("Total: $%.2f%n", total));
+        return sb.toString();
+    }
+
+    private void sendOrderSubmittedEmail(Cart cart) {
+        if (cart.getUserEmail() == null) return;
+        try {
+            String adminEmail = EnvHelper.getAdminEmail();
+            String body = "Hi " + cart.getUserName() + ",\n\n"
+                + "Thank you for your order! We've received your claim and it is currently being processed.\n\n"
+                + "A Lightning Comics team member will contact you shortly to arrange payment.\n\n"
+                + "ORDER SUMMARY\n"
+                + "=============\n"
+                + buildOrderItemsText(cart) + "\n"
+                + (cart.getCustomerNotes() != null && !cart.getCustomerNotes().isBlank()
+                    ? "Your notes: " + cart.getCustomerNotes() + "\n\n" : "")
+                + "Thank you for shopping with Lightning Comics!\n";
+            EmailService.getServiceInstance().send(
+                List.of(cart.getUserEmail()), adminEmail, adminEmail,
+                "Your Order is Being Processed", body);
+        } catch (Exception e) {
+            log.warn("Failed to send order submitted email to {}: {}", cart.getUserEmail(), e.getMessage());
+        }
+    }
+
+    private void sendPaymentReceivedEmail(Cart cart) {
+        if (cart.getUserEmail() == null) return;
+        try {
+            String body = "Hi " + cart.getUserName() + ",\n\n"
+                + "Great news! We've received your payment for your recent order.\n\n"
+                + "ORDER RECEIPT\n"
+                + "=============\n"
+                + buildOrderItemsText(cart) + "\n"
+                + "Thank you for your payment!\n\n"
+                + "Lightning Comics\n";
+            EmailService.getServiceInstance().send(
+                List.of(cart.getUserEmail()), null, null,
+                "Payment Received", body);
+        } catch (Exception e) {
+            log.warn("Failed to send payment received email to {}: {}", cart.getUserEmail(), e.getMessage());
+        }
+    }
+
+    private void sendFulfillmentEmail(Cart cart) {
+        if (cart.getUserEmail() == null) return;
+        try {
+            StringBuilder itemsText = new StringBuilder();
+            for (CartItem item : cart.getItems()) {
+                if (item.isSetContainer()) continue;
+                String num = item.getComicNumber() != null ? " " + item.getComicNumber() : "";
+                itemsText.append(String.format("  %s%s%n", item.getComicTitle(), num));
+            }
+            String body = "Hi " + cart.getUserName() + ",\n\n"
+                + "Lightning Comics has fulfilled your order and it's on the way!\n\n"
+                + itemsText
+                + "\nThank you for your business. We hope you enjoy your comics!\n\n"
+                + "Lightning Comics\n";
+            EmailService.getServiceInstance().send(
+                List.of(cart.getUserEmail()), null, null,
+                "Your Order Has Shipped", body);
+        } catch (Exception e) {
+            log.warn("Failed to send fulfillment email to {}: {}", cart.getUserEmail(), e.getMessage());
+        }
     }
 
     private Cart findCartById(String cartId) {

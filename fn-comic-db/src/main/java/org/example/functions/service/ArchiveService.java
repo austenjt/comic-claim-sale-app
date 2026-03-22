@@ -88,7 +88,47 @@ public class ArchiveService {
         ObjectNode node = OBJECT_MAPPER.valueToTree(order);
         archivedOrdersContainer.replaceItem(node, orderId, new PartitionKey(orderId), new CosmosItemRequestOptions());
         log.info("Payment status for archived order {} set to {}", orderId, status);
+        if ("PAID".equals(status)) {
+            sendArchivedPaymentReceivedEmail(order);
+        }
         return order;
+    }
+
+    private void sendArchivedPaymentReceivedEmail(ArchivedOrder order) {
+        if (order.getUserEmail() == null) return;
+        try {
+            StringBuilder sb = new StringBuilder();
+            double subtotal = 0;
+            for (ArchivedOrderItem item : order.getItems()) {
+                if (item.getPrice() == 0) continue;
+                String num = item.getComicNumber() != null ? " " + item.getComicNumber() : "";
+                sb.append(String.format("  %s%s — $%.2f%n", item.getComicTitle(), num, item.getPrice()));
+                subtotal += item.getPrice();
+            }
+            sb.append(String.format("%nSubtotal: $%.2f%n", subtotal));
+            if (order.getShippingCost() > 0) {
+                sb.append(String.format("Shipping: $%.2f%n", order.getShippingCost()));
+            }
+            if (order.getDiscountAmount() > 0) {
+                String desc = order.getDiscountDescription() != null ? " (" + order.getDiscountDescription() + ")" : "";
+                sb.append(String.format("Discount%s: -$%.2f%n", desc, order.getDiscountAmount()));
+            }
+            double total = subtotal + order.getShippingCost() - order.getDiscountAmount();
+            sb.append(String.format("Total: $%.2f%n", total));
+
+            String body = "Hi " + order.getUserName() + ",\n\n"
+                + "Great news! We've received your payment for your recent order.\n\n"
+                + "ORDER RECEIPT\n"
+                + "=============\n"
+                + sb + "\n"
+                + "Thank you for your payment!\n\n"
+                + "Lightning Comics\n";
+            EmailService.getServiceInstance().send(
+                java.util.List.of(order.getUserEmail()), null, null,
+                "Payment Received", body);
+        } catch (Exception e) {
+            log.warn("Failed to send payment received email to {}: {}", order.getUserEmail(), e.getMessage());
+        }
     }
 
     /** Permanently deletes an archived order by ID. */

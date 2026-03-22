@@ -11,7 +11,7 @@ import { ConfigService } from './config.service';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
-  title = 'Lightning Comics PDX';
+  title = 'Lightning Comics Rocks';
 
   constructor(
     public auth: AuthService,

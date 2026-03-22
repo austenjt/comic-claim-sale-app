@@ -49,54 +49,67 @@
     No approved users yet.
   </div>
 
-  <table *ngIf="existingUsers.length > 0">
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Email</th>
-        <th>Address</th>
-        <th>Phone</th>
-        <th>Notes</th>
-        <th>Venmo</th>
-        <th>PayPal</th>
-        <th>Cash App</th>
-        <th>eBay</th>
-        <th>Approved</th>
-        <th>Status</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let user of existingUsers">
-        <td>{{ user.name }}</td>
-        <td>{{ user.email }}</td>
-        <td class="address-cell">{{ user.address }}</td>
-        <td>{{ user.phone }}</td>
-        <td>{{ user.notes }}</td>
-        <td>{{ user.venmoHandle ? '@' + user.venmoHandle : '' }}</td>
-        <td>{{ user.paypalHandle ? '@' + user.paypalHandle : '' }}</td>
-        <td>{{ user.cashAppHandle ? '$' + user.cashAppHandle : '' }}</td>
-        <td>{{ user.ebayUsername }}</td>
-        <td>{{ user.approvedDate | date:'short' }}</td>
-        <td>
-          <span class="status-badge"
-            [class.badge-active]="user.status === 'APPROVED'"
-            [class.badge-suspended]="user.status === 'SUSPENDED'">
-            {{ user.status === 'APPROVED' ? 'Active' : 'Suspended' }}
-          </span>
-        </td>
-        <td class="action-cell">
-          <ng-container *ngIf="user.isAdmin; else userActions">
-            <span class="admin-label">Admin</span>
-            <button (click)="resetPin(user)">Reset PIN</button>
-          </ng-container>
-          <ng-template #userActions>
-            <button (click)="resetPin(user)">Reset PIN</button>
-            <button *ngIf="user.status === 'APPROVED'" class="btn-suspend" (click)="suspend(user)">Suspend</button>
-            <button *ngIf="user.status === 'SUSPENDED'" class="btn-reactivate" (click)="reactivate(user)">Reactivate</button>
-          </ng-template>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+  <div class="user-card-list" *ngIf="existingUsers.length > 0">
+    <div class="user-card" *ngFor="let user of existingUsers">
+      <div class="user-card-header">
+        <span class="status-badge"
+          [class.badge-active]="user.status === 'APPROVED'"
+          [class.badge-suspended]="user.status === 'SUSPENDED'">
+          {{ user.status === 'APPROVED' ? 'Active' : 'Suspended' }}
+        </span>
+        <span *ngIf="user.isAdmin" class="admin-label">Admin</span>
+        <div class="user-card-actions">
+          <button (click)="resetPin(user)">Reset PIN</button>
+          <button *ngIf="!user.isAdmin && user.status === 'APPROVED'" class="btn-suspend" (click)="suspend(user)">Suspend</button>
+          <button *ngIf="!user.isAdmin && user.status === 'SUSPENDED'" class="btn-reactivate" (click)="reactivate(user)">Reactivate</button>
+        </div>
+      </div>
+      <div class="user-props-grid">
+        <div class="user-prop">
+          <span class="prop-label">Name</span>
+          <span class="prop-value">{{ user.name }}</span>
+        </div>
+        <div class="user-prop">
+          <span class="prop-label">Email</span>
+          <span class="prop-value">{{ user.email }}</span>
+        </div>
+        <div class="user-prop">
+          <span class="prop-label">Phone</span>
+          <span class="prop-value">{{ user.phone || '—' }}</span>
+        </div>
+        <div class="user-prop">
+          <span class="prop-label">Address</span>
+          <span class="prop-value">{{ user.address || '—' }}</span>
+        </div>
+        <div class="user-prop">
+          <span class="prop-label">Approved</span>
+          <span class="prop-value">{{ user.approvedDate | date:'shortDate' }}</span>
+        </div>
+        <div class="user-prop">
+          <span class="prop-label">Venmo</span>
+          <span class="prop-value">{{ user.venmoHandle ? '@' + user.venmoHandle : '—' }}</span>
+        </div>
+        <div class="user-prop">
+          <span class="prop-label">PayPal</span>
+          <span class="prop-value">{{ user.paypalHandle ? '@' + user.paypalHandle : '—' }}</span>
+        </div>
+        <div class="user-prop">
+          <span class="prop-label">Cash App</span>
+          <span class="prop-value">{{ user.cashAppHandle ? '$' + user.cashAppHandle : '—' }}</span>
+        </div>
+        <div class="user-prop">
+          <span class="prop-label">eBay</span>
+          <span class="prop-value">{{ user.ebayUsername || '—' }}</span>
+        </div>
+      </div>
+      <div class="user-notes-row" *ngIf="user.preferences">
+        <span class="prop-label">Preferences</span>
+        <span class="prop-value">{{ user.preferences }}</span>
+      </div>
+      <div class="user-notes-row" *ngIf="user.notes">
+        <span class="prop-label">Notes</span>
+        <span class="prop-value">{{ user.notes }}</span>
+      </div>
+    </div>
+  </div>
 </div>
