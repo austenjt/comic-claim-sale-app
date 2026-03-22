@@ -119,7 +119,7 @@
                 <ng-container *ngIf="configService.biddingMode && comic.enableBid && isBiddingActive(comic)">
                   <div class="bid-countdown">⏱ {{ bidCountdownLabel(comic.id) }}</div>
                   <div class="bid-leader" *ngIf="comic.currentBidderName">
-                    High bid: ${{ (comic.highBid ?? 0).toFixed(2) }} by {{ comic.currentBidderName }}
+                    by {{ comic.currentBidderName }}
                   </div>
                   <button class="btn-bid"
                     (click)="$event.preventDefault(); $event.stopPropagation(); placeBid(comic)">
