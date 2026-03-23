@@ -25,6 +25,7 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
   claimedMap: Record<string, string> = {};
   myCart: Cart | null = null;
   claimError = '';
+  loading = true;
   actionLoading = false;
   bidSecondsRemaining = 0;
   private bidTimerInterval: any = null;
@@ -249,6 +250,7 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
     this.comicService.getComic(id)
       .subscribe(comic => {
         this.comic = comic;
+        this.loading = false;
         if (comic?.bidStartedAt) {
           const endsAt = new Date(comic.bidStartedAt).getTime() +
                          this.configService.biddingCycleMins * 60000;

@@ -1,3 +1,8 @@
+<div *ngIf="loading" class="warming-up">
+  <div class="warming-up-spinner"></div>
+  <span>Please wait while things warm up. This site is not always on, and turns on when visited.</span>
+</div>
+
 <div *ngIf="comic">
   <div class="page-nav">
     <button type="button" (click)="goBack()">go back</button>
