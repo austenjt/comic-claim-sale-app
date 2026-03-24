@@ -31,8 +31,14 @@
           <td>{{ item.price | currency }}</td>
           <td>{{ item.claimedAt | date:'short' }}</td>
           <td>
-            <button class="btn-release" (click)="unclaim(item.comicId)"
-              title="Release this comic back to available">Release</button>
+            <ng-container *ngIf="item.isSetContainer">
+              <button class="btn-release" (click)="unclaim(item.comicId)"
+                title="Release the entire set back to available">Release Set</button>
+            </ng-container>
+            <ng-container *ngIf="!item.isSetContainer && !(item.collectionGroup && item.collectionGroup > 0)">
+              <button class="btn-release" (click)="unclaim(item.comicId)"
+                title="Release this comic back to available">Release</button>
+            </ng-container>
           </td>
         </tr>
       </tbody>
@@ -138,8 +144,14 @@
           <td>{{ item.price | currency }}</td>
           <td>{{ item.claimedAt | date:'short' }}</td>
           <td>
-            <button class="btn-release" (click)="unclaim(item.comicId)"
-              title="Release this comic back to available">Release</button>
+            <ng-container *ngIf="item.isSetContainer">
+              <button class="btn-release" (click)="unclaim(item.comicId)"
+                title="Release the entire set back to available">Release Set</button>
+            </ng-container>
+            <ng-container *ngIf="!item.isSetContainer && !(item.collectionGroup && item.collectionGroup > 0)">
+              <button class="btn-release" (click)="unclaim(item.comicId)"
+                title="Release this comic back to available">Release</button>
+            </ng-container>
           </td>
         </tr>
       </tbody>

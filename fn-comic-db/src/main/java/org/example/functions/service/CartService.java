@@ -108,7 +108,8 @@ public class CartService {
         item.setComicId(comicId);
         item.setComicTitle(comic.getTitle());
         item.setComicNumber(formatComicNumber(comic.getNumber()));
-        item.setPrice(comic.getTargetPrice() != null ? comic.getTargetPrice().doubleValue() : 1.00);
+        item.setPrice(comic.getSalePrice() != null ? comic.getSalePrice().doubleValue()
+                : comic.getTargetPrice() != null ? comic.getTargetPrice().doubleValue() : 0.0);
         item.setClaimedAt(Instant.now().toString());
         item.setWonViaBid(wonViaBid);
 
@@ -162,7 +163,8 @@ public class CartService {
                 item.setPrice(0.0);
                 item.setSetContainer(true);
             } else {
-                item.setPrice(member.getTargetPrice() != null ? member.getTargetPrice().doubleValue() : 1.00);
+                item.setPrice(member.getSalePrice() != null ? member.getSalePrice().doubleValue()
+                        : member.getTargetPrice() != null ? member.getTargetPrice().doubleValue() : 0.0);
                 memberCount++;
             }
             cart.getItems().add(item);
