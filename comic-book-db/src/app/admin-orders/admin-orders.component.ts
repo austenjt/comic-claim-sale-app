@@ -175,6 +175,11 @@ export class AdminOrdersComponent implements OnInit {
     return status ? (labels[status] ?? status) : 'Unpaid';
   }
 
+  setContainerComicId(items: { comicId: string; collectionGroup?: number | null; isSetContainer?: boolean }[], collectionGroup: number): string | null {
+    const container = items.find(i => i.isSetContainer && i.collectionGroup === collectionGroup);
+    return container?.comicId ?? null;
+  }
+
   hasSetItems(order: ArchivedOrder): boolean {
     return order.items.some(i => i.collectionGroup != null && i.collectionGroup > 0);
   }
