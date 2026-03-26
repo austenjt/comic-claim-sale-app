@@ -1,5 +1,8 @@
 /* Global Styles */
 
+@import 'ag-grid-community/styles/ag-grid.css';
+@import 'ag-grid-community/styles/ag-theme-alpine.css';
+
 /* ── Warm-up / loading indicator (shared across dashboard, comic-detail, set-detail) ── */
 .warming-up {
   display: flex;
@@ -32,9 +35,6 @@
 @keyframes warming-up-spin {
   to { transform: rotate(360deg); }
 }
-
-@import 'ag-grid-community/styles/ag-grid.css';
-@import 'ag-grid-community/styles/ag-theme-alpine.css';
 
 :root {
   --color-bg: #f0ead2;
