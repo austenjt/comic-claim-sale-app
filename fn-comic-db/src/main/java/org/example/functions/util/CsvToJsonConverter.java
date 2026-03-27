@@ -37,7 +37,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -48,6 +47,11 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 public class CsvToJsonConverter {
 
   private static final ObjectMapper objectMapper = new ObjectMapper();
+
+  // Priority-2: explicit issue-number marker anywhere in the title
+  private static final Pattern HASH_NUMBER_PATTERN = Pattern.compile("#(\\d+)");
+  // Priority-3: bare number after the series prefix has been stripped
+  private static final Pattern LEADING_NUMBER_PATTERN = Pattern.compile("^#?(\\d+)|(?:^|\\s)(\\d+)");
 
   private final String csvData;
   private final ComicService comicService;
@@ -147,21 +151,44 @@ public class CsvToJsonConverter {
     return result;
   }
 
-  private ComicNumber parseComicNumber(String issueNumber, String title) {
+  private ComicNumber parseComicNumber(String issueNumber, String title, String series) {
+    // Priority 1: explicit "Issue #" column value
     if (isNotBlank(issueNumber)) {
       try {
         return ComicNumber.of(-1, Integer.parseInt(issueNumber.trim()));
       } catch (NumberFormatException e) {
-        // fall through to title extraction
+        // fall through
       }
     }
-    Map<String, String> extracted = extractNumberFromTitle(title);
-    String numberStr = extracted.get("number");
-    try {
-      return ComicNumber.of(-1, Integer.parseInt(numberStr));
-    } catch (NumberFormatException e) {
-      return ComicNumber.of(-1, NumberSentinel.valueOf(numberStr.toUpperCase()));
+
+    // Priority 2: #N anywhere in the title — strongest signal for an issue number
+    Matcher hashMatcher = HASH_NUMBER_PATTERN.matcher(title);
+    if (hashMatcher.find()) {
+      return ComicNumber.of(-1, Integer.parseInt(hashMatcher.group(1)));
     }
+
+    // Priority 3: bare N in the title, but only after stripping the series prefix
+    // so that a number embedded in the series name (e.g. "2099" in "X-Men 2099")
+    // is not mistaken for the issue number.
+    String searchTitle = title.trim();
+    if (isNotBlank(series)) {
+      String lowerTitle = searchTitle.toLowerCase();
+      String lowerSeries = series.trim().toLowerCase();
+      if (lowerTitle.startsWith(lowerSeries)) {
+        searchTitle = searchTitle.substring(lowerSeries.length()).trim();
+      }
+    }
+    Matcher leadingMatcher = LEADING_NUMBER_PATTERN.matcher(searchTitle);
+    if (leadingMatcher.find()) {
+      String digits = leadingMatcher.group(1) != null ? leadingMatcher.group(1) : leadingMatcher.group(2);
+      try {
+        return ComicNumber.of(-1, Integer.parseInt(digits));
+      } catch (NumberFormatException e) {
+        // fall through
+      }
+    }
+
+    return ComicNumber.of(-1, -1);
   }
 
   // --- Main method ---
@@ -191,30 +218,16 @@ public class CsvToJsonConverter {
 
     try (CSVParser csvParser = CSVParser.parse(cleanCsvData, CSVFormat.DEFAULT.builder().setHeader().setSkipHeaderRecord(true).get())) {
 
-      // Validate required columns before processing any records
-      List<String> headers = csvParser.getHeaderNames();
-      // Only columns accessed unconditionally for every record are required.
-      // CGC/CBCS columns are optional — GoCollect omits them from raw-book-only exports.
-      List<String> required = List.of(
-          ComicFields.COMIC.col(), ComicFields.ISSUE_NUMBER.col(), ComicFields.SERIES.col(),
-          GoCollectFields.PRICE_PAID.col(), GoCollectFields.TARGET_PRICE.col(),
-          GoCollectFields.PERSONAL_ESTIMATE.col(), GoCollectFields.DATE_ACQUIRED.col(),
-          GoCollectFields.DATE_SOLD.col(), GoCollectFields.PURCHASED_FROM.col(),
-          GoCollectFields.PURCHASE_REFERENCE_URL.col(), GoCollectFields.PERSONAL_NOTES.col(),
-          GoCollectFields.PUBLIC_NOTES.col(), GoCollectFields.COMIC_URL.col(), GoCollectFields.GCIN.col(),
-          ConditionFields.CERTIFICATION_COMPANY.col(), ConditionFields.CERTIFICATION_ID.col(),
-          ConditionFields.NOT_CERTIFIED_LABEL.col(), ConditionFields.NOT_CERTIFIED_GRADE.col(),
-          ConditionFields.NOT_CERTIFIED_PAGE_QUALITY.col(), ConditionFields.NOT_CERTIFIED_PEDIGREE.col(),
-          ConditionFields.NOT_CERTIFIED_DEGREE_OF_RESTORATION.col(), ConditionFields.NOT_CERTIFIED_SIGNATURE.col()
-      );
-      List<String> missing = required.stream().filter(f -> !headers.contains(f)).collect(Collectors.toList());
-      if (!missing.isEmpty()) {
-          log.error("CSV is missing required columns: {}", missing);
+      // GoCollect exports are user-configurable — only the title column is strictly required.
+      // All other columns are read via safeGet() and default to "" when absent.
+      if (!csvParser.getHeaderNames().contains(ComicFields.COMIC.col())) {
+          log.error("CSV is missing the required '{}' column.", ComicFields.COMIC.col());
           Map<String, Object> errorResult = new HashMap<>();
           errorResult.put("succeeded", List.of());
           errorResult.put("failed", List.of());
           errorResult.put("duplicates", List.of());
-          errorResult.put("errors", List.of("Missing required CSV columns: " + missing));
+          errorResult.put("errors", List.of("Missing required CSV column: '" + ComicFields.COMIC.col()
+              + "'. Please export from GoCollect with at least the Comic title column included."));
           return request.createResponseBuilder(HttpStatus.OK)
               .header("Access-Control-Allow-Origin", "*")
               .header("Access-Control-Allow-Methods", "*")
@@ -227,24 +240,25 @@ public class CsvToJsonConverter {
         try {
           ComicBook comicBook = new ComicBook();
 
-          // Title and number
+          // Title and number (series fetched early so it can guide number extraction)
           String title = record.get(ComicFields.COMIC.col());
-          String issueNumber = record.get(ComicFields.ISSUE_NUMBER.col());
-          ComicNumber comicNumber = parseComicNumber(issueNumber, title);
+          String series = safeGet(record, ComicFields.SERIES.col());
+          String issueNumber = safeGet(record, ComicFields.ISSUE_NUMBER.col());
+          ComicNumber comicNumber = parseComicNumber(issueNumber, title, series);
           comicBook.setTitle(reconcileTitleWithNumber(title, comicNumber));
           comicBook.setNumber(comicNumber);
 
           // Series
-          comicBook.setSeries(record.get(ComicFields.SERIES.col()));
+          comicBook.setSeries(series);
 
           // GoCollect info
-          String comicUrl = record.get(GoCollectFields.COMIC_URL.col());
+          String comicUrl = safeGet(record, GoCollectFields.COMIC_URL.col());
           String gcSlug = isNotBlank(comicUrl) ? comicUrl.substring(comicUrl.lastIndexOf('/') + 1) : null;
           comicBook.setGoCollectInfo(GoCollectInfo.builder()
-              .gcIndex(parseInteger(record.get(GoCollectFields.GCIN.col())))
+              .gcIndex(parseInteger(safeGet(record, GoCollectFields.GCIN.col())))
               .gcSlug(gcSlug)
               .gcUrl(comicUrl)
-              .gcSeries(record.get(ComicFields.SERIES.col()))
+              .gcSeries(series)
               .importDate(LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE))
               .build());
 
@@ -262,25 +276,25 @@ public class CsvToJsonConverter {
           comicBook.setDocType("COMIC");
 
           // Financial
-          comicBook.setPersonalEstimate(parseBigDecimal(record.get(GoCollectFields.PERSONAL_ESTIMATE.col())));
-          comicBook.setTargetPrice(parseBigDecimal(record.get(GoCollectFields.TARGET_PRICE.col())));
-          BigDecimal pricePaid = parseBigDecimal(record.get(GoCollectFields.PRICE_PAID.col()));
+          comicBook.setPersonalEstimate(parseBigDecimal(safeGet(record, GoCollectFields.PERSONAL_ESTIMATE.col())));
+          comicBook.setTargetPrice(parseBigDecimal(safeGet(record, GoCollectFields.TARGET_PRICE.col())));
+          BigDecimal pricePaid = parseBigDecimal(safeGet(record, GoCollectFields.PRICE_PAID.col()));
           comicBook.setPricePaid(pricePaid);
           if (setPriceToPricePaid && pricePaid != null && pricePaid.compareTo(BigDecimal.ZERO) > 0) {
               comicBook.setSalePrice(pricePaid);
           }
 
           // Grading & Condition
-          GradingCompany certificationCompany = parseGradingCompany(record.get(ConditionFields.CERTIFICATION_COMPANY.col()));
+          GradingCompany certificationCompany = parseGradingCompany(safeGet(record, ConditionFields.CERTIFICATION_COMPANY.col()));
           ComicCondition.ComicConditionBuilder condition = ComicCondition.builder()
               .certificationCompany(certificationCompany)
-              .certificationId(record.get(ConditionFields.CERTIFICATION_ID.col()))
-              .notCertifiedLabel(record.get(ConditionFields.NOT_CERTIFIED_LABEL.col()))
-              .notCertifiedGrade(parseComicGrade(record.get(ConditionFields.NOT_CERTIFIED_GRADE.col())))
-              .notCertifiedPageQuality(parsePageQuality(record.get(ConditionFields.NOT_CERTIFIED_PAGE_QUALITY.col())))
-              .notCertifiedPedigree(record.get(ConditionFields.NOT_CERTIFIED_PEDIGREE.col()))
-              .notCertifiedDegreeOfRestoration(record.get(ConditionFields.NOT_CERTIFIED_DEGREE_OF_RESTORATION.col()))
-              .notCertifiedSignature(parseBoolean(record.get(ConditionFields.NOT_CERTIFIED_SIGNATURE.col())));
+              .certificationId(safeGet(record, ConditionFields.CERTIFICATION_ID.col()))
+              .notCertifiedLabel(safeGet(record, ConditionFields.NOT_CERTIFIED_LABEL.col()))
+              .notCertifiedGrade(parseComicGrade(safeGet(record, ConditionFields.NOT_CERTIFIED_GRADE.col())))
+              .notCertifiedPageQuality(parsePageQuality(safeGet(record, ConditionFields.NOT_CERTIFIED_PAGE_QUALITY.col())))
+              .notCertifiedPedigree(safeGet(record, ConditionFields.NOT_CERTIFIED_PEDIGREE.col()))
+              .notCertifiedDegreeOfRestoration(safeGet(record, ConditionFields.NOT_CERTIFIED_DEGREE_OF_RESTORATION.col()))
+              .notCertifiedSignature(parseBoolean(safeGet(record, ConditionFields.NOT_CERTIFIED_SIGNATURE.col())));
           if (certificationCompany == GradingCompany.CGC) {
               condition
                   .isGraded(true)
@@ -311,15 +325,15 @@ public class CsvToJsonConverter {
           comicBook.getComicCondition().syncCondition();
 
           // Dates and purchase info
-          comicBook.setDateAcquired(record.get(GoCollectFields.DATE_ACQUIRED.col()));
-          comicBook.setDateSold(record.get(GoCollectFields.DATE_SOLD.col()));
-          comicBook.setPurchasedFrom(record.get(GoCollectFields.PURCHASED_FROM.col()));
-          comicBook.setPurchaseReferenceURL(record.get(GoCollectFields.PURCHASE_REFERENCE_URL.col()));
+          comicBook.setDateAcquired(safeGet(record, GoCollectFields.DATE_ACQUIRED.col()));
+          comicBook.setDateSold(safeGet(record, GoCollectFields.DATE_SOLD.col()));
+          comicBook.setPurchasedFrom(safeGet(record, GoCollectFields.PURCHASED_FROM.col()));
+          comicBook.setPurchaseReferenceURL(safeGet(record, GoCollectFields.PURCHASE_REFERENCE_URL.col()));
           comicBook.setPublishedDate("");
 
           // Notes
-          comicBook.setPersonalNotes(record.get(GoCollectFields.PERSONAL_NOTES.col()));
-          comicBook.setPublicNotes(record.get(GoCollectFields.PUBLIC_NOTES.col()));
+          comicBook.setPersonalNotes(safeGet(record, GoCollectFields.PERSONAL_NOTES.col()));
+          comicBook.setPublicNotes(safeGet(record, GoCollectFields.PUBLIC_NOTES.col()));
 
           // Images (defaults)
           comicBook.setSmallCachedImageId("");
