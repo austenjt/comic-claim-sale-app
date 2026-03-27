@@ -13,6 +13,10 @@
     <input type="checkbox" [(ngModel)]="importAsSet" (ngModelChange)="onImportAsSetChange()" [disabled]="status === 'processing'" />
     Import as Set
   </label>
+  <label class="csv-set-toggle">
+    <input type="checkbox" [(ngModel)]="setPriceToPricePaid" [disabled]="status === 'processing'" />
+    Set Price to Price Paid
+  </label>
   <div *ngIf="importAsSet" class="csv-set-picker">
     <select [(ngModel)]="selectedSet" [disabled]="status === 'processing'">
       <option [ngValue]="null">— select a set —</option>

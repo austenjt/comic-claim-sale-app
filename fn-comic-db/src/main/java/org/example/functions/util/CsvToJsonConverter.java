@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -127,6 +128,10 @@ public class CsvToJsonConverter {
     }
   }
 
+  private String safeGet(CSVRecord record, String fieldName) {
+    return record.isMapped(fieldName) ? record.get(fieldName) : "";
+  }
+
   private Boolean parseBoolean(String value) {
     if (isBlank(value)) return null;
     return Boolean.valueOf(value);
@@ -170,17 +175,54 @@ public class CsvToJsonConverter {
    * @return an HTTP response with succeeded/failed/duplicate results
    * @throws JsonProcessingException if JSON serialization fails
    */
-  public HttpResponseMessage loadGoCollectCsvData(HttpRequestMessage<Optional<String>> request, Integer targetCollectionGroup) throws JsonProcessingException {
+  public HttpResponseMessage loadGoCollectCsvData(HttpRequestMessage<Optional<String>> request, Integer targetCollectionGroup, boolean setPriceToPricePaid) throws JsonProcessingException {
     log.info("Attempting to parse GoCollect CSV data...");
     List<ComicBook> loaded = new ArrayList<>();
     List<ComicBook> failedToLoad = new ArrayList<>();
     List<ComicBook> duplicates = new ArrayList<>();
+    List<String> parseErrors = new ArrayList<>();
+
+    // Strip UTF-8 BOM if present (common in GoCollect CSV exports)
+    String cleanCsvData = csvData.startsWith("\uFEFF") ? csvData.substring(1) : csvData;
 
     // Load existing comics once for duplicate checking
     Set<ComicBook> existingComics = new HashSet<>(comicService.getComicsList());
     log.info("Loaded {} existing comics for duplicate checking.", existingComics.size());
 
-    try (CSVParser csvParser = CSVParser.parse(csvData, CSVFormat.DEFAULT.builder().setHeader().setSkipHeaderRecord(true).get())) {
+    try (CSVParser csvParser = CSVParser.parse(cleanCsvData, CSVFormat.DEFAULT.builder().setHeader().setSkipHeaderRecord(true).get())) {
+
+      // Validate required columns before processing any records
+      List<String> headers = csvParser.getHeaderNames();
+      // Only columns accessed unconditionally for every record are required.
+      // CGC/CBCS columns are optional — GoCollect omits them from raw-book-only exports.
+      List<String> required = List.of(
+          ComicFields.COMIC.col(), ComicFields.ISSUE_NUMBER.col(), ComicFields.SERIES.col(),
+          GoCollectFields.PRICE_PAID.col(), GoCollectFields.TARGET_PRICE.col(),
+          GoCollectFields.PERSONAL_ESTIMATE.col(), GoCollectFields.DATE_ACQUIRED.col(),
+          GoCollectFields.DATE_SOLD.col(), GoCollectFields.PURCHASED_FROM.col(),
+          GoCollectFields.PURCHASE_REFERENCE_URL.col(), GoCollectFields.PERSONAL_NOTES.col(),
+          GoCollectFields.PUBLIC_NOTES.col(), GoCollectFields.COMIC_URL.col(), GoCollectFields.GCIN.col(),
+          ConditionFields.CERTIFICATION_COMPANY.col(), ConditionFields.CERTIFICATION_ID.col(),
+          ConditionFields.NOT_CERTIFIED_LABEL.col(), ConditionFields.NOT_CERTIFIED_GRADE.col(),
+          ConditionFields.NOT_CERTIFIED_PAGE_QUALITY.col(), ConditionFields.NOT_CERTIFIED_PEDIGREE.col(),
+          ConditionFields.NOT_CERTIFIED_DEGREE_OF_RESTORATION.col(), ConditionFields.NOT_CERTIFIED_SIGNATURE.col()
+      );
+      List<String> missing = required.stream().filter(f -> !headers.contains(f)).collect(Collectors.toList());
+      if (!missing.isEmpty()) {
+          log.error("CSV is missing required columns: {}", missing);
+          Map<String, Object> errorResult = new HashMap<>();
+          errorResult.put("succeeded", List.of());
+          errorResult.put("failed", List.of());
+          errorResult.put("duplicates", List.of());
+          errorResult.put("errors", List.of("Missing required CSV columns: " + missing));
+          return request.createResponseBuilder(HttpStatus.OK)
+              .header("Access-Control-Allow-Origin", "*")
+              .header("Access-Control-Allow-Methods", "*")
+              .header("Access-Control-Allow-Headers", "Content-Type")
+              .body(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(errorResult))
+              .build();
+      }
+
       for (CSVRecord record : csvParser) {
         try {
           ComicBook comicBook = new ComicBook();
@@ -222,7 +264,11 @@ public class CsvToJsonConverter {
           // Financial
           comicBook.setPersonalEstimate(parseBigDecimal(record.get(GoCollectFields.PERSONAL_ESTIMATE.col())));
           comicBook.setTargetPrice(parseBigDecimal(record.get(GoCollectFields.TARGET_PRICE.col())));
-          comicBook.setPricePaid(parseBigDecimal(record.get(GoCollectFields.PRICE_PAID.col())));
+          BigDecimal pricePaid = parseBigDecimal(record.get(GoCollectFields.PRICE_PAID.col()));
+          comicBook.setPricePaid(pricePaid);
+          if (setPriceToPricePaid && pricePaid != null && pricePaid.compareTo(BigDecimal.ZERO) > 0) {
+              comicBook.setSalePrice(pricePaid);
+          }
 
           // Grading & Condition
           GradingCompany certificationCompany = parseGradingCompany(record.get(ConditionFields.CERTIFICATION_COMPANY.col()));
@@ -239,24 +285,24 @@ public class CsvToJsonConverter {
               condition
                   .isGraded(true)
                   .cgcCondition(CGCCondition.builder()
-                      .label(record.get(ConditionFields.CGC_LABEL.col()))
-                      .grade(parseComicGrade(record.get(ConditionFields.CGC_GRADE.col())))
-                      .pageQuality(parsePageQuality(record.get(ConditionFields.CGC_PAGE_QUALITY.col())))
-                      .pedigree(record.get(ConditionFields.CGC_PEDIGREE.col()))
-                      .signature(parseBoolean(record.get(ConditionFields.CGC_SIGNATURE.col())))
-                      .degreeOfRestoration(record.get(ConditionFields.CGC_DEGREE_OF_RESTORATION.col()))
-                      .graderNotes(record.get(ConditionFields.CGC_GRADER_NOTES.col()))
+                      .label(safeGet(record, ConditionFields.CGC_LABEL.col()))
+                      .grade(parseComicGrade(safeGet(record, ConditionFields.CGC_GRADE.col())))
+                      .pageQuality(parsePageQuality(safeGet(record, ConditionFields.CGC_PAGE_QUALITY.col())))
+                      .pedigree(safeGet(record, ConditionFields.CGC_PEDIGREE.col()))
+                      .signature(parseBoolean(safeGet(record, ConditionFields.CGC_SIGNATURE.col())))
+                      .degreeOfRestoration(safeGet(record, ConditionFields.CGC_DEGREE_OF_RESTORATION.col()))
+                      .graderNotes(safeGet(record, ConditionFields.CGC_GRADER_NOTES.col()))
                       .build());
           } else if (certificationCompany == GradingCompany.CBCS) {
               condition
                   .isGraded(true)
                   .cbcsCondition(CBCSCondition.builder()
-                      .label(record.get(ConditionFields.CBCS_LABEL.col()))
-                      .grade(parseComicGrade(record.get(ConditionFields.CBCS_GRADE.col())))
-                      .pageQuality(parsePageQuality(record.get(ConditionFields.CBCS_PAGE_QUALITY.col())))
-                      .pedigree(record.get(ConditionFields.CBCS_PEDIGREE.col()))
-                      .signature(parseBoolean(record.get(ConditionFields.CBCS_SIGNATURE.col())))
-                      .degreeOfRestoration(record.get(ConditionFields.CBCS_DEGREE_OF_RESTORATION.col()))
+                      .label(safeGet(record, ConditionFields.CBCS_LABEL.col()))
+                      .grade(parseComicGrade(safeGet(record, ConditionFields.CBCS_GRADE.col())))
+                      .pageQuality(parsePageQuality(safeGet(record, ConditionFields.CBCS_PAGE_QUALITY.col())))
+                      .pedigree(safeGet(record, ConditionFields.CBCS_PEDIGREE.col()))
+                      .signature(parseBoolean(safeGet(record, ConditionFields.CBCS_SIGNATURE.col())))
+                      .degreeOfRestoration(safeGet(record, ConditionFields.CBCS_DEGREE_OF_RESTORATION.col()))
                       .build());
           } else {
               condition.isGraded(false);
@@ -301,6 +347,10 @@ public class CsvToJsonConverter {
           log.info("Loaded comic: {} {}", comicBook.getTitle(), comicBook.getNumber());
         } catch (Exception e) {
           log.error("Failed to load record: {}", record, e);
+          String errMsg = e.getClass().getSimpleName() + ": " + e.getMessage();
+          if (parseErrors.size() < 5 && !parseErrors.contains(errMsg)) {
+            parseErrors.add(errMsg);
+          }
           ComicBook failed = new ComicBook();
           failed.setTitle(record.isMapped(ComicFields.COMIC.col()) ? record.get(ComicFields.COMIC.col()) : "Unknown");
           failedToLoad.add(failed);
@@ -314,6 +364,9 @@ public class CsvToJsonConverter {
     results.put("succeeded", loaded);
     results.put("failed", failedToLoad);
     results.put("duplicates", duplicates);
+    if (!parseErrors.isEmpty()) {
+      results.put("errors", parseErrors);
+    }
     return request.createResponseBuilder(HttpStatus.OK)
         .header("Access-Control-Allow-Origin", "*")
         .header("Access-Control-Allow-Methods", "*")

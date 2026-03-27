@@ -79,6 +79,29 @@ public class ComicTriggers {
         }
     }
 
+    @FunctionName("getSeriesList")
+    public HttpResponseMessage getSeriesList(
+        @HttpTrigger(
+            name = "getSeriesList",
+            route = "comics/series",
+            methods = {HttpMethod.GET},
+            authLevel = AuthorizationLevel.ANONYMOUS)
+        HttpRequestMessage<Optional<String>> request)
+    {
+        log.info("Processing getSeriesList function.");
+        try {
+            List<String> series = ComicService.getServiceInstance().getUniqueSeries();
+            String body = OBJECT_MAPPER.writeValueAsString(series);
+            return request.createResponseBuilder(HttpStatus.OK)
+                .header("Access-Control-Allow-Origin", "*")
+                .header("Content-Type", "application/json")
+                .body(body)
+                .build();
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("getSeriesList failed.", e);
+        }
+    }
+
     @FunctionName("getComicById")
     public HttpResponseMessage getComicById(
         @HttpTrigger(
@@ -375,8 +398,9 @@ public class ComicTriggers {
         if (collectionGroupStr != null) {
             try { collectionGroup = Integer.parseInt(collectionGroupStr); } catch (NumberFormatException ignored) {}
         }
+        boolean setPriceToPricePaid = "true".equalsIgnoreCase(request.getQueryParameters().get("setPriceToPricePaid"));
         try {
-            return csvToJsonConverter.loadGoCollectCsvData(request, collectionGroup);
+            return csvToJsonConverter.loadGoCollectCsvData(request, collectionGroup, setPriceToPricePaid);
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Data load failed to return results.", e);
         }

@@ -82,6 +82,20 @@ public class ComicService {
         return result;
     }
 
+    public List<String> getUniqueSeries() {
+        log.info("Calling getUniqueSeries...");
+        CosmosPagedIterable<String> items = comicsContainer.queryItems(
+            "SELECT DISTINCT VALUE c.series FROM c WHERE IS_DEFINED(c.series) AND c.series != null AND c.series != ''",
+            new CosmosQueryRequestOptions(), String.class);
+        List<String> result = new ArrayList<>();
+        for (String s : items) {
+            if (s != null && !s.isBlank()) result.add(s);
+        }
+        result.sort(String.CASE_INSENSITIVE_ORDER);
+        log.info("getUniqueSeries() returned {} unique series.", result.size());
+        return result;
+    }
+
     public List<String> getOrphanedImagesNames() {
         List<String> allCachedImages = ImageService.getServiceInstance().getImagesList();
         List<ComicBook> comicBooks = this.getComicsList();

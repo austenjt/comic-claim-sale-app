@@ -16,6 +16,7 @@ export class LoadGoCollectFormComponent {
   statusMessage = '';
 
   importAsSet = false;
+  setPriceToPricePaid = false;
   availableSets: Comic[] = [];
   selectedSet: Comic | null = null;
 
@@ -56,14 +57,15 @@ export class LoadGoCollectFormComponent {
     const collectionGroup = this.importAsSet && this.selectedSet?.collectionGroup != null
       ? this.selectedSet.collectionGroup
       : undefined;
-    this.comicService.uploadCSVFile(this.selectedFile!, collectionGroup).subscribe({
+    this.comicService.uploadCSVFile(this.selectedFile!, collectionGroup, this.setPriceToPricePaid).subscribe({
       next: (result: CsvUploadResult) => {
-        this.status = 'success';
+        this.status = result.errors?.length ? 'error' : 'success';
         this.statusMessage =
           `${result.succeeded.length} added` +
           (collectionGroup != null ? ` to Set ${collectionGroup}` : '') +
           `, ${result.duplicates.length} duplicate${result.duplicates.length !== 1 ? 's' : ''}, ` +
-          `${result.failed.length} failed.`;
+          `${result.failed.length} failed.` +
+          (result.errors?.length ? ` Reason: ${result.errors[0]}` : '');
         this.selectedFile = undefined;
       },
       error: () => {

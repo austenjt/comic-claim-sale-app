@@ -583,6 +583,7 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
   // ── Add Set modal ─────────────────────────────────────────────────────────
   showAddSetModal = false;
   addSetCollectionGroup: number | null = null;
+  addSetName = '';
   addSetSaving = false;
   addSetError = '';
   addSetExistingGroups: number[] = [];
@@ -609,8 +610,10 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
   // ── Quick Add wizard ──────────────────────────────────────────────────────
   qaStep = 1;
   qaSaving = false;
-  qaSuccess = false;
+  qaSuccess: string | false = false;
   qaError = '';
+  qaSeries: string[] = [];
+  private qaLastSeries = '';
 
   readonly ERA_OPTIONS = ['Golden Age', 'Silver Age', 'Bronze Age', 'Copper Age', 'Modern Age'];
 
@@ -651,7 +654,7 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
   };
 
   qaDefaultSeries() {
-    if (!this.qa.series) this.qa.series = this.qa.title;
+    if (!this.qa.series && !this.qaLastSeries) this.qa.series = this.qa.title;
   }
 
   qaNext() { this.qaStep = 2; }
@@ -664,7 +667,7 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
     this.qaSuccess = false;
     this.qaError = '';
     this.qa = {
-      title: '', series: '', number: '', publisher: '', era: '', publishedDate: '',
+      title: '', series: this.qaLastSeries, number: '', publisher: '', era: '', publishedDate: '',
       variant: '', barCode: '', printRun: null, keyIssue: '', writer: '', artist: '',
       isForSale: true, salePrice: null, targetPrice: null, personalEstimate: null,
       pricePaid: null, dateAcquired: '', purchasedFrom: '', purchaseReferenceURL: '',
@@ -779,12 +782,16 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
       next: returned => {
         this.comics = [...this.comics, returned];
         this.qaSaving = false;
-        this.qaSuccess = true;
+        this.qaLastSeries = this.qa.series;
+        const numLabel = this.comicNumberLabel(returned);
+        this.qaSuccess = `Saved "${returned.title}${numLabel}" — Ready for next entry.`;
         this.dataLoaded = false;
-        setTimeout(() => this.qaReset(), 1200);
+        setTimeout(() => this.qaReset(), 3000);
       },
       error: () => {
-        this.qaError = 'Failed to save. Please try again.';
+        const title = this.qa.title.trim() || 'comic';
+        const numLabel = this.qa.number.trim() ? ` #${this.qa.number.trim()}` : '';
+        this.qaError = `Failed to save "${title}${numLabel}". Please try again.`;
         this.qaSaving = false;
       }
     });
@@ -795,6 +802,7 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.enums = this.configService.getEnums();
+    this.comicService.getSeriesList().subscribe(list => { this.qaSeries = list; });
   }
 
   ngOnDestroy() { }
@@ -883,6 +891,7 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
 
   openAddSet(): void {
     this.addSetCollectionGroup = null;
+    this.addSetName = '';
     this.addSetError = '';
     this.comicService.getCachedComics().pipe(take(1)).subscribe(allComics => {
       this.addSetExistingGroups = allComics
@@ -895,17 +904,19 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
   cancelAddSet(): void {
     this.showAddSetModal = false;
     this.addSetCollectionGroup = null;
+    this.addSetName = '';
     this.addSetError = '';
     this.addSetExistingGroups = [];
   }
 
   confirmAddSet(): void {
     if (!this.addSetCollectionGroup || this.addSetGroupInvalid || this.addSetGroupConflict) return;
+    if (!this.addSetName.trim()) return;
     this.addSetSaving = true;
     this.addSetError = '';
     const setComic: Comic = {
       id: -1,
-      title: 'Set (Needs Name)',
+      title: this.addSetName.trim(),
       series: '',
       number: { volume: null, number: null, sentinel: 'SET' },
       publisher: null,
@@ -960,6 +971,7 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
         this.dataLoaded = true;
         this.showAddSetModal = false;
         this.addSetCollectionGroup = null;
+        this.addSetName = '';
         this.addSetExistingGroups = [];
       },
       error: () => {
