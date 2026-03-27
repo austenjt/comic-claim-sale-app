@@ -1,66 +1,63 @@
 <div class="hiw-container">
 
-  <h1>Start Here — How It Works</h1>
-
-  <div class="hiw-actions">
-    <a routerLink="/register" class="hiw-btn hiw-btn-primary">Request an Account</a>
-    <a routerLink="/login" class="hiw-btn hiw-btn-secondary">Log In</a>
-    <a routerLink="/dashboard" class="hiw-btn hiw-btn-secondary">Browse Comics</a>
+  <div class="hiw-hero">
+    <h1>Documentation</h1>
+    <p class="hiw-subtitle">Everything you need to know about browsing, claiming, and ordering.</p>
+    <div class="hiw-actions">
+      <a routerLink="/register" class="hiw-btn hiw-btn-primary">Request an Account</a>
+      <a routerLink="/login" class="hiw-btn hiw-btn-secondary">Log In</a>
+      <a routerLink="/dashboard" class="hiw-btn hiw-btn-secondary">Browse Comics</a>
+    </div>
   </div>
 
-  <!-- ── What Is This Platform ────────────────────────────────────────── -->
-  <section class="hiw-section">
-    <h2>What Is This Platform?</h2>
-    <p>
-      This is a <strong>claim sale platform</strong> — a private, invite-only storefront purpose-built
-      for running claim sales online. It handles the full experience: browsing a catalogue, claiming
-      items in real time, cart management, order review, fulfillment, and a permanent sales archive.
-    </p>
-    <p>
-      The platform is <strong>duplicatable</strong> for a one-time fee of <strong>$3,000</strong>.
-      That covers a fully configured, ready-to-run copy of the platform deployed to your own Azure
-      account — your own domain, your own data, completely independent of anyone else's instance.
-    </p>
-    <p>
-      Once deployed, your ongoing infrastructure costs are approximately <strong>$3/month</strong>, for Azure
-      usage, the Namecheap DNS + email service. Azure's serverless pricing means you only pay for what you
-      use, and a typical claim sale operation stays well within free-tier limits for most of the month.
-    </p>
-    <p>
-      The <strong>$20/month AI subscription</strong> (Claude) is entirely optional. It is only needed
-      during periods when you want to make changes to the site — adding features, adjusting the design,
-      or performing maintenance. When you're not actively developing, you can cancel it and resubscribe
-      only when needed.
-    </p>
-  </section>
+  <!-- ── What Is This Platform (collapsible) ──────────────────────────── -->
+  <details class="hiw-collapsible">
+    <summary>What Is This Platform?</summary>
+    <div class="hiw-collapsible-body">
+      <p>
+        This is a <strong>claim sale platform</strong> — a private, invite-only storefront purpose-built
+        for running claim sales online. It handles the full experience: browsing a catalogue, claiming
+        items in real time, cart management, order review, fulfillment, and a permanent sales archive.
+      </p>
+      <p>
+        The platform is <strong>duplicatable</strong> for a one-time fee of <strong>$3,000</strong>.
+        That covers a fully configured, ready-to-run copy deployed to your own Azure account — your own
+        domain, your own data, completely independent of anyone else's instance.
+      </p>
+      <p>
+        Once deployed, your ongoing infrastructure costs are approximately <strong>$3/month</strong> for
+        Azure usage and Namecheap DNS. Azure's serverless pricing means you only pay for what you use,
+        and a typical claim sale operation stays well within free-tier limits for most of the month.
+      </p>
+      <p>
+        The <strong>$20/month AI subscription</strong> (Claude) is entirely optional — only needed when
+        you want to make changes to the site. Cancel and resubscribe only when needed.
+      </p>
+    </div>
+  </details>
 
-  <!-- ── What Is a Claim Sale ─────────────────────────────────────────── -->
+  <!-- ── Buyer Sections ───────────────────────────────────────────────── -->
+  <div class="hiw-section-label">For Buyers</div>
+
   <section class="hiw-section">
     <h2>What Is a Claim Sale?</h2>
     <p>
       A <strong>Claim Sale</strong> is a first-come, first-served selling format that originated in
       comic book communities on social media. The seller lists comics at fixed prices and buyers
-      race to claim individual books — no bidding, no auctions, no back-and-forth negotiating.
+      race to claim individual books — no bidding, no auctions, no negotiating.
       The price is set, and the first person to claim a book gets it.
     </p>
     <p>
-      This site is a private, invite-only storefront built around that format. The seller (that's us)
-      loads the catalogue and sets prices. Approved buyers browse and claim. It's intentionally
-      small and personal — you know exactly who you're buying from, and the seller knows exactly
-      who they're selling to.
+      This site is a private, invite-only storefront built around that format. The seller loads the
+      catalogue and sets prices. Approved buyers browse and claim. It's intentionally small and
+      personal — you know exactly who you're buying from.
     </p>
     <p>
       Claim sales move fast. If you see something you want, don't wait — someone else might grab it
-      first. Once a book is claimed it's off the table for everyone else until it's released
-      back or the order is cancelled.
-    </p>
-    <p>
-      You can simulate a "timed claim sale" by putting books in the database without prices. Then
-      make them go live one by one by setting a price — only priced books show a Claim button.
+      first. Once a book is claimed it's off the table until released back or the order is cancelled.
     </p>
   </section>
 
-  <!-- ── Getting Access ─────────────────────────────────────────────────── -->
   <section class="hiw-section">
     <h2>Getting Access</h2>
     <p>
@@ -70,66 +67,59 @@
     <ol>
       <li>
         <strong>Request an account</strong> — fill out the <a routerLink="/register">registration form</a>
-        with your name, email, shipping address, phone number, and your preferred payment method.
+        with your name, email, shipping address, phone number, and preferred payment method.
       </li>
       <li>
         <strong>Wait for approval</strong> — the seller reviews your request. Once approved, you'll
-        receive a <strong>PIN</strong> directly from the seller via message or email.
-        This PIN is your password — it's generated once and never stored in plain text.
+        receive a <strong>PIN</strong> directly from the seller. This PIN is your password — it's
+        generated once and never stored in plain text.
       </li>
       <li>
         <strong>Log in</strong> — head to the <a routerLink="/login">login page</a>, enter your
-        email address and PIN, and you're in. No email verification links, no password resets.
-        If you ever lose your PIN, contact the seller to have it reset.
+        email and PIN, and you're in. If you ever lose your PIN, contact the seller to have it reset.
       </li>
     </ol>
   </section>
 
-  <!-- ── The Dashboard ─────────────────────────────────────────────────── -->
   <section class="hiw-section">
     <h2>The Dashboard</h2>
     <p>
       The <a routerLink="/dashboard">Dashboard</a> is the main catalogue — every comic currently
-      available for sale is shown here as a card with its cover image, title, series, grade, and price.
-      Comics that have already been sold are not shown at all.
+      available for sale shown as a card with cover image, title, series, grade, and price.
     </p>
     <ul>
       <li>
-        <strong>Available comics</strong> show a blue <em>Claim</em> button if you're logged in as
-        an approved buyer. Comics without a price set do not show a Claim button — the seller hasn't
-        priced them yet.
+        <strong>Available comics</strong> show a green <em>Claim</em> button if you're logged in as
+        an approved buyer. Comics without a price set do not show a Claim button.
       </li>
       <li>
-        <strong>Claimed comics</strong> show a grey <em>Claimed</em> label with the date it was
-        claimed. They're in someone else's active cart — if that order falls through, the book
-        may become available again.
+        <strong>Claimed comics</strong> show a grey <em>Claimed</em> label — they're in someone
+        else's active cart. If that order falls through, the book may become available again.
       </li>
       <li>
-        <strong>Comics in your own cart</strong> show a green <em>In Your Cart</em> label so you
-        can see at a glance what you've already claimed.
+        <strong>Comics in your cart</strong> show a green <em>In Your Cart</em> label.
       </li>
       <li>
-        <strong>Sets</strong> appear as their own card with an orange <em>Set N</em> badge. Clicking
-        a set card takes you to the set's detail page rather than a single-comic detail page.
+        <strong>Sets</strong> appear with an orange <em>Set N</em> badge. Clicking a set card
+        opens the set's detail page.
       </li>
     </ul>
     <p>
-      You can also use the search bar at the top of the dashboard to filter comics by title, series,
-      or other details.
+      Use the search bar to filter by title or series. Use the sort dropdown to order comics by
+      <em>Oldest First</em>, <em>Newest First</em>, <em>A–Z</em>, <em>Z–A</em>,
+      <em>Priced First</em>, <em>Claimed First</em>, or <em>Bidding First</em>.
+      The filter buttons let you hide already-claimed items or hide unpriced items.
     </p>
   </section>
 
-  <!-- ── Sets ──────────────────────────────────────────────────────────── -->
   <section class="hiw-section">
     <h2>Sets</h2>
     <p>
-      A <strong>Set</strong> is a bundle of comics sold together as a single unit. Sets are ideal
-      for runs, lots, or curated groups the seller wants to keep together. You cannot buy individual
-      books out of a set — it's all-or-nothing.
+      A <strong>Set</strong> is a bundle of comics sold together as a single unit — ideal for runs,
+      lots, or curated groups the seller wants to keep together. You cannot buy individual books out
+      of a set; it's all-or-nothing.
     </p>
-    <p>
-      Clicking a set card on the dashboard opens the <strong>Set Detail page</strong>, which shows:
-    </p>
+    <p>The <strong>Set Detail page</strong> shows:</p>
     <ul>
       <li>A cover image and description for the set</li>
       <li>The full list of member books with their individual grades and prices</li>
@@ -138,80 +128,72 @@
     </ul>
     <p>
       When you claim a set, every book in the bundle is added to your cart at once, each tagged with
-      the orange <em>Set N</em> badge. If you want to remove the set from your cart, clicking
-      <em>Remove Set</em> on any member book removes the entire set in one action — you cannot
-      remove just one book from a set while keeping the others.
-    </p>
-    <p>
+      the orange <em>Set N</em> badge. Clicking <em>Remove Set</em> on any member book removes the
+      entire set in one action — you cannot remove just one book from a set.
       All books in a set must be priced before the <em>Claim Set</em> button appears.
     </p>
   </section>
 
-  <!-- ── Bidding ───────────────────────────────────────────────────────── -->
   <section class="hiw-section">
     <h2>Bidding</h2>
     <p>
       Some comics are offered through a <strong>bidding format</strong> instead of a fixed-price
-      claim. These are easy to spot — they show a <em>Bid</em> button on the dashboard card and
-      detail page rather than a <em>Claim</em> button.
+      claim. These are easy to spot — they show a <em>Bid</em> button once the seller opens bidding.
     </p>
     <p>
-      The bidding format used here is a <strong>soft-close English auction</strong>. That means:
+      The format used here is a <strong>soft-close English auction</strong>:
     </p>
     <ul>
       <li>
         <strong>Ascending price</strong> — each bid must be higher than the current high bid.
-        The highest bidder at the end wins.
+        The highest bidder when the timer expires wins.
       </li>
       <li>
-        <strong>Open bids</strong> — the full bid history (bidder names, amounts, and timestamps)
-        is visible to everyone on the comic's detail page.
+        <strong>Open bids</strong> — the full bid history (names, amounts, timestamps) is visible
+        to everyone on the comic's detail page.
       </li>
       <li>
         <strong>Inactivity close</strong> — there is no fixed end time. The countdown timer resets
-        to the full window every time a new bid is placed. The auction only closes after the entire
-        window passes with no new bids. This prevents last-second sniping — if you get outbid,
-        you always have time to respond.
+        every time a new bid is placed. The auction only closes after the full window passes with
+        no new bids — preventing last-second sniping.
       </li>
     </ul>
     <h3>How to participate</h3>
     <ol>
       <li>
-        <strong>Start the cycle</strong> — click <em>Bid</em> on any eligible comic. This opens
-        the bidding cycle at the opening price and makes you the current high bidder. The countdown
-        timer starts immediately and is visible to all buyers.
+        <strong>Wait for the seller to open bidding</strong> — the <em>Bid</em> button on a comic
+        only appears after the seller has opened that item for bidding. You'll see a live
+        notification when bidding goes live.
       </li>
       <li>
-        <strong>Place bids</strong> — if another buyer outbids you during the window, you'll see the
-        live high bid and their name update on both the dashboard card and the detail page. Enter a
-        higher amount on the detail page and click <em>Place Bid</em> to retake the lead.
-        Each bid resets the timer to the full window.
+        <strong>Place your first bid</strong> — click <em>Bid</em> to open the detail page and
+        enter an amount. The first bid starts the countdown timer, which is visible to all buyers.
+      </li>
+      <li>
+        <strong>Stay in the lead</strong> — if you get outbid, the live high bid and bidder name
+        update on both the dashboard card and the detail page. Enter a higher amount and click
+        <em>Place Bid</em> to retake the lead. Each bid resets the timer to the full window.
       </li>
       <li>
         <strong>Winning</strong> — when the timer runs out with no new bids, the comic is
-        automatically added to the winner's cart at the final high-bid price. A toast notification
+        automatically added to the winner's cart at the final high-bid price. A notification
         announces the result to everyone on the dashboard.
       </li>
     </ol>
     <p>
       Items won via bidding show a <em>Won via bid</em> tag in your cart and
-      <strong>cannot be removed</strong>. Contact the seller directly if there is an issue with a
-      bid-won item.
-    </p>
-    <p>
+      <strong>cannot be removed</strong>. Contact the seller directly if there is an issue.
       There is no minimum bid increment — any amount strictly above the current high bid is valid.
     </p>
   </section>
 
-  <!-- ── Comic Detail Pages ─────────────────────────────────────────────── -->
   <section class="hiw-section">
     <h2>Comic Detail Pages</h2>
     <p>
-      Click any comic card on the dashboard to open its detail page. Here you'll find the full
-      information for that book:
+      Click any comic card on the dashboard to open its detail page. Here you'll find:
     </p>
     <ul>
-      <li>High-resolution front and back cover images (click to zoom in)</li>
+      <li>High-resolution front and back cover images</li>
       <li>Title, series, issue number, publisher, and publication date</li>
       <li>Grading details — CGC/CBCS certification number and grade, or estimated grade for raw copies</li>
       <li>Page quality, pedigree, restoration notes, and signatures if applicable</li>
@@ -219,12 +201,11 @@
       <li>GoCollect and Grand Comics Database links if available</li>
     </ul>
     <p>
-      The <em>Claim</em> and <em>Release</em> buttons are also available on the detail page, so you
-      can review a book fully before adding it to your cart, or remove it from your cart directly.
+      The <em>Claim</em> and <em>Release</em> buttons are also available on the detail page so you
+      can review a book fully before adding it to your cart.
     </p>
   </section>
 
-  <!-- ── Your Cart ─────────────────────────────────────────────────────── -->
   <section class="hiw-section">
     <h2>Your Cart</h2>
     <p>
@@ -233,75 +214,60 @@
     </p>
     <ol>
       <li>
-        <strong>Open</strong> — you can freely add and remove comics. There's no time limit while
-        your cart is open.
+        <strong>Open</strong> — freely add and remove comics. No time limit.
       </li>
       <li>
-        <strong>Submitted (review window)</strong> — when you're done shopping, click
-        <em>Submit Order</em>. This starts a short review period set by the seller. During this
-        window you can still remove items but you cannot add new ones. Any applicable sale discounts
-        are calculated and shown at this point.
+        <strong>Submitted (review window)</strong> — click <em>Submit Order</em> when you're done.
+        This starts a short review period set by the seller. During this window you can still remove
+        items but cannot add new ones. Any applicable discounts are calculated and shown here.
       </li>
       <li>
         <strong>Finalized</strong> — once the review window expires, your cart locks automatically.
         The seller will reach out to arrange payment and shipping.
       </li>
       <li>
-        <strong>Fulfilled</strong> — once the seller marks your order as fulfilled, the cart is
-        closed. You can then start a new cart and claim again.
+        <strong>Fulfilled</strong> — once the seller marks your order as fulfilled, the cart closes.
+        You can then start a new cart and claim again.
       </li>
     </ol>
     <p>
-      If a discount applies to your order, you'll see a <em>Discount</em> line in your cart summary
-      with the amount saved and a description of which rule was applied. Discounts are automatically
-      recalculated if you remove items from a submitted cart.
+      If a discount applies, you'll see a <em>Discount</em> line in your cart summary with the
+      amount saved and a description of the rule applied. Discounts are recalculated automatically
+      if you remove items from a submitted cart.
     </p>
     <p>
-      Items that belong to a set are grouped and tagged with an orange <em>Set N</em> badge. The
-      <em>Remove Set</em> button removes all books in the set at once — individual set members
-      cannot be removed one at a time.
+      Set items are grouped with an orange <em>Set N</em> badge. The <em>Remove Set</em> button
+      removes all books in the set at once — you cannot remove individual books from a set.
     </p>
   </section>
 
-  <!-- ── Orders ────────────────────────────────────────────────────────── -->
   <section class="hiw-section">
     <h2>Orders</h2>
     <p>
-      The <a routerLink="/orders">Orders page</a> shows your complete order history — every order
-      that has been fulfilled, with its line items, prices, and totals. This history is permanently
-      archived and will never be lost, even if the seller resets the catalogue between sale events.
+      The <a routerLink="/orders">Orders page</a> shows your complete order history — every fulfilled
+      order with its line items, prices, and totals. This history is permanently archived and will
+      never be lost, even if the seller resets the catalogue between sale events.
     </p>
   </section>
 
-  <!-- ── Live Notifications ─────────────────────────────────────────────── -->
   <section class="hiw-section">
     <h2>Live Notifications</h2>
     <p>
-      The app shows real-time toast notifications in the upper-right corner of every page, so you
-      always know what's happening even when you're not on the dashboard.
+      The app shows real-time toast notifications in the upper-right corner so you always know
+      what's happening.
     </p>
     <ul>
-      <li>
-        When you <strong>claim</strong> a comic, you'll see a confirmation: <em>"Title #N" added to your cart — $XX</em>.
-      </li>
-      <li>
-        When <strong>someone else claims</strong> a comic, you'll see: <em>"Title #N" added to UserName's cart — $XX</em>.
-      </li>
-      <li>
-        When the seller <strong>awards</strong> a comic to a user, everyone sees: <em>"Title #N" awarded to UserName — FREE!</em>
-      </li>
-      <li>
-        When anyone <strong>removes</strong> a comic from their cart, everyone sees: <em>"Title #N" Returned to sale</em>.
-        This is useful so you know a book you wanted has come back available.
-      </li>
+      <li>When you <strong>claim</strong> a comic: <em>"Title #N" added to your cart — $XX</em></li>
+      <li>When <strong>someone else claims</strong>: <em>"Title #N" added to UserName's cart — $XX</em></li>
+      <li>When the seller <strong>awards</strong> a comic: <em>"Title #N" awarded to UserName — FREE!</em></li>
+      <li>When a comic is <strong>returned to sale</strong>: <em>"Title #N" Returned to sale</em> — useful for spotting books you missed coming back available</li>
     </ul>
     <p>
-      Each notification stays visible for 30 seconds and can be dismissed early with the ✕ button.
-      Multiple toasts can stack. Notifications clear automatically when you navigate to a new page.
+      Each notification stays visible for 30 seconds and can be dismissed early. Multiple toasts
+      can stack and clear automatically when you navigate to a new page.
     </p>
   </section>
 
-  <!-- ── Your Profile ──────────────────────────────────────────────────── -->
   <section class="hiw-section">
     <h2>Your Profile</h2>
     <p>
@@ -311,42 +277,27 @@
     </p>
   </section>
 
-  <!-- ── Payment ────────────────────────────────────────────────────────── -->
   <section class="hiw-section">
     <h2>Payment</h2>
     <p>
-      Payment is handled directly between you and the seller — there's no checkout or payment
-      processor built into this site. When you register (or update your profile), include your
-      preferred payment method in the <em>Payment Notes</em> field. Common options include
-      PayPal, Venmo, cash at pickup, and so on. The seller will contact you after your order is
-      finalized to confirm the total, payment, and shipping details.
+      Payment is handled directly between you and the seller — there's no payment processor built
+      into this site. Include your preferred payment method in the <em>Payment Notes</em> field
+      of your profile (PayPal, Venmo, cash at pickup, etc.). The seller will contact you after
+      your order is finalized to confirm the total and shipping details.
     </p>
   </section>
 
-  <!-- ── Contact ───────────────────────────────────────────────────────── -->
   <section class="hiw-section">
     <h2>Contact</h2>
     <p>
       The <a routerLink="/contact">Contact page</a> is the best way to reach the seller outside of
-      a formal order. Use it to:
-    </p>
-    <ul>
-      <li>Ask a question about a specific listing</li>
-      <li>Make an offer on something you've seen</li>
-      <li>Inquire about a book not currently in the catalogue</li>
-      <li>Say hello</li>
-    </ul>
-    <p>
-      Fill in your name, email address, and message, then hit <em>Send Message</em>. The seller
-      typically responds within 1–2 business days. You do not need to be logged in to use the
-      contact form.
+      a formal order — ask about a listing, make an offer, or inquire about something not currently
+      in the catalogue. You do not need to be logged in to use the contact form.
     </p>
   </section>
 
-  <!-- ── Admin Section ─────────────────────────────────────────────────── -->
-  <div class="hiw-admin-divider">
-    <span>Admin Reference</span>
-  </div>
+  <!-- ── Admin Sections ────────────────────────────────────────────────── -->
+  <div class="hiw-admin-divider"><span>Admin Reference</span></div>
 
   <section class="hiw-section hiw-admin">
     <h2>Dashboard (Admin View)</h2>
@@ -356,10 +307,9 @@
     </p>
     <ul>
       <li>
-        <strong>Award button</strong> — appears on any unclaimed comic. Clicking it opens a modal
-        listing all approved (non-admin) users. Selecting a user immediately adds the comic to
-        that user's cart at <strong>$0.00</strong> (free). If the user has no active cart, one is
-        created for them. Already-claimed comics do not show the Award button.
+        <strong>Award button</strong> — appears on any unclaimed comic. Opens a modal listing all
+        approved users. Selecting a user immediately adds the comic to their cart at <strong>$0.00</strong>.
+        If the user has no active cart, one is created. Already-claimed comics do not show the Award button.
       </li>
     </ul>
   </section>
@@ -373,31 +323,38 @@
       <li>
         <strong>Global switch</strong> — set the <code>BIDDING_MODE</code> environment variable
         to <code>true</code> on the Azure Function App to enable the bidding API. When
-        <code>false</code> (or unset), all bid endpoints are disabled and the dashboard shows
-        normal Claim buttons even on bid-enabled comics.
+        <code>false</code> (or unset), all bid endpoints are disabled.
       </li>
       <li>
         <strong>Per-comic opt-in</strong> — check the <em>Enable Bid</em> checkbox on a comic
-        row in Comics Management to mark that comic for bidding. Only comics with this flag set
-        will show a Bid button to buyers (when global bidding is also on).
+        row in Comics Management. Only comics with this flag set can enter a bidding cycle.
       </li>
       <li>
         <strong>Window length</strong> — set <code>BIDDING_CYCLE</code> (in minutes, default 10)
-        to control how long the inactivity window is. Each new bid resets the full window.
-        Shorter windows create faster, more urgent cycles; longer windows give buyers more time to
-        respond to an outbid.
+        to control the inactivity window. Each new bid resets the full window.
       </li>
     </ul>
+    <h3>Opening and cancelling a cycle</h3>
     <p>
-      <strong>No manual action is needed to close a cycle.</strong> When the countdown timer on
-      the dashboard hits zero, the browser automatically calls the finalize API, adds the comic to
-      the winner's cart at the high-bid price, and shows a toast notification to all online users.
-      The comic then shows as claimed on the dashboard and is locked out of further bidding.
+      Bid-enabled comics show a <strong>Start Bid</strong> button on the dashboard (admin only).
+      Clicking it opens the item for bidding — buyers will see the <em>Bid</em> button appear and
+      receive a live notification. Bidding does not officially start (the timer does not run) until
+      the first buyer places a bid.
     </p>
     <p>
-      Bid-won items carry a <code>wonViaBid</code> flag on the cart item. They are priced at the
-      winning bid amount and are excluded from the buyer's ability to remove items, but they are
-      included in discount calculations when the buyer submits their order.
+      If no buyer has bid yet, a <strong>Cancel</strong> button appears next to the status label,
+      letting you rescind the open offer. Once a buyer has placed a bid, the cycle cannot be
+      cancelled — it must run to completion.
+    </p>
+    <p>
+      <strong>No manual action is needed to close a cycle.</strong> When the countdown timer hits
+      zero, the browser automatically calls the finalize API, adds the comic to the winner's cart
+      at the high-bid price, and notifies all online users. The comic then shows as claimed and is
+      locked from further bidding.
+    </p>
+    <p>
+      Bid-won items carry a <code>wonViaBid</code> flag. They are priced at the winning bid amount,
+      cannot be removed by the buyer, and are included in discount calculations when the order is submitted.
     </p>
   </section>
 
@@ -408,61 +365,51 @@
       (submitted and finalized carts), <em>Open Shopping Carts</em> (carts with items that haven't
       been submitted yet), and <em>Order Archive</em> (permanently fulfilled orders).
     </p>
-    <p>
-      Each comic title is a clickable link showing the title and issue number together.
-    </p>
     <ul>
       <li>
-        <strong>Release</strong> — removes a single comic from a buyer's cart and returns it to
-        sale. A <em>"Returned to sale"</em> toast is shown to all users in real time. Discounts
-        are automatically recalculated after removal.
+        <strong>Release</strong> — removes a standalone comic from a buyer's cart and returns it to
+        sale. A <em>"Returned to sale"</em> toast is shown to all users in real time.
+      </li>
+      <li>
+        <strong>Release Set</strong> — appears on set member books. Removes the entire set from the
+        buyer's cart in one action and returns all books to sale with a single notification.
+      </li>
+      <li>
+        <strong>UnSubmit</strong> — reverts a submitted order back to Open so the buyer can add or
+        remove items. Useful when a buyer needs to make changes after submitting.
       </li>
       <li>
         <strong>Mark as Fulfilled</strong> — only enabled once a cart reaches <em>Finalized</em>
-        status (after the review window). Uses a two-click confirmation: first click reloads the
-        latest order data, then the button turns orange showing <em>Confirm Fulfill?</em>. The
-        second click permanently archives the order, stamps each comic with the buyer's name and
-        sold date, and removes it from the active list. Fulfilled comics no longer appear on the
-        dashboard.
+        status. Uses a two-click confirmation. The second click permanently archives the order,
+        stamps each comic with the buyer's name and sold date, and removes them from the dashboard.
       </li>
     </ul>
     <p>
-      Carts transition from <em>Submitted</em> to <em>Finalized</em> lazily — the next time the
-      Orders page loads after the review window expires.
+      Carts transition from <em>Submitted</em> to <em>Finalized</em> lazily — on the next page load
+      after the review window expires. The window length is controlled by the
+      <code>FINALIZE_HOURS</code> environment variable (default 20 hours).
     </p>
-    <p>
-      The review window length is controlled by the <code>FINALIZE_HOURS</code> environment variable
-      on the Azure Function App. The default is 20 hours if not set. Adjust it via the Azure portal
-      or <code>az functionapp config appsettings set</code>.
-    </p>
-    <p>
-      The <strong>Order Archive</strong> section at the bottom shows all permanently fulfilled
-      orders. Each archived order has two delete options:
-    </p>
+    <p>The <strong>Order Archive</strong> section has two delete options:</p>
     <ul>
       <li>
-        <strong>Delete</strong> — removes only the archived order record. The comics that were in
-        that order remain in the database (useful if you want to keep the comic records).
+        <strong>Delete</strong> — removes only the archived order record. The comics remain in
+        the database.
       </li>
       <li>
-        <strong>Full Delete</strong> — only appears on orders that contained a set. Removes the
+        <strong>Full Delete</strong> — only appears on orders containing a set. Removes the
         archived order record <em>and</em> permanently deletes all comics in the associated set
-        from the database. Use this when you want to fully clean up a sold set.
+        from the database.
       </li>
     </ul>
-    <p>
-      Order Archive records are never touched by a database reset, so the full sales history
-      is always preserved.
-    </p>
+    <p>Order Archive records are never touched by a database reset — the full sales history is always preserved.</p>
   </section>
 
   <section class="hiw-section hiw-admin">
     <h2>Sales &amp; Discounts</h2>
     <p>
       The <strong>Sales</strong> page lets you configure discount rules automatically applied when
-      a buyer submits their order. Multiple active rules stack. The discount is snapshotted onto
-      the order at submit time, so historical totals are preserved even if you later change or
-      remove a rule.
+      a buyer submits their order. Multiple active rules stack. Discounts are snapshotted at submit
+      time, so historical totals are preserved even if you later change the rules.
     </p>
     <p>Three discount types are supported:</p>
     <ul>
@@ -476,64 +423,56 @@
       </li>
       <li>
         <strong>Percentage Per X Books</strong> (<em>PERCENTAGE_PER_X_BOOKS</em>) — for every
-        X books in the cart, add a percentage discount (capped at 100%). Example: 5% off per
-        3 books means a 6-book cart gets 10% off, a 9-book cart gets 15%, and so on.
+        X books, add a percentage discount (capped at 100%). Example: 5% off per 3 books means
+        a 6-book cart gets 10% off, a 9-book cart gets 15%, and so on.
       </li>
     </ul>
     <p>
-      Each rule can be toggled active or inactive. Inactive rules are saved but not applied.
-      You can create, edit, and delete rules from this screen.
+      Awarded items ($0.00) are excluded from discount calculations. Each rule can be toggled
+      active or inactive without deleting it.
     </p>
     <p>
       This page also lets you toggle <strong>Award Mode</strong> — when enabled, an Award button
-      appears on unclaimed comics on the dashboard, letting you add a book to any approved user's
-      cart at $0.00.
+      appears on unclaimed comics on the dashboard.
     </p>
-
     <h3>Reset Database</h3>
     <p>
       At the bottom of the Sales page is a <strong>Reset Database</strong> section, intended for
-      use between sale events. To confirm the action, type <code>RESET</code> in the input field
-      and click the button. This will:
+      use between sale events. Type <code>RESET</code> to confirm. This will:
     </p>
     <ul>
-      <li>Archive any fulfilled carts that haven't been archived yet (order history is preserved)</li>
+      <li>Archive any fulfilled carts not yet archived (order history is preserved)</li>
       <li>Delete all active carts and discounts</li>
       <li>Delete all comics and their associated images</li>
       <li>Delete all sessions except your own (so you stay logged in)</li>
     </ul>
-    <p>
-      The Order Archive is never touched by a reset — all past sales history remains intact
-      in the <strong>Orders</strong> admin view and in each buyer's <strong>Orders</strong> page.
-    </p>
+    <p>The Order Archive is never touched by a reset.</p>
   </section>
 
   <section class="hiw-section hiw-admin">
     <h2>User Admin</h2>
     <p>
-      The <strong>User Admin</strong> screen is split into two tables — pending account requests
-      at the top and existing approved users below.
+      The <strong>User Admin</strong> screen shows pending account requests at the top and approved
+      users in cards below.
     </p>
     <ul>
       <li>
-        <strong>Approve</strong> — approves a pending request, generates a PIN, and moves the
-        user to the Approved Users table. A modal displays the new PIN — copy it and send it to
-        the buyer directly. It will not be shown again.
+        <strong>Approve</strong> — approves a pending request, generates a PIN, and moves the user
+        to the approved list. A modal displays the new PIN — copy it and send it directly to the
+        buyer. It will not be shown again.
       </li>
       <li>
-        <strong>Reset PIN</strong> — generates a brand-new PIN for an existing user (for example,
-        if they've lost theirs). The same modal appears with the new PIN. The old PIN stops working
-        immediately.
+        <strong>Reset PIN</strong> — generates a brand-new PIN for an existing user. The same modal
+        appears with the new PIN. The old PIN stops working immediately.
       </li>
       <li>
         <strong>Suspend / Reactivate</strong> — suspending a user blocks their login immediately
-        without deleting their account. Their status badge turns red. Reactivating restores their
-        access.
+        without deleting their account. Reactivating restores access.
       </li>
     </ul>
     <p>
       The admin account row does not show Reset PIN or Suspend controls — it displays
-      <em>Admin</em> in the Actions column instead.
+      <em>Admin</em> in the actions area instead.
     </p>
   </section>
 
@@ -541,61 +480,47 @@
     <h2>Comics Management</h2>
     <p>
       The <strong>Comics Management</strong> screen is a full-featured data grid showing every
-      comic in the database — not just the ones listed for sale. Each row is directly editable:
-      click any cell to update it and the change saves automatically.
+      comic in the database. Each row is directly editable — click any cell to update it and the
+      change saves automatically.
     </p>
     <ul>
       <li>
-        <strong>For Sale</strong> — the checkbox in this column controls whether a comic appears
-        on the buyer-facing dashboard. Unchecking it hides the comic from buyers immediately
-        without deleting it.
-      </li>
-      <li>
-        <strong>Date fields</strong> — Date Acquired, Published Date, and Date Sold use a date
-        picker. Enter dates in YYYY-MM-DD format. Setting a Date Sold value on a comic
-        automatically hides it from the dashboard.
+        <strong>For Sale</strong> — controls whether a comic appears on the buyer-facing dashboard.
+        Unchecking it hides the comic immediately without deleting it.
       </li>
       <li>
         <strong>Sale Price vs Target Price</strong> — Target Price is your internal reference;
-        Sale Price is what buyers see on the dashboard and in their cart totals. Books without
-        a Sale Price do not show a Claim button to buyers.
+        Sale Price is what buyers see on the dashboard and pay in their cart. Books without a Sale
+        Price do not show a Claim button.
       </li>
       <li>
-        <strong>Add</strong> — use the toolbar button to add a new comic row with placeholder
-        values. Fill in the details directly in the grid.
+        <strong>Date fields</strong> — Date Acquired, Published Date, and Date Sold use YYYY-MM-DD
+        format. Setting a Date Sold automatically hides the comic from the dashboard.
       </li>
       <li>
-        <strong>Delete</strong> — the delete icon on the left of any row permanently removes the
-        comic, deletes all of its associated images (front cover, back cover, and thumbnails),
-        and automatically releases it from any active carts.
+        <strong>Quick Add</strong> — use the Quick Add wizard at the top of the page to add a new
+        comic with the most common fields in a two-step form.
       </li>
       <li>
-        <strong>Sorting and filtering</strong> — click any column header to sort, or use the
-        filter icon to narrow the list by any field.
+        <strong>Delete</strong> — the delete icon on the left permanently removes the comic,
+        deletes all associated images, and releases it from any active carts.
       </li>
     </ul>
-
     <h3>Sets Management</h3>
-    <p>
-      The toolbar also contains set-specific actions:
-    </p>
     <ul>
       <li>
-        <strong>Add Set</strong> — creates a new set container comic. Give it a title, series,
-        cover image, and public notes that describe the bundle. The container itself is priced at
-        $0; the total displayed to buyers is the sum of the member books' sale prices.
+        <strong>Add Set</strong> — creates a new set container. Give it a title, series, cover
+        image, and public notes. The container is priced at $0; the total shown to buyers is the
+        sum of member books' sale prices.
       </li>
       <li>
-        <strong>Add to Set</strong> — assigns an existing standalone comic to a set. Select the
-        target set and then the comic to add. The comic becomes a member of that set and will no
-        longer appear as a standalone item on the dashboard.
+        <strong>Add to Set</strong> — assigns an existing standalone comic to a set. The comic
+        becomes a member and no longer appears as a standalone item on the dashboard.
       </li>
       <li>
-        <strong>Delete Set</strong> — removes the set container and ungroups its member comics,
-        making them standalone again. This is only allowed <em>before</em> the set has been
-        claimed. If any member is currently in a user's cart, or if the set appears in a fulfilled
-        archived order, the delete will be blocked with an explanatory message. To remove a
-        fulfilled set, use <strong>Full Delete</strong> on the corresponding archived order instead.
+        <strong>Delete Set</strong> — removes the set container and ungroups its members, making
+        them standalone again. Blocked if any member is in an active cart or if the set appears
+        in a fulfilled archived order (use <strong>Full Delete</strong> on that order instead).
       </li>
     </ul>
   </section>
@@ -603,22 +528,21 @@
   <section class="hiw-section hiw-admin">
     <h2>Comic Detail Page (Admin View)</h2>
     <p>
-      When logged in as Admin, comic detail pages include additional image management controls.
+      Admin detail pages include image management controls below the cover image.
     </p>
     <ul>
       <li>
-        <strong>Update Image</strong> — uploads a new front cover image for the comic. The image
-        is automatically resized if it is very large, and a small thumbnail is generated for use
-        on the dashboard. If the upload fails, an error message appears below the button.
+        <strong>Update Front Cover</strong> — uploads a new front cover image. Automatically resized
+        if very large; a small thumbnail is generated for the dashboard.
       </li>
       <li>
         <strong>Update Back Cover</strong> — uploads a back cover image. This section only appears
-        after a front cover image has been uploaded. A thumbnail is generated automatically.
+        after a front cover has been uploaded.
       </li>
     </ul>
     <p>
-      Uploaded images are stored with metadata (comic ID, title, series, and issue number)
-      attached to each image record.
+      Uploaded images are stored with metadata (comic ID, title, series, issue number) attached
+      to each image record.
     </p>
   </section>
 

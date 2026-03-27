@@ -1,89 +1,195 @@
 .hiw-container {
-  max-width: 760px;
+  max-width: 780px;
   margin: 0 auto;
-  padding: 32px 16px;
+  padding: 32px 20px 64px;
 }
 
-h1 {
-  font-size: 1.8rem;
-  margin-bottom: 32px;
-  color: #7b8f4b;
-}
+/* ── Hero ─────────────────────────────────────────────────────────────── */
 
-.hiw-section {
+.hiw-hero {
   margin-bottom: 36px;
+  padding-bottom: 28px;
+  border-bottom: 2px solid var(--color-border);
 }
 
-.hiw-section h2 {
-  font-size: 1.2rem;
+.hiw-hero h1 {
+  font-size: 2rem;
   font-weight: 700;
-  margin-bottom: 10px;
-  border-bottom: 2px solid #7b8f4b;
-  padding-bottom: 4px;
-  color: var(--color-text);
-}
-
-.hiw-section p, .hiw-section li {
-  line-height: 1.7;
-  margin-bottom: 8px;
-  color: var(--color-text-muted);
-}
-
-.hiw-section ol, .hiw-section ul {
-  padding-left: 24px;
-}
-
-.hiw-section a {
   color: #7b8f4b;
-  font-weight: 500;
+  margin-bottom: 6px;
+}
+
+.hiw-subtitle {
+  font-size: 1rem;
+  color: var(--color-text-muted);
+  margin: 0 0 20px;
 }
 
 .hiw-actions {
   display: flex;
-  gap: 12px;
+  gap: 10px;
   flex-wrap: wrap;
-  margin-top: 16px;
 }
 
 .hiw-btn {
-  padding: 10px 22px;
+  padding: 9px 20px;
   border-radius: 4px;
   text-decoration: none;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   font-weight: 600;
+  transition: background 0.15s;
 }
 
 .hiw-btn-primary {
   background: #7b8f4b;
   color: #f0ead2;
 }
-
-.hiw-btn-primary:hover {
-  background: #6b7e3e;
-  color: #f0ead2;
-}
+.hiw-btn-primary:hover { background: #6b7e3e; color: #f0ead2; text-decoration: none; }
 
 .hiw-btn-secondary {
-  background: #7b8f4b;
-  color: #f0ead2;
-  border: none;
+  background: #dde5b6;
+  color: #6c584c;
+  border: 1px solid #b8c89a;
+}
+.hiw-btn-secondary:hover { background: #c8d4a8; color: #6c584c; text-decoration: none; }
+
+/* ── Collapsible ──────────────────────────────────────────────────────── */
+
+.hiw-collapsible {
+  background: #dde5b6;
+  border: 1px solid #b8c89a;
+  border-radius: 6px;
+  margin-bottom: 24px;
 }
 
-.hiw-btn-secondary:hover {
-  background: #6b7e3e;
-  color: #f0ead2;
+.hiw-collapsible summary {
+  padding: 14px 18px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--color-text);
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  user-select: none;
 }
+
+.hiw-collapsible summary::-webkit-details-marker { display: none; }
+
+.hiw-collapsible summary::before {
+  content: '▶';
+  font-size: 0.65rem;
+  color: #a98467;
+  transition: transform 0.15s;
+  flex-shrink: 0;
+}
+
+.hiw-collapsible[open] summary::before {
+  transform: rotate(90deg);
+}
+
+.hiw-collapsible-body {
+  padding: 0 18px 16px;
+  border-top: 1px solid #b8c89a;
+}
+
+.hiw-collapsible-body p {
+  line-height: 1.7;
+  margin-top: 12px;
+  margin-bottom: 0;
+  color: var(--color-text-muted);
+  font-size: 0.92rem;
+}
+
+/* ── Section label ────────────────────────────────────────────────────── */
+
+.hiw-section-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #a98467;
+  margin: 8px 0 14px;
+}
+
+/* ── Buyer sections ───────────────────────────────────────────────────── */
+
+.hiw-section {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 20px 24px;
+  margin-bottom: 14px;
+}
+
+.hiw-section h2 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0 0 12px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #7b8f4b;
+}
+
+.hiw-section h3 {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #7b8f4b;
+  margin: 16px 0 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.hiw-section p {
+  line-height: 1.7;
+  margin: 0 0 10px;
+  color: var(--color-text-muted);
+  font-size: 0.92rem;
+}
+
+.hiw-section p:last-child { margin-bottom: 0; }
+
+.hiw-section ul,
+.hiw-section ol {
+  padding-left: 20px;
+  margin: 0 0 10px;
+}
+
+.hiw-section li {
+  line-height: 1.7;
+  margin-bottom: 6px;
+  color: var(--color-text-muted);
+  font-size: 0.92rem;
+}
+
+.hiw-section li:last-child { margin-bottom: 0; }
+
+.hiw-section a {
+  color: #7b8f4b;
+  font-weight: 500;
+}
+
+.hiw-section code {
+  background: #c8d4a8;
+  color: #6c584c;
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-size: 0.85em;
+}
+
+/* ── Admin divider ────────────────────────────────────────────────────── */
 
 .hiw-admin-divider {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin: 48px 0 24px;
+  margin: 40px 0 20px;
   color: var(--color-text-muted);
-  font-size: 0.78rem;
+  font-size: 0.68rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.12em;
 }
 
 .hiw-admin-divider::before,
@@ -93,14 +199,18 @@ h1 {
   border-top: 1px solid var(--color-border);
 }
 
+/* ── Admin sections ───────────────────────────────────────────────────── */
+
 .hiw-admin {
   background: #dde5b6;
-  border-left: 3px solid #7b8f4b;
-  border-radius: 0 6px 6px 0;
-  padding: 16px 20px;
-  margin-bottom: 20px;
+  border-left: 3px solid #a98467;
 }
 
 .hiw-admin h2 {
-  border-bottom-color: #7b8f4b;
+  border-bottom-color: #a98467;
+  color: var(--color-text);
+}
+
+.hiw-admin h3 {
+  color: #a98467;
 }

@@ -531,7 +531,21 @@ public class CartService {
             CartItem found = cart.getItems().stream()
                 .filter(i -> comicId.equals(i.getComicId())).findFirst().orElse(null);
             if (found != null) {
-                cart.getItems().removeIf(i -> comicId.equals(i.getComicId()));
+                // Cascade: if the item belongs to a set, remove all items in that set
+                List<CartItem> toRemove;
+                if (found.getCollectionGroup() != null && found.getCollectionGroup() > 0) {
+                    final int group = found.getCollectionGroup();
+                    toRemove = cart.getItems().stream()
+                        .filter(i -> i.getCollectionGroup() != null && group == i.getCollectionGroup())
+                        .collect(java.util.stream.Collectors.toList());
+                    log.info("Admin set release: removing {} items with collectionGroup={} from cart {}", toRemove.size(), group, cart.getId());
+                } else {
+                    toRemove = List.of(found);
+                }
+                java.util.Set<String> idsToRemove = toRemove.stream()
+                    .map(CartItem::getComicId)
+                    .collect(java.util.stream.Collectors.toSet());
+                cart.getItems().removeIf(i -> idsToRemove.contains(i.getComicId()));
                 if (cart.getItems().isEmpty()) {
                     cart.setStatus("DELETED");
                     cart.setFinalizeAfter(null);
@@ -539,8 +553,13 @@ public class CartService {
                     log.info("Cart {} is now empty after admin release, marked as DELETED", cart.getId());
                 }
                 save(cart);
-                writeReturnEvent(found);
-                log.info("Admin removed comic {} from cart {}", comicId, cart.getId());
+                // For set releases, write a single return event using the container item
+                CartItem eventItem = toRemove.stream()
+                    .filter(CartItem::isSetContainer)
+                    .findFirst()
+                    .orElse(found);
+                writeReturnEvent(eventItem);
+                log.info("Admin removed comic {} (and {} set siblings) from cart {}", comicId, toRemove.size() - 1, cart.getId());
                 return cart;
             }
         }

@@ -34,7 +34,7 @@
             <td>
               <ng-container *ngIf="item.collectionGroup && item.collectionGroup > 0; else standaloneRelease">
                 <button class="btn-release"
-                  (click)="unclaim(setContainerComicId(order.items, item.collectionGroup)!)"
+                  (click)="unclaim(item.comicId)"
                   title="Release the entire set back to available">Release Set</button>
               </ng-container>
               <ng-template #standaloneRelease>
@@ -150,7 +150,7 @@
             <td>
               <ng-container *ngIf="item.collectionGroup && item.collectionGroup > 0; else standaloneReleaseOpen">
                 <button class="btn-release"
-                  (click)="unclaim(setContainerComicId(cart.items, item.collectionGroup)!)"
+                  (click)="unclaim(item.comicId)"
                   title="Release the entire set back to available">Release Set</button>
               </ng-container>
               <ng-template #standaloneReleaseOpen>

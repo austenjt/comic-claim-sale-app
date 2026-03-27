@@ -21,7 +21,8 @@
         <select class="sort-select"
                 [value]="sortOrder"
                 (change)="sortOrderChange.emit($any($event.target).value)">
-          <option value="date-added">Date Added</option>
+          <option value="oldest-first">Oldest First</option>
+          <option value="newest-first">Newest First</option>
           <option value="bidding-first">Bidding First</option>
           <option value="claimed-first">Claimed First</option>
           <option value="a-z">A–Z Sort</option>

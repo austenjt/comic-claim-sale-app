@@ -38,7 +38,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   claimingSetId: number | null = null;
   excludeClaimed = false;
   showPricedOnly = false;
-  sortOrder = 'date-added';
+  sortOrder = 'oldest-first';
 
   // Bidding state: comicId → seconds remaining
   bidCountdowns: Record<string, number> = {};
@@ -59,9 +59,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
         c.docType === 'SET' ? this.getSetPrice(c) > 0 : c.salePrice != null
       );
     }
-    if (this.sortOrder !== 'date-added') {
+    if (this.sortOrder !== 'oldest-first') {
       result = [...result];
       switch (this.sortOrder) {
+        case 'newest-first':
+          result.reverse();
+          break;
         case 'a-z':
           result.sort((a, b) => a.title.localeCompare(b.title));
           break;
