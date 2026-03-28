@@ -71,13 +71,18 @@ export class DashboardComponent implements OnInit, OnDestroy {
         case 'z-a':
           result.sort((a, b) => b.title.localeCompare(a.title));
           break;
-        case 'priced-first':
+        case 'highest-price':
           result.sort((a, b) => {
             const aP = a.docType === 'SET' ? this.getSetPrice(a) : (a.salePrice ?? 0);
             const bP = b.docType === 'SET' ? this.getSetPrice(b) : (b.salePrice ?? 0);
-            if (aP > 0 && bP === 0) return -1;
-            if (aP === 0 && bP > 0) return 1;
-            return 0;
+            return bP - aP;
+          });
+          break;
+        case 'lowest-price':
+          result.sort((a, b) => {
+            const aP = a.docType === 'SET' ? this.getSetPrice(a) : (a.salePrice ?? 0);
+            const bP = b.docType === 'SET' ? this.getSetPrice(b) : (b.salePrice ?? 0);
+            return aP - bP;
           });
           break;
         case 'claimed-first':
