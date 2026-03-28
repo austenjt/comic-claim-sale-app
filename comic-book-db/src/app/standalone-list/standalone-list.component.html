@@ -359,6 +359,7 @@
           (cellValueChanged)="onCellValueChanged($event)"
           [stopEditingWhenCellsLoseFocus]="true"
           [quickFilterText]="gridSearch"
+          (firstDataRendered)="onFirstDataRendered($event)"
     >
     </ag-grid-angular>
   </div>

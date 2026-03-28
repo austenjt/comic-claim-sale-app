@@ -237,6 +237,14 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
       }
     },
     {
+      headerName: "Storage Location",
+      field: "storageLocation",
+      filter: true,
+      sortable: true,
+      editable: true,
+      resizable: true,
+    },
+    {
       headerName: "Type",
       field: "docType",
       filter: true,
@@ -806,6 +814,10 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() { }
+
+  onFirstDataRendered(params: any): void {
+    params.api.autoSizeAllColumns();
+  }
 
   onCellClicked( event: CellClickedEvent) {
     console.log('Cell Clicked:', event.value);
