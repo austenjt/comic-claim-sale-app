@@ -312,7 +312,7 @@
       </div>
 
       <!-- Sale Info -->
-      <div class="detail-section" *ngIf="comic.isForSale || comic.salePrice || comic.dateSold || comic.soldTo">
+      <div class="detail-section">
         <div class="detail-section-title">Sale Info</div>
         <div class="detail-item" *ngIf="comic.isForSale">
           <span class="detail-label">For Sale</span>
@@ -329,6 +329,10 @@
         <div class="detail-item" *ngIf="comic.soldTo">
           <span class="detail-label">Sold To</span>
           <span class="detail-value">{{comic.soldTo}}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Storage Location</span>
+          <span class="detail-value">{{comic.storageLocation || ''}}</span>
         </div>
       </div>
 
