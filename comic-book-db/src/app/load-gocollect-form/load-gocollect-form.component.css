@@ -7,6 +7,13 @@
     max-width: 520px;
 }
 
+.csv-patience-note {
+    margin: 0 0 12px 0;
+    font-size: 0.85rem;
+    color: var(--color-text-muted, #888);
+    font-style: italic;
+}
+
 .csv-row {
     display: flex;
     align-items: center;

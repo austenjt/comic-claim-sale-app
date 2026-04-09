@@ -10,9 +10,16 @@ export interface Toast {
   isError?: boolean;
 }
 
+export interface LogEntry {
+  message: string;
+  timestamp: Date;
+  isError: boolean;
+}
+
 @Injectable({ providedIn: 'root' })
 export class ToastService {
   toasts: Toast[] = [];
+  logEntries: LogEntry[] = [];
   newClaimEvent$ = new Subject<ClaimNotification>();
 
   private toastCounter = 0;
@@ -60,6 +67,8 @@ export class ToastService {
     const id = ++this.toastCounter;
     this.toasts.push({ id, message, isError });
     setTimeout(() => this.dismiss(id), 30000);
+    this.logEntries.unshift({ message, timestamp: new Date(), isError });
+    if (this.logEntries.length > 100) this.logEntries.length = 100;
   }
 
   dismiss(id: number): void {

@@ -26,6 +26,7 @@ import org.example.functions.util.Views;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 public class ComicTriggers {
@@ -126,10 +127,7 @@ public class ComicTriggers {
         log.info("Processing getComicById {} function.", id);
         boolean admin = AuthHelper.isAdminRequest(request);
         ComicService comicService = ComicService.getServiceInstance();
-        List<ComicBook> comicBookData = comicService.getComicsList();
-        Optional<ComicBook> matchingComic = comicBookData.stream()
-            .filter(comic -> comic.getId() == Integer.parseInt(id))
-            .findFirst();
+        Optional<ComicBook> matchingComic = comicService.getComicById(Integer.parseInt(id));
         if (matchingComic.isEmpty()) {
             return request.createResponseBuilder(HttpStatus.NOT_FOUND)
                 .header("Access-Control-Allow-Origin", "*")
@@ -138,10 +136,18 @@ public class ComicTriggers {
                 .body(String.format("Comic with id %s not found.", id))
                 .build();
         }
+        ComicBook comic = matchingComic.get();
+        if ("SET".equals(comic.getDocType()) && comic.getCollectionGroup() != null && comic.getCollectionGroup() > 0) {
+            List<ComicBook> members = comicService.getComicsByCollectionGroup(comic.getCollectionGroup())
+                .stream()
+                .filter(m -> !"SET".equals(m.getDocType()))
+                .collect(Collectors.toList());
+            comic.setItems(members);
+        }
         try {
             String body = admin
-                ? OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(matchingComic.get())
-                : OBJECT_MAPPER.writerWithView(Views.Public.class).writeValueAsString(matchingComic.get());
+                ? OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(comic)
+                : OBJECT_MAPPER.writerWithView(Views.Public.class).writeValueAsString(comic);
             return request.createResponseBuilder(HttpStatus.OK)
                 .header("Access-Control-Allow-Origin", "*")
                 .header("Access-Control-Allow-Methods", "*")
@@ -374,6 +380,72 @@ public class ComicTriggers {
             return request.createResponseBuilder(HttpStatus.I_AM_A_TEAPOT)
                 .header("Access-Control-Allow-Origin", "*")
                 .body(ExceptionUtils.getMessage(e))
+                .build();
+        }
+    }
+
+    @FunctionName("getSets")
+    public HttpResponseMessage getSets(
+        @HttpTrigger(
+            name = "getSets",
+            route = "sets",
+            methods = {HttpMethod.GET},
+            authLevel = AuthorizationLevel.ANONYMOUS)
+        HttpRequestMessage<Optional<String>> request)
+    {
+        log.info("Processing getSets function.");
+        if (!AuthHelper.isAdminRequest(request)) {
+            return request.createResponseBuilder(HttpStatus.FORBIDDEN)
+                .header("Access-Control-Allow-Origin", "*")
+                .body("Admin access required.")
+                .build();
+        }
+        try {
+            List<ComicBook> sets = ComicService.getServiceInstance().getSetsList();
+            String body = OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(sets);
+            return request.createResponseBuilder(HttpStatus.OK)
+                .header("Access-Control-Allow-Origin", "*")
+                .header("Content-Type", "application/json")
+                .body(body)
+                .build();
+        } catch (JsonProcessingException e) {
+            log.error("Error in getSets.", e);
+            return request.createResponseBuilder(HttpStatus.INTERNAL_SERVER_ERROR)
+                .header("Access-Control-Allow-Origin", "*")
+                .body(e.getMessage())
+                .build();
+        }
+    }
+
+    @FunctionName("getSingleComics")
+    public HttpResponseMessage getSingleComics(
+        @HttpTrigger(
+            name = "getSingleComics",
+            route = "comics/single",
+            methods = {HttpMethod.GET},
+            authLevel = AuthorizationLevel.ANONYMOUS)
+        HttpRequestMessage<Optional<String>> request)
+    {
+        log.info("Processing getSingleComics function.");
+        if (!AuthHelper.isAdminRequest(request)) {
+            return request.createResponseBuilder(HttpStatus.FORBIDDEN)
+                .header("Access-Control-Allow-Origin", "*")
+                .body("Admin access required.")
+                .build();
+        }
+        try {
+            List<ComicBook> singles = ComicService.getServiceInstance().getSingleComics();
+            String body = OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(singles);
+            return request.createResponseBuilder(HttpStatus.OK)
+                .header("Access-Control-Allow-Origin", "*")
+                .header("Content-Type", "application/json")
+                .body(body)
+                .build();
+        } catch (JsonProcessingException e) {
+            log.error("Error in getSingleComics.", e);
+            return request.createResponseBuilder(HttpStatus.INTERNAL_SERVER_ERROR)
+                .header("Access-Control-Allow-Origin", "*")
+                .body(e.getMessage())
                 .build();
         }
     }

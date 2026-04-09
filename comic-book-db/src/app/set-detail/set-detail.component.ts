@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Location } from '@angular/common';
 import { Observable, of } from 'rxjs';
-import { filter, take } from 'rxjs/operators';
 
 import { Comic } from '../comic';
 import { Cart } from '../cart';
@@ -46,12 +45,9 @@ export class SetDetailComponent implements OnInit {
   ngOnInit(): void {
     const id = parseInt(this.route.snapshot.paramMap.get('id')!, 10);
 
-    this.comicService.getCachedNestedComics().pipe(
-      filter(comics => comics.length > 0),
-      take(1)
-    ).subscribe(nestedComics => {
-      this.container = nestedComics.find(c => c.id === id);
-      this.setMembers = this.container?.items ?? [];
+    this.comicService.getComic(id).subscribe(comic => {
+      this.container = comic;
+      this.setMembers = comic?.items ?? [];
       this.loading = false;
     });
 

@@ -1,5 +1,6 @@
 <div class="form-section">
   <div class="form-section-title">Upload GoCollect CSV Data</div>
+  <p class="csv-patience-note">Loading a .csv file can sometimes take a little time. Be patient.</p>
   <div class="csv-row">
     <input type="file" (change)="onFileChange($event)" accept=".csv" [disabled]="status === 'processing'" />
     <button (click)="processFile()" [disabled]="!canProcess || status === 'processing'">

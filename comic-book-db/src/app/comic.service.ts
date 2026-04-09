@@ -6,7 +6,6 @@ import { catchError, map, tap, switchMap } from 'rxjs/operators';
 
 import { Comic, PagedResponse } from './comic';
 import { MessageService } from './message.service';
-import { BehaviorSubject } from 'rxjs';
 
 export interface CsvUploadResult {
   succeeded: any[];
@@ -21,28 +20,17 @@ export class ComicService {
   private baseServiceUrl = 'https://fn-comicBook-db-1703810588398.azurewebsites.net/api';
   //private baseServiceUrl = 'http://localhost:7071/api';
   private comicsUrl = this.baseServiceUrl + '/comics';
+  private setsUrl = this.baseServiceUrl + '/sets';
   private dataLoadUrl = this.comicsUrl + '/data';
   private searchUrl = this.baseServiceUrl + '/search';
   private syncUrl = this.comicsUrl + '/data/sync'
-
-  private comicsSubject = new BehaviorSubject<Comic[]>([]);        // flat list (all comics including set members)
-  private nestedComicsSubject = new BehaviorSubject<Comic[]>([]); // top-level list (sets with items embedded)
 
   httpOptions = {
     headers: new HttpHeaders({ 'Content-Type': 'application/json' })
   };
 
   constructor(private http: HttpClient, private messageService: MessageService) {
-      this.log('Loading comic service.  Please wait for database warmup...');
-      this.loadInitialData();
-  }
-
-  private loadInitialData() {
-    this.http.get<Comic[]>(this.comicsUrl)
-        .subscribe(nested => {
-          this.nestedComicsSubject.next(nested);
-          this.comicsSubject.next(this.flattenComics(nested));
-        });
+      this.log('Loading comic service...');
   }
 
   /** Flattens a nested comics response into a flat list that includes set members. */
@@ -92,15 +80,20 @@ export class ComicService {
   }
 
 
-  /** Returns a flat cached list of all comics including set members (used by admin grid). */
-  getCachedComics(): Observable<Comic[]> {
-    this.log('fetched comics from memory cache')
-    return this.comicsSubject.asObservable();
+  /** GET all SET-type comics (admin use only). */
+  getSets(): Observable<Comic[]> {
+    return this.http.get<Comic[]>(this.setsUrl).pipe(
+      tap(() => this.log('fetched sets')),
+      catchError(this.handleError<Comic[]>('getSets', []))
+    );
   }
 
-  /** Returns the top-level nested cached list: sets have items[] populated, members excluded from top level. */
-  getCachedNestedComics(): Observable<Comic[]> {
-    return this.nestedComicsSubject.asObservable();
+  /** GET standalone comics not belonging to any set (admin use only). */
+  getSingleComics(): Observable<Comic[]> {
+    return this.http.get<Comic[]>(`${this.comicsUrl}/single`).pipe(
+      tap(() => this.log('fetched single comics')),
+      catchError(this.handleError<Comic[]>('getSingleComics', []))
+    );
   }
 
   /** GET comics from the server as a flat list (set members included at top level). */
@@ -110,15 +103,6 @@ export class ComicService {
         map(nested => this.flattenComics(nested)),
         tap(_ => this.log('fetched comics from remote')),
         catchError(this.handleError<Comic[]>('getRemoteComics', []))
-      );
-  }
-
-  /** GET comics from the server in nested form: sets include items[], members excluded from top level. */
-  getRemoteNestedComics(): Observable<Comic[]> {
-    return this.http.get<Comic[]>(this.comicsUrl)
-      .pipe(
-        tap(_ => this.log('fetched nested comics from remote')),
-        catchError(this.handleError<Comic[]>('getRemoteNestedComics', []))
       );
   }
 
@@ -165,7 +149,6 @@ export class ComicService {
     return this.http.post<Comic>(this.comicsUrl, comic, this.httpOptions).pipe(
       tap((newComic: Comic) => {
         this.log(`added comic w/ id=${newComic.id} and title=${newComic.title}`);
-        this.refreshComics();
       }),
       catchError(this.handleError<Comic>('addComic'))
     );
@@ -207,14 +190,6 @@ export class ComicService {
       }),
       catchError(this.handleError<any>('updateComic'))
     );
-  }
-
-  refreshComics() {
-    console.log('Refreshing comic list.');
-    this.http.get<Comic[]>(this.comicsUrl).subscribe(nested => {
-      this.nestedComicsSubject.next(nested);
-      this.comicsSubject.next(this.flattenComics(nested));
-    });
   }
 
   /**

@@ -43,7 +43,6 @@ export class DeleteButtonCellRendererComponent implements ICellRendererAngularCo
     this.comicService.deleteComic(data.id).subscribe({
       next: () => {
         this.params.api.applyTransaction({ remove: [data] });
-        this.comicService.refreshComics();
       },
       error: () => {
         this.deleting = false;

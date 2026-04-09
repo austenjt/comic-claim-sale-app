@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { take } from 'rxjs/operators';
 import { ComicService, CsvUploadResult } from '../comic.service';
 import { Comic } from '../comic';
 
@@ -37,8 +36,8 @@ export class LoadGoCollectFormComponent {
 
   onImportAsSetChange(): void {
     if (this.importAsSet && this.availableSets.length === 0) {
-      this.comicService.getCachedComics().pipe(take(1)).subscribe(comics => {
-        this.availableSets = comics.filter(c => c.docType === 'SET');
+      this.comicService.getSets().subscribe(sets => {
+        this.availableSets = sets;
       });
     }
     if (!this.importAsSet) {

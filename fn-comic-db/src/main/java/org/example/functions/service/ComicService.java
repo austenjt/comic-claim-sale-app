@@ -293,6 +293,34 @@ public class ComicService {
         return result;
     }
 
+    public List<ComicBook> getSetsList() {
+        log.info("Calling getSetsList...");
+        CosmosPagedIterable<ObjectNode> items = comicsContainer.queryItems(
+            "SELECT * FROM c WHERE c.docType = 'SET'", new CosmosQueryRequestOptions(), ObjectNode.class);
+        List<ComicBook> result = new ArrayList<>();
+        for (ObjectNode node : items) {
+            ComicBook cb = nodeToComicBook(node);
+            if (cb != null) result.add(cb);
+        }
+        log.info("getSetsList() returned {} items.", result.size());
+        return result;
+    }
+
+    public List<ComicBook> getSingleComics() {
+        log.info("Calling getSingleComics...");
+        CosmosPagedIterable<ObjectNode> items = comicsContainer.queryItems(
+            "SELECT * FROM c WHERE NOT (c.docType = 'SET')" +
+            " AND (NOT IS_DEFINED(c.collectionGroup) OR c.collectionGroup = null OR c.collectionGroup <= 0)",
+            new CosmosQueryRequestOptions(), ObjectNode.class);
+        List<ComicBook> result = new ArrayList<>();
+        for (ObjectNode node : items) {
+            ComicBook cb = nodeToComicBook(node);
+            if (cb != null) result.add(cb);
+        }
+        log.info("getSingleComics() returned {} items.", result.size());
+        return result;
+    }
+
     public List<ComicBook> getComicsByCollectionGroup(int collectionGroup) {
         SqlQuerySpec querySpec = new SqlQuerySpec(
             "SELECT * FROM c WHERE c.collectionGroup = @collectionGroup",

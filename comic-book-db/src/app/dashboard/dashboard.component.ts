@@ -39,6 +39,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
   deletingId: number | null = null;
   claimingSetId: number | null = null;
 
+  logsExpanded = false;
+
   private _excludeClaimed = false;
   get excludeClaimed() { return this._excludeClaimed; }
   set excludeClaimed(v: boolean) { this._excludeClaimed = v; this.currentPage = 1; }
@@ -87,7 +89,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     private imageService: ImageService,
     public auth: AuthService,
     private cartService: CartService,
-    private toastService: ToastService,
+    public toastService: ToastService,
     private userService: UserService,
     public configService: ConfigService
   ) {}
@@ -125,20 +127,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         this.loading = false;
         this.initBidCountdowns();
       },
-      error: () => {
-        // Cold-start fallback: load everything and slice to first page
-        this.comicService.getRemoteNestedComics().subscribe({
-          next: comics => {
-            const filtered = comics.filter(c => c.isForSale !== false && !c.dateSold);
-            this.pageItems = filtered.slice(0, this.pageSize);
-            this.totalCount = filtered.length;
-            this.totalPages = Math.ceil(this.totalCount / this.pageSize);
-            this.loading = false;
-            this.initBidCountdowns();
-          },
-          error: () => { this.loading = false; }
-        });
-      }
+      error: () => { this.loading = false; }
     });
   }
 
@@ -500,7 +489,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.deletingId = comic.id;
     this.comicService.deleteComic(comic.id).subscribe({
       next: () => {
-        this.comicService.refreshComics();
         this.deletingId = null;
         this.loadPage();
       },

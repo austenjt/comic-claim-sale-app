@@ -1,6 +1,6 @@
 
 import { Component, OnInit, OnDestroy, Output, EventEmitter } from '@angular/core';
-import { take } from 'rxjs/operators';
+import { forkJoin } from 'rxjs';
 import { AgGridModule } from 'ag-grid-angular';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -905,9 +905,9 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
     this.addSetCollectionGroup = null;
     this.addSetName = '';
     this.addSetError = '';
-    this.comicService.getCachedComics().pipe(take(1)).subscribe(allComics => {
-      this.addSetExistingGroups = allComics
-        .filter(c => c.docType === 'SET' && c.collectionGroup != null)
+    this.comicService.getSets().subscribe(sets => {
+      this.addSetExistingGroups = sets
+        .filter(c => c.collectionGroup != null)
         .map(c => c.collectionGroup!);
     });
     this.showAddSetModal = true;
@@ -994,11 +994,9 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
   }
 
   openAddToSet(): void {
-    this.comicService.getCachedComics().pipe(take(1)).subscribe(allComics => {
-      this.addToSetAvailableSets = allComics.filter(c => c.docType === 'SET');
-      this.addToSetUnassigned = allComics.filter(c =>
-        c.docType !== 'SET' && (c.collectionGroup == null || c.collectionGroup <= 0)
-      );
+    forkJoin([this.comicService.getSets(), this.comicService.getSingleComics()]).subscribe(([sets, singles]) => {
+      this.addToSetAvailableSets = sets;
+      this.addToSetUnassigned = singles;
       this.addToSetStep = 1;
       this.addToSetSelectedSet = null;
       this.addToSetSearchTerm = '';
@@ -1035,7 +1033,6 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
     const updated: Comic = { ...comic, collectionGroup: this.addToSetSelectedSet.collectionGroup };
     this.comicService.updateComic(updated).subscribe({
       next: () => {
-        this.comicService.refreshComics();
         this.comics = this.comics.map(c => c.id === updated.id ? updated : c);
         this.addToSetSaving = false;
         this.showAddToSetModal = false;
@@ -1048,8 +1045,8 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
   }
 
   openDeleteSet(): void {
-    this.comicService.getCachedComics().pipe(take(1)).subscribe(allComics => {
-      this.deleteSetAvailableSets = allComics.filter(c => c.docType === 'SET');
+    this.comicService.getSets().subscribe(sets => {
+      this.deleteSetAvailableSets = sets;
       this.deleteSetSelected = null;
       this.deleteSetError = '';
       this.deleteSetConfirmFull = false;
@@ -1074,7 +1071,6 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
     this.deleteSetError = '';
     this.comicService.deleteSet(this.deleteSetSelected.collectionGroup).subscribe({
       next: () => {
-        this.comicService.refreshComics();
         this.comics = this.comics.filter(c => c.collectionGroup !== this.deleteSetSelected!.collectionGroup);
         this.deleteSetSaving = false;
         this.showDeleteSetModal = false;
@@ -1093,7 +1089,6 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
     this.deleteSetError = '';
     this.comicService.deleteSetFully(this.deleteSetSelected.collectionGroup).subscribe({
       next: () => {
-        this.comicService.refreshComics();
         this.comics = this.comics.filter(c => c.collectionGroup !== this.deleteSetSelected!.collectionGroup);
         this.deleteSetSaving = false;
         this.showDeleteSetModal = false;
