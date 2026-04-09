@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { Subject, Subscription, timer } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { CartService, ClaimNotification } from './cart.service';
@@ -22,14 +23,35 @@ export class ToastService {
   logEntries: LogEntry[] = [];
   newClaimEvent$ = new Subject<ClaimNotification>();
 
+  private readonly activityLogsUrl = 'https://fn-comicBook-db-1703810588398.azurewebsites.net/api/activity-logs';
   private toastCounter = 0;
   private seenEventKeys = new Set<string>();
   private justActed = new Set<string>();
   private firstPoll = true;
   private pollSub!: Subscription;
 
-  constructor(private cartService: CartService, private configService: ConfigService) {
+  constructor(
+    private cartService: CartService,
+    private configService: ConfigService,
+    private http: HttpClient
+  ) {
     this.startPolling();
+    this.loadPersistedLogs();
+  }
+
+  private loadPersistedLogs(): void {
+    this.http.get<any[]>(this.activityLogsUrl).subscribe({
+      next: entries => {
+        const loaded: LogEntry[] = entries.map(e => ({
+          message: e.message,
+          timestamp: new Date(e.timestamp),
+          isError: e.isError ?? false
+        }));
+        // Prepend any in-session entries already collected before the HTTP response arrived
+        this.logEntries = [...this.logEntries, ...loaded].slice(0, 100);
+      },
+      error: () => {}
+    });
   }
 
   private startPolling(): void {
@@ -67,8 +89,11 @@ export class ToastService {
     const id = ++this.toastCounter;
     this.toasts.push({ id, message, isError });
     setTimeout(() => this.dismiss(id), 30000);
-    this.logEntries.unshift({ message, timestamp: new Date(), isError });
+    const entry: LogEntry = { message, timestamp: new Date(), isError };
+    this.logEntries.unshift(entry);
     if (this.logEntries.length > 100) this.logEntries.length = 100;
+    this.http.post(this.activityLogsUrl, { message, timestamp: entry.timestamp.toISOString(), isError })
+      .subscribe({ error: () => {} });
   }
 
   dismiss(id: number): void {

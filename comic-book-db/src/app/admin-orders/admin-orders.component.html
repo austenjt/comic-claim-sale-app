@@ -54,10 +54,9 @@
         </tr>
         <tr *ngIf="order.discountAmount && order.discountAmount > 0">
           <td>Discount</td>
-          <td style="color:#2e7d32">-{{ order.discountAmount | currency }}
+          <td colspan="2" style="color:#2e7d32">-{{ order.discountAmount | currency }}
             <span *ngIf="order.discountDescription" style="font-size:0.85em;color:#555;margin-left:0.4rem">({{ order.discountDescription }})</span>
           </td>
-          <td></td>
           <td></td>
         </tr>
         <tr *ngIf="order.shippingCost && order.shippingCost > 0">
@@ -214,10 +213,9 @@
       <tfoot>
         <tr *ngIf="order.discountAmount && order.discountAmount > 0">
           <td>Discount</td>
-          <td style="color:#2e7d32">-{{ order.discountAmount | currency }}
+          <td colspan="2" style="color:#2e7d32">-{{ order.discountAmount | currency }}
             <span *ngIf="order.discountDescription" style="font-size:0.85em;color:#555;margin-left:0.4rem">({{ order.discountDescription }})</span>
           </td>
-          <td></td>
         </tr>
         <tr *ngIf="order.shippingCost && order.shippingCost > 0">
           <td>Shipping</td>
