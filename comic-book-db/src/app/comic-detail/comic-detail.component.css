@@ -283,6 +283,32 @@ button {
   color: #c0634c;
 }
 
+.img-upload-error-toggle {
+  margin-left: 8px;
+  font-size: 0.75rem;
+  color: #c0634c;
+  background: none;
+  border: 1px solid #c0634c;
+  border-radius: 3px;
+  padding: 1px 6px;
+  cursor: pointer;
+  vertical-align: middle;
+}
+
+.img-upload-error-detail {
+  margin-top: 6px;
+  padding: 6px 8px;
+  background: #2a1a1a;
+  border: 1px solid #c0634c55;
+  border-radius: 4px;
+  font-size: 0.72rem;
+  color: #e0a090;
+  white-space: pre-wrap;
+  word-break: break-all;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
 .claim-status-claimed {
   color: #79675c;
   font-weight: 700;

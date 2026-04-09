@@ -29,13 +29,25 @@
             <button class="img-update-btn" (click)="imageFileInput.click()" [disabled]="imageUploading">
               {{ imageUploading ? 'Uploading...' : 'Update Front Cover' }}
             </button>
-            <div *ngIf="imageUploadError" class="img-upload-error">{{ imageUploadError }}</div>
+            <div *ngIf="imageUploadErrorSummary" class="img-upload-error">
+              {{ imageUploadErrorSummary }}
+              <button class="img-upload-error-toggle" (click)="imageUploadErrorExpanded = !imageUploadErrorExpanded">
+                {{ imageUploadErrorExpanded ? 'Hide Error' : 'Show Error' }}
+              </button>
+              <pre *ngIf="imageUploadErrorExpanded" class="img-upload-error-detail">{{ imageUploadErrorDetail }}</pre>
+            </div>
           </ng-container>
           <ng-container *ngIf="activeImage === 'back'">
             <button class="img-update-btn" (click)="backImageFileInput.click()" [disabled]="backImageUploading">
               {{ backImageUploading ? 'Uploading...' : 'Update Back Cover' }}
             </button>
-            <div *ngIf="backImageUploadError" class="img-upload-error">{{ backImageUploadError }}</div>
+            <div *ngIf="backImageUploadErrorSummary" class="img-upload-error">
+              {{ backImageUploadErrorSummary }}
+              <button class="img-upload-error-toggle" (click)="backImageUploadErrorExpanded = !backImageUploadErrorExpanded">
+                {{ backImageUploadErrorExpanded ? 'Hide Error' : 'Show Error' }}
+              </button>
+              <pre *ngIf="backImageUploadErrorExpanded" class="img-upload-error-detail">{{ backImageUploadErrorDetail }}</pre>
+            </div>
           </ng-container>
         </div>
       </div>

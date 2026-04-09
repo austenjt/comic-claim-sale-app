@@ -32,9 +32,13 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
   private bidPollInterval: any = null;
   private claimEventSub: Subscription | null = null;
   imageUploading = false;
-  imageUploadError = '';
+  imageUploadErrorSummary = '';
+  imageUploadErrorDetail = '';
+  imageUploadErrorExpanded = false;
   backImageUploading = false;
-  backImageUploadError = '';
+  backImageUploadErrorSummary = '';
+  backImageUploadErrorDetail = '';
+  backImageUploadErrorExpanded = false;
   linkCopied = false;
 
   constructor(
@@ -312,7 +316,9 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
     if (!input.files?.length || !this.comic) return;
     const file = input.files[0];
     this.imageUploading = true;
-    this.imageUploadError = '';
+    this.imageUploadErrorSummary = '';
+    this.imageUploadErrorDetail = '';
+    this.imageUploadErrorExpanded = false;
     this.imageService.uploadComicImage(this.comic.id, file).subscribe({
       next: (updatedComic: Comic) => {
         this.imageUploading = false;
@@ -325,8 +331,8 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
       error: (err: any) => {
         this.imageUploading = false;
         const sizeMB = (file.size / 1024 / 1024).toFixed(1);
-        const detail = err?.error || err?.message || 'Image may be too large or an invalid format.';
-        this.imageUploadError = `Upload failed (${sizeMB} MB): ${detail}`;
+        this.imageUploadErrorSummary = `Upload failed (${sizeMB} MB).`;
+        this.imageUploadErrorDetail = err?.error || err?.message || 'Image may be too large or an invalid format.';
         input.value = '';
       }
     });
@@ -337,7 +343,9 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
     if (!input.files?.length || !this.comic) return;
     const file = input.files[0];
     this.backImageUploading = true;
-    this.backImageUploadError = '';
+    this.backImageUploadErrorSummary = '';
+    this.backImageUploadErrorDetail = '';
+    this.backImageUploadErrorExpanded = false;
     this.imageService.uploadComicBackImage(this.comic.id, file).subscribe({
       next: (updatedComic: Comic) => {
         this.backImageUploading = false;
@@ -350,8 +358,8 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
       error: (err: any) => {
         this.backImageUploading = false;
         const sizeMB = (file.size / 1024 / 1024).toFixed(1);
-        const detail = err?.error || err?.message || 'Image may be too large or an invalid format.';
-        this.backImageUploadError = `Upload failed (${sizeMB} MB): ${detail}`;
+        this.backImageUploadErrorSummary = `Upload failed (${sizeMB} MB).`;
+        this.backImageUploadErrorDetail = err?.error || err?.message || 'Image may be too large or an invalid format.';
         input.value = '';
       }
     });
