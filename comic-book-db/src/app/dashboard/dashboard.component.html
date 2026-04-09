@@ -1,9 +1,13 @@
 <app-dashboard-header
   [itemCount]="displayComics.length"
-  [totalCount]="comics.length"
+  [totalCount]="totalCount"
+  [currentPage]="currentPage"
+  [totalPages]="totalPages"
   [(excludeClaimed)]="excludeClaimed"
   [(showPricedOnly)]="showPricedOnly"
-  [(sortOrder)]="sortOrder">
+  [(sortOrder)]="sortOrder"
+  (prevPage)="prevPage()"
+  (nextPage)="nextPage()">
 </app-dashboard-header>
 
 <!-- Award modal -->
@@ -37,7 +41,7 @@
 </div>
 
 <div class="comics-list">
-  <ng-container *ngFor="let comic of displayComics">
+  <ng-container *ngFor="let comic of displayComics; trackBy: trackById">
 
     <!-- SET CARD -->
     <ng-container *ngIf="comic.docType === 'SET'; else normalCard">
@@ -185,4 +189,10 @@
     </ng-template>
 
   </ng-container>
+</div>
+
+<div *ngIf="totalPages > 1" class="pagination-bar">
+  <button class="pagination-btn" (click)="prevPage()" [disabled]="currentPage === 1">&#8249; Prev</button>
+  <span class="pagination-label">Page {{ currentPage }} of {{ totalPages }}</span>
+  <button class="pagination-btn" (click)="nextPage()" [disabled]="currentPage === totalPages">Next &#8250;</button>
 </div>

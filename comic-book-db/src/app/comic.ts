@@ -1,4 +1,12 @@
 
+export interface PagedResponse<T> {
+  items: T[];
+  totalCount: number;
+  pageNumber: number;
+  pageSize: number;
+  totalPages: number;
+}
+
 export interface BidEntry {
   userId: string;
   userName: string;

@@ -13,6 +13,7 @@ import com.microsoft.azure.functions.annotation.HttpTrigger;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.example.functions.model.ComicBook;
+import org.example.functions.model.PagedResponse;
 import org.example.functions.model.User;
 import org.example.functions.service.ArchiveService;
 import org.example.functions.service.CartService;
@@ -45,24 +46,35 @@ public class ComicTriggers {
         String pageSizeStr = request.getQueryParameters().get("pageSize");
         boolean admin = AuthHelper.isAdminRequest(request);
         ComicService comicService = ComicService.getServiceInstance();
-        List<ComicBook> comicBookData;
         try {
             if (pageNumberStr != null && pageSizeStr != null) {
                 int pageNumber = Integer.parseInt(pageNumberStr);
                 int pageSize = Integer.parseInt(pageSizeStr);
-                comicBookData = comicService.getComicsList(pageNumber, pageSize);
+                String sort = request.getQueryParameters().getOrDefault("sort", "oldest-first");
+                boolean onlyPriced = "true".equalsIgnoreCase(request.getQueryParameters().get("onlyPriced"));
+                PagedResponse<ComicBook> paged = comicService.getTopLevelComicsPaged(pageNumber, pageSize, sort, onlyPriced);
+                String body = admin
+                    ? OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(paged)
+                    : OBJECT_MAPPER.writerWithView(Views.Public.class).writeValueAsString(paged);
+                return request.createResponseBuilder(HttpStatus.OK)
+                    .header("Access-Control-Allow-Origin", "*")
+                    .header("Access-Control-Allow-Methods", "*")
+                    .header("Content-Type", "application/json")
+                    .body(body)
+                    .build();
             } else {
-                comicBookData = comicService.getComicsListEnriched();
+                // Non-paginated path: used by admin tools and the in-memory cache warm-up
+                List<ComicBook> comicBookData = comicService.getComicsListEnriched();
+                String body = admin
+                    ? OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(comicBookData)
+                    : OBJECT_MAPPER.writerWithView(Views.Public.class).writeValueAsString(comicBookData);
+                return request.createResponseBuilder(HttpStatus.OK)
+                    .header("Access-Control-Allow-Origin", "*")
+                    .header("Access-Control-Allow-Methods", "*")
+                    .header("Content-Type", "application/json")
+                    .body(body)
+                    .build();
             }
-            String body = admin
-                ? OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(comicBookData)
-                : OBJECT_MAPPER.writerWithView(Views.Public.class).writeValueAsString(comicBookData);
-            return request.createResponseBuilder(HttpStatus.OK)
-                .header("Access-Control-Allow-Origin", "*")
-                .header("Access-Control-Allow-Methods", "*")
-                .header("Content-Type", "application/json")
-                .body(body)
-                .build();
         } catch (NumberFormatException e) {
             log.error("Invalid pagination parameters.", e);
             return request.createResponseBuilder(HttpStatus.BAD_REQUEST)

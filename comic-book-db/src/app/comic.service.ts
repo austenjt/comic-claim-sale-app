@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 
 import { Observable, of, from } from 'rxjs';
 import { catchError, map, tap, switchMap } from 'rxjs/operators';
 
-import { Comic } from './comic';
+import { Comic, PagedResponse } from './comic';
 import { MessageService } from './message.service';
 import { BehaviorSubject } from 'rxjs';
 
@@ -56,6 +56,23 @@ export class ComicService {
       }
     }
     return result;
+  }
+
+  /** GET a single page of for-sale comics from the server. Errors propagate for fallback handling. */
+  getDashboardPage(
+    pageNumber: number,
+    pageSize: number,
+    sort: string,
+    onlyPriced: boolean
+  ): Observable<PagedResponse<Comic>> {
+    const params = new HttpParams()
+      .set('pageNumber', pageNumber.toString())
+      .set('pageSize', pageSize.toString())
+      .set('sort', sort)
+      .set('onlyPriced', onlyPriced.toString());
+    return this.http.get<PagedResponse<Comic>>(this.comicsUrl, { params }).pipe(
+      tap(() => this.log(`fetched dashboard page ${pageNumber} (sort=${sort}, onlyPriced=${onlyPriced})`))
+    );
   }
 
   getSeriesList(): Observable<string[]> {

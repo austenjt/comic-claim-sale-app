@@ -17,6 +17,7 @@ import com.microsoft.azure.functions.HttpStatus;
 import lombok.extern.slf4j.Slf4j;
 import org.example.functions.client.CosmosDbClient;
 import org.example.functions.model.ComicAuditLog;
+import org.example.functions.model.PagedResponse;
 import org.example.functions.util.Mappers;
 import org.example.functions.model.ComicBook;
 import org.example.functions.model.FieldChange;
@@ -80,6 +81,104 @@ public class ComicService {
         }
         log.info("getComicsList() returned {} items for page {}.", result.size(), pageNumber);
         return result;
+    }
+
+    /**
+     * Returns a paginated, filtered, sorted page of top-level comics (standalone + SET containers).
+     * Set members are fetched separately and embedded into their container's items[].
+     *
+     * NOTE: Cosmos DB requires composite indexes for WHERE + ORDER BY on different fields.
+     * Add composite indexes in the Azure Portal for (isForSale, _ts), (isForSale, title),
+     * and (isForSale, salePrice) before deploying.
+     */
+    public PagedResponse<ComicBook> getTopLevelComicsPaged(
+            int pageNumber, int pageSize, String sort, boolean onlyPriced) {
+        int offset = (pageNumber - 1) * pageSize;
+
+        // WHERE: top-level only (standalone comics + SET containers, no members)
+        StringBuilder where = new StringBuilder();
+        where.append("(c.docType = 'SET'")
+             .append(" OR NOT IS_DEFINED(c.collectionGroup)")
+             .append(" OR c.collectionGroup = null")
+             .append(" OR c.collectionGroup <= 0)");
+        // Match frontend logic: isForSale !== false — includes null/undefined (old comics without the field)
+        where.append(" AND (NOT IS_DEFINED(c.isForSale) OR c.isForSale = null OR c.isForSale = true)");
+        where.append(" AND (NOT IS_DEFINED(c.dateSold) OR c.dateSold = null OR c.dateSold = '')");
+        if (onlyPriced) {
+            // SETs are always included; individual comics must have a price
+            where.append(" AND (c.docType = 'SET' OR (IS_DEFINED(c.salePrice) AND c.salePrice != null))");
+        }
+        String whereClause = where.toString();
+
+        // Count query
+        String countSql = "SELECT VALUE COUNT(1) FROM c WHERE " + whereClause;
+        int totalCount = 0;
+        for (Integer n : comicsContainer.queryItems(countSql, new CosmosQueryRequestOptions(), Integer.class)) {
+            totalCount = n;
+            break;
+        }
+
+        // Page query
+        String orderBy = sortToOrderBy(sort);
+        String pageSql = "SELECT * FROM c WHERE " + whereClause
+                + " ORDER BY " + orderBy
+                + " OFFSET @offset LIMIT @limit";
+        SqlQuerySpec pageSpec = new SqlQuerySpec(pageSql,
+                List.of(new SqlParameter("@offset", offset), new SqlParameter("@limit", pageSize)));
+
+        List<ComicBook> pageItems = new ArrayList<>();
+        for (ObjectNode node : comicsContainer.queryItems(pageSpec, new CosmosQueryRequestOptions(), ObjectNode.class)) {
+            ComicBook cb = nodeToComicBook(node);
+            if (cb != null) pageItems.add(cb);
+        }
+
+        // Enrich SET containers with their member comics (one batch query for all sets on this page)
+        List<Integer> setGroups = pageItems.stream()
+                .filter(c -> "SET".equals(c.getDocType())
+                        && c.getCollectionGroup() != null
+                        && c.getCollectionGroup() > 0)
+                .map(ComicBook::getCollectionGroup)
+                .collect(Collectors.toList());
+
+        if (!setGroups.isEmpty()) {
+            String inClause = setGroups.stream().map(String::valueOf).collect(Collectors.joining(", "));
+            // NOT (c.docType = 'SET') correctly handles undefined docType (unlike != which returns false for undefined)
+            String membersSql = "SELECT * FROM c WHERE c.collectionGroup IN (" + inClause + ") AND NOT (c.docType = 'SET')";
+            List<ComicBook> allMembers = new ArrayList<>();
+            for (ObjectNode node : comicsContainer.queryItems(membersSql, new CosmosQueryRequestOptions(), ObjectNode.class)) {
+                ComicBook m = nodeToComicBook(node);
+                if (m != null) allMembers.add(m);
+            }
+            Map<Integer, List<ComicBook>> membersByGroup = allMembers.stream()
+                    .collect(Collectors.groupingBy(ComicBook::getCollectionGroup));
+            for (ComicBook comic : pageItems) {
+                if ("SET".equals(comic.getDocType()) && comic.getCollectionGroup() != null) {
+                    comic.setItems(membersByGroup.getOrDefault(comic.getCollectionGroup(), new ArrayList<>()));
+                }
+            }
+        }
+
+        int totalPages = (int) Math.ceil((double) totalCount / pageSize);
+        log.info("getTopLevelComicsPaged: page={}, size={}, total={}, sort={}", pageNumber, pageSize, totalCount, sort);
+        return PagedResponse.<ComicBook>builder()
+                .items(pageItems)
+                .totalCount(totalCount)
+                .pageNumber(pageNumber)
+                .pageSize(pageSize)
+                .totalPages(totalPages)
+                .build();
+    }
+
+    private String sortToOrderBy(String sort) {
+        if (sort == null) return "c._ts ASC";
+        return switch (sort) {
+            case "newest-first" -> "c._ts DESC";
+            case "a-z"          -> "c.title ASC";
+            case "z-a"          -> "c.title DESC";
+            case "highest-price" -> "c.salePrice DESC";
+            case "lowest-price"  -> "c.salePrice ASC";
+            default             -> "c._ts ASC"; // oldest-first, claimed-first, bidding-first
+        };
     }
 
     public List<String> getUniqueSeries() {

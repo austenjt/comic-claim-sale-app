@@ -5,7 +5,7 @@
       <span *ngIf="excludeClaimed && showPricedOnly" class="claim-sale-mode-label">Claim Sale Mode</span>
       <span class="items-count">
         <ng-container *ngIf="isFiltered; else noFilter">{{ itemCount }} of {{ totalCount }} items</ng-container>
-        <ng-template #noFilter>{{ itemCount }} items</ng-template>
+        <ng-template #noFilter>{{ totalCount }} items</ng-template>
       </span>
       <div class="filter-buttons">
         <button class="btn-exclude-claimed"
@@ -32,5 +32,10 @@
         </select>
       </div>
     </div>
+  </div>
+  <div *ngIf="totalPages > 1" class="pagination-bar">
+    <button class="pagination-btn" (click)="prevPage.emit()" [disabled]="currentPage === 1">&#8249; Prev</button>
+    <span class="pagination-label">Page {{ currentPage }} of {{ totalPages }}</span>
+    <button class="pagination-btn" (click)="nextPage.emit()" [disabled]="currentPage === totalPages">Next &#8250;</button>
   </div>
 </div>
