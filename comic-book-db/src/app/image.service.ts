@@ -55,8 +55,7 @@ export class ImageService {
     formData.append('file', file, file.name);
     return this.http.post(`${this.baseServiceUrl}/comics/${comicId}/image`, formData)
       .pipe(
-        tap(() => this.log(`Uploaded image for comic ${comicId}`)),
-        catchError(this.handleError('uploadComicImage', null))
+        tap(() => this.log(`Uploaded image for comic ${comicId}`))
       );
   }
 
@@ -65,8 +64,7 @@ export class ImageService {
     formData.append('file', file, file.name);
     return this.http.post(`${this.baseServiceUrl}/comics/${comicId}/back-image`, formData)
       .pipe(
-        tap(() => this.log(`Uploaded back image for comic ${comicId}`)),
-        catchError(this.handleError('uploadComicBackImage', null))
+        tap(() => this.log(`Uploaded back image for comic ${comicId}`))
       );
   }
 

@@ -322,9 +322,11 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
         }
         input.value = '';
       },
-      error: () => {
+      error: (err: any) => {
         this.imageUploading = false;
-        this.imageUploadError = 'Upload failed. Image may be too large or an invalid format.';
+        const sizeMB = (file.size / 1024 / 1024).toFixed(1);
+        const detail = err?.error || err?.message || 'Image may be too large or an invalid format.';
+        this.imageUploadError = `Upload failed (${sizeMB} MB): ${detail}`;
         input.value = '';
       }
     });
@@ -345,9 +347,11 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
         }
         input.value = '';
       },
-      error: () => {
+      error: (err: any) => {
         this.backImageUploading = false;
-        this.backImageUploadError = 'Upload failed. Image may be too large or an invalid format.';
+        const sizeMB = (file.size / 1024 / 1024).toFixed(1);
+        const detail = err?.error || err?.message || 'Image may be too large or an invalid format.';
+        this.backImageUploadError = `Upload failed (${sizeMB} MB): ${detail}`;
         input.value = '';
       }
     });
