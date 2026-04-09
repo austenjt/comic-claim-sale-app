@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.functions.model.Cart;
 import org.example.functions.model.ComicBook;
 import org.example.functions.model.User;
+import org.example.functions.service.ActivityLogService;
 import org.example.functions.service.BidService;
 import org.example.functions.util.AuthHelper;
 import org.example.functions.util.HttpHelper;
@@ -154,6 +155,9 @@ public class BidTriggers {
             BigDecimal amount = new BigDecimal(amountNode.asText());
 
             ComicBook comic = BidService.getServiceInstance().placeBid(user, comicId, amount);
+            String logMsg = String.format("User %s placed bid of $%.2f on \"%s\"",
+                user.getName(), amount, comic.getTitle());
+            ActivityLogService.getServiceInstance().writeLog(logMsg, false);
             return cors(request.createResponseBuilder(HttpStatus.OK))
                 .header("Content-Type", "application/json")
                 .body(OBJECT_MAPPER.writeValueAsString(comic)).build();

@@ -201,7 +201,7 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
         this.bidSecondsRemaining = Math.max(0, Math.floor((endsAt - Date.now()) / 1000));
         this.startBidTimer();
         this.actionLoading = false;
-        this.toastService.show(`Bidding started — ${this.configService.biddingCycleMins} min window open!`);
+        this.toastService.showBid(`Bidding started — ${this.configService.biddingCycleMins} min window open!`);
         // Ensure all viewers start getting live updates from this point on
         this.setupBidRefresh();
       },
@@ -240,7 +240,7 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
         // If the timer is still running it will self-correct on the next 1s tick
         this.actionLoading = false;
         this.claimError = '';
-        this.toastService.show(`Bid of $${amount.toFixed(2)} placed!`);
+        this.toastService.showBid(`Bid of $${amount.toFixed(2)} placed!`);
       },
       error: err => {
         this.claimError = err?.error || 'Bid failed.';

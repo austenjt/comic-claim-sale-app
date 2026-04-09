@@ -39,15 +39,6 @@
   </div>
   </div>
 </header>
-<div class="toast-stack">
-  <div *ngIf="toastService.toasts.length > 0" class="app-toast toast-close-all" (click)="toastService.clearAll()">
-    Dismiss All
-  </div>
-  <div *ngFor="let t of toastService.toasts" class="app-toast" [class.app-toast-error]="t.isError">
-    <span>{{ t.message }}</span>
-    <button class="toast-close" (click)="toastService.dismiss(t.id)">&#x2715;</button>
-  </div>
-</div>
 
 <div *ngIf="!auth.storageAvailable" class="storage-warning-banner">
   ⚠️ Your browser is blocking session storage — you'll be logged out on every page refresh.

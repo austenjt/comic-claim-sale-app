@@ -9,7 +9,7 @@ import { UserService } from '../user.service';
 import { ConfigService } from '../config.service';
 import { Cart } from '../cart';
 import { User } from '../user';
-import { Observable, of } from 'rxjs';
+import { Observable, of, Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-dashboard',
@@ -58,6 +58,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
   private bidTimerInterval: any = null;
   private bidPollInterval: any = null;
 
+  private loadSub: Subscription | null = null;
+  private loadRetryTimer: any = null;
+
   get displayComics(): Comic[] {
     let result = this.pageItems;
     if (this.excludeClaimed) {
@@ -76,9 +79,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
       });
     } else if (this.sortOrder === 'bidding-first') {
       result = [...result].sort((a, b) => {
-        const aBid = (a.bidOpenedAt || a.bidStartedAt) ? 1 : 0;
-        const bBid = (b.bidOpenedAt || b.bidStartedAt) ? 1 : 0;
-        return bBid - aBid;
+        // Admin sees all enableBid items at top (including not-yet-opened ones with "Start Bid" button).
+        // Regular users only see items that admin has already opened or started.
+        const isBidRelevant = (c: Comic) => this.auth.isAdmin()
+          ? !!c.enableBid
+          : !!(c.bidOpenedAt || c.bidStartedAt);
+        return (isBidRelevant(b) ? 1 : 0) - (isBidRelevant(a) ? 1 : 0);
       });
     }
     return result;
@@ -113,22 +119,41 @@ export class DashboardComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     if (this.bidTimerInterval) clearInterval(this.bidTimerInterval);
     if (this.bidPollInterval) clearInterval(this.bidPollInterval);
+    if (this.loadRetryTimer) clearTimeout(this.loadRetryTimer);
+    if (this.loadSub) this.loadSub.unsubscribe();
   }
 
   loadPage(): void {
+    // Cancel any stalled in-flight request and its retry timer before starting fresh
+    if (this.loadSub) { this.loadSub.unsubscribe(); this.loadSub = null; }
+    if (this.loadRetryTimer) { clearTimeout(this.loadRetryTimer); this.loadRetryTimer = null; }
+
     this.loading = true;
-    this.comicService.getDashboardPage(
+
+    this.loadSub = this.comicService.getDashboardPage(
       this.currentPage, this.pageSize, this.sortOrder, this.showPricedOnly
     ).subscribe({
       next: (response: PagedResponse<Comic>) => {
+        this.loadSub = null;
+        if (this.loadRetryTimer) { clearTimeout(this.loadRetryTimer); this.loadRetryTimer = null; }
         this.pageItems = response.items;
         this.totalCount = response.totalCount;
         this.totalPages = response.totalPages;
         this.loading = false;
         this.initBidCountdowns();
       },
-      error: () => { this.loading = false; }
+      error: () => {
+        this.loadSub = null;
+        if (this.loadRetryTimer) { clearTimeout(this.loadRetryTimer); this.loadRetryTimer = null; }
+        this.loading = false;
+      }
     });
+
+    // If still loading after 10 seconds, the request likely stalled — cancel and retry
+    this.loadRetryTimer = setTimeout(() => {
+      this.loadRetryTimer = null;
+      if (this.loading) { this.loadPage(); }
+    }, 10000);
   }
 
   nextPage(): void {
@@ -211,7 +236,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       next: cart => {
         this.myCart = cart;
         this.claimedMap[String(comic.id)] = new Date().toISOString();
-        this.toastService.show(`Bidding ended for "${comic.title}" — added to winner's cart.`);
+        this.toastService.showBid(`Bidding ended for "${comic.title}" — added to winner's cart.`);
       },
       error: () => { this.loadClaimedMap(); }
     });
@@ -227,7 +252,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         const wasOpened = !!this.pageItems[idx].bidOpenedAt;
         this.pageItems[idx] = { ...this.pageItems[idx], ...latestComic };
         if (!wasOpened && this.pageItems[idx].bidOpenedAt && !this.auth.isAdmin()) {
-          this.toastService.show(`Bidding is now open for "${this.pageItems[idx].title}" — place your bid!`);
+          this.toastService.showBid(`Bidding is now open for "${this.pageItems[idx].title}" — place your bid!`);
         }
         if (!wasActive && this.pageItems[idx].bidStartedAt) {
           this.bidCountdowns[String(this.pageItems[idx].id)] =
@@ -244,7 +269,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       next: updatedComic => {
         const idx = this.pageItems.findIndex(c => c.id === comic.id);
         if (idx >= 0) this.pageItems[idx] = { ...this.pageItems[idx], ...updatedComic };
-        this.toastService.show(`Bidding cancelled for "${comic.title}".`);
+        this.toastService.showBid(`Bidding cancelled for "${comic.title}".`);
       },
       error: err => {
         const msg: string = typeof err?.error === 'string' ? err.error : '';
@@ -258,7 +283,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       next: updatedComic => {
         const idx = this.pageItems.findIndex(c => c.id === comic.id);
         if (idx >= 0) this.pageItems[idx] = { ...this.pageItems[idx], ...updatedComic };
-        this.toastService.show(`Bidding opened for "${comic.title}" — waiting for first bid.`);
+        this.toastService.showBid(`Bidding opened for "${comic.title}" — waiting for first bid.`);
       },
       error: err => {
         const msg: string = typeof err?.error === 'string' ? err.error : '';
@@ -274,7 +299,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         if (idx >= 0) this.pageItems[idx] = { ...this.pageItems[idx], ...updatedComic };
         this.bidCountdowns[String(comic.id)] = this.bidSecondsRemaining(updatedComic);
         this.startBidTimer();
-        this.toastService.show(`Bidding started on "${comic.title}" — ${this.configService.biddingCycleMins} min window open!`);
+        this.toastService.showBid(`Bidding started on "${comic.title}" — ${this.configService.biddingCycleMins} min window open!`);
       },
       error: err => {
         const msg: string = typeof err?.error === 'string' ? err.error : '';
@@ -293,7 +318,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     if (input === null) return;
     const amount = parseFloat(input);
     if (isNaN(amount) || amount <= currentHigh) {
-      this.toastService.show(`Bid must be greater than $${currentHigh.toFixed(2)}.`, true);
+      this.toastService.showBid(`Bid must be greater than $${currentHigh.toFixed(2)}.`, true);
       return;
     }
     this.cartService.placeBid(String(comic.id), amount).subscribe({
@@ -350,7 +375,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
         this.toastService.markActed(String(comic.id));
         const num = this.comicNumberLabel(comic);
         const price = comic.salePrice != null ? ` — $${comic.salePrice.toFixed(2)}` : '';
-        this.toastService.show(`"${comic.title}${num}" added to your cart.${price}`);
+        const claimName = this.auth.currentUser$.value?.name ?? 'User';
+        this.toastService.show(`"${comic.title}${num}" added to ${claimName}'s cart.${price}`);
       },
       error: (err) => { this.handleClaimError(err); }
     });
@@ -369,7 +395,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
           this.toastService.markActed(String(m.id));
         }
         this.claimingSetId = null;
-        this.toastService.show(`"${container.title}" set (${members.length} books) added to your cart.`);
+        const setClaimName = this.auth.currentUser$.value?.name ?? 'User';
+        this.toastService.show(`"${container.title}" set (${members.length} books) added to ${setClaimName}'s cart.`);
         this.loadPage();
       },
       error: (err) => {

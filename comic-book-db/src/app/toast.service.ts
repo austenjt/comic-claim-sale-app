@@ -84,11 +84,18 @@ export class ToastService {
     });
   }
 
+  /** Log-only — no popup. Use for routine activity (claims, cart updates, etc.). */
   show(message: string, isError = false): void {
     if (this.configService.pauseNotifications) return;
-    const id = ++this.toastCounter;
-    this.toasts.push({ id, message, isError });
-    setTimeout(() => this.dismiss(id), 30000);
+    this.persistToLog(message, isError);
+  }
+
+  /** Log-only — same as show() but always logs regardless of pauseNotifications. */
+  showBid(message: string, isError = false): void {
+    this.persistToLog(message, isError);
+  }
+
+  private persistToLog(message: string, isError: boolean): void {
     const entry: LogEntry = { message, timestamp: new Date(), isError };
     this.logEntries.unshift(entry);
     if (this.logEntries.length > 100) this.logEntries.length = 100;

@@ -172,12 +172,13 @@ public class ComicService {
     private String sortToOrderBy(String sort) {
         if (sort == null) return "c._ts ASC";
         return switch (sort) {
-            case "newest-first" -> "c._ts DESC";
-            case "a-z"          -> "c.title ASC";
-            case "z-a"          -> "c.title DESC";
+            case "newest-first"  -> "c._ts DESC";
+            case "bidding-first" -> "c._ts DESC"; // client-side floats bid items; fall back to newest-first
+            case "a-z"           -> "c.title ASC";
+            case "z-a"           -> "c.title DESC";
             case "highest-price" -> "c.salePrice DESC";
             case "lowest-price"  -> "c.salePrice ASC";
-            default             -> "c._ts ASC"; // oldest-first, claimed-first, bidding-first
+            default              -> "c._ts ASC"; // oldest-first, claimed-first
         };
     }
 

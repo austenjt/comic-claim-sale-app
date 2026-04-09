@@ -121,7 +121,8 @@ export class SetDetailComponent implements OnInit {
           this.claimedMap[String(m.id)] = new Date().toISOString();
         }
         this.actionLoading = false;
-        this.toastService.show(`"${this.container!.title}" set (${this.setMembers.length} books) added to your cart.`);
+        const claimName = this.auth.currentUser$.value?.name ?? 'User';
+        this.toastService.show(`"${this.container!.title}" set (${this.setMembers.length} books) added to ${claimName}'s cart.`);
       },
       error: err => {
         this.claimError = err?.error || 'Failed to claim set.';
