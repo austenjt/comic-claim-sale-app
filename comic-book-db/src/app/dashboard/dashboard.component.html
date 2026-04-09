@@ -94,9 +94,7 @@
               <div *ngIf="comic.number?.number != null || comic.number?.sentinel != null" class="comic-number">
                 Number: <b>{{ comic.number?.sentinel ?? comic.number?.number }}</b>
               </div>
-              <div *ngIf="comic.comicCondition?.cgcCondition?.grade" class="comic-grade-certified">CGC: <b>{{comic.comicCondition?.cgcCondition?.grade}}</b></div>
-              <div *ngIf="comic.comicCondition?.cbcsCondition?.grade" class="comic-grade-certified">CBCS: <b>{{comic.comicCondition?.cbcsCondition?.grade}}</b></div>
-              <div *ngIf="comic.comicCondition?.notCertifiedGrade" class="comic-grade-est">Grade: <b>{{comic.comicCondition?.notCertifiedGrade}}</b></div>
+              <div *ngIf="comic.comicCondition?.notCertifiedGrade" class="comic-grade-est">Grade: <b>{{comic.comicCondition?.notCertifiedGrade | number:'1.1-1'}}</b></div>
               <div *ngIf="comic.salePrice && !comic.soldTo" class="comic-price">Price: <b>{{ comic.salePrice | currency:'USD':'symbol':'1.2-2' }}</b></div>
             </div>
         </div>

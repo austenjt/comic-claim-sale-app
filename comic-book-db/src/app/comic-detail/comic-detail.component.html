@@ -175,7 +175,7 @@
         </div>
         <div class="detail-item" *ngIf="!comic.comicCondition?.cgcCondition && !comic.comicCondition?.cbcsCondition && comic.comicCondition?.notCertifiedGrade">
           <span class="detail-label">Raw Grade</span>
-          <span class="detail-value">{{comic.comicCondition.notCertifiedGrade}}</span>
+          <span class="detail-value">{{comic.comicCondition.notCertifiedGrade | number:'1.1-1'}}</span>
         </div>
 
         <!-- CGC -->
@@ -195,7 +195,7 @@
           </div>
           <div class="detail-item" *ngIf="comic.comicCondition?.cgcCondition?.grade">
             <span class="detail-label">Grade</span>
-            <span class="detail-value">{{comic.comicCondition!.cgcCondition!.grade}}</span>
+            <span class="detail-value">{{comic.comicCondition!.cgcCondition!.grade | number:'1.1-1'}}</span>
           </div>
           <div class="detail-item" *ngIf="comic.comicCondition?.cgcCondition?.pageQuality">
             <span class="detail-label">Page Quality</span>
@@ -232,7 +232,7 @@
           </div>
           <div class="detail-item" *ngIf="comic.comicCondition?.cbcsCondition?.grade">
             <span class="detail-label">Grade</span>
-            <span class="detail-value">{{comic.comicCondition!.cbcsCondition!.grade}}</span>
+            <span class="detail-value">{{comic.comicCondition!.cbcsCondition!.grade | number:'1.1-1'}}</span>
           </div>
           <div class="detail-item" *ngIf="comic.comicCondition?.cbcsCondition?.pageQuality">
             <span class="detail-label">Page Quality</span>
@@ -261,7 +261,7 @@
           </div>
           <div class="detail-item" *ngIf="comic.comicCondition?.notCertifiedGrade">
             <span class="detail-label">Grade</span>
-            <span class="detail-value">{{comic.comicCondition.notCertifiedGrade}}</span>
+            <span class="detail-value">{{comic.comicCondition.notCertifiedGrade | number:'1.1-1'}}</span>
           </div>
           <div class="detail-item" *ngIf="comic.comicCondition?.notCertifiedPageQuality">
             <span class="detail-label">Page Quality</span>
