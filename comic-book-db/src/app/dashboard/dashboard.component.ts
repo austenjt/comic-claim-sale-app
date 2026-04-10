@@ -99,7 +99,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         // Admin sees all enableBid items at top (including not-yet-opened ones with "Start Bid" button).
         // Regular users only see items that admin has already opened or started.
         const isBidRelevant = (c: Comic) => this.auth.isAdmin()
-          ? !!c.enableBid
+          ? !!c.enableBid && !c.sold
           : !!(c.bidOpenedAt || c.bidStartedAt);
         return (isBidRelevant(b) ? 1 : 0) - (isBidRelevant(a) ? 1 : 0);
       });
@@ -261,7 +261,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   private startBidPolling(): void {
     if (this.bidPollInterval) return;
     this.bidPollInterval = setInterval(() => {
-      const bidEnabled = this.pageItems.filter(c => c.enableBid);
+      const bidEnabled = this.pageItems.filter(c => c.enableBid && !c.sold);
       if (bidEnabled.length === 0) {
         clearInterval(this.bidPollInterval);
         this.bidPollInterval = null;
@@ -275,6 +275,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   private finalizeBidExpiry(comic: Comic): void {
     comic.bidStartedAt = null;
+    comic.sold = true;  // prevent bid UI from re-appearing while HTTP round-trip is in flight
     this.cartService.finalizeBid(String(comic.id)).subscribe({
       next: cart => {
         this.myCart = cart;
@@ -287,7 +288,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   private refreshComicBidState(comicId: string): void {
     const idx = this.pageItems.findIndex(c => String(c.id) === comicId);
-    if (idx < 0 || !this.pageItems[idx].enableBid) return;
+    if (idx < 0 || !this.pageItems[idx].enableBid || this.pageItems[idx].sold) return;
+    const wasSold = !!this.pageItems[idx].sold;
     this.comicService.getComic(this.pageItems[idx].id).subscribe({
       next: latestComic => {
         if (!latestComic) return;
@@ -301,6 +303,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
           this.bidCountdowns[String(this.pageItems[idx].id)] =
             this.bidSecondsRemaining(this.pageItems[idx]);
           this.startBidTimer();
+        }
+        // sold=true is only set after full DB commit — reliable signal to refresh claim state
+        if (!wasSold && this.pageItems[idx].sold) {
+          this.loadClaimedMap();
+          if (!this.auth.isAdmin()) this.refreshMyCart();
         }
       },
       error: () => {}
@@ -618,7 +625,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       }
     }
     if (anyActive) this.startBidTimer();
-    if (this.pageItems.some(c => c.enableBid)) this.startBidPolling();
+    if (this.pageItems.some(c => c.enableBid && !c.sold)) this.startBidPolling();
   }
 
   trackById(_index: number, comic: Comic): number { return comic.id; }

@@ -31,6 +31,10 @@ public class BiddingState {
     private String currentBidderId;
     private String currentBidderName;
 
+    /** Set to true when the bid is finalized and the item is awarded to the winner.
+     *  Treated as an override for enableBid=true — a sold bid item is no longer biddable. */
+    private boolean sold;
+
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<BidEntry> bidHistory;
 }

@@ -197,7 +197,7 @@
               </ng-container>
 
               <!-- Admin bid controls -->
-              <ng-container *ngIf="auth.isAdmin() && configService.biddingMode && comic.enableBid && !claimedDate(comic.id)">
+              <ng-container *ngIf="auth.isAdmin() && configService.biddingMode && comic.enableBid && !comic.sold && !claimedDate(comic.id)">
                 <!-- Not yet opened: show Start Bid button -->
                 <ng-container *ngIf="!comic.bidOpenedAt && !isBiddingActive(comic)">
                   <button class="btn-start-bid"

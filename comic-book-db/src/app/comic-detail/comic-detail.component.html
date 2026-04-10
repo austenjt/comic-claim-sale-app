@@ -373,7 +373,7 @@
         <div class="detail-section-title">Sale Info</div>
         <div class="detail-item">
           <span class="detail-label">Biddable</span>
-          <span class="detail-value">{{ comic.enableBid ? 'Yes' : 'No' }}</span>
+          <span class="detail-value">{{ (comic.enableBid && !comic.sold) ? 'Yes' : 'No' }}</span>
         </div>
         <div class="detail-item" *ngIf="comic.isForSale">
           <span class="detail-label">For Sale</span>
@@ -464,7 +464,7 @@
         <div class="detail-section-title">Sale Info</div>
         <div class="detail-item">
           <span class="detail-label">Biddable</span>
-          <span class="detail-value">{{ comic.enableBid ? 'Yes' : 'No' }}</span>
+          <span class="detail-value">{{ (comic.enableBid && !comic.sold) ? 'Yes' : 'No' }}</span>
         </div>
       </div>
 
@@ -571,7 +571,7 @@
       </div>
 
       <!-- Admin Actions -->
-      <div class="detail-section" *ngIf="auth.isAdmin() && !isBiddingActive() && !claimedDate(comic.id)">
+      <div class="detail-section" *ngIf="auth.isAdmin() && !isBiddingActive() && !comic.sold && !claimedDate(comic.id)">
         <div class="detail-section-title">Admin Actions</div>
         <div class="detail-item">
           <span class="detail-label">Delete Comic</span>

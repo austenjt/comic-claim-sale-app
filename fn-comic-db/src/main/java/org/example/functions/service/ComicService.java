@@ -109,7 +109,9 @@ public class ComicService {
             where.append(" AND (c.docType = 'SET' OR (IS_DEFINED(c.salePrice) AND c.salePrice != null))");
         }
         if (onlyBiddable) {
-            where.append(" AND c.enableBid = true");
+            // Exclude sold bid items — sold=true overrides enableBid=true
+            where.append(" AND c.enableBid = true")
+                 .append(" AND (NOT IS_DEFINED(c.sold) OR c.sold = false OR c.sold = null)");
         }
         String whereClause = where.toString();
 

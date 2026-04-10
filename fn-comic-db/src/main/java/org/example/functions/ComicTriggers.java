@@ -254,6 +254,13 @@ public class ComicTriggers {
             .findFirst();
         try {
             if (existingComic.isPresent()) {
+                // Block deletion of bid-sold items
+                if (existingComic.get().getBiddingState().isSold()) {
+                    return request.createResponseBuilder(HttpStatus.CONFLICT)
+                        .header("Content-Type", "text/plain")
+                        .body("Cannot delete a comic that was sold via bidding.")
+                        .build();
+                }
                 comicService.deleteComic(existingComic.get().getId());
 
                 // Remove comic from any active carts (best-effort)

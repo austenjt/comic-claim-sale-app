@@ -62,6 +62,9 @@ public class BidService {
         }
 
         BiddingState bid = comic.getBiddingState();
+        if (bid.isSold()) {
+            throw new IllegalStateException("Comic " + comicId + " has already been sold via bidding.");
+        }
         if (bid.getBidOpenedAt() != null) {
             return comic; // Already opened — idempotent
         }
@@ -95,6 +98,10 @@ public class BidService {
         }
 
         BiddingState bid = comic.getBiddingState();
+
+        if (bid.isSold()) {
+            throw new IllegalStateException("Comic " + comicId + " has already been sold via bidding.");
+        }
 
         if (bid.getBidOpenedAt() == null) {
             throw new IllegalStateException("Admin has not opened bidding for comic " + comicId + " yet.");
@@ -151,6 +158,10 @@ public class BidService {
         }
 
         BiddingState bid = comic.getBiddingState();
+
+        if (bid.isSold()) {
+            throw new IllegalStateException("Comic " + comicId + " has already been sold via bidding.");
+        }
 
         if (bid.getBidStartedAt() == null) {
             throw new IllegalStateException("Bidding has not started for comic " + comicId + ".");
@@ -248,12 +259,13 @@ public class BidService {
             .note("WON")
             .build());
 
-        // Clear active bidding state (keep bidHistory) and disable future bidding
+        // Clear active bidding state (keep bidHistory) and mark as sold
+        // sold=true overrides enableBid=true — the item is no longer biddable
         bid.setBidOpenedAt(null);
         bid.setBidStartedAt(null);
         bid.setCurrentBidderId(null);
         bid.setCurrentBidderName(null);
-        comic.setEnableBid(false);
+        bid.setSold(true);
         ComicService.getServiceInstance().updateComic(comic, "system:bid-finalized");
 
         // Add to winner's cart

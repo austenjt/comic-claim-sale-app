@@ -106,6 +106,7 @@ export interface Comic {
   personalNotes: string | null;
   publicNotes: string | null;
   enableBid?: boolean | null;
+  sold?: boolean | null;
   bidOpenedAt?: string | null;
   highBid?: number | null;
   bidStartedAt?: string | null;
