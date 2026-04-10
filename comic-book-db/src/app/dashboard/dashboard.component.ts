@@ -40,6 +40,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   logsExpanded = false;
 
+  readonly Math = Math;
   private static readonly PREFS_KEY = 'dashboard_prefs';
 
   private _excludeClaimed = false;
@@ -358,6 +359,22 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.bidModalSubmitting = false;
   }
 
+  minNextBid(highBid: number): number {
+    const nextQuarter = Math.ceil((highBid + 0.001) / 0.25) * 0.25;
+    return Math.max(nextQuarter, 1.00);
+  }
+
+  get bidModalWarning(): string {
+    const comic = this.bidModalComic;
+    if (!comic) return '';
+    const amount = parseFloat(this.bidModalAmount);
+    const currentHigh = comic.highBid ?? 0;
+    if (!isNaN(amount) && amount >= currentHigh + 10) {
+      return `Your bid is $${(amount - currentHigh).toFixed(2)} over the current high bid — double-check before submitting.`;
+    }
+    return '';
+  }
+
   submitBid(): void {
     const comic = this.bidModalComic;
     if (!comic) return;
@@ -365,6 +382,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
     const currentHigh = comic.highBid ?? 0;
     if (isNaN(amount) || amount <= currentHigh) {
       this.bidModalError = `Amount must exceed the current high bid of $${currentHigh.toFixed(2)}.`;
+      return;
+    }
+    if (amount < 1.00) {
+      this.bidModalError = 'Bid must be at least $1.00.';
+      return;
+    }
+    if (Math.abs(Math.round(amount * 4) - amount * 4) > 0.001) {
+      this.bidModalError = 'Bid must be in whole dollar or $0.25 increments (e.g. $1.00, $1.25, $1.50).';
       return;
     }
     this.bidModalSubmitting = true;

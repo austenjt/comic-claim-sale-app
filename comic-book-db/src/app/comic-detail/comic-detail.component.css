@@ -523,6 +523,12 @@ button {
   font-size: 1rem;
 }
 
+.bid-modal-warning {
+  color: #d97706;
+  font-size: 0.85rem;
+  margin-top: 8px;
+}
+
 .bid-modal-error {
   color: #c0634c;
   font-size: 0.85rem;

@@ -110,7 +110,9 @@ public class BidService {
         bid.setCurrentBidderId(user.getId());
         bid.setCurrentBidderName(user.getName());
 
-        BigDecimal startingBid = comic.getSalePrice() != null ? comic.getSalePrice() : BigDecimal.ZERO;
+        BigDecimal startingBid = comic.getSalePrice() != null
+            ? comic.getSalePrice().max(BigDecimal.ONE)
+            : BigDecimal.ONE;
         bid.setHighBid(startingBid);
 
         if (bid.getBidHistory() == null) {
@@ -165,6 +167,19 @@ public class BidService {
             throw new IllegalArgumentException(
                 "Bid must be greater than the current high bid of $" + currentHigh + ".");
         }
+
+        // Minimum bid is $1.00
+        if (amount.compareTo(BigDecimal.ONE) < 0) {
+            throw new IllegalArgumentException("Bid must be at least $1.00.");
+        }
+
+        // Must be in $0.25 increments
+        BigDecimal[] divRem = amount.divideAndRemainder(new BigDecimal("0.25"));
+        if (divRem[1].compareTo(BigDecimal.ZERO) != 0) {
+            throw new IllegalArgumentException(
+                "Bid must be in whole dollar or $0.25 increments (e.g. $1.00, $1.25, $1.50).");
+        }
+
 
         String now = Instant.now().toString();
         bid.setHighBid(amount);
@@ -238,11 +253,12 @@ public class BidService {
             .note("WON")
             .build());
 
-        // Clear active bidding state (keep bidHistory)
+        // Clear active bidding state (keep bidHistory) and disable future bidding
         bid.setBidOpenedAt(null);
         bid.setBidStartedAt(null);
         bid.setCurrentBidderId(null);
         bid.setCurrentBidderName(null);
+        comic.setEnableBid(false);
         ComicService.getServiceInstance().updateComic(comic, "system:bid-finalized");
 
         // Add to winner's cart

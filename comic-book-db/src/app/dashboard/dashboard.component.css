@@ -678,6 +678,12 @@ h2 {
 .bid-modal-input::-webkit-inner-spin-button,
 .bid-modal-input::-webkit-outer-spin-button { opacity: 1; }
 
+.bid-modal-warning {
+  color: #d97706;
+  font-size: 0.85rem;
+  margin-bottom: 8px;
+}
+
 .bid-modal-error {
   color: #c0634c;
   font-size: 0.85rem;

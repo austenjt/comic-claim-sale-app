@@ -39,6 +39,7 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
   backImageUploadErrorSummary = '';
   backImageUploadErrorDetail = '';
   backImageUploadErrorExpanded = false;
+  readonly Math = Math;
   linkCopied = false;
   bidModalOpen = false;
   bidModalAmount: number | null = null;
@@ -230,12 +231,34 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
     this.bidModalError = '';
   }
 
+  minNextBid(highBid: number): number {
+    const nextQuarter = Math.ceil((highBid + 0.001) / 0.25) * 0.25;
+    return Math.max(nextQuarter, 1.00);
+  }
+
+  get bidModalWarning(): string {
+    if (!this.comic || this.bidModalAmount === null) return '';
+    const currentHigh = this.comic.highBid ?? 0;
+    if (this.bidModalAmount >= currentHigh + 10) {
+      return `Your bid is $${(this.bidModalAmount - currentHigh).toFixed(2)} over the current high bid — double-check before submitting.`;
+    }
+    return '';
+  }
+
   submitBid(): void {
     if (!this.comic || this.bidModalSubmitting) return;
     const currentHigh = this.comic.highBid ?? 0;
     const amount = this.bidModalAmount;
     if (amount === null || isNaN(amount) || amount <= currentHigh) {
       this.bidModalError = `Bid must be greater than $${currentHigh.toFixed(2)}.`;
+      return;
+    }
+    if (amount < 1.00) {
+      this.bidModalError = 'Bid must be at least $1.00.';
+      return;
+    }
+    if (Math.abs(Math.round(amount * 4) - amount * 4) > 0.001) {
+      this.bidModalError = 'Bid must be in whole dollar or $0.25 increments (e.g. $1.00, $1.25, $1.50).';
       return;
     }
     this.bidModalSubmitting = true;
