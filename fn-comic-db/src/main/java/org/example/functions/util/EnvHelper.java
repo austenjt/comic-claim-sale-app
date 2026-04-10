@@ -40,6 +40,12 @@ public class EnvHelper {
         try { return Integer.parseInt(val.trim()); } catch (NumberFormatException e) { return 10; }
     }
 
+    public static int getDashboardPageSize() {
+        String val = getProp("DASHBOARD_PAGE_SIZE");
+        if (val == null || val.isBlank()) return 500; // default: 500 items per page
+        try { return Integer.parseInt(val.trim()); } catch (NumberFormatException e) { return 500; }
+    }
+
     public static int getCartExpiryDays() {
         String val = getProp("CART_EXPIRY_DAYS");
         if (val == null || val.isBlank()) return 7;

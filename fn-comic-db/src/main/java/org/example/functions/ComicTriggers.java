@@ -20,6 +20,7 @@ import org.example.functions.service.CartService;
 import org.example.functions.service.ComicService;
 import org.example.functions.service.ImageService;
 import org.example.functions.util.AuthHelper;
+import org.example.functions.util.EnvHelper;
 import org.example.functions.util.CsvToJsonConverter;
 import org.example.functions.util.Mappers;
 import org.example.functions.util.Views;
@@ -48,9 +49,9 @@ public class ComicTriggers {
         boolean admin = AuthHelper.isAdminRequest(request);
         ComicService comicService = ComicService.getServiceInstance();
         try {
-            if (pageNumberStr != null && pageSizeStr != null) {
+            if (pageNumberStr != null) {
                 int pageNumber = Integer.parseInt(pageNumberStr);
-                int pageSize = Integer.parseInt(pageSizeStr);
+                int pageSize = EnvHelper.getDashboardPageSize();
                 String sort = request.getQueryParameters().getOrDefault("sort", "oldest-first");
                 boolean onlyPriced = "true".equalsIgnoreCase(request.getQueryParameters().get("onlyPriced"));
                 PagedResponse<ComicBook> paged = comicService.getTopLevelComicsPaged(pageNumber, pageSize, sort, onlyPriced);

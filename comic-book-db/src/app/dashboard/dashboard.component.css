@@ -182,6 +182,21 @@ h2 {
 }
 .btn-bid:hover { background: #a93226; }
 
+/* Filled orange — used for user's "Bid" (start bidding) button */
+.btn-bid-start {
+  padding: 6px 18px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  background: #d97706;
+  color: #fff;
+  border: none;
+}
+.btn-bid-start:hover { background: #b45309; }
+.btn-bid-start:disabled { background: #fcd34d; color: #fff; cursor: not-allowed; }
+
+/* Outline orange — used for admin Start Bid and Cancel buttons */
 .btn-start-bid {
   padding: 6px 14px;
   border-radius: 4px;
@@ -189,35 +204,22 @@ h2 {
   font-weight: 700;
   cursor: pointer;
   background: transparent;
-  color: #c0392b;
-  border: 2px solid #c0392b;
+  color: #d97706;
+  border: 2px solid #d97706;
 }
-.btn-start-bid:hover { background: rgba(192,57,43,0.1); }
-
-.bid-open-label {
-  font-size: 0.78rem;
-  font-weight: 700;
-  color: #c0392b;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-.bid-open-sub {
-  font-size: 0.72rem;
-  color: var(--color-text-muted);
-  font-style: italic;
-}
+.btn-start-bid:hover { background: rgba(217,119,6,0.1); }
 
 .btn-cancel-bid {
-  padding: 3px 10px;
+  padding: 6px 14px;
   border-radius: 4px;
-  font-size: 0.75rem;
-  font-weight: 600;
+  font-size: 0.82rem;
+  font-weight: 700;
   cursor: pointer;
   background: transparent;
-  color: var(--color-text-muted);
-  border: 1px solid var(--color-border);
+  color: #d97706;
+  border: 2px solid #d97706;
 }
-.btn-cancel-bid:hover { background: rgba(0,0,0,0.06); }
+.btn-cancel-bid:hover { background: rgba(217,119,6,0.1); }
 
 @keyframes bid-pulse {
   0%, 100% { box-shadow: 0 0 0 0 rgba(192,57,43,0.45); }

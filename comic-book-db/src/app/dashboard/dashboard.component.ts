@@ -22,7 +22,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
   totalCount = 0;
   totalPages = 0;
   currentPage = 1;
-  readonly pageSize = 500;
 
   claimedMap: Record<string, string> = {};
   myCart: Cart | null = null;
@@ -131,7 +130,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.loading = true;
 
     this.loadSub = this.comicService.getDashboardPage(
-      this.currentPage, this.pageSize, this.sortOrder, this.showPricedOnly
+      this.currentPage, this.sortOrder, this.showPricedOnly
     ).subscribe({
       next: (response: PagedResponse<Comic>) => {
         this.loadSub = null;
@@ -428,6 +427,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
   canClaim(comic: Comic): boolean {
     return this.showClaimButton(comic) &&
            (this.myCart?.status === 'OPEN' || !this.myCart);
+  }
+
+  canBid(): boolean {
+    return this.myCart?.status === 'OPEN' || !this.myCart;
   }
 
   cartLockedTitle(): string {

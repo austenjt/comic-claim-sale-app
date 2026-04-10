@@ -12,7 +12,7 @@ export class DashboardHeaderComponent {
   @Input() totalPages: number = 0;
 
   get isFiltered(): boolean {
-    return this.excludeClaimed || this.showPricedOnly;
+    return this.excludeClaimed || this.showPricedOnly || this.totalPages > 1;
   }
   @Input() excludeClaimed: boolean = false;
   @Output() excludeClaimedChange = new EventEmitter<boolean>();

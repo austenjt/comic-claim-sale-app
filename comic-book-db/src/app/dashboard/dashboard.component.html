@@ -125,6 +125,8 @@
                     by {{ comic.currentBidderName }}
                   </div>
                   <button class="btn-bid"
+                    [disabled]="!canBid()"
+                    [title]="canBid() ? '' : cartLockedTitle()"
                     (click)="$event.preventDefault(); $event.stopPropagation(); placeBid(comic)">
                     BID ${{ (comic.highBid ?? 0).toFixed(2) }}
                   </button>
@@ -132,9 +134,9 @@
 
                 <!-- Bidding: start (Bid button — only visible after admin has opened it) -->
                 <ng-container *ngIf="configService.biddingMode && comic.enableBid && comic.bidOpenedAt && !isBiddingActive(comic)">
-                  <button class="btn-claim"
-                    [disabled]="!canClaim(comic)"
-                    [title]="canClaim(comic) ? '' : cartLockedTitle()"
+                  <button class="btn-bid-start"
+                    [disabled]="!canBid()"
+                    [title]="canBid() ? '' : cartLockedTitle()"
                     (click)="$event.preventDefault(); $event.stopPropagation(); startBidding(comic)">Bid</button>
                 </ng-container>
 
@@ -158,8 +160,6 @@
                 </ng-container>
                 <!-- Opened, waiting for first bid -->
                 <ng-container *ngIf="comic.bidOpenedAt && !isBiddingActive(comic)">
-                  <div class="bid-open-label">Bidding Open</div>
-                  <div class="bid-open-sub">Waiting for first bid…</div>
                   <button class="btn-cancel-bid"
                     (click)="$event.preventDefault(); $event.stopPropagation(); cancelBid(comic)">
                     Cancel
@@ -173,10 +173,10 @@
                 </ng-container>
               </ng-container>
 
-              <button *ngIf="auth.isAdmin() && configService.awardModeEnabled && !claimedDate(comic.id) && !comic.comicCondition?.cgcCondition?.grade && !comic.comicCondition?.cbcsCondition?.grade"
+              <button *ngIf="auth.isAdmin() && configService.awardModeEnabled && !claimedDate(comic.id) && !comic.comicCondition?.cgcCondition?.grade && !comic.comicCondition?.cbcsCondition?.grade && !isBiddingActive(comic)"
                 class="btn-award"
                 (click)="$event.preventDefault(); $event.stopPropagation(); openAwardModal(comic)">Award</button>
-              <button *ngIf="auth.isAdmin()"
+              <button *ngIf="auth.isAdmin() && !isBiddingActive(comic)"
                 class="btn-delete-card"
                 [class.btn-delete-card-confirm]="pendingDeleteId === comic.id"
                 (click)="deleteComic(comic, $event)">

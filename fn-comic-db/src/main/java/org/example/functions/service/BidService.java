@@ -89,6 +89,11 @@ public class BidService {
             throw new IllegalArgumentException("Comic " + comicId + " does not have bidding enabled.");
         }
 
+        Cart activeCart = CartService.getServiceInstance().getActiveCart(user.getId()).orElse(null);
+        if (activeCart != null && ("FINALIZING".equals(activeCart.getStatus()) || "FINALIZED".equals(activeCart.getStatus()))) {
+            throw new IllegalStateException("Your order has been submitted — you cannot bid until it is fulfilled.");
+        }
+
         BiddingState bid = comic.getBiddingState();
 
         if (bid.getBidOpenedAt() == null) {
@@ -136,6 +141,11 @@ public class BidService {
 
         if (!Boolean.TRUE.equals(comic.getEnableBid())) {
             throw new IllegalArgumentException("Comic " + comicId + " does not have bidding enabled.");
+        }
+
+        Cart activeCart = CartService.getServiceInstance().getActiveCart(user.getId()).orElse(null);
+        if (activeCart != null && ("FINALIZING".equals(activeCart.getStatus()) || "FINALIZED".equals(activeCart.getStatus()))) {
+            throw new IllegalStateException("Your order has been submitted — you cannot bid until it is fulfilled.");
         }
 
         BiddingState bid = comic.getBiddingState();

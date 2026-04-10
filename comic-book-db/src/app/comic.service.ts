@@ -49,13 +49,11 @@ export class ComicService {
   /** GET a single page of for-sale comics from the server. Errors propagate for fallback handling. */
   getDashboardPage(
     pageNumber: number,
-    pageSize: number,
     sort: string,
     onlyPriced: boolean
   ): Observable<PagedResponse<Comic>> {
     const params = new HttpParams()
       .set('pageNumber', pageNumber.toString())
-      .set('pageSize', pageSize.toString())
       .set('sort', sort)
       .set('onlyPriced', onlyPriced.toString());
     return this.http.get<PagedResponse<Comic>>(this.comicsUrl, { params }).pipe(
