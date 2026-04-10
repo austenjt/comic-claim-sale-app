@@ -109,14 +109,20 @@ public class DiscountService {
             return new DiscountResult(0.0, null);
         }
 
-        List<CartItem> discountableItems = cart.getItems().stream()
+        // Bid-won items count toward tier thresholds but never receive a discount themselves.
+        // Awarded ($0) items are excluded from both counting and discount application.
+        List<CartItem> countableItems = cart.getItems().stream()
             .filter(i -> !i.isAwarded())
+            .collect(Collectors.toList());
+
+        List<CartItem> discountableItems = countableItems.stream()
+            .filter(i -> !i.isWonViaBid())
             .collect(Collectors.toList());
 
         double subtotal = discountableItems.stream()
             .mapToDouble(CartItem::getPrice)
             .sum();
-        int itemCount = discountableItems.size();
+        int itemCount = countableItems.size();
 
         double totalSavings = 0.0;
         List<String> descriptions = new ArrayList<>();

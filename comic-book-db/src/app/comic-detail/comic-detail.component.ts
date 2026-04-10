@@ -335,6 +335,7 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
   private refreshBidState(): void {
     if (!this.comic || this.actionLoading) return;
     const wasActive = this.isBiddingActive();
+    const wasEnableBid = this.comic.enableBid;
     this.comicService.getComic(this.comic.id).subscribe({
       next: latestComic => {
         if (!latestComic) return;
@@ -346,9 +347,14 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
           this.bidSecondsRemaining = Math.max(0, Math.floor((endsAt - Date.now()) / 1000));
           if (this.bidSecondsRemaining > 0) this.startBidTimer();
         }
-        // If bidding was already active, the running timer self-corrects each tick
-        // because it reads this.comic.bidStartedAt live — so a bid reset is picked
-        // up automatically on the very next 1-second tick.
+        // enableBid flips to false only when finalization is fully committed to the DB.
+        // Use that as a reliable signal to refresh claim state for all viewers.
+        if (wasEnableBid && !this.comic.enableBid) {
+          this.loadClaimedMap();
+          if (!this.auth.isAdmin()) {
+            this.cartService.getMyCart().subscribe({ next: c => this.myCart = c, error: () => {} });
+          }
+        }
       },
       error: () => {}
     });
