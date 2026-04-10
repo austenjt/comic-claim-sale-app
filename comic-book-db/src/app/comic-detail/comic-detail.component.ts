@@ -181,13 +181,24 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
     if (!this.comic) return;
     const comicId = String(this.comic.id);
     this.comic.bidStartedAt = null;
+
+    if (this.auth.isAdmin()) {
+      // Admin never triggers finalization — just refresh display state
+      this.loadClaimedMap();
+      return;
+    }
+
     this.cartService.finalizeBid(comicId).subscribe({
-      next: cart => {
-        this.myCart = cart;
+      next: () => {
         this.claimedMap[comicId] = new Date().toISOString();
         this.toastService.show('Bidding ended — comic added to winner\'s cart.');
+        this.cartService.getMyCart().subscribe({ next: c => this.myCart = c, error: () => {} });
       },
-      error: () => { this.loadClaimedMap(); }
+      error: () => {
+        // Another client already finalized — refresh both claimed map and cart
+        this.loadClaimedMap();
+        this.cartService.getMyCart().subscribe({ next: c => this.myCart = c, error: () => {} });
+      }
     });
   }
 
