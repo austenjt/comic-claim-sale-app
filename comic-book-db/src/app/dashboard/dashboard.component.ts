@@ -57,6 +57,17 @@ export class DashboardComponent implements OnInit, OnDestroy {
   private bidTimerInterval: any = null;
   private bidPollInterval: any = null;
 
+  // Bid modal state
+  bidModalComicId: number | null = null;
+  bidModalAmount = '';
+  bidModalError = '';
+  bidModalSubmitting = false;
+
+  get bidModalComic(): Comic | null {
+    if (this.bidModalComicId == null) return null;
+    return this.pageItems.find(c => c.id === this.bidModalComicId) ?? null;
+  }
+
   private loadSub: Subscription | null = null;
   private loadRetryTimer: any = null;
 
@@ -308,26 +319,41 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   placeBid(comic: Comic): void {
+    this.bidModalComicId = comic.id;
+    this.bidModalAmount = '';
+    this.bidModalError = '';
+    this.bidModalSubmitting = false;
+  }
+
+  closeBidModal(): void {
+    this.bidModalComicId = null;
+    this.bidModalAmount = '';
+    this.bidModalError = '';
+    this.bidModalSubmitting = false;
+  }
+
+  submitBid(): void {
+    const comic = this.bidModalComic;
+    if (!comic) return;
+    const amount = parseFloat(this.bidModalAmount);
     const currentHigh = comic.highBid ?? 0;
-    const input = window.prompt(
-      `Current high bid: $${currentHigh.toFixed(2)}\n` +
-      `Bidder: ${comic.currentBidderName ?? 'none'}\n\n` +
-      `Enter your bid amount (must be greater than $${currentHigh.toFixed(2)}):`
-    );
-    if (input === null) return;
-    const amount = parseFloat(input);
     if (isNaN(amount) || amount <= currentHigh) {
-      this.toastService.showBid(`Bid must be greater than $${currentHigh.toFixed(2)}.`, true);
+      this.bidModalError = `Amount must exceed the current high bid of $${currentHigh.toFixed(2)}.`;
       return;
     }
+    this.bidModalSubmitting = true;
+    this.bidModalError = '';
     this.cartService.placeBid(String(comic.id), amount).subscribe({
       next: updatedComic => {
         const idx = this.pageItems.findIndex(c => c.id === comic.id);
         if (idx >= 0) this.pageItems[idx] = { ...this.pageItems[idx], ...updatedComic };
+        this.closeBidModal();
       },
       error: err => {
         const msg: string = typeof err?.error === 'string' ? err.error : '';
-        this.toastService.show(msg || 'Bid failed.');
+        this.bidModalError = msg || 'Bid failed.';
+        this.bidModalSubmitting = false;
+        this.refreshComicBidState(String(comic.id));
       }
     });
   }

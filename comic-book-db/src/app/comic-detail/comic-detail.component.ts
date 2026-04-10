@@ -40,6 +40,10 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
   backImageUploadErrorDetail = '';
   backImageUploadErrorExpanded = false;
   linkCopied = false;
+  bidModalOpen = false;
+  bidModalAmount: number | null = null;
+  bidModalError = '';
+  bidModalSubmitting = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -214,19 +218,28 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
 
   placeBid(): void {
     if (!this.comic) return;
+    this.bidModalAmount = null;
+    this.bidModalError = '';
+    this.bidModalOpen = true;
+  }
+
+  closeBidModal(): void {
+    if (this.bidModalSubmitting) return;
+    this.bidModalOpen = false;
+    this.bidModalAmount = null;
+    this.bidModalError = '';
+  }
+
+  submitBid(): void {
+    if (!this.comic || this.bidModalSubmitting) return;
     const currentHigh = this.comic.highBid ?? 0;
-    const input = window.prompt(
-      `Current high bid: $${currentHigh.toFixed(2)}\n` +
-      `Bidder: ${this.comic.currentBidderName ?? 'none'}\n\n` +
-      `Enter your bid (must be greater than $${currentHigh.toFixed(2)}):`
-    );
-    if (input === null) return;
-    const amount = parseFloat(input);
-    if (isNaN(amount) || amount <= currentHigh) {
-      this.claimError = `Bid must be greater than $${currentHigh.toFixed(2)}.`;
+    const amount = this.bidModalAmount;
+    if (amount === null || isNaN(amount) || amount <= currentHigh) {
+      this.bidModalError = `Bid must be greater than $${currentHigh.toFixed(2)}.`;
       return;
     }
-    this.actionLoading = true;
+    this.bidModalSubmitting = true;
+    this.bidModalError = '';
     this.cartService.placeBid(String(this.comic.id), amount).subscribe({
       next: updatedComic => {
         this.comic = { ...this.comic!, ...updatedComic };
@@ -237,14 +250,14 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
           this.bidSecondsRemaining = Math.max(0, Math.floor((endsAt - Date.now()) / 1000));
           if (this.bidSecondsRemaining > 0) this.startBidTimer();
         }
-        // If the timer is still running it will self-correct on the next 1s tick
-        this.actionLoading = false;
+        this.bidModalSubmitting = false;
+        this.bidModalOpen = false;
         this.claimError = '';
         this.toastService.showBid(`Bid of $${amount.toFixed(2)} placed!`);
       },
       error: err => {
-        this.claimError = err?.error || 'Bid failed.';
-        this.actionLoading = false;
+        this.bidModalError = err?.error || 'Bid failed.';
+        this.bidModalSubmitting = false;
       }
     });
   }

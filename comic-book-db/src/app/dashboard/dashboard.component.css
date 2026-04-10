@@ -175,12 +175,13 @@ h2 {
   font-size: 0.85rem;
   font-weight: 700;
   cursor: pointer;
-  background: #c0392b;
+  background: #d97706;
   color: #fff;
   border: none;
   animation: bid-pulse 1.5s ease-in-out infinite;
 }
-.btn-bid:hover { background: #a93226; }
+.btn-bid:hover { background: #b45309; }
+.btn-bid:disabled { background: #fcd34d; color: #fff; cursor: not-allowed; animation: none; }
 
 /* Filled orange — used for user's "Bid" (start bidding) button */
 .btn-bid-start {
@@ -222,8 +223,8 @@ h2 {
 .btn-cancel-bid:hover { background: rgba(217,119,6,0.1); }
 
 @keyframes bid-pulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(192,57,43,0.45); }
-  50% { box-shadow: 0 0 0 6px rgba(192,57,43,0); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(217,119,6,0.5); }
+  50% { box-shadow: 0 0 0 6px rgba(217,119,6,0); }
 }
 
 .bid-countdown {
@@ -573,3 +574,142 @@ h2 {
   font-family: inherit;
   font-size: 0.82rem;
 }
+
+/* ── Bid Modal ─────────────────────────────────────────────────────────────── */
+
+.bid-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.bid-modal {
+  background: #dde5b6;
+  border: 1px solid #b8c89a;
+  border-radius: 10px;
+  padding: 28px 32px;
+  min-width: 320px;
+  max-width: 420px;
+  width: 90%;
+  box-shadow: 0 8px 32px rgba(108,88,76,0.25);
+}
+
+.bid-modal-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #6c584c;
+  margin-bottom: 4px;
+}
+
+.bid-modal-comic-name {
+  font-size: 0.9rem;
+  color: #79675c;
+  margin-bottom: 16px;
+  font-style: italic;
+}
+
+.bid-modal-info {
+  background: #f0ead2;
+  border: 1px solid #b8c89a;
+  border-radius: 6px;
+  padding: 10px 14px;
+  margin-bottom: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.bid-modal-info-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.88rem;
+  color: #6c584c;
+}
+
+.bid-modal-timer {
+  color: #d97706;
+}
+
+.bid-modal-input-group {
+  margin-bottom: 14px;
+}
+
+.bid-modal-label {
+  display: block;
+  font-size: 0.82rem;
+  color: #79675c;
+  margin-bottom: 6px;
+}
+
+.bid-modal-input-row {
+  display: flex;
+  align-items: center;
+  border: 1px solid #b8c89a;
+  border-radius: 4px;
+  background: #f0ead2;
+  overflow: hidden;
+}
+
+.bid-modal-dollar {
+  padding: 0 10px;
+  font-size: 0.95rem;
+  color: #6c584c;
+  font-weight: 600;
+  background: #c8d4a8;
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  border-right: 1px solid #b8c89a;
+}
+
+.bid-modal-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 8px 10px;
+  font-size: 0.95rem;
+  color: #6c584c;
+  outline: none;
+}
+.bid-modal-input::-webkit-inner-spin-button,
+.bid-modal-input::-webkit-outer-spin-button { opacity: 1; }
+
+.bid-modal-error {
+  color: #c0634c;
+  font-size: 0.85rem;
+  margin-bottom: 12px;
+}
+
+.bid-modal-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.bid-modal-submit-btn {
+  padding: 8px 22px;
+  border-radius: 4px;
+  border: none;
+  background: #d97706;
+  color: #fff;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+.bid-modal-submit-btn:hover:not(:disabled) { background: #b45309; }
+.bid-modal-submit-btn:disabled { background: #fcd34d; color: #fff; cursor: not-allowed; }
+
+.bid-modal-cancel-btn {
+  padding: 8px 22px;
+  border-radius: 4px;
+  border: 1px solid #b8c89a;
+  background: transparent;
+  color: #79675c;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+.bid-modal-cancel-btn:hover:not(:disabled) { background: #c8d4a8; }
+.bid-modal-cancel-btn:disabled { opacity: 0.5; cursor: not-allowed; }

@@ -379,7 +379,7 @@ button {
 }
 
 .claim-status-bidding {
-  color: #c0392b;
+  color: #d97706;
   font-weight: 700;
 }
 
@@ -391,7 +391,7 @@ button {
 
 .btn-bid-detail {
   padding: 8px 22px;
-  background: #c0392b;
+  background: #d97706;
   color: #fff;
   border: none;
   border-radius: 4px;
@@ -400,12 +400,12 @@ button {
   cursor: pointer;
   animation: bid-pulse 1.5s ease-in-out infinite;
 }
-.btn-bid-detail:hover:not(:disabled) { background: #a93226; }
+.btn-bid-detail:hover:not(:disabled) { background: #b45309; }
 .btn-bid-detail:disabled { opacity: 0.6; cursor: default; animation: none; }
 
 @keyframes bid-pulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(192,57,43,0.45); }
-  50% { box-shadow: 0 0 0 6px rgba(192,57,43,0); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(217,119,6,0.5); }
+  50% { box-shadow: 0 0 0 6px rgba(217,119,6,0); }
 }
 
 .bid-history-table {
@@ -432,5 +432,130 @@ button {
 
 .bid-row-winner td {
   font-weight: 700;
+  color: #d97706;
+}
+
+/* Bid modal */
+.bid-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.bid-modal {
+  background: var(--color-surface, #1e1e1e);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: 28px 32px;
+  width: 360px;
+  max-width: 95vw;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+}
+
+.bid-modal-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #d97706;
+  margin-bottom: 4px;
+}
+
+.bid-modal-comic-name {
+  font-size: 0.95rem;
+  color: var(--color-text-muted);
+  margin-bottom: 16px;
+}
+
+.bid-modal-info {
+  background: rgba(255,255,255,0.04);
+  border-radius: 6px;
+  padding: 10px 14px;
+  margin-bottom: 18px;
+}
+
+.bid-modal-info-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.88rem;
+  padding: 3px 0;
+  color: var(--color-text-muted);
+}
+
+.bid-modal-info-row strong {
+  color: var(--color-text);
+}
+
+.bid-modal-timer {
   color: #c0392b;
 }
+
+.bid-modal-label {
+  display: block;
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+  margin-bottom: 6px;
+}
+
+.bid-modal-input-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.bid-modal-dollar {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.bid-modal-input {
+  flex: 1;
+  padding: 8px 10px;
+  background: var(--color-bg, #121212);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  color: var(--color-text);
+  font-size: 1rem;
+}
+
+.bid-modal-error {
+  color: #c0634c;
+  font-size: 0.85rem;
+  margin-top: 8px;
+}
+
+.bid-modal-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.bid-modal-submit-btn {
+  flex: 1;
+  padding: 9px 0;
+  background: #d97706;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.bid-modal-submit-btn:hover:not(:disabled) { background: #b45309; }
+.bid-modal-submit-btn:disabled { opacity: 0.6; cursor: default; }
+
+.bid-modal-cancel-btn {
+  padding: 9px 18px;
+  background: transparent;
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+.bid-modal-cancel-btn:hover:not(:disabled) { background: rgba(255,255,255,0.05); }

@@ -33,6 +33,50 @@
   </div>
 </div>
 
+<!-- Bid modal -->
+<div *ngIf="bidModalComic" class="bid-modal-overlay" (click)="closeBidModal()">
+  <div class="bid-modal" (click)="$event.stopPropagation()">
+    <div class="bid-modal-title">Place Bid</div>
+    <div class="bid-modal-comic-name">"{{ bidModalComic.title }}"</div>
+    <div class="bid-modal-info">
+      <div class="bid-modal-info-row">
+        <span>Current High Bid</span>
+        <strong>${{ (bidModalComic.highBid ?? 0).toFixed(2) }}</strong>
+      </div>
+      <div class="bid-modal-info-row" *ngIf="bidModalComic.currentBidderName">
+        <span>Leader</span>
+        <strong>{{ bidModalComic.currentBidderName }}</strong>
+      </div>
+      <div class="bid-modal-info-row">
+        <span>Time Remaining</span>
+        <strong class="bid-modal-timer">⏱ {{ bidCountdownLabel(bidModalComic.id) }}</strong>
+      </div>
+    </div>
+    <div class="bid-modal-input-group">
+      <label class="bid-modal-label">Your Bid (must exceed ${{ (bidModalComic.highBid ?? 0).toFixed(2) }})</label>
+      <div class="bid-modal-input-row">
+        <span class="bid-modal-dollar">$</span>
+        <input type="number"
+               class="bid-modal-input"
+               [(ngModel)]="bidModalAmount"
+               [min]="(bidModalComic.highBid ?? 0) + 0.01"
+               step="0.01"
+               placeholder="0.00"
+               (keyup.enter)="submitBid()"
+               [disabled]="bidModalSubmitting"
+               autofocus>
+      </div>
+    </div>
+    <div *ngIf="bidModalError" class="bid-modal-error">{{ bidModalError }}</div>
+    <div class="bid-modal-actions">
+      <button class="bid-modal-submit-btn" (click)="submitBid()" [disabled]="bidModalSubmitting || !bidModalAmount">
+        {{ bidModalSubmitting ? 'Placing…' : 'Place Bid' }}
+      </button>
+      <button class="bid-modal-cancel-btn" (click)="closeBidModal()" [disabled]="bidModalSubmitting">Cancel</button>
+    </div>
+  </div>
+</div>
+
 <div *ngIf="claimError" class="claim-error">{{ claimError }}</div>
 
 <div *ngIf="loading" class="warming-up">
@@ -124,11 +168,12 @@
                   <div class="bid-leader" *ngIf="comic.currentBidderName">
                     by {{ comic.currentBidderName }}
                   </div>
+                  <div class="bid-leader">${{ (comic.highBid ?? 0).toFixed(2) }}</div>
                   <button class="btn-bid"
                     [disabled]="!canBid()"
                     [title]="canBid() ? '' : cartLockedTitle()"
                     (click)="$event.preventDefault(); $event.stopPropagation(); placeBid(comic)">
-                    BID ${{ (comic.highBid ?? 0).toFixed(2) }}
+                    BID
                   </button>
                 </ng-container>
 
