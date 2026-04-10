@@ -40,17 +40,19 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   logsExpanded = false;
 
+  private static readonly PREFS_KEY = 'dashboard_prefs';
+
   private _excludeClaimed = false;
   get excludeClaimed() { return this._excludeClaimed; }
-  set excludeClaimed(v: boolean) { this._excludeClaimed = v; this.currentPage = 1; }
+  set excludeClaimed(v: boolean) { this._excludeClaimed = v; this.currentPage = 1; this.savePrefs(); }
 
   private _showPricedOnly = false;
   get showPricedOnly() { return this._showPricedOnly; }
-  set showPricedOnly(v: boolean) { this._showPricedOnly = v; this.currentPage = 1; this.loadPage(); }
+  set showPricedOnly(v: boolean) { this._showPricedOnly = v; this.currentPage = 1; this.loadPage(); this.savePrefs(); }
 
   private _sortOrder = 'oldest-first';
   get sortOrder() { return this._sortOrder; }
-  set sortOrder(v: string) { this._sortOrder = v; this.currentPage = 1; this.loadPage(); }
+  set sortOrder(v: string) { this._sortOrder = v; this.currentPage = 1; this.loadPage(); this.savePrefs(); }
 
   // Bidding state: comicId → seconds remaining
   bidCountdowns: Record<string, number> = {};
@@ -110,7 +112,29 @@ export class DashboardComponent implements OnInit, OnDestroy {
     public configService: ConfigService
   ) {}
 
+  private savePrefs(): void {
+    localStorage.setItem(DashboardComponent.PREFS_KEY, JSON.stringify({
+      sortOrder: this._sortOrder,
+      currentPage: this.currentPage,
+      excludeClaimed: this._excludeClaimed,
+      showPricedOnly: this._showPricedOnly
+    }));
+  }
+
+  private restorePrefs(): void {
+    try {
+      const raw = localStorage.getItem(DashboardComponent.PREFS_KEY);
+      if (!raw) return;
+      const prefs = JSON.parse(raw);
+      if (prefs.sortOrder) this._sortOrder = prefs.sortOrder;
+      if (prefs.currentPage) this.currentPage = prefs.currentPage;
+      if (prefs.excludeClaimed != null) this._excludeClaimed = prefs.excludeClaimed;
+      if (prefs.showPricedOnly != null) this._showPricedOnly = prefs.showPricedOnly;
+    } catch { /* ignore corrupt data */ }
+  }
+
   ngOnInit(): void {
+    this.restorePrefs();
     this.loadPage();
     this.loadClaimedMap();
     if (this.auth.isApproved()) {
@@ -169,6 +193,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   nextPage(): void {
     if (this.currentPage < this.totalPages) {
       this.currentPage++;
+      this.savePrefs();
       this.loadPage();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -177,6 +202,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   prevPage(): void {
     if (this.currentPage > 1) {
       this.currentPage--;
+      this.savePrefs();
       this.loadPage();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
