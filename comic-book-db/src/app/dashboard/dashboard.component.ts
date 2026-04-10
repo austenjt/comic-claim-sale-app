@@ -55,6 +55,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
   get sortOrder() { return this._sortOrder; }
   set sortOrder(v: string) { this._sortOrder = v; this.currentPage = 1; this.loadPage(); this.savePrefs(); }
 
+  private _biddableOnly = false;
+  get biddableOnly() { return this._biddableOnly; }
+  set biddableOnly(v: boolean) { this._biddableOnly = v; this.currentPage = 1; this.loadPage(); this.savePrefs(); }
+
   // Bidding state: comicId → seconds remaining
   bidCountdowns: Record<string, number> = {};
   private bidTimerInterval: any = null;
@@ -118,7 +122,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
       sortOrder: this._sortOrder,
       currentPage: this.currentPage,
       excludeClaimed: this._excludeClaimed,
-      showPricedOnly: this._showPricedOnly
+      showPricedOnly: this._showPricedOnly,
+      biddableOnly: this._biddableOnly
     }));
   }
 
@@ -131,6 +136,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       if (prefs.currentPage) this.currentPage = prefs.currentPage;
       if (prefs.excludeClaimed != null) this._excludeClaimed = prefs.excludeClaimed;
       if (prefs.showPricedOnly != null) this._showPricedOnly = prefs.showPricedOnly;
+      if (prefs.biddableOnly != null) this._biddableOnly = prefs.biddableOnly;
     } catch { /* ignore corrupt data */ }
   }
 
@@ -166,7 +172,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.loading = true;
 
     this.loadSub = this.comicService.getDashboardPage(
-      this.currentPage, this.sortOrder, this.showPricedOnly
+      this.currentPage, this.sortOrder, this.showPricedOnly, this.biddableOnly
     ).subscribe({
       next: (response: PagedResponse<Comic>) => {
         this.loadSub = null;

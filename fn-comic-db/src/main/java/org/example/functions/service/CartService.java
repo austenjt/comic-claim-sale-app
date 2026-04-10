@@ -84,16 +84,16 @@ public class CartService {
 
     /** Add a comic to the user's cart via a normal claim. Throws if comic is already claimed or cart is not OPEN. */
     public Cart addItem(User user, String comicId) {
-        return addItemInternal(user, comicId, false);
+        return addItemInternal(user, comicId, false, null);
     }
 
     /** Add a comic to the user's cart as the winner of a completed bid cycle.
      *  The item will be marked {@code wonViaBid=true} and cannot be returned by the user. */
-    public Cart addBidWonItem(User user, String comicId) {
-        return addItemInternal(user, comicId, true);
+    public Cart addBidWonItem(User user, String comicId, java.math.BigDecimal winningBid) {
+        return addItemInternal(user, comicId, true, winningBid);
     }
 
-    private Cart addItemInternal(User user, String comicId, boolean wonViaBid) {
+    private Cart addItemInternal(User user, String comicId, boolean wonViaBid, java.math.BigDecimal overridePrice) {
         if (isComicClaimed(comicId)) {
             throw new IllegalStateException("Comic " + comicId + " is already claimed.");
         }
@@ -108,7 +108,8 @@ public class CartService {
         item.setComicId(comicId);
         item.setComicTitle(comic.getTitle());
         item.setComicNumber(formatComicNumber(comic.getNumber()));
-        item.setPrice(comic.getSalePrice() != null ? comic.getSalePrice().doubleValue()
+        item.setPrice(overridePrice != null ? overridePrice.doubleValue()
+                : comic.getSalePrice() != null ? comic.getSalePrice().doubleValue()
                 : comic.getTargetPrice() != null ? comic.getTargetPrice().doubleValue() : 0.0);
         item.setClaimedAt(Instant.now().toString());
         item.setWonViaBid(wonViaBid);

@@ -514,7 +514,7 @@
         </ng-container>
 
         <!-- Available -->
-        <ng-container *ngIf="!comic.soldTo && !claimedDate(comic.id)">
+        <ng-container *ngIf="!comic.soldTo && !claimedDate(comic.id) && !isInMyCart(comic.id)">
           <div class="detail-item">
             <span class="detail-label">Status</span>
             <span class="detail-value" [class.claim-status-available]="!isBiddingActive()" [class.claim-status-bidding]="isBiddingActive()">
@@ -568,6 +568,23 @@
           </div>
         </ng-container>
 
+      </div>
+
+      <!-- Admin Actions -->
+      <div class="detail-section" *ngIf="auth.isAdmin() && !isBiddingActive() && !claimedDate(comic.id)">
+        <div class="detail-section-title">Admin Actions</div>
+        <div class="detail-item">
+          <span class="detail-label">Delete Comic</span>
+          <span class="detail-value">
+            <button class="btn-admin-delete"
+              [class.btn-admin-delete-confirm]="pendingDelete"
+              [disabled]="deleting"
+              (click)="deleteComic()">
+              {{ deleting ? 'Deleting…' : pendingDelete ? 'Confirm Delete?' : 'Delete' }}
+            </button>
+            <span *ngIf="pendingDelete" class="admin-delete-warning">This will permanently remove the comic.</span>
+          </span>
+        </div>
       </div>
 
       <!-- Bid History -->

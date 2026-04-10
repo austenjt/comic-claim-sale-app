@@ -25,12 +25,31 @@ app-comic-search {
   gap: 8px;
 }
 
-.claim-sale-mode-label {
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: #7b8f4b;
+.btn-claim-sale {
+  background: transparent;
+  color: #d97706;
+  border: 1px solid #d97706;
+  padding: 0.45rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+  margin-bottom: 0;
+  margin-right: 0;
+}
+
+.btn-claim-sale:hover {
+  background: rgba(217,119,6,0.08);
+}
+
+.btn-claim-sale-active {
+  background: rgba(217,119,6,0.15);
+  color: #d97706;
+  border-color: #d97706;
+}
+
+.btn-claim-sale-active:hover {
+  background: rgba(217,119,6,0.25);
 }
 
 .items-count {

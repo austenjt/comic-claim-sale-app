@@ -235,11 +235,6 @@ public class BidService {
             throw new IllegalStateException("No bids were placed; bidding cancelled for comic " + comicId + ".");
         }
 
-        // Stamp targetPrice with the winning bid so CartService picks it up
-        if (bid.getHighBid() != null && bid.getHighBid().compareTo(BigDecimal.ZERO) > 0) {
-            comic.setTargetPrice(bid.getHighBid());
-        }
-
         // Log the win event in bid history
         String finalizedAt = Instant.now().toString();
         if (bid.getBidHistory() == null) {
@@ -265,7 +260,7 @@ public class BidService {
         User winner = UserService.getServiceInstance().findById(winnerId)
             .orElseThrow(() -> new IllegalStateException("Winning bidder not found: " + winnerId));
 
-        Cart cart = CartService.getServiceInstance().addBidWonItem(winner, comicId);
+        Cart cart = CartService.getServiceInstance().addBidWonItem(winner, comicId, bid.getHighBid());
         log.info("Bid finalized for comic {} — winner: {} at ${}", comicId, winner.getName(), bid.getHighBid());
         return cart;
     }

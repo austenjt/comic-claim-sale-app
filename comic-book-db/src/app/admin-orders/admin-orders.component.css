@@ -179,6 +179,13 @@ tfoot td { font-weight: bold; }
 }
 .btn-release:hover { background: rgba(192,99,76,0.1); }
 
+.bid-won-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #d97706;
+  letter-spacing: 0.03em;
+}
+
 .success-message { color: #7b8f4b; margin-bottom: 16px; }
 .error-message { color: #c0634c; margin-bottom: 12px; }
 

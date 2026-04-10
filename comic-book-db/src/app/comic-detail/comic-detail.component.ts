@@ -41,6 +41,8 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
   backImageUploadErrorExpanded = false;
   readonly Math = Math;
   linkCopied = false;
+  pendingDelete = false;
+  deleting = false;
   bidModalOpen = false;
   bidModalAmount: number | null = null;
   bidModalError = '';
@@ -183,15 +185,20 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
     this.comic.bidStartedAt = null;
 
     if (this.auth.isAdmin()) {
-      // Admin never triggers finalization — just refresh display state
-      this.loadClaimedMap();
+      // Admin never triggers finalization. Don't call loadClaimedMap() here — the
+      // server hasn't committed yet. refreshBidState() polling detects enableBid→false
+      // (only set after full commit) and calls loadClaimedMap() at the right time.
       return;
     }
 
+    // Immediately clear enableBid so the Bid button doesn't re-appear while the
+    // finalizeBid HTTP round-trip is in flight.
+    this.comic.enableBid = false;
+
     this.cartService.finalizeBid(comicId).subscribe({
       next: () => {
-        this.claimedMap[comicId] = new Date().toISOString();
         this.toastService.show('Bidding ended — comic added to winner\'s cart.');
+        this.loadClaimedMap();
         this.cartService.getMyCart().subscribe({ next: c => this.myCart = c, error: () => {} });
       },
       error: () => {
@@ -415,6 +422,20 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
         this.backImageUploadErrorDetail = err?.error || err?.message || 'Image may be too large or an invalid format.';
         input.value = '';
       }
+    });
+  }
+
+  deleteComic(): void {
+    if (!this.comic) return;
+    if (!this.pendingDelete) {
+      this.pendingDelete = true;
+      return;
+    }
+    this.pendingDelete = false;
+    this.deleting = true;
+    this.comicService.deleteComic(this.comic.id).subscribe({
+      next: () => { this.location.back(); },
+      error: () => { this.deleting = false; }
     });
   }
 

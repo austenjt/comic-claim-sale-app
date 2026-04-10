@@ -2,7 +2,6 @@
   <div class="search-row">
     <app-comic-search></app-comic-search>
     <div class="filter-panel">
-      <span *ngIf="excludeClaimed && showPricedOnly" class="claim-sale-mode-label">Claim Sale Mode</span>
       <span class="items-count">
         <ng-container *ngIf="isFiltered; else noFilter">{{ itemCount }} of {{ totalCount }} items</ng-container>
         <ng-template #noFilter>{{ totalCount }} items</ng-template>
@@ -17,6 +16,11 @@
                 [class.btn-exclude-claimed-active]="showPricedOnly"
                 (click)="showPricedOnlyChange.emit(!showPricedOnly)">
           {{ showPricedOnly ? 'Show Unpriced' : 'Exclude Unpriced' }}
+        </button>
+        <button class="btn-claim-sale"
+                [class.btn-claim-sale-active]="biddableOnly"
+                (click)="biddableOnlyChange.emit(!biddableOnly)">
+          {{ biddableOnly ? 'Exit Sale' : 'Claim Sale' }}
         </button>
         <select class="sort-select"
                 [value]="sortOrder"

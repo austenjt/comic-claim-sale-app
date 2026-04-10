@@ -105,6 +105,22 @@ h2 {
   gap: 6px;
 }
 
+/* All buttons and inline labels in the card footer share the same 28px height */
+.footer-actions button {
+  height: 28px;
+  padding: 0 14px;
+  font-size: 0.83rem;
+  font-weight: 700;
+  border-radius: 4px;
+  cursor: pointer;
+  white-space: nowrap;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
 .comic-title {
   font-size: 0.95rem;
   margin-bottom: 4px;
@@ -199,26 +215,16 @@ h2 {
 
 /* Outline orange — used for admin Start Bid and Cancel buttons */
 .btn-start-bid {
-  padding: 6px 14px;
-  border-radius: 4px;
-  font-size: 0.82rem;
-  font-weight: 700;
-  cursor: pointer;
   background: transparent;
   color: #d97706;
-  border: 2px solid #d97706;
+  border: 1px solid #d97706;
 }
 .btn-start-bid:hover { background: rgba(217,119,6,0.1); }
 
 .btn-cancel-bid {
-  padding: 6px 14px;
-  border-radius: 4px;
-  font-size: 0.82rem;
-  font-weight: 700;
-  cursor: pointer;
   background: transparent;
   color: #d97706;
-  border: 2px solid #d97706;
+  border: 1px solid #d97706;
 }
 .btn-cancel-bid:hover { background: rgba(217,119,6,0.1); }
 
@@ -264,7 +270,6 @@ h2 {
 }
 
 .comic-claimed-status {
-  margin-top: 8px;
   font-size: 0.8rem;
   font-weight: 600;
   color: #79675c;
@@ -284,7 +289,6 @@ h2 {
 }
 
 .sold-label {
-  margin-top: 8px;
   font-size: 0.82rem;
   font-weight: 700;
   color: #c0634c;

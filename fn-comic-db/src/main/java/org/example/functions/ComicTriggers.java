@@ -54,7 +54,8 @@ public class ComicTriggers {
                 int pageSize = EnvHelper.getDashboardPageSize();
                 String sort = request.getQueryParameters().getOrDefault("sort", "oldest-first");
                 boolean onlyPriced = "true".equalsIgnoreCase(request.getQueryParameters().get("onlyPriced"));
-                PagedResponse<ComicBook> paged = comicService.getTopLevelComicsPaged(pageNumber, pageSize, sort, onlyPriced);
+                boolean onlyBiddable = "true".equalsIgnoreCase(request.getQueryParameters().get("onlyBiddable"));
+                PagedResponse<ComicBook> paged = comicService.getTopLevelComicsPaged(pageNumber, pageSize, sort, onlyPriced, onlyBiddable);
                 String body = admin
                     ? OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(paged)
                     : OBJECT_MAPPER.writerWithView(Views.Public.class).writeValueAsString(paged);

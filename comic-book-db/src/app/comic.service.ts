@@ -50,14 +50,16 @@ export class ComicService {
   getDashboardPage(
     pageNumber: number,
     sort: string,
-    onlyPriced: boolean
+    onlyPriced: boolean,
+    onlyBiddable: boolean = false
   ): Observable<PagedResponse<Comic>> {
     const params = new HttpParams()
       .set('pageNumber', pageNumber.toString())
       .set('sort', sort)
-      .set('onlyPriced', onlyPriced.toString());
+      .set('onlyPriced', onlyPriced.toString())
+      .set('onlyBiddable', onlyBiddable.toString());
     return this.http.get<PagedResponse<Comic>>(this.comicsUrl, { params }).pipe(
-      tap(() => this.log(`fetched dashboard page ${pageNumber} (sort=${sort}, onlyPriced=${onlyPriced})`))
+      tap(() => this.log(`fetched dashboard page ${pageNumber} (sort=${sort}, onlyPriced=${onlyPriced}, onlyBiddable=${onlyBiddable})`))
     );
   }
 

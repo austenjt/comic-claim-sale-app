@@ -92,7 +92,7 @@ public class ComicService {
      * and (isForSale, salePrice) before deploying.
      */
     public PagedResponse<ComicBook> getTopLevelComicsPaged(
-            int pageNumber, int pageSize, String sort, boolean onlyPriced) {
+            int pageNumber, int pageSize, String sort, boolean onlyPriced, boolean onlyBiddable) {
         int offset = (pageNumber - 1) * pageSize;
 
         // WHERE: top-level only (standalone comics + SET containers, no members)
@@ -107,6 +107,9 @@ public class ComicService {
         if (onlyPriced) {
             // SETs are always included; individual comics must have a price
             where.append(" AND (c.docType = 'SET' OR (IS_DEFINED(c.salePrice) AND c.salePrice != null))");
+        }
+        if (onlyBiddable) {
+            where.append(" AND c.enableBid = true");
         }
         String whereClause = where.toString();
 

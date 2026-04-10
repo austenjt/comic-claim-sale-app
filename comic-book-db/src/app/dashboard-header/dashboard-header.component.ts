@@ -18,6 +18,8 @@ export class DashboardHeaderComponent {
   @Output() excludeClaimedChange = new EventEmitter<boolean>();
   @Input() showPricedOnly: boolean = false;
   @Output() showPricedOnlyChange = new EventEmitter<boolean>();
+  @Input() biddableOnly: boolean = false;
+  @Output() biddableOnlyChange = new EventEmitter<boolean>();
   @Input() sortOrder: string = 'oldest-first';
   @Output() sortOrderChange = new EventEmitter<string>();
   @Output() prevPage = new EventEmitter<void>();

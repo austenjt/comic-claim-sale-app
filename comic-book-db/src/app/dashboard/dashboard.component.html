@@ -5,6 +5,7 @@
   [totalPages]="totalPages"
   [(excludeClaimed)]="excludeClaimed"
   [(showPricedOnly)]="showPricedOnly"
+  [(biddableOnly)]="biddableOnly"
   [(sortOrder)]="sortOrder"
   (prevPage)="prevPage()"
   (nextPage)="nextPage()">
@@ -222,12 +223,6 @@
               <button *ngIf="auth.isAdmin() && configService.awardModeEnabled && !claimedDate(comic.id) && !comic.comicCondition?.cgcCondition?.grade && !comic.comicCondition?.cbcsCondition?.grade && !isBiddingActive(comic)"
                 class="btn-award"
                 (click)="$event.preventDefault(); $event.stopPropagation(); openAwardModal(comic)">Award</button>
-              <button *ngIf="auth.isAdmin() && !isBiddingActive(comic)"
-                class="btn-delete-card"
-                [class.btn-delete-card-confirm]="pendingDeleteId === comic.id"
-                (click)="deleteComic(comic, $event)">
-                {{ pendingDeleteId === comic.id ? 'Confirm?' : 'Delete' }}
-              </button>
             </ng-template>
           </div>
         </div>
