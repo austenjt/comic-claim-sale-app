@@ -281,10 +281,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
     comic.bidStartedAt = null;
     comic.sold = true;  // prevent bid UI from re-appearing while HTTP round-trip is in flight
     this.cartService.finalizeBid(String(comic.id)).subscribe({
-      next: cart => {
-        this.myCart = cart;
+      next: () => {
         this.claimedMap[String(comic.id)] = new Date().toISOString();
         this.logService.logBid(`Bidding ended for "${comic.title}" — added to winner's cart.`);
+        if (!this.auth.isAdmin()) this.refreshMyCart();
       },
       error: () => { this.loadClaimedMap(); }
     });
