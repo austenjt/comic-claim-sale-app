@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CartService } from '../cart.service';
-import { ToastService } from '../toast.service';
+import { LogService } from '../log.service';
 import { ConfigService } from '../config.service';
 import { Cart } from '../cart';
 
@@ -16,7 +16,7 @@ export class CartComponent implements OnInit {
   submitting = false;
   customerNotes = '';
 
-  constructor(private cartService: CartService, private toastService: ToastService, public configService: ConfigService) {}
+  constructor(private cartService: CartService, private logService: LogService, public configService: ConfigService) {}
 
   ngOnInit() {
     this.loadCart();
@@ -53,7 +53,7 @@ export class CartComponent implements OnInit {
           const msg = isSetItem
             ? `"${item.comicTitle}" set (${setCount} books) returned to available.`
             : `"${item.comicTitle}${item.comicNumber ? ' ' + item.comicNumber : ''}" Returned to sale`;
-          this.toastService.show(msg);
+          this.logService.log(msg);
         }
       },
       error: () => this.error = 'Failed to remove item.'

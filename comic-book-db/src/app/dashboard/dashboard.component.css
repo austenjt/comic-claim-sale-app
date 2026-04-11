@@ -212,6 +212,7 @@ h2 {
 }
 .btn-bid-start:hover { background: #b45309; }
 .btn-bid-start:disabled { background: #fcd34d; color: #fff; cursor: not-allowed; }
+.btn-bid-pending:disabled { background: #d1d5db; color: #9ca3af; cursor: not-allowed; }
 
 /* Outline orange — used for admin Start Bid and Cancel buttons */
 .btn-start-bid {

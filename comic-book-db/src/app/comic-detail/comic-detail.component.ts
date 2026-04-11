@@ -7,7 +7,7 @@ import { Cart } from '../cart';
 import { ComicService } from '../comic.service';
 import { ImageService } from '../image.service';
 import { CartService } from '../cart.service';
-import { ToastService } from '../toast.service';
+import { LogService } from '../log.service';
 import { AuthService } from '../auth.service';
 import { ConfigService } from '../config.service';
 import { Observable, of, map, Subscription } from 'rxjs';
@@ -53,7 +53,7 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
     private comicService: ComicService,
     private imageService: ImageService,
     private cartService: CartService,
-    private toastService: ToastService,
+    private logService: LogService,
     public auth: AuthService,
     public configService: ConfigService,
     private location: Location
@@ -130,7 +130,7 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
         this.myCart = cart;
         delete this.claimedMap[String(this.comic!.id)];
         this.actionLoading = false;
-        this.toastService.show(`"${heading}" Returned to sale`);
+        this.logService.log(`"${heading}" Returned to sale`);
       },
       error: err => {
         this.claimError = err?.error || 'Failed to release comic.';
@@ -197,7 +197,7 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
 
     this.cartService.finalizeBid(comicId).subscribe({
       next: () => {
-        this.toastService.show('Bidding ended — comic added to winner\'s cart.');
+        this.logService.log('Bidding ended — comic added to winner\'s cart.');
         this.loadClaimedMap();
         this.cartService.getMyCart().subscribe({ next: c => this.myCart = c, error: () => {} });
       },
@@ -224,7 +224,7 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
         this.bidSecondsRemaining = Math.max(0, Math.floor((endsAt - Date.now()) / 1000));
         this.startBidTimer();
         this.actionLoading = false;
-        this.toastService.showBid(`Bidding started — ${this.configService.biddingCycleMins} min window open!`);
+        this.logService.logBid(`Bidding started — ${this.configService.biddingCycleMins} min window open!`);
         // Ensure all viewers start getting live updates from this point on
         this.setupBidRefresh();
       },
@@ -294,7 +294,7 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
         this.bidModalSubmitting = false;
         this.bidModalOpen = false;
         this.claimError = '';
-        this.toastService.showBid(`Bid of $${amount.toFixed(2)} placed!`);
+        this.logService.logBid(`Bid of $${amount.toFixed(2)} placed!`);
       },
       error: err => {
         this.bidModalError = err?.error || 'Bid failed.';
@@ -326,7 +326,7 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
   private setupBidRefresh(): void {
     // Event-driven: react immediately when a bid notification arrives for this comic
     if (!this.claimEventSub) {
-      this.claimEventSub = this.toastService.newClaimEvent$.subscribe(n => {
+      this.claimEventSub = this.logService.newClaimEvent$.subscribe(n => {
         if (this.comic && n.comicId === String(this.comic.id)) {
           this.refreshBidState();
         }

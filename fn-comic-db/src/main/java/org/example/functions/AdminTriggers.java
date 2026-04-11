@@ -228,7 +228,7 @@ public class AdminTriggers {
     // ─── POST /api/orders/{cartId}/payment ───────────────────────────────────
 
     private static final java.util.Set<String> VALID_PAYMENT_STATUSES =
-        java.util.Set.of("UNPAID", "PARTIAL", "PAID");
+        java.util.Set.of("UNPAID", "PAID");
 
     @FunctionName("updatePaymentStatus")
     public HttpResponseMessage updatePaymentStatus(
@@ -244,7 +244,7 @@ public class AdminTriggers {
             String status = payload.has("status") ? payload.get("status").asText() : null;
             if (status == null || !VALID_PAYMENT_STATUSES.contains(status)) {
                 return cors(request.createResponseBuilder(HttpStatus.BAD_REQUEST))
-                    .body("status must be one of: UNPAID, PARTIAL, PAID").build();
+                    .body("status must be one of: UNPAID, PAID").build();
             }
             Cart cart = CartService.getServiceInstance().updatePaymentStatus(cartId, status);
             return cors(request.createResponseBuilder(HttpStatus.OK))
@@ -274,7 +274,7 @@ public class AdminTriggers {
             String status = payload.has("status") ? payload.get("status").asText() : null;
             if (status == null || !VALID_PAYMENT_STATUSES.contains(status)) {
                 return cors(request.createResponseBuilder(HttpStatus.BAD_REQUEST))
-                    .body("status must be one of: UNPAID, PARTIAL, PAID").build();
+                    .body("status must be one of: UNPAID, PAID").build();
             }
             ArchivedOrder order = ArchiveService.getServiceInstance().updatePaymentStatus(orderId, status);
             return cors(request.createResponseBuilder(HttpStatus.OK))

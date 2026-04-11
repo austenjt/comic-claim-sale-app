@@ -180,11 +180,16 @@
                 </ng-container>
 
                 <!-- Bidding: start (Bid button — only visible after admin has opened it) -->
-                <ng-container *ngIf="configService.biddingMode && comic.enableBid && comic.bidOpenedAt && !isBiddingActive(comic)">
+                <ng-container *ngIf="configService.biddingMode && comic.enableBid && !comic.sold && comic.bidOpenedAt && !isBiddingActive(comic)">
                   <button class="btn-bid-start"
                     [disabled]="!canBid()"
                     [title]="canBid() ? '' : cartLockedTitle()"
                     (click)="$event.preventDefault(); $event.stopPropagation(); startBidding(comic)">Bid</button>
+                </ng-container>
+
+                <!-- Bidding: not yet opened — placeholder so users know bidding is coming -->
+                <ng-container *ngIf="configService.biddingMode && comic.enableBid && !comic.sold && !comic.bidOpenedAt && !isBiddingActive(comic)">
+                  <button class="btn-bid-start btn-bid-pending" disabled title="Bidding not yet open">Bid</button>
                 </ng-container>
 
                 <!-- Normal claim (no bidding) -->
@@ -243,12 +248,12 @@
     <span class="footer-address">Oregon City, Oregon 97045 USA</span>
     <button class="footer-logs-toggle" (click)="logsExpanded = !logsExpanded">
       {{ logsExpanded ? '&#9650; Hide Logs' : '&#9660; Logs' }}
-      <span class="footer-logs-count">{{ toastService.logEntries.length }}</span>
+      <span class="footer-logs-count">{{ logService.logEntries.length }}</span>
     </button>
   </div>
   <div *ngIf="logsExpanded" class="footer-logs-panel">
-    <div *ngIf="toastService.logEntries.length === 0" class="footer-log-empty">No logs yet.</div>
-    <div *ngFor="let entry of toastService.logEntries"
+    <div *ngIf="logService.logEntries.length === 0" class="footer-log-empty">No logs yet.</div>
+    <div *ngFor="let entry of logService.logEntries"
          class="footer-log-entry"
          [class.footer-log-error]="entry.isError">
       <span class="footer-log-time">{{ entry.timestamp | date:'HH:mm:ss' }}</span>

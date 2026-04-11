@@ -36,10 +36,7 @@
           <td>{{ item.price | currency }}</td>
           <td>{{ item.claimedAt | date:'short' }}</td>
           <td *ngIf="canRemove()">
-            <button *ngIf="canRemoveItem(item.comicId)" class="btn-remove" (click)="removeItem(item.comicId)">
-              {{ item.collectionGroup && item.collectionGroup > 0 ? 'Remove Set' : 'Remove' }}
-            </button>
-            <span *ngIf="!canRemoveItem(item.comicId) && item.wonViaBid" class="bid-won-label" title="Items won via bidding cannot be returned">Won via bid</span>
+            <button *ngIf="canRemoveItem(item.comicId) && !(item.collectionGroup && item.collectionGroup > 0)" class="btn-remove" (click)="removeItem(item.comicId)">Remove</button>
           </td>
         </tr>
       </tbody>

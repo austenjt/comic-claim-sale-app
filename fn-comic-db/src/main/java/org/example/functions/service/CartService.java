@@ -249,7 +249,7 @@ public class CartService {
         return cart;
     }
 
-    /** Start the configurable finalization countdown (FINALIZE_HOURS env var, default 20). Cart must be OPEN with at least one item. */
+    /** Submit an order. Cart moves to FINALIZING; fulfillment is unlocked when the admin marks payment as PAID. */
     public Cart submitOrder(String userId, String customerNotes) {
         Cart cart = getActiveCart(userId)
             .orElseThrow(() -> new IllegalStateException("No active cart found."));
@@ -269,10 +269,8 @@ public class CartService {
         if (customerNotes != null && !customerNotes.isBlank()) {
             cart.setCustomerNotes(customerNotes.trim());
         }
-        int finalizeHours = EnvHelper.getFinalizeHours();
-        cart.setFinalizeAfter(Instant.now().plus(finalizeHours, ChronoUnit.HOURS).toString());
         save(cart);
-        log.info("Cart {} submitted, finalizes after {}", cart.getId(), cart.getFinalizeAfter());
+        log.info("Cart {} submitted", cart.getId());
         sendOrderSubmittedEmail(cart);
         return cart;
     }
@@ -412,16 +410,8 @@ public class CartService {
             .iterator().hasNext();
     }
 
-    /** Lazily transitions a FINALIZING cart to FINALIZED if the deadline has passed. */
+    /** No-op: time-based auto-finalization has been removed. Fulfillment is unlocked by admin marking payment as PAID. */
     private Cart checkAndFinalize(Cart cart) {
-        if ("FINALIZING".equals(cart.getStatus()) && cart.getFinalizeAfter() != null) {
-            if (Instant.now().isAfter(Instant.parse(cart.getFinalizeAfter()))) {
-                cart.setStatus("FINALIZED");
-                cart.setFinalizedAt(Instant.now().toString());
-                save(cart);
-                log.info("Cart {} auto-finalized.", cart.getId());
-            }
-        }
         return cart;
     }
 

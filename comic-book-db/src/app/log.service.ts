@@ -5,12 +5,6 @@ import { switchMap } from 'rxjs/operators';
 import { CartService, ClaimNotification } from './cart.service';
 import { ConfigService } from './config.service';
 
-export interface Toast {
-  id: number;
-  message: string;
-  isError?: boolean;
-}
-
 export interface LogEntry {
   message: string;
   timestamp: Date;
@@ -18,13 +12,11 @@ export interface LogEntry {
 }
 
 @Injectable({ providedIn: 'root' })
-export class ToastService {
-  toasts: Toast[] = [];
+export class LogService {
   logEntries: LogEntry[] = [];
   newClaimEvent$ = new Subject<ClaimNotification>();
 
   private readonly activityLogsUrl = 'https://fn-comicBook-db-1703810588398.azurewebsites.net/api/activity-logs';
-  private toastCounter = 0;
   private seenEventKeys = new Set<string>();
   private justActed = new Set<string>();
   private firstPoll = true;
@@ -68,12 +60,12 @@ export class ToastService {
             this.newClaimEvent$.next(n);
             const numPart = n.comicNumber ? ` ${n.comicNumber}` : '';
             if (n.eventType === 'RETURN') {
-              this.show(`"${n.comicTitle}${numPart}" Returned to sale`);
+              this.log(`"${n.comicTitle}${numPart}" Returned to sale`);
             } else if (!this.justActed.has(n.comicId)) {
               if (n.price === 0) {
-                this.show(`"${n.comicTitle}${numPart}" awarded to ${n.userName} — FREE!`);
+                this.log(`"${n.comicTitle}${numPart}" awarded to ${n.userName} — FREE!`);
               } else {
-                this.show(`"${n.comicTitle}${numPart}" added to ${n.userName}'s cart — $${n.price.toFixed(2)}`);
+                this.log(`"${n.comicTitle}${numPart}" added to cart of user ${n.userName} — $${n.price.toFixed(2)}`);
               }
             }
           }
@@ -84,14 +76,12 @@ export class ToastService {
     });
   }
 
-  /** Log-only — no popup. Use for routine activity (claims, cart updates, etc.). */
-  show(message: string, isError = false): void {
+  log(message: string, isError = false): void {
     if (this.configService.pauseNotifications) return;
     this.persistToLog(message, isError);
   }
 
-  /** Log-only — same as show() but always logs regardless of pauseNotifications. */
-  showBid(message: string, isError = false): void {
+  logBid(message: string, isError = false): void {
     this.persistToLog(message, isError);
   }
 
@@ -101,14 +91,6 @@ export class ToastService {
     if (this.logEntries.length > 100) this.logEntries.length = 100;
     this.http.post(this.activityLogsUrl, { message, timestamp: entry.timestamp.toISOString(), isError })
       .subscribe({ error: () => {} });
-  }
-
-  dismiss(id: number): void {
-    this.toasts = this.toasts.filter(t => t.id !== id);
-  }
-
-  clearAll(): void {
-    this.toasts = [];
   }
 
   markActed(comicId: string): void {

@@ -8,7 +8,7 @@ import { Cart } from '../cart';
 import { ComicService } from '../comic.service';
 import { ImageService } from '../image.service';
 import { CartService } from '../cart.service';
-import { ToastService } from '../toast.service';
+import { LogService } from '../log.service';
 import { AuthService } from '../auth.service';
 
 @Component({
@@ -37,7 +37,7 @@ export class SetDetailComponent implements OnInit {
     private comicService: ComicService,
     private imageService: ImageService,
     private cartService: CartService,
-    private toastService: ToastService,
+    private logService: LogService,
     public auth: AuthService,
     private location: Location
   ) {}
@@ -122,7 +122,7 @@ export class SetDetailComponent implements OnInit {
         }
         this.actionLoading = false;
         const claimName = this.auth.currentUser$.value?.name ?? 'User';
-        this.toastService.show(`"${this.container!.title}" set (${this.setMembers.length} books) added to ${claimName}'s cart.`);
+        this.logService.log(`"${this.container!.title}" set (${this.setMembers.length} books) added to ${claimName}'s cart.`);
       },
       error: err => {
         this.claimError = err?.error || 'Failed to claim set.';

@@ -117,7 +117,7 @@ export class AdminOrdersComponent implements OnInit {
     });
   }
 
-  readonly paymentStatuses = ['UNPAID', 'PARTIAL', 'PAID'];
+  readonly paymentStatuses = ['UNPAID', 'PAID'];
 
   adminNoteDrafts: Record<string, string> = {};
 
@@ -171,7 +171,7 @@ export class AdminOrdersComponent implements OnInit {
   }
 
   paymentLabel(status: string | null | undefined): string {
-    const labels: Record<string, string> = { UNPAID: 'Unpaid', PARTIAL: 'Partial', PAID: 'Paid' };
+    const labels: Record<string, string> = { UNPAID: 'Unpaid', PAID: 'Paid' };
     return status ? (labels[status] ?? status) : 'Unpaid';
   }
 
@@ -192,28 +192,23 @@ export class AdminOrdersComponent implements OnInit {
   }
 
   statusLabel(status: string): string {
-    const hours = this.configService.finalizeHours;
     const labels: Record<string, string> = {
-      OPEN: 'Open', FINALIZING: `Submitted (${hours}h)`, FINALIZED: 'Finalized'
+      OPEN: 'Open', FINALIZING: 'Submitted', FINALIZED: 'Finalized'
     };
     return labels[status] ?? status;
   }
 
   canFulfill(order: Cart): boolean {
     if (order.status === 'FINALIZED') return true;
-    if (order.status === 'FINALIZING' && order.finalizeAfter) {
-      return Date.now() > new Date(order.finalizeAfter).getTime();
-    }
+    if (order.status === 'FINALIZING') return order.paymentStatus === 'PAID';
     return false;
   }
 
   fulfillTitle(order: Cart): string {
     if (this.canFulfill(order)) return '';
-    if (order.status === 'FINALIZING' && order.finalizeAfter) {
-      const deadline = new Date(order.finalizeAfter);
-      const hours = this.configService.finalizeHours;
-      return `Still in ${hours}h review window — unlocks ${deadline.toLocaleString()}`;
+    if (order.status === 'FINALIZING') {
+      return 'Mark the order as Paid to enable fulfillment';
     }
-    return 'Order must be finalized before fulfillment';
+    return 'Order must be submitted before fulfillment';
   }
 }

@@ -4,7 +4,7 @@ import { ComicService } from '../comic.service';
 import { ImageService } from '../image.service';
 import { AuthService } from '../auth.service';
 import { CartService } from '../cart.service';
-import { ToastService } from '../toast.service';
+import { LogService } from '../log.service';
 import { UserService } from '../user.service';
 import { ConfigService } from '../config.service';
 import { Cart } from '../cart';
@@ -37,6 +37,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
   pendingDeleteId: number | null = null;
   deletingId: number | null = null;
   claimingSetId: number | null = null;
+
+  // IDs acted on (claimed/awarded) this session — kept in list even when excludeClaimed is on
+  private recentlyActedIds = new Set<string>();
 
   logsExpanded = false;
 
@@ -81,11 +84,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
   get displayComics(): Comic[] {
     let result = this.pageItems;
     if (this.excludeClaimed) {
-      result = result.filter(c =>
-        c.docType === 'SET'
+      result = result.filter(c => {
+        if (this.recentlyActedIds.has(String(c.id))) return true;
+        return c.docType === 'SET'
           ? !this.isSetClaimedByOther(c) && !this.isSetInMyCart(c)
-          : !this.isClaimedByOther(c.id) && !this.isInMyCart(c.id)
-      );
+          : !this.isClaimedByOther(c.id) && !this.isInMyCart(c.id);
+      });
     }
     // claimed-first and bidding-first require cross-container data; apply client-side on the current page
     if (this.sortOrder === 'claimed-first') {
@@ -112,7 +116,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     private imageService: ImageService,
     public auth: AuthService,
     private cartService: CartService,
-    public toastService: ToastService,
+    public logService: LogService,
     private userService: UserService,
     public configService: ConfigService
   ) {}
@@ -147,7 +151,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     if (this.auth.isApproved()) {
       this.cartService.getMyCart().subscribe({ next: cart => this.myCart = cart, error: () => {} });
     }
-    this.toastService.newClaimEvent$.subscribe(n => {
+    this.logService.newClaimEvent$.subscribe(n => {
       if (n.eventType === 'RETURN') {
         delete this.claimedMap[n.comicId];
       } else {
@@ -280,7 +284,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       next: cart => {
         this.myCart = cart;
         this.claimedMap[String(comic.id)] = new Date().toISOString();
-        this.toastService.showBid(`Bidding ended for "${comic.title}" — added to winner's cart.`);
+        this.logService.logBid(`Bidding ended for "${comic.title}" — added to winner's cart.`);
       },
       error: () => { this.loadClaimedMap(); }
     });
@@ -297,7 +301,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         const wasOpened = !!this.pageItems[idx].bidOpenedAt;
         this.pageItems[idx] = { ...this.pageItems[idx], ...latestComic };
         if (!wasOpened && this.pageItems[idx].bidOpenedAt && !this.auth.isAdmin()) {
-          this.toastService.showBid(`Bidding is now open for "${this.pageItems[idx].title}" — place your bid!`);
+          this.logService.logBid(`Bidding is now open for "${this.pageItems[idx].title}" — place your bid!`);
         }
         if (!wasActive && this.pageItems[idx].bidStartedAt) {
           this.bidCountdowns[String(this.pageItems[idx].id)] =
@@ -319,11 +323,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
       next: updatedComic => {
         const idx = this.pageItems.findIndex(c => c.id === comic.id);
         if (idx >= 0) this.pageItems[idx] = { ...this.pageItems[idx], ...updatedComic };
-        this.toastService.showBid(`Bidding cancelled for "${comic.title}".`);
+        this.logService.logBid(`Bidding cancelled for "${comic.title}".`);
       },
       error: err => {
         const msg: string = typeof err?.error === 'string' ? err.error : '';
-        this.toastService.show(msg || 'Failed to cancel bidding.', true);
+        this.logService.log(msg || 'Failed to cancel bidding.', true);
       }
     });
   }
@@ -333,11 +337,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
       next: updatedComic => {
         const idx = this.pageItems.findIndex(c => c.id === comic.id);
         if (idx >= 0) this.pageItems[idx] = { ...this.pageItems[idx], ...updatedComic };
-        this.toastService.showBid(`Bidding opened for "${comic.title}" — waiting for first bid.`);
+        this.logService.logBid(`Bidding opened for "${comic.title}" — waiting for first bid.`);
       },
       error: err => {
         const msg: string = typeof err?.error === 'string' ? err.error : '';
-        this.toastService.show(msg || 'Failed to open bidding.', true);
+        this.logService.log(msg || 'Failed to open bidding.', true);
       }
     });
   }
@@ -349,11 +353,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
         if (idx >= 0) this.pageItems[idx] = { ...this.pageItems[idx], ...updatedComic };
         this.bidCountdowns[String(comic.id)] = this.bidSecondsRemaining(updatedComic);
         this.startBidTimer();
-        this.toastService.showBid(`Bidding started on "${comic.title}" — ${this.configService.biddingCycleMins} min window open!`);
+        this.logService.logBid(`Bidding started on "${comic.title}" — ${this.configService.biddingCycleMins} minute window open!`);
       },
       error: err => {
         const msg: string = typeof err?.error === 'string' ? err.error : '';
-        this.toastService.show(msg || 'Failed to start bidding.');
+        this.logService.log(msg || 'Failed to start bidding.');
       }
     });
   }
@@ -372,7 +376,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.bidModalSubmitting = false;
   }
 
-  minNextBid(highBid: number): number {
+  minNextBid(highBid: number, startPrice?: number | null): number {
+    if (highBid <= 0) {
+      return Math.max(startPrice ?? 1.00, 1.00);
+    }
     const nextQuarter = Math.ceil((highBid + 0.001) / 0.25) * 0.25;
     return Math.max(nextQuarter, 1.00);
   }
@@ -395,10 +402,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
     const currentHigh = comic.highBid ?? 0;
     if (isNaN(amount) || amount <= currentHigh) {
       this.bidModalError = `Amount must exceed the current high bid of $${currentHigh.toFixed(2)}.`;
-      return;
-    }
-    if (amount < 1.00) {
-      this.bidModalError = 'Bid must be at least $1.00.';
       return;
     }
     if (Math.abs(Math.round(amount * 4) - amount * 4) > 0.001) {
@@ -437,7 +440,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.refreshMyCart();
     const msg: string = typeof err?.error === 'string' ? err.error : '';
     if (msg.toLowerCase().includes('not open') || msg.toLowerCase().includes('status:')) {
-      this.toastService.show('Your order has already been submitted — new claims are not allowed.');
+      this.logService.log('Your order has already been submitted — new claims are not allowed.');
     } else {
       this.loadClaimedMap();
     }
@@ -461,11 +464,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
       next: cart => {
         this.myCart = cart;
         this.claimedMap[String(comic.id)] = new Date().toISOString();
-        this.toastService.markActed(String(comic.id));
+        this.recentlyActedIds.add(String(comic.id));
+        this.logService.markActed(String(comic.id));
         const num = this.comicNumberLabel(comic);
         const price = comic.salePrice != null ? ` — $${comic.salePrice.toFixed(2)}` : '';
         const claimName = this.auth.currentUser$.value?.name ?? 'User';
-        this.toastService.show(`"${comic.title}${num}" added to ${claimName}'s cart.${price}`);
+        this.logService.log(`"${comic.title}${num}" added to ${claimName}'s cart.${price}`);
       },
       error: (err) => { this.handleClaimError(err); }
     });
@@ -478,14 +482,16 @@ export class DashboardComponent implements OnInit, OnDestroy {
         this.myCart = cart;
         const members = container.items ?? [];
         this.claimedMap[String(container.id)] = new Date().toISOString();
-        this.toastService.markActed(String(container.id));
+        this.recentlyActedIds.add(String(container.id));
+        this.logService.markActed(String(container.id));
         for (const m of members) {
           this.claimedMap[String(m.id)] = new Date().toISOString();
-          this.toastService.markActed(String(m.id));
+          this.recentlyActedIds.add(String(m.id));
+          this.logService.markActed(String(m.id));
         }
         this.claimingSetId = null;
         const setClaimName = this.auth.currentUser$.value?.name ?? 'User';
-        this.toastService.show(`"${container.title}" set (${members.length} books) added to ${setClaimName}'s cart.`);
+        this.logService.log(`"${container.title}" set (${members.length} books) added to ${setClaimName}'s cart.`);
         this.loadPage();
       },
       error: (err) => {
@@ -585,11 +591,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.cartService.awardComic(String(comic.id), user.id).subscribe({
       next: () => {
         this.claimedMap[String(comic.id)] = new Date().toISOString();
-        this.toastService.markActed(String(comic.id));
+        this.recentlyActedIds.add(String(comic.id));
+        this.logService.markActed(String(comic.id));
         this.awardLoading = false;
         this.awardingComic = null;
         this.selectedUserId = null;
-        this.toastService.show(`${label} awarded to ${user.name} — FREE!`);
+        this.logService.log(`${label} awarded to ${user.name} — FREE!`);
       },
       error: (err) => {
         this.awardError = err?.error || 'Award failed.';

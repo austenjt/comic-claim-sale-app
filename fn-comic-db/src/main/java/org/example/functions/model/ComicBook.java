@@ -80,6 +80,9 @@ public class ComicBook {
 
     // Collection & storage
     private Integer collectionGroup;
+    // Set members — populated at response-time when docType="SET"; not persisted in Cosmos
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private List<ComicBook> items;
     private String docType;
     private String storageLocation;
 
@@ -109,10 +112,6 @@ public class ComicBook {
         if (this.biddingState == null) this.biddingState = new BiddingState();
         return this.biddingState;
     }
-
-    // Set members — populated at response-time when docType="SET"; not persisted in Cosmos
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    private List<ComicBook> items;
 
     /**
      * Used to prevent duplicate data being added.

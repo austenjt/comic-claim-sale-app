@@ -1,8 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { Router, NavigationEnd } from '@angular/router';
-import { filter } from 'rxjs/operators';
 import { AuthService } from './auth.service';
-import { ToastService } from './toast.service';
+import { LogService } from './log.service';
 import { ConfigService } from './config.service';
 
 @Component({
@@ -15,16 +13,12 @@ export class AppComponent implements OnInit {
 
   constructor(
     public auth: AuthService,
-    public toastService: ToastService,
-    public configService: ConfigService,
-    private router: Router
+    public logService: LogService,
+    public configService: ConfigService
   ) {}
 
   ngOnInit() {
     this.auth.loadSession();
-    this.router.events.pipe(
-      filter(e => e instanceof NavigationEnd)
-    ).subscribe(() => this.toastService.clearAll());
   }
 
   logout() {
