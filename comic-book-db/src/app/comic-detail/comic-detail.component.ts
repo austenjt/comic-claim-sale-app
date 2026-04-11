@@ -184,27 +184,25 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
     const comicId = String(this.comic.id);
     this.comic.bidStartedAt = null;
 
-    if (this.auth.isAdmin()) {
-      // Admin never triggers finalization. Don't call loadClaimedMap() here — the
-      // server hasn't committed yet. refreshBidState() polling detects enableBid→false
-      // (only set after full commit) and calls loadClaimedMap() at the right time.
-      return;
-    }
-
-    // Immediately mark as sold so the Bid button doesn't re-appear while the
-    // finalizeBid HTTP round-trip is in flight.
+    // Immediately mark as sold so the bid/delete UI doesn't re-appear while the
+    // finalizeBid HTTP round-trip is in flight. Admin also calls finalizeBid so
+    // the comic is finalized even when no regular user has the page open.
     this.comic.sold = true;
 
     this.cartService.finalizeBid(comicId).subscribe({
       next: () => {
         this.logService.log('Bidding ended — comic added to winner\'s cart.');
         this.loadClaimedMap();
-        this.cartService.getMyCart().subscribe({ next: c => this.myCart = c, error: () => {} });
+        if (!this.auth.isAdmin()) {
+          this.cartService.getMyCart().subscribe({ next: c => this.myCart = c, error: () => {} });
+        }
       },
       error: () => {
-        // Another client already finalized — refresh both claimed map and cart
+        // Another client already finalized — refresh claimed map and (for non-admin) cart
         this.loadClaimedMap();
-        this.cartService.getMyCart().subscribe({ next: c => this.myCart = c, error: () => {} });
+        if (!this.auth.isAdmin()) {
+          this.cartService.getMyCart().subscribe({ next: c => this.myCart = c, error: () => {} });
+        }
       }
     });
   }

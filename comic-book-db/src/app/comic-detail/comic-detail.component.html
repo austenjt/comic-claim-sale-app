@@ -480,8 +480,16 @@
           </div>
         </ng-container>
 
+        <!-- Won via bid (finalized but not yet fulfilled) -->
+        <ng-container *ngIf="!comic.soldTo && comic.sold">
+          <div class="detail-item">
+            <span class="detail-label">Status</span>
+            <span class="detail-value claim-status-claimed">Won via Bid</span>
+          </div>
+        </ng-container>
+
         <!-- In my cart -->
-        <ng-container *ngIf="!comic.soldTo && isInMyCart(comic.id)">
+        <ng-container *ngIf="!comic.soldTo && !comic.sold && isInMyCart(comic.id)">
           <div class="detail-item">
             <span class="detail-label">Status</span>
             <span class="detail-value claim-status-mine">In Your Cart</span>
@@ -502,7 +510,7 @@
         </ng-container>
 
         <!-- Claimed by someone else -->
-        <ng-container *ngIf="!comic.soldTo && !isInMyCart(comic.id) && claimedDate(comic.id)">
+        <ng-container *ngIf="!comic.soldTo && !comic.sold && !isInMyCart(comic.id) && claimedDate(comic.id)">
           <div class="detail-item">
             <span class="detail-label">Status</span>
             <span class="detail-value claim-status-claimed">Claimed</span>
@@ -514,7 +522,7 @@
         </ng-container>
 
         <!-- Available -->
-        <ng-container *ngIf="!comic.soldTo && !claimedDate(comic.id) && !isInMyCart(comic.id)">
+        <ng-container *ngIf="!comic.soldTo && !comic.sold && !claimedDate(comic.id) && !isInMyCart(comic.id)">
           <div class="detail-item">
             <span class="detail-label">Status</span>
             <span class="detail-value" [class.claim-status-available]="!isBiddingActive()" [class.claim-status-bidding]="isBiddingActive()">
