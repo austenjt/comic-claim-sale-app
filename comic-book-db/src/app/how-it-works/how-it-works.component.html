@@ -44,8 +44,9 @@
     <p>
       A <strong>Claim Sale</strong> is a first-come, first-served selling format that originated in
       comic book communities on social media. The seller lists comics at fixed prices and buyers
-      race to claim individual books — no bidding, no auctions, no negotiating.
-      The price is set, and the first person to claim a book gets it.
+      race to claim individual books — the price is set, and the first person to claim a book gets it.
+      Some items may also be offered through a <strong>bid auction</strong> format — see the
+      Bidding section below.
     </p>
     <p>
       This site is a private, invite-only storefront built around that format. The seller loads the
@@ -106,9 +107,10 @@
     </ul>
     <p>
       Use the search bar to filter by title or series. Use the sort dropdown to order comics by
-      <em>Oldest First</em>, <em>Newest First</em>, <em>A–Z</em>, <em>Z–A</em>,
-      <em>Priced First</em>, <em>Claimed First</em>, or <em>Bidding First</em>.
-      The filter buttons let you hide already-claimed items or hide unpriced items.
+      <em>Oldest First</em>, <em>Newest First</em>, <em>A–Z Sort</em>, <em>Z–A Sort</em>,
+      <em>Highest Price</em>, <em>Lowest Price</em>, <em>Claimed First</em>, or <em>Bidding First</em>.
+      The filter buttons let you hide already-claimed items, hide unpriced items, or narrow to
+      only biddable comics (<em>Only Bidding</em> mode).
     </p>
   </section>
 
@@ -128,8 +130,8 @@
     </ul>
     <p>
       When you claim a set, every book in the bundle is added to your cart at once, each tagged with
-      the orange <em>Set N</em> badge. Clicking <em>Remove Set</em> on any member book removes the
-      entire set in one action — you cannot remove just one book from a set.
+      the orange <em>Set N</em> badge. You cannot remove individual books from a set; if you need
+      to release a claimed set, contact the seller directly.
       All books in a set must be priced before the <em>Claim Set</em> button appears.
     </p>
   </section>
@@ -181,9 +183,9 @@
       </li>
     </ol>
     <p>
-      Items won via bidding show a <em>Won via bid</em> tag in your cart and
-      <strong>cannot be removed</strong>. Contact the seller directly if there is an issue.
-      There is no minimum bid increment — any amount strictly above the current high bid is valid.
+      Items won via bidding <strong>cannot be removed</strong> from your cart.
+      Contact the seller directly if there is an issue.
+      Bids must be placed in <strong>$0.25 increments</strong> above the current high bid.
     </p>
   </section>
 
@@ -236,8 +238,8 @@
       if you remove items from a submitted cart.
     </p>
     <p>
-      Set items are grouped with an orange <em>Set N</em> badge. The <em>Remove Set</em> button
-      removes all books in the set at once — you cannot remove individual books from a set.
+      Set items are grouped with an orange <em>Set N</em> badge. You cannot remove individual books
+      from a set — contact the seller if you need to release a claimed set.
     </p>
   </section>
 
@@ -253,18 +255,18 @@
   <section class="hiw-section">
     <h2>Live Notifications</h2>
     <p>
-      The app shows real-time toast notifications in the upper-right corner so you always know
-      what's happening.
+      The app polls for activity every few seconds and records events in the <strong>Logs panel</strong>
+      at the bottom of the dashboard. Click <em>Logs</em> in the footer to expand it.
     </p>
     <ul>
-      <li>When you <strong>claim</strong> a comic: <em>"Title #N" added to your cart — $XX</em></li>
-      <li>When <strong>someone else claims</strong>: <em>"Title #N" added to UserName's cart — $XX</em></li>
+      <li>When <strong>someone claims</strong> a comic: <em>"Title #N" added to cart of user UserName — $XX</em></li>
       <li>When the seller <strong>awards</strong> a comic: <em>"Title #N" awarded to UserName — FREE!</em></li>
       <li>When a comic is <strong>returned to sale</strong>: <em>"Title #N" Returned to sale</em> — useful for spotting books you missed coming back available</li>
+      <li>When a <strong>bid auction ends</strong>: a message announces the result to everyone on the dashboard</li>
     </ul>
     <p>
-      Each notification stays visible for 30 seconds and can be dismissed early. Multiple toasts
-      can stack and clear automatically when you navigate to a new page.
+      Log entries are timestamped and persist across page refreshes, so you can review recent
+      activity even if you were away for a moment.
     </p>
   </section>
 
@@ -354,7 +356,7 @@
     </p>
     <p>
       Bid-won items carry a <code>wonViaBid</code> flag. They are priced at the winning bid amount,
-      cannot be removed by the buyer, and are included in discount calculations when the order is submitted.
+      cannot be removed by the buyer, and are <strong>excluded</strong> from discount calculations when the order is submitted.
     </p>
   </section>
 
@@ -368,11 +370,8 @@
     <ul>
       <li>
         <strong>Release</strong> — removes a standalone comic from a buyer's cart and returns it to
-        sale. A <em>"Returned to sale"</em> toast is shown to all users in real time.
-      </li>
-      <li>
-        <strong>Release Set</strong> — appears on set member books. Removes the entire set from the
-        buyer's cart in one action and returns all books to sale with a single notification.
+        sale. A <em>"Returned to sale"</em> log entry is recorded in real time.
+        Set items do not have a Release button; contact the buyer if a set needs to be released.
       </li>
       <li>
         <strong>UnSubmit</strong> — reverts a submitted order back to Open so the buyer can add or

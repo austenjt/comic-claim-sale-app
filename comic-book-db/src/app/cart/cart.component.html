@@ -86,6 +86,14 @@
       <button class="btn-unsubmit" (click)="unsubmit()">UnSubmit Order</button>
     </div>
 
+    <div class="cart-actions bid-block-notice" *ngIf="cart?.status === 'OPEN' && visibleItems.length > 0 && myActiveBidLeads.length > 0">
+      <p class="bid-block-message">
+        You are currently the highest bidder on
+        <strong>{{ myActiveBidLeads.length === 1 ? myActiveBidLeads[0].title : myActiveBidLeads.length + ' items' }}</strong>.
+        Submission is locked until that auction ends or you are outbid.
+      </p>
+    </div>
+
     <div class="cart-actions" *ngIf="canSubmit()">
       <p class="submit-note">
         Ready to order? Submitting starts a {{ configService.finalizeHours }}-hour review window before your order is finalized.

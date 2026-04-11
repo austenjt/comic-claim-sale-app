@@ -20,7 +20,7 @@
         <button class="btn-claim-sale"
                 [class.btn-claim-sale-active]="biddableOnly"
                 (click)="biddableOnlyChange.emit(!biddableOnly)">
-          {{ biddableOnly ? 'Exit Sale' : 'Claim Sale' }}
+          {{ biddableOnly ? 'Show All' : 'Only Bidding' }}
         </button>
         <select class="sort-select"
                 [value]="sortOrder"

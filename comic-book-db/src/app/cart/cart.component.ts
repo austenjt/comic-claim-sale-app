@@ -1,25 +1,67 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { CartService } from '../cart.service';
 import { LogService } from '../log.service';
 import { ConfigService } from '../config.service';
+import { ComicService } from '../comic.service';
+import { AuthService } from '../auth.service';
 import { Cart } from '../cart';
+import { Comic } from '../comic';
 
 @Component({
   selector: 'app-cart',
   templateUrl: './cart.component.html',
   styleUrls: ['./cart.component.css']
 })
-export class CartComponent implements OnInit {
+export class CartComponent implements OnInit, OnDestroy {
   cart: Cart | null = null;
   loading = false;
   error = '';
   submitting = false;
   customerNotes = '';
 
-  constructor(private cartService: CartService, private logService: LogService, public configService: ConfigService) {}
+  private activeBidComics: Comic[] = [];
+  private claimSub!: Subscription;
+
+  constructor(
+    private cartService: CartService,
+    private logService: LogService,
+    public configService: ConfigService,
+    private comicService: ComicService,
+    public auth: AuthService
+  ) {}
 
   ngOnInit() {
     this.loadCart();
+    this.refreshActiveBids();
+    this.claimSub = this.logService.newClaimEvent$.subscribe(() => this.refreshActiveBids());
+  }
+
+  ngOnDestroy() {
+    this.claimSub?.unsubscribe();
+  }
+
+  private refreshActiveBids(): void {
+    if (!this.configService.biddingMode) return;
+    this.comicService.getDashboardPage(1, 'bidding-first', false, true).subscribe({
+      next: resp => { this.activeBidComics = resp.items; },
+      error: () => {}
+    });
+  }
+
+  private bidSecondsRemaining(comic: Comic): number {
+    if (!comic.bidStartedAt) return 0;
+    const endsAt = new Date(comic.bidStartedAt).getTime() +
+                   this.configService.biddingCycleMins * 60000;
+    return Math.max(0, Math.floor((endsAt - Date.now()) / 1000));
+  }
+
+  get myActiveBidLeads(): Comic[] {
+    const myName = this.auth.currentUser$.value?.name;
+    if (!myName) return [];
+    return this.activeBidComics.filter(c =>
+      c.currentBidderName === myName && this.bidSecondsRemaining(c) > 0
+    );
   }
 
   loadCart() {
@@ -116,7 +158,9 @@ export class CartComponent implements OnInit {
   }
 
   canSubmit(): boolean {
-    return this.cart?.status === 'OPEN' && this.visibleItems.length > 0;
+    return this.cart?.status === 'OPEN' &&
+           this.visibleItems.length > 0 &&
+           this.myActiveBidLeads.length === 0;
   }
 
   canUnsubmit(): boolean {
