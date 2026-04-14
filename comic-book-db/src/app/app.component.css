@@ -29,7 +29,8 @@
   display: block;
 }
 
-.header-right {
+/* Center section: title + nav */
+.header-center {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -50,6 +51,95 @@
   font-weight: 700;
   color: #adc178;
   letter-spacing: 0.02em;
+}
+
+/* Right section: avatar + dropdown */
+.header-user {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding-left: 1.25rem;
+  margin-left: 1rem;
+  border-left: 1px solid rgba(240,234,210,0.2);
+  flex-shrink: 0;
+}
+
+.avatar-btn {
+  background: none;
+  border: 2px solid transparent;
+  border-radius: 50%;
+  padding: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+
+.avatar-btn:hover,
+.avatar-btn.open {
+  border-color: #adc178;
+  background-color: rgba(173,193,120,0.15);
+}
+
+.avatar-icon {
+  width: 36px;
+  height: 36px;
+  display: block;
+  filter: brightness(0) invert(1) opacity(0.85);
+}
+
+.profile-dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+  min-width: 180px;
+  z-index: 1000;
+  overflow: hidden;
+}
+
+.dropdown-name {
+  padding: 0.6rem 1rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #888;
+  border-bottom: 1px solid #eee;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dropdown-item {
+  display: block;
+  width: 100%;
+  padding: 0.6rem 1rem;
+  font-size: 0.9rem;
+  color: #444;
+  text-decoration: none;
+  background: none;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.15s;
+  box-sizing: border-box;
+}
+
+.dropdown-item:hover {
+  background-color: #f5f5f5;
+  color: #222;
+}
+
+.dropdown-logout {
+  color: #c0392b;
+  border-top: 1px solid #eee;
+}
+
+.dropdown-logout:hover {
+  background-color: #fff5f5;
 }
 
 
@@ -101,12 +191,6 @@ nav a.active {
   font-weight: 700 !important;
 }
 
-.nav-user {
-  color: rgba(240,234,210,0.85);
-  padding: 0.35rem 0.85rem;
-  font-size: 0.9rem;
-  font-weight: 500;
-}
 
 .nav-pause-btn {
   background: transparent;

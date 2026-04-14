@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 import { Router } from '@angular/router';
 import { MsalService } from '@azure/msal-angular';
 import { AuthService } from './auth.service';
@@ -13,6 +13,15 @@ import { ConfigService } from './config.service';
 })
 export class AppComponent implements OnInit {
   title = 'Lightning Comics Rocks';
+  profileOpen = false;
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.header-user')) {
+      this.profileOpen = false;
+    }
+  }
 
   constructor(
     public auth: AuthService,

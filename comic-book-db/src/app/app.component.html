@@ -1,41 +1,50 @@
 <header class="app-header">
   <div class="header-inner">
-  <div class="header-logo">
-    <img src="assets/logo.svg" alt="Logo" class="logo-img">
-  </div>
 
-  <div class="header-right">
-    <div class="header-title">
-      <div class="header-title-line1">Lightning Comics Rocks</div>
+    <div class="header-logo">
+      <img src="assets/logo.svg" alt="Logo" class="logo-img">
     </div>
-    <nav>
-      <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
 
-      <ng-container *ngIf="auth.isLoggedIn() && !auth.isAdmin()">
-        <a routerLink="/cart" routerLinkActive="active">My Cart</a>
-        <a routerLink="/orders" routerLinkActive="active">Orders</a>
-      </ng-container>
+    <div class="header-center">
+      <div class="header-title">
+        <div class="header-title-line1">Lightning Comics Rocks</div>
+      </div>
+      <nav>
+        <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
 
-      <ng-container *ngIf="auth.isAdmin()">
-        <a routerLink="/admin/orders" routerLinkActive="active">Manage Orders</a>
-        <a routerLink="/comics" routerLinkActive="active">Comics Management</a>
-        <a routerLink="/admin/users" routerLinkActive="active">User Admin</a>
-        <a routerLink="/admin/sales" routerLinkActive="active">Sales</a>
-      </ng-container>
+        <ng-container *ngIf="auth.isLoggedIn() && !auth.isAdmin()">
+          <a routerLink="/cart" routerLinkActive="active">My Cart</a>
+          <a routerLink="/orders" routerLinkActive="active">Orders</a>
+        </ng-container>
 
-      <a *ngIf="!auth.isAdmin()" routerLink="/how-it-works" routerLinkActive="active" class="nav-start-here">Documentation</a>
-      <a *ngIf="!auth.isAdmin()" routerLink="/contact" routerLinkActive="active">Contact</a>
+        <ng-container *ngIf="auth.isAdmin()">
+          <a routerLink="/admin/orders" routerLinkActive="active">Manage Orders</a>
+          <a routerLink="/comics" routerLinkActive="active">Comics Management</a>
+          <a routerLink="/admin/users" routerLinkActive="active">User Admin</a>
+          <a routerLink="/admin/sales" routerLinkActive="active">Sales</a>
+        </ng-container>
 
-      <ng-container *ngIf="!auth.isLoggedIn()">
-        <a routerLink="/login" routerLinkActive="active">Login</a>
-      </ng-container>
+        <a *ngIf="!auth.isAdmin()" routerLink="/how-it-works" routerLinkActive="active" class="nav-start-here">Documentation</a>
+        <a *ngIf="!auth.isAdmin()" routerLink="/contact" routerLinkActive="active">Contact</a>
 
-      <ng-container *ngIf="auth.isLoggedIn()">
-        <a routerLink="/profile" class="nav-user">{{ (auth.currentUser$ | async)?.name }}</a>
-        <a href="#" (click)="$event.preventDefault(); logout()">Logout</a>
-      </ng-container>
-    </nav>
-  </div>
+        <ng-container *ngIf="!auth.isLoggedIn()">
+          <a routerLink="/login" routerLinkActive="active">Login</a>
+        </ng-container>
+      </nav>
+    </div>
+
+    <!-- User avatar + dropdown — only shown when logged in -->
+    <div *ngIf="auth.isLoggedIn()" class="header-user">
+      <button class="avatar-btn" (click)="profileOpen = !profileOpen" [class.open]="profileOpen" aria-label="User menu">
+        <img src="assets/user-profile.svg" alt="Profile" class="avatar-icon">
+      </button>
+      <div class="profile-dropdown" *ngIf="profileOpen" (click)="profileOpen = false">
+        <div class="dropdown-name">{{ (auth.currentUser$ | async)?.name }}</div>
+        <a routerLink="/profile" class="dropdown-item">My Profile</a>
+        <button class="dropdown-item dropdown-logout" (click)="logout()">Logout</button>
+      </div>
+    </div>
+
   </div>
 </header>
 
