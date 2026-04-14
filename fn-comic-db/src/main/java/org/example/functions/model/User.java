@@ -2,7 +2,9 @@ package org.example.functions.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Data;
 
+@Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class User {
     private String id;
@@ -20,57 +22,6 @@ public class User {
     private String status; // "PENDING" | "APPROVED" | "SUSPENDED"
     private String createdDate;
     private String approvedDate;
+    @JsonProperty("isAdmin")
     private boolean isAdmin;
-
-    public User() {}
-
-    public String getId()            { return id; }
-    public void setId(String id)     { this.id = id; }
-
-    public String getName()              { return name; }
-    public void setName(String name)     { this.name = name; }
-
-    public String getEmail()             { return email; }
-    public void setEmail(String email)   { this.email = email; }
-
-    public String getEntraOid()              { return entraOid; }
-    public void setEntraOid(String entraOid) { this.entraOid = entraOid; }
-
-    public String getAddress()               { return address; }
-    public void setAddress(String address)   { this.address = address; }
-
-    public String getPhone()             { return phone; }
-    public void setPhone(String phone)   { this.phone = phone; }
-
-    public String getNotes()             { return notes; }
-    public void setNotes(String notes)   { this.notes = notes; }
-
-    public String getPreferences()                   { return preferences; }
-    public void setPreferences(String preferences)   { this.preferences = preferences; }
-
-    public String getVenmoHandle()                   { return venmoHandle; }
-    public void setVenmoHandle(String venmoHandle)   { this.venmoHandle = venmoHandle; }
-
-    public String getPaypalHandle()                  { return paypalHandle; }
-    public void setPaypalHandle(String paypalHandle) { this.paypalHandle = paypalHandle; }
-
-    public String getEbayUsername()                  { return ebayUsername; }
-    public void setEbayUsername(String ebayUsername) { this.ebayUsername = ebayUsername; }
-
-    public String getCashAppHandle()                     { return cashAppHandle; }
-    public void setCashAppHandle(String cashAppHandle)   { this.cashAppHandle = cashAppHandle; }
-
-    public String getStatus()              { return status; }
-    public void setStatus(String status)   { this.status = status; }
-
-    public String getCreatedDate()                   { return createdDate; }
-    public void setCreatedDate(String createdDate)   { this.createdDate = createdDate; }
-
-    public String getApprovedDate()                  { return approvedDate; }
-    public void setApprovedDate(String approvedDate) { this.approvedDate = approvedDate; }
-
-    @JsonProperty("isAdmin")
-    public boolean isAdmin()              { return isAdmin; }
-    @JsonProperty("isAdmin")
-    public void setAdmin(boolean admin)   { isAdmin = admin; }
 }
