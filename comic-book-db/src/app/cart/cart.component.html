@@ -11,9 +11,6 @@
   <ng-container *ngIf="cart">
     <div class="cart-status" [ngClass]="'status-' + cart.status.toLowerCase()">
       {{ statusLabel }}
-      <span *ngIf="cart.status === 'FINALIZING' && finalizeDeadline">
-        Finalizes: <strong>{{ finalizeDeadline | date:'medium' }}</strong>
-      </span>
     </div>
 
     <table *ngIf="visibleItems.length > 0">
@@ -34,9 +31,9 @@
             <span *ngIf="item.collectionGroup && item.collectionGroup > 0" class="set-tag">Set {{ item.collectionGroup }}</span>
           </td>
           <td>
-            <ng-container *ngIf="showItemDiscounts; else plainPrice">
+            <ng-container *ngIf="showItemDiscounts && !item.wonViaBid; else plainPrice">
               <span class="price-original">{{ item.price | currency }}</span>
-              <span class="price-discounted">{{ discountedItemPrice(item.price) | currency }}</span>
+              <span class="price-discounted">{{ discountedItemPrice(item) | currency }}</span>
             </ng-container>
             <ng-template #plainPrice>{{ item.price | currency }}</ng-template>
           </td>
@@ -85,8 +82,8 @@
 
     <div class="cart-actions finalizing-note" *ngIf="cart.status === 'FINALIZING'">
       <p>
-        Until your order is finalized, you cannot claim more books for this order.
-        Once this order is shipped or fulfilled, you can start a new claim cart.
+        Your order has been submitted. You can still remove items if needed.
+        Once fulfilled, you can start a new claim cart.
       </p>
       <button class="btn-unsubmit" (click)="unsubmit()">UnSubmit Order</button>
     </div>
@@ -101,8 +98,7 @@
 
     <div class="cart-actions" *ngIf="canSubmit()">
       <p class="submit-note">
-        Ready to order? Submitting starts a {{ configService.finalizeHours }}-hour review window before your order is finalized.
-        You can still remove items during this window, but not add new ones.
+        Ready to order? You can still remove items after submitting, but not add new ones.
       </p>
       <div class="notes-group">
         <label for="customerNotes" class="notes-label">Notes for seller <span class="notes-optional">(optional)</span></label>

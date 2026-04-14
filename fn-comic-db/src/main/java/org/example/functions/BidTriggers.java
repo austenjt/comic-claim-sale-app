@@ -155,8 +155,16 @@ public class BidTriggers {
             BigDecimal amount = new BigDecimal(amountNode.asText());
 
             ComicBook comic = BidService.getServiceInstance().placeBid(user, comicId, amount);
-            String logMsg = String.format("User %s placed bid of $%.2f on \"%s\"",
-                user.getName(), amount, comic.getTitle());
+            String issueLabel = "";
+            if (comic.getNumber() != null) {
+                if (comic.getNumber().getNumber() != null) {
+                    issueLabel = " #" + comic.getNumber().getNumber();
+                } else if (comic.getNumber().getSentinel() != null) {
+                    issueLabel = " #" + comic.getNumber().getSentinel().getValue();
+                }
+            }
+            String logMsg = String.format("User %s placed bid of $%.2f on \"%s%s\"",
+                user.getName(), amount, comic.getTitle(), issueLabel);
             ActivityLogService.getServiceInstance().writeLog(logMsg, false);
             return cors(request.createResponseBuilder(HttpStatus.OK))
                 .header("Content-Type", "application/json")

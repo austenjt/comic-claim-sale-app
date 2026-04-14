@@ -5,7 +5,7 @@ import { LogService } from '../log.service';
 import { ConfigService } from '../config.service';
 import { ComicService } from '../comic.service';
 import { AuthService } from '../auth.service';
-import { Cart } from '../cart';
+import { Cart, CartItem } from '../cart';
 import { Comic } from '../comic';
 
 @Component({
@@ -137,23 +137,34 @@ export class CartComponent implements OnInit, OnDestroy {
     return this.cart?.status !== 'OPEN' && (this.cart?.discountAmount ?? 0) > 0;
   }
 
-  discountedItemPrice(price: number): number {
-    const discount = this.cart?.discountAmount ?? 0;
-    if (discount <= 0 || this.cartTotal <= 0) return price;
-    const factor = Math.max(0, this.cartTotal - discount) / this.cartTotal;
-    return Math.round(price * factor * 100) / 100;
+  /** Total of only the non-bid-won items — the pool the discount is spread across. */
+  private get discountableTotal(): number {
+    return this.visibleItems
+      .filter(i => !i.wonViaBid)
+      .reduce((sum, i) => sum + i.price, 0);
   }
 
-  get finalizeDeadline(): Date | null {
-    if (!this.cart?.finalizeAfter) return null;
-    return new Date(this.cart.finalizeAfter);
+  /**
+   * Returns the discounted price for a single item.
+   * Items won via bid are never discounted.
+   * The discount factor is computed only against non-bid items,
+   * so bid-won items still count toward quantity thresholds on the backend
+   * but don't absorb any of the discount pool.
+   */
+  discountedItemPrice(item: CartItem): number {
+    if (item.wonViaBid) return item.price;
+    const discount = this.cart?.discountAmount ?? 0;
+    const base = this.discountableTotal;
+    if (discount <= 0 || base <= 0) return item.price;
+    const factor = Math.max(0, base - discount) / base;
+    return Math.round(item.price * factor * 100) / 100;
   }
 
   get statusLabel(): string {
     switch (this.cart?.status) {
       case 'OPEN': return 'Open — add or remove items freely.';
-      case 'FINALIZING': return `Submitted — ${this.configService.finalizeHours}-hour review window in progress.`;
-      case 'FINALIZED': return 'Finalized — awaiting seller fulfillment.';
+      case 'FINALIZING': return 'Submitted — your order is with the seller.';
+      case 'FINALIZED': return 'Finalized — awaiting fulfillment.';
       case 'FULFILLED': return 'Fulfilled — your order has been shipped!';
       default: return '';
     }
