@@ -3,6 +3,7 @@ package org.example.functions.model;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+import lombok.Getter;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -22,6 +23,7 @@ public class User {
     private String status; // "PENDING" | "APPROVED" | "SUSPENDED"
     private String createdDate;
     private String approvedDate;
+    @Getter(onMethod_ = {@JsonProperty("isAdmin")})
     @JsonProperty("isAdmin")
     private boolean isAdmin;
 }
