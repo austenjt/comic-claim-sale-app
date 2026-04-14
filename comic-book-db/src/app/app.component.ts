@@ -3,7 +3,6 @@ import { Router } from '@angular/router';
 import { MsalService } from '@azure/msal-angular';
 import { AuthService } from './auth.service';
 import { LogService } from './log.service';
-import { ConfigService } from './config.service';
 
 @Component({
     selector: 'app-root',
@@ -26,7 +25,6 @@ export class AppComponent implements OnInit {
   constructor(
     public auth: AuthService,
     public logService: LogService,
-    public configService: ConfigService,
     private msal: MsalService,
     private router: Router,
   ) {}
@@ -65,6 +63,10 @@ export class AppComponent implements OnInit {
         },
       });
     });
+  }
+
+  login(): void {
+    this.auth.signIn().subscribe();
   }
 
   logout(): void {

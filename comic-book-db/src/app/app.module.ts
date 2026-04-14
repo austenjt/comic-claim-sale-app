@@ -8,11 +8,11 @@ import {
   MSAL_INTERCEPTOR_CONFIG,
   MsalBroadcastService,
   MsalGuard,
-  MsalInterceptor,
   MsalService,
 } from '@azure/msal-angular';
 
 import { ConfigService } from './config.service';
+import { AuthInterceptor } from './auth.interceptor';
 import { HttpLoggingInterceptor } from './http-logging.interceptor';
 import { msalGuardConfig, msalInstanceFactory, msalInterceptorConfig } from './auth.config';
 
@@ -81,9 +81,9 @@ import { DashboardHeaderComponent } from './dashboard-header/dashboard-header.co
         MsalGuard,
         MsalBroadcastService,
 
-        // HTTP interceptors (order matters: logging first, then MSAL Bearer token attachment)
+        // HTTP interceptors (order matters: logging first, then Bearer token attachment)
         { provide: HTTP_INTERCEPTORS, useClass: HttpLoggingInterceptor, multi: true },
-        { provide: HTTP_INTERCEPTORS, useClass: MsalInterceptor,        multi: true },
+        { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor,        multi: true },
 
         provideHttpClient(withInterceptorsFromDi()),
     ],

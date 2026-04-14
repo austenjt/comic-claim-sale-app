@@ -26,22 +26,23 @@
 
         <a *ngIf="!auth.isAdmin()" routerLink="/how-it-works" routerLinkActive="active" class="nav-start-here">Documentation</a>
         <a *ngIf="!auth.isAdmin()" routerLink="/contact" routerLinkActive="active">Contact</a>
-
-        <ng-container *ngIf="!auth.isLoggedIn()">
-          <a routerLink="/login" routerLinkActive="active">Login</a>
-        </ng-container>
       </nav>
     </div>
 
-    <!-- User avatar + dropdown — only shown when logged in -->
-    <div *ngIf="auth.isLoggedIn()" class="header-user">
+    <!-- User avatar — always visible; shows Login or Profile/Logout depending on auth state -->
+    <div class="header-user">
       <button class="avatar-btn" (click)="profileOpen = !profileOpen" [class.open]="profileOpen" aria-label="User menu">
         <img src="assets/user-profile.svg" alt="Profile" class="avatar-icon">
       </button>
       <div class="profile-dropdown" *ngIf="profileOpen" (click)="profileOpen = false">
-        <div class="dropdown-name">{{ (auth.currentUser$ | async)?.name }}</div>
-        <a routerLink="/profile" class="dropdown-item">My Profile</a>
-        <button class="dropdown-item dropdown-logout" (click)="logout()">Logout</button>
+        <ng-container *ngIf="auth.isLoggedIn(); else loggedOut">
+          <div class="dropdown-name">{{ (auth.currentUser$ | async)?.name }}</div>
+          <a routerLink="/profile" class="dropdown-item">My Profile</a>
+          <button class="dropdown-item dropdown-logout" (click)="logout()">Logout</button>
+        </ng-container>
+        <ng-template #loggedOut>
+          <button class="dropdown-item" (click)="login()">Login</button>
+        </ng-template>
       </div>
     </div>
 
