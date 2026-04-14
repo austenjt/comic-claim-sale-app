@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
@@ -73,6 +73,14 @@ import { DashboardHeaderComponent } from './dashboard-header/dashboard-header.co
         AgGridModule,
     ],
     providers: [
+        // Load app config (biddingMode, awardModeEnabled, etc.) before any component renders
+        {
+            provide: APP_INITIALIZER,
+            useFactory: (config: ConfigService) => () => config.load(),
+            deps: [ConfigService],
+            multi: true,
+        },
+
         // MSAL providers
         { provide: MSAL_INSTANCE,          useFactory: msalInstanceFactory },
         { provide: MSAL_GUARD_CONFIG,      useValue: msalGuardConfig },

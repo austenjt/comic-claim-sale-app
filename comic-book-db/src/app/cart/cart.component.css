@@ -133,6 +133,9 @@ tfoot td { font-weight: bold; background: #adc178; }
 .discount-savings { color: #7b8f4b; font-weight: 500; }
 .discount-desc { font-size: 0.85em; color: var(--color-text-muted); margin-left: 0.4rem; }
 
+.price-original { text-decoration: line-through; color: var(--color-text-muted); margin-right: 6px; }
+.price-discounted { color: #7b8f4b; font-weight: 600; }
+
 .empty-cart { color: var(--color-text-muted); }
 .empty-cart a { color: #7b8f4b; }
 .error-message { color: #c0634c; margin-bottom: 12px; }

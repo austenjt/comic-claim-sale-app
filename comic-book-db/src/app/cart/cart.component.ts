@@ -133,6 +133,17 @@ export class CartComponent implements OnInit, OnDestroy {
     return Math.max(0, this.cartTotal - (this.cart?.discountAmount ?? 0)) + shipping;
   }
 
+  get showItemDiscounts(): boolean {
+    return this.cart?.status !== 'OPEN' && (this.cart?.discountAmount ?? 0) > 0;
+  }
+
+  discountedItemPrice(price: number): number {
+    const discount = this.cart?.discountAmount ?? 0;
+    if (discount <= 0 || this.cartTotal <= 0) return price;
+    const factor = Math.max(0, this.cartTotal - discount) / this.cartTotal;
+    return Math.round(price * factor * 100) / 100;
+  }
+
   get finalizeDeadline(): Date | null {
     if (!this.cart?.finalizeAfter) return null;
     return new Date(this.cart.finalizeAfter);
