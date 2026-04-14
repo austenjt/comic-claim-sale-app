@@ -13,8 +13,6 @@ export class AdminUsersComponent implements OnInit {
   existingUsers: User[] = [];
   loading = false;
   error = '';
-  approvedPin: string | null = null;
-  approvedUserName = '';
 
   constructor(private userService: UserService) {}
 
@@ -36,27 +34,13 @@ export class AdminUsersComponent implements OnInit {
 
   approve(user: User) {
     this.userService.approveUser(user.id).subscribe({
-      next: resp => {
-        this.approvedPin = resp.pin;
-        this.approvedUserName = user.name;
+      next: () => {
         this.pendingUsers = this.pendingUsers.filter(u => u.id !== user.id);
         this.userService.getApprovedUsers().subscribe({
           next: users => { this.existingUsers = users; }
         });
       },
-      error: () => {
-        this.error = 'Failed to approve user.';
-      }
-    });
-  }
-
-  resetPin(user: User) {
-    this.userService.resetPin(user.id).subscribe({
-      next: resp => {
-        this.approvedPin = resp.pin;
-        this.approvedUserName = user.name;
-      },
-      error: () => { this.error = 'Failed to reset PIN.'; }
+      error: () => { this.error = 'Failed to approve user.'; }
     });
   }
 
@@ -76,10 +60,5 @@ export class AdminUsersComponent implements OnInit {
       }),
       error: () => { this.error = 'Failed to reactivate user.'; }
     });
-  }
-
-  dismissPin() {
-    this.approvedPin = null;
-    this.approvedUserName = '';
   }
 }

@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { MsalService } from '@azure/msal-angular';
 import { AuthService } from './auth.service';
 import { LogService } from './log.service';
 import { ConfigService } from './config.service';
@@ -15,14 +17,48 @@ export class AppComponent implements OnInit {
   constructor(
     public auth: AuthService,
     public logService: LogService,
-    public configService: ConfigService
+    public configService: ConfigService,
+    private msal: MsalService,
+    private router: Router,
   ) {}
 
-  ngOnInit() {
-    this.auth.loadSession();
+  ngOnInit(): void {
+    // handleRedirectObservable() MUST be called on every page load in redirect flow.
+    // It clears the interaction_in_progress lock MSAL sets before navigating to Entra,
+    // and processes the token response when returning from Entra's login page.
+    this.msal.initialize().subscribe(() => {
+      this.msal.handleRedirectObservable().subscribe({
+        next: (result) => {
+          if (result?.account) {
+            this.msal.instance.setActiveAccount(result.account);
+          }
+
+          // If the user has an Entra account in cache, fetch their CosmosDB record
+          if (this.msal.instance.getAllAccounts().length > 0) {
+            this.auth.loadCurrentUser().subscribe({
+              next: (user) => {
+                if (user) {
+                  // Only navigate away from auth-callback or login pages after loading
+                  const url = this.router.url;
+                  if (url.includes('auth-callback') || url === '/login' || url === '/') {
+                    this.router.navigate(['/dashboard']);
+                  }
+                }
+              },
+              error: (err) => {
+                // 403 = PENDING or SUSPENDED
+                if (err?.status === 403 || err?.status === 202) {
+                  this.router.navigate(['/pending-approval']);
+                }
+              }
+            });
+          }
+        },
+      });
+    });
   }
 
-  logout() {
-    this.auth.logout();
+  logout(): void {
+    this.auth.signOut();
   }
 }

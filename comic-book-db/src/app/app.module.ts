@@ -1,10 +1,20 @@
-import { NgModule, APP_INITIALIZER } from '@angular/core';
+import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import {
+  MSAL_GUARD_CONFIG,
+  MSAL_INSTANCE,
+  MSAL_INTERCEPTOR_CONFIG,
+  MsalBroadcastService,
+  MsalGuard,
+  MsalInterceptor,
+  MsalService,
+} from '@azure/msal-angular';
+
 import { ConfigService } from './config.service';
 import { HttpLoggingInterceptor } from './http-logging.interceptor';
-import { AuthInterceptor } from './auth.interceptor';
+import { msalGuardConfig, msalInstanceFactory, msalInterceptorConfig } from './auth.config';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AgGridModule } from 'ag-grid-angular';
@@ -18,7 +28,8 @@ import { MessagesComponent } from './messages/messages.component';
 import { StandaloneListComponent } from './standalone-list/standalone-list.component';
 import { LoadGoCollectFormComponent } from './load-gocollect-form/load-gocollect-form.component';
 import { LoginComponent } from './login/login.component';
-import { AccountRequestComponent } from './account-request/account-request.component';
+import { AuthCallbackComponent } from './auth-callback/auth-callback.component';
+import { PendingApprovalComponent } from './pending-approval/pending-approval.component';
 import { AdminUsersComponent } from './admin-users/admin-users.component';
 import { HowItWorksComponent } from './how-it-works/how-it-works.component';
 import { CartComponent } from './cart/cart.component';
@@ -30,7 +41,8 @@ import { ContactComponent } from './contact/contact.component';
 import { SetDetailComponent } from './set-detail/set-detail.component';
 import { DashboardHeaderComponent } from './dashboard-header/dashboard-header.component';
 
-@NgModule({ declarations: [
+@NgModule({
+    declarations: [
         AppComponent,
         DashboardComponent,
         ManagementComponent,
@@ -39,7 +51,8 @@ import { DashboardHeaderComponent } from './dashboard-header/dashboard-header.co
         ComicSearchComponent,
         LoadGoCollectFormComponent,
         LoginComponent,
-        AccountRequestComponent,
+        AuthCallbackComponent,
+        PendingApprovalComponent,
         AdminUsersComponent,
         HowItWorksComponent,
         CartComponent,
@@ -49,20 +62,30 @@ import { DashboardHeaderComponent } from './dashboard-header/dashboard-header.co
         AdminSalesComponent,
         ContactComponent,
         SetDetailComponent,
-        DashboardHeaderComponent
+        DashboardHeaderComponent,
     ],
-    bootstrap: [AppComponent], imports: [BrowserModule,
+    bootstrap: [AppComponent],
+    imports: [
+        BrowserModule,
         FormsModule,
         AppRoutingModule,
-        StandaloneListComponent], providers: [
+        StandaloneListComponent,
+        AgGridModule,
+    ],
+    providers: [
+        // MSAL providers
+        { provide: MSAL_INSTANCE,          useFactory: msalInstanceFactory },
+        { provide: MSAL_GUARD_CONFIG,      useValue: msalGuardConfig },
+        { provide: MSAL_INTERCEPTOR_CONFIG, useValue: msalInterceptorConfig },
+        MsalService,
+        MsalGuard,
+        MsalBroadcastService,
+
+        // HTTP interceptors (order matters: logging first, then MSAL Bearer token attachment)
         { provide: HTTP_INTERCEPTORS, useClass: HttpLoggingInterceptor, multi: true },
-        { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
-        {
-            provide: APP_INITIALIZER,
-            useFactory: (configService: ConfigService) => () => configService.load(),
-            deps: [ConfigService],
-            multi: true
-        },
-        provideHttpClient(withInterceptorsFromDi())
-    ] })
-export class AppModule { }
+        { provide: HTTP_INTERCEPTORS, useClass: MsalInterceptor,        multi: true },
+
+        provideHttpClient(withInterceptorsFromDi()),
+    ],
+})
+export class AppModule {}

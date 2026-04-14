@@ -1,16 +1,6 @@
 <div class="admin-users">
   <h2>Pending Account Requests</h2>
 
-  <!-- PIN modal -->
-  <div *ngIf="approvedPin" class="pin-modal-overlay">
-    <div class="pin-modal">
-      <h3>User Approved: {{ approvedUserName }}</h3>
-      <p>Copy this PIN — it won't be shown again:</p>
-      <div class="pin-display">{{ approvedPin }}</div>
-      <button (click)="dismissPin()">Dismiss</button>
-    </div>
-  </div>
-
   <div *ngIf="error" class="error-message">{{ error }}</div>
   <div *ngIf="loading">Loading…</div>
 
@@ -23,9 +13,6 @@
       <tr>
         <th>Name</th>
         <th>Email</th>
-        <th>Address</th>
-        <th>Phone</th>
-        <th>Notes</th>
         <th>Requested</th>
         <th>Action</th>
       </tr>
@@ -34,9 +21,6 @@
       <tr *ngFor="let user of pendingUsers">
         <td>{{ user.name }}</td>
         <td>{{ user.email }}</td>
-        <td class="address-cell">{{ user.address }}</td>
-        <td>{{ user.phone }}</td>
-        <td>{{ user.notes }}</td>
         <td>{{ user.createdDate | date:'short' }}</td>
         <td><button (click)="approve(user)">Approve</button></td>
       </tr>
@@ -59,7 +43,6 @@
         </span>
         <span *ngIf="user.isAdmin" class="admin-label">Admin</span>
         <div class="user-card-actions">
-          <button (click)="resetPin(user)">Reset PIN</button>
           <button *ngIf="!user.isAdmin && user.status === 'APPROVED'" class="btn-suspend" (click)="suspend(user)">Suspend</button>
           <button *ngIf="!user.isAdmin && user.status === 'SUSPENDED'" class="btn-reactivate" (click)="reactivate(user)">Reactivate</button>
         </div>

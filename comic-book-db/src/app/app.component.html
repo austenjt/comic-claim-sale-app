@@ -28,7 +28,6 @@
 
       <ng-container *ngIf="!auth.isLoggedIn()">
         <a routerLink="/login" routerLinkActive="active">Login</a>
-        <a routerLink="/register" routerLinkActive="active">Register</a>
       </ng-container>
 
       <ng-container *ngIf="auth.isLoggedIn()">
@@ -39,12 +38,6 @@
   </div>
   </div>
 </header>
-
-<div *ngIf="!auth.storageAvailable" class="storage-warning-banner">
-  ⚠️ Your browser is blocking session storage — you'll be logged out on every page refresh.
-  In Safari, go to <strong>Settings → Safari → Advanced → Privacy Preserving Ad Measurement</strong>
-  and disable <strong>Prevent Cross-Site Tracking</strong>, or open a regular (non-Private) window.
-</div>
 
 <main class="app-main">
   <router-outlet></router-outlet>

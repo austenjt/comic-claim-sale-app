@@ -27,7 +27,7 @@ public class ConfigTriggers {
 
     private static final ObjectMapper OBJECT_MAPPER = Mappers.STANDARD;
     private static final String CORS_ORIGIN  = "*";
-    private static final String CORS_HEADERS = "X-Session-Token, Content-Type";
+    private static final String CORS_HEADERS = "Authorization, Content-Type";
 
     @FunctionName("getConfig")
     public HttpResponseMessage getConfig(

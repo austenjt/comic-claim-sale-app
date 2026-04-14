@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../auth.service';
 import { UserService } from '../user.service';
 import { User } from '../user';
-import { ConfigService } from '../config.service';
 
 @Component({
     selector: 'app-account-profile',
@@ -25,7 +24,7 @@ export class AccountProfileComponent implements OnInit {
   saveSuccess = false;
   saveError = '';
 
-  constructor(public auth: AuthService, private userService: UserService, public configService: ConfigService) {}
+  constructor(public auth: AuthService, private userService: UserService) {}
 
   ngOnInit() {
     const user = this.auth.currentUser$.value;

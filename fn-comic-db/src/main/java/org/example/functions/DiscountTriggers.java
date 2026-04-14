@@ -23,7 +23,7 @@ public class DiscountTriggers {
 
     private static final ObjectMapper OBJECT_MAPPER = Mappers.STANDARD;
     private static final String CORS_ORIGIN = "*";
-    private static final String CORS_HEADERS = "X-Session-Token, Content-Type";
+    private static final String CORS_HEADERS = "Authorization, Content-Type";
 
     // ─── GET /api/discounts ───────────────────────────────────────────────────
 

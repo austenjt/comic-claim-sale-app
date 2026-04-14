@@ -27,7 +27,7 @@ public class BidTriggers {
 
     private static final ObjectMapper OBJECT_MAPPER = Mappers.STANDARD;
     private static final String CORS_ORIGIN  = "*";
-    private static final String CORS_HEADERS = "X-Session-Token, Content-Type";
+    private static final String CORS_HEADERS = "Authorization, Content-Type";
 
     // ─── POST /api/bid/cancel ─────────────────────────────────────────────────
     // Admin-only: cancel an opened bid before any user has bid. Resets to pre-opened state.

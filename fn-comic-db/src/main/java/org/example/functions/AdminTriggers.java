@@ -19,7 +19,6 @@ import org.example.functions.service.ArchiveService;
 import org.example.functions.service.CartService;
 import org.example.functions.service.ComicService;
 import org.example.functions.service.DiscountService;
-import org.example.functions.service.SessionService;
 import org.example.functions.service.UserService;
 import org.example.functions.util.AuthHelper;
 import org.example.functions.util.Mappers;
@@ -33,7 +32,7 @@ public class AdminTriggers {
 
     private static final ObjectMapper OBJECT_MAPPER = Mappers.STANDARD;
     private static final String CORS_ORIGIN = "*";
-    private static final String CORS_HEADERS = "X-Session-Token, Content-Type";
+    private static final String CORS_HEADERS = "Authorization, Content-Type";
 
     // ─── GET /api/orders ──────────────────────────────────────────────────────
 
@@ -410,7 +409,6 @@ public class AdminTriggers {
     {
         User admin = AuthHelper.requireAdmin(request);
         if (admin == null) return unauthorized(request);
-        String adminToken = request.getHeaders().get("x-session-token");
         try {
             log.warn("DATABASE RESET initiated by admin {}", admin.getEmail());
 
@@ -426,9 +424,6 @@ public class AdminTriggers {
 
             // 4. Delete all comics and images
             ComicService.getServiceInstance().deleteAllComicsAndImages();
-
-            // 5. Delete all sessions except admin's current session
-            SessionService.getServiceInstance().deleteAllExcept(adminToken);
 
             log.warn("DATABASE RESET complete.");
             return cors(request.createResponseBuilder(HttpStatus.OK))

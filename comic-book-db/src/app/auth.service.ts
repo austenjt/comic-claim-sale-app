@@ -1,89 +1,55 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { BehaviorSubject, Observable, of } from 'rxjs';
-import { tap, catchError } from 'rxjs/operators';
-import { User, SessionInfo } from './user';
-
-const SESSION_KEY = 'session_token';
+import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
+import { MsalService, MsalBroadcastService } from '@azure/msal-angular';
+import { InteractionStatus } from '@azure/msal-browser';
+import { filter } from 'rxjs/operators';
+import { User } from './user';
+import { apiBase, clientId } from './auth.config';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private readonly apiBase = 'https://fn-comicBook-db-1703810588398.azurewebsites.net/api';
+  private readonly meUrl = `${apiBase}/auth/me`;
+
   currentUser$ = new BehaviorSubject<User | null>(null);
 
-  /** False when localStorage is unavailable (Safari Private Browsing, "Block All Cookies"). */
-  readonly storageAvailable: boolean = (() => {
-    try {
-      localStorage.setItem('__test__', '1');
-      const ok = localStorage.getItem('__test__') === '1';
-      localStorage.removeItem('__test__');
-      return ok;
-    } catch {
-      return false;
-    }
-  })();
+  /** Emits when MSAL interaction completes — subscribe to react to sign-in/sign-out events. */
+  readonly interactionComplete$: Observable<InteractionStatus>;
 
-  // In-memory fallback for environments where localStorage is blocked (e.g. Safari
-  // with "Block All Cookies" or Private Browsing).  The token lives here for the
-  // duration of the SPA session even if it could not be persisted to localStorage.
-  private _memoryToken: string | null = null;
-
-  constructor(private http: HttpClient) {}
-
-  private safeGetStorage(key: string): string | null {
-    try { return localStorage.getItem(key); } catch { return null; }
-  }
-
-  private safeSetStorage(key: string, value: string): void {
-    try { localStorage.setItem(key, value); } catch { /* unavailable in some Safari modes */ }
-  }
-
-  private safeRemoveStorage(key: string): void {
-    try { localStorage.removeItem(key); } catch { /* ignore */ }
-  }
-
-  login(email: string, pin: string): Observable<SessionInfo> {
-    return this.http.post<SessionInfo>(`${this.apiBase}/users/login`, { email, pin }).pipe(
-      tap(resp => {
-        this._memoryToken = resp.token;        // always keep in memory first
-        this.safeSetStorage(SESSION_KEY, resp.token);
-        this.currentUser$.next(resp.user);
-      })
+  constructor(
+    private readonly msal: MsalService,
+    private readonly broadcast: MsalBroadcastService,
+    private readonly http: HttpClient,
+  ) {
+    this.interactionComplete$ = this.broadcast.inProgress$.pipe(
+      filter(status => status === InteractionStatus.None),
     );
   }
 
-  logout(): void {
-    const token = this.getToken();
-    if (token) {
-      this.http.post(`${this.apiBase}/users/logout`, {}).subscribe({ error: () => {} });
-    }
-    this._memoryToken = null;
-    this.safeRemoveStorage(SESSION_KEY);
+  /**
+   * Trigger MSAL redirect sign-in.
+   * Navigates the main window to the Entra login page.
+   */
+  signIn(): Observable<void> {
+    return this.msal.loginRedirect({ scopes: [`${clientId}/.default`] }).pipe(map(() => void 0));
+  }
+
+  /**
+   * Trigger MSAL redirect sign-out.
+   */
+  signOut(): void {
+    const account = this.msal.instance.getActiveAccount()
+      ?? this.msal.instance.getAllAccounts()[0];
     this.currentUser$.next(null);
+    this.msal.logoutRedirect({ account });
   }
 
-  loadSession(): void {
-    const token = this.safeGetStorage(SESSION_KEY);
-    if (!token) return;
-    this._memoryToken = token;               // sync memory from storage on startup
-    this.http.get<User>(`${this.apiBase}/users/me`).pipe(
-      tap(user => this.currentUser$.next(user)),
-      catchError((err) => {
-        // Only invalidate the stored token when the server explicitly rejects it (401).
-        // Network errors, cold-start timeouts, etc. should not wipe a valid session.
-        if (err instanceof HttpErrorResponse && err.status === 401) {
-          this._memoryToken = null;
-          this.safeRemoveStorage(SESSION_KEY);
-        }
-        return of(null);
-      })
-    ).subscribe();
-  }
-
-  /** Returns the session token, preferring localStorage but falling back to the
-   *  in-memory copy for Safari environments where localStorage is not available. */
-  getToken(): string | null {
-    return this.safeGetStorage(SESSION_KEY) ?? this._memoryToken;
+  /**
+   * Returns true if there is at least one cached MSAL account.
+   */
+  get isAuthenticated(): boolean {
+    return this.msal.instance.getAllAccounts().length > 0;
   }
 
   isLoggedIn(): boolean {
@@ -98,5 +64,32 @@ export class AuthService {
     const user = this.currentUser$.value;
     if (!user) return false;
     return user.isAdmin || user.status === 'APPROVED';
+  }
+
+  /**
+   * Fetches the current user from GET /api/auth/me (validates JWT, looks up CosmosDB record).
+   * - Returns the User on success (status APPROVED).
+   * - Emits null and clears MSAL cache on 401.
+   * - Re-throws 403 (PENDING/SUSPENDED) so callers can show the appropriate message.
+   */
+  loadCurrentUser(): Observable<User | null> {
+    return this.http.get<User>(this.meUrl).pipe(
+      map(user => {
+        this.currentUser$.next(user);
+        return user;
+      }),
+      catchError((err: HttpErrorResponse) => {
+        if (err.status === 401) {
+          const account = this.msal.instance.getActiveAccount()
+            ?? this.msal.instance.getAllAccounts()[0];
+          if (account) this.msal.instance.setActiveAccount(null);
+          this.currentUser$.next(null);
+          return of(null);
+        }
+        // 202 ACCEPTED means PENDING — treat as a rejection for the UI
+        // 403 means PENDING or SUSPENDED — re-throw so callers can route to the right page
+        return throwError(() => err);
+      }),
+    );
   }
 }

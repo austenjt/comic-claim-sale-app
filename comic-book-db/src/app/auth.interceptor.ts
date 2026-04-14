@@ -1,21 +1,20 @@
 import { Injectable, Injector } from '@angular/core';
 import { HttpInterceptor, HttpRequest, HttpHandler, HttpEvent } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { AuthService } from './auth.service';
+import { MsalInterceptor } from '@azure/msal-angular';
 
+/**
+ * Delegates to MsalInterceptor to attach Bearer tokens to requests
+ * targeting the protected API (configured via msalInterceptorConfig in app.module.ts).
+ *
+ * Using Injector to avoid circular dependency issues with MsalInterceptor's own deps.
+ */
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
-  // Injector is used instead of injecting AuthService directly to avoid a
-  // circular dependency: AuthService → HttpClient → [interceptors] → AuthService.
   constructor(private injector: Injector) {}
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    const auth = this.injector.get(AuthService);
-    const token = auth.getToken();   // uses localStorage with in-memory fallback
-    if (token) {
-      const cloned = req.clone({ setHeaders: { 'X-Session-Token': token } });
-      return next.handle(cloned);
-    }
-    return next.handle(req);
+    const msalInterceptor = this.injector.get(MsalInterceptor);
+    return msalInterceptor.intercept(req, next);
   }
 }

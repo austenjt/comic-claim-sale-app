@@ -15,8 +15,3 @@ export interface User {
   createdDate?: string;
   approvedDate?: string;
 }
-
-export interface SessionInfo {
-  token: string;
-  user: User;
-}

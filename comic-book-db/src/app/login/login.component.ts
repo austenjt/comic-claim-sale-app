@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../auth.service';
 
@@ -8,38 +8,25 @@ import { AuthService } from '../auth.service';
     styleUrls: ['./login.component.css'],
     standalone: false
 })
-export class LoginComponent {
-  email = '';
-  pin = '';
-  error = '';
-  suspended = false;
+export class LoginComponent implements OnInit {
   loading = false;
+  error = '';
 
-  constructor(private auth: AuthService, private router: Router) {
-    try {
-      this.email = localStorage.getItem('lastLoginEmail') ?? '';
-    } catch {
-      this.email = '';
+  constructor(private auth: AuthService, private router: Router) {}
+
+  ngOnInit(): void {
+    if (this.auth.isAuthenticated && this.auth.isLoggedIn()) {
+      this.router.navigate(['/dashboard']);
     }
   }
 
-  onSubmit() {
-    this.error = '';
-    this.suspended = false;
+  signIn(): void {
     this.loading = true;
-    this.auth.login(this.email, this.pin).subscribe({
-      next: () => {
-        try { localStorage.setItem('lastLoginEmail', this.email); } catch { /* ignore */ }
+    this.error = '';
+    this.auth.signIn().subscribe({
+      error: () => {
         this.loading = false;
-        this.router.navigate(['/dashboard']);
-      },
-      error: (err) => {
-        this.loading = false;
-        if (err.status === 403) {
-          this.suspended = true;
-        } else {
-          this.error = 'Invalid email or PIN. Please try again.';
-        }
+        this.error = 'Sign-in failed. Please try again.';
       }
     });
   }

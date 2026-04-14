@@ -2,45 +2,36 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { User } from './user';
+import { apiBase } from './auth.config';
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
-  private readonly apiBase = 'https://fn-comicBook-db-1703810588398.azurewebsites.net/api';
-
   constructor(private http: HttpClient) {}
 
-  register(name: string, email: string, address: string, phone: string, notes: string): Observable<any> {
-    return this.http.post(`${this.apiBase}/users/register`, { name, email, address, phone, notes });
-  }
-
   getPendingUsers(): Observable<User[]> {
-    return this.http.get<User[]>(`${this.apiBase}/users/pending`);
+    return this.http.get<User[]>(`${apiBase}/users/pending`);
   }
 
-  approveUser(id: string): Observable<{ pin: string; userId: string }> {
-    return this.http.post<{ pin: string; userId: string }>(`${this.apiBase}/users/${id}/approve`, {});
+  approveUser(id: string): Observable<{ userId: string; status: string }> {
+    return this.http.post<{ userId: string; status: string }>(`${apiBase}/users/${id}/approve`, {});
   }
 
   getApprovedUsers(): Observable<User[]> {
-    return this.http.get<User[]>(`${this.apiBase}/users`);
-  }
-
-  resetPin(id: string): Observable<{ pin: string; userId: string }> {
-    return this.http.post<{ pin: string; userId: string }>(`${this.apiBase}/users/${id}/reset-pin`, {});
+    return this.http.get<User[]>(`${apiBase}/users`);
   }
 
   suspendUser(id: string): Observable<any> {
-    return this.http.post(`${this.apiBase}/users/${id}/suspend`, {}, { responseType: 'text' });
+    return this.http.post(`${apiBase}/users/${id}/suspend`, {}, { responseType: 'text' });
   }
 
   reactivateUser(id: string): Observable<any> {
-    return this.http.post(`${this.apiBase}/users/${id}/reactivate`, {}, { responseType: 'text' });
+    return this.http.post(`${apiBase}/users/${id}/reactivate`, {}, { responseType: 'text' });
   }
 
   updateProfile(name: string, address: string, phone: string, notes: string, preferences: string,
                 venmoHandle: string, paypalHandle: string, ebayUsername: string,
                 cashAppHandle: string): Observable<User> {
-    return this.http.put<User>(`${this.apiBase}/users/me`, {
+    return this.http.put<User>(`${apiBase}/users/me`, {
       name, address, phone, notes, preferences,
       venmoHandle, paypalHandle, ebayUsername, cashAppHandle
     });

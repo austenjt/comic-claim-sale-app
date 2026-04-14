@@ -1,8 +1,9 @@
 package org.example.functions.util;
 
 import com.microsoft.azure.functions.HttpRequestMessage;
+import org.example.functions.auth.EntraJwtValidator;
 import org.example.functions.model.User;
-import org.example.functions.service.SessionService;
+import org.example.functions.model.UserIdentity;
 import org.example.functions.service.UserService;
 
 /** Shared authentication helpers used by all trigger classes. */
@@ -10,12 +11,26 @@ public final class AuthHelper {
 
     private AuthHelper() {}
 
-    /** Returns the authenticated User, or null if the session token is missing/invalid. */
+    /**
+     * Validates the Bearer token in the Authorization header and returns the
+     * corresponding CosmosDB User, or null if the token is missing/invalid or
+     * the user record does not exist / is not approved.
+     */
     public static User requireSession(HttpRequestMessage<?> request) {
-        String token = request.getHeaders().get("x-session-token");
-        String userId = SessionService.getServiceInstance().validateSession(token);
-        if (userId == null) return null;
-        return UserService.getServiceInstance().findById(userId).orElse(null);
+        String authHeader = request.getHeaders().get("authorization");
+        if (authHeader == null || !authHeader.toLowerCase().startsWith("bearer ")) {
+            return null;
+        }
+        String token = authHeader.substring(7).trim();
+
+        UserIdentity identity;
+        try {
+            identity = EntraJwtValidator.getInstance().validate(token);
+        } catch (Exception e) {
+            return null;
+        }
+
+        return UserService.getServiceInstance().findByEmail(identity.getEmail()).orElse(null);
     }
 
     /** Returns the authenticated User only if they are APPROVED (or admin), otherwise null. */
@@ -33,7 +48,7 @@ public final class AuthHelper {
         return user;
     }
 
-    /** Returns true if the request carries a valid admin session token. */
+    /** Returns true if the request carries a valid admin Bearer token. */
     public static boolean isAdminRequest(HttpRequestMessage<?> request) {
         User user = requireSession(request);
         return user != null && user.isAdmin();
