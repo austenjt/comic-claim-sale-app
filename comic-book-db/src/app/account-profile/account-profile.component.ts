@@ -5,9 +5,10 @@ import { User } from '../user';
 import { ConfigService } from '../config.service';
 
 @Component({
-  selector: 'app-account-profile',
-  templateUrl: './account-profile.component.html',
-  styleUrls: ['./account-profile.component.css']
+    selector: 'app-account-profile',
+    templateUrl: './account-profile.component.html',
+    styleUrls: ['./account-profile.component.css'],
+    standalone: false
 })
 export class AccountProfileComponent implements OnInit {
   name = '';

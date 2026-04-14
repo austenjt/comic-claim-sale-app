@@ -13,9 +13,10 @@ import { ConfigService } from '../config.service';
 import { Observable, of, map, Subscription } from 'rxjs';
 
 @Component({
-  selector: 'app-comic-detail',
-  templateUrl: './comic-detail.component.html',
-  styleUrls: [ './comic-detail.component.css' ]
+    selector: 'app-comic-detail',
+    templateUrl: './comic-detail.component.html',
+    styleUrls: ['./comic-detail.component.css'],
+    standalone: false
 })
 export class ComicDetailComponent implements OnInit, OnDestroy {
 

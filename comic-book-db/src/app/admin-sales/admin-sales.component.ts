@@ -4,9 +4,10 @@ import { Discount, DiscountType } from '../discount';
 import { CartService } from '../cart.service';
 
 @Component({
-  selector: 'app-admin-sales',
-  templateUrl: './admin-sales.component.html',
-  styleUrls: ['./admin-sales.component.css']
+    selector: 'app-admin-sales',
+    templateUrl: './admin-sales.component.html',
+    styleUrls: ['./admin-sales.component.css'],
+    standalone: false
 })
 export class AdminSalesComponent implements OnInit {
   discounts: Discount[] = [];

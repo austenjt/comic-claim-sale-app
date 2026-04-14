@@ -8,10 +8,9 @@ import { debounceTime, switchMap } from 'rxjs/operators';
 import { ValidationService, NumberValidationResult } from '../validation.service';
 
 @Component({
-  selector: 'app-number-cell-editor',
-  standalone: true,
-  imports: [FormsModule, CommonModule],
-  template: `
+    selector: 'app-number-cell-editor',
+    imports: [FormsModule, CommonModule],
+    template: `
     <div class="num-editor-wrap">
       <input #inputEl
              class="num-editor-input"
@@ -25,7 +24,7 @@ import { ValidationService, NumberValidationResult } from '../validation.service
       <div class="num-editor-hint"    *ngIf="!validating && !error">{{ hint }}</div>
     </div>
   `,
-  styles: [`
+    styles: [`
     .num-editor-wrap {
       display: flex;
       flex-direction: column;

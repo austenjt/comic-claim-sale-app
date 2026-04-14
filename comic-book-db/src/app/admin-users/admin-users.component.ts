@@ -3,9 +3,10 @@ import { UserService } from '../user.service';
 import { User } from '../user';
 
 @Component({
-  selector: 'app-admin-users',
-  templateUrl: './admin-users.component.html',
-  styleUrls: ['./admin-users.component.css']
+    selector: 'app-admin-users',
+    templateUrl: './admin-users.component.html',
+    styleUrls: ['./admin-users.component.css'],
+    standalone: false
 })
 export class AdminUsersComponent implements OnInit {
   pendingUsers: User[] = [];

@@ -3,9 +3,10 @@ import { CartService } from '../cart.service';
 import { ArchivedOrder } from '../archived-order';
 
 @Component({
-  selector: 'app-order-history',
-  templateUrl: './order-history.component.html',
-  styleUrls: ['./order-history.component.css']
+    selector: 'app-order-history',
+    templateUrl: './order-history.component.html',
+    styleUrls: ['./order-history.component.css'],
+    standalone: false
 })
 export class OrderHistoryComponent implements OnInit {
   orders: ArchivedOrder[] = [];

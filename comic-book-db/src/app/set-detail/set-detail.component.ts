@@ -12,9 +12,10 @@ import { LogService } from '../log.service';
 import { AuthService } from '../auth.service';
 
 @Component({
-  selector: 'app-set-detail',
-  templateUrl: './set-detail.component.html',
-  styleUrls: ['./set-detail.component.css']
+    selector: 'app-set-detail',
+    templateUrl: './set-detail.component.html',
+    styleUrls: ['./set-detail.component.css'],
+    standalone: false
 })
 export class SetDetailComponent implements OnInit {
 

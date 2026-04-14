@@ -3,9 +3,10 @@ import { HttpClient } from '@angular/common/http';
 import { ConfigService } from '../config.service';
 
 @Component({
-  selector: 'app-contact',
-  templateUrl: './contact.component.html',
-  styleUrls: ['./contact.component.css']
+    selector: 'app-contact',
+    templateUrl: './contact.component.html',
+    styleUrls: ['./contact.component.css'],
+    standalone: false
 })
 export class ContactComponent {
   private readonly apiBase = 'https://fn-comicBook-db-1703810588398.azurewebsites.net/api';

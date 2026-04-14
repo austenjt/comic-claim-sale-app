@@ -1,7 +1,7 @@
 import { NgModule, APP_INITIALIZER } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
-import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { ConfigService } from './config.service';
 import { HttpLoggingInterceptor } from './http-logging.interceptor';
 import { AuthInterceptor } from './auth.interceptor';
@@ -30,45 +30,39 @@ import { ContactComponent } from './contact/contact.component';
 import { SetDetailComponent } from './set-detail/set-detail.component';
 import { DashboardHeaderComponent } from './dashboard-header/dashboard-header.component';
 
-@NgModule({
-  declarations: [
-    AppComponent,
-    DashboardComponent,
-    ManagementComponent,
-    ComicDetailComponent,
-    MessagesComponent,
-    ComicSearchComponent,
-    LoadGoCollectFormComponent,
-    LoginComponent,
-    AccountRequestComponent,
-    AdminUsersComponent,
-    HowItWorksComponent,
-    CartComponent,
-    AdminOrdersComponent,
-    AccountProfileComponent,
-    OrderHistoryComponent,
-    AdminSalesComponent,
-    ContactComponent,
-    SetDetailComponent,
-    DashboardHeaderComponent
-  ],
-  imports: [
-    BrowserModule,
-    FormsModule,
-    AppRoutingModule,
-    HttpClientModule,
-    StandaloneListComponent
-  ],
-  providers: [
-    { provide: HTTP_INTERCEPTORS, useClass: HttpLoggingInterceptor, multi: true },
-    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
-    {
-      provide: APP_INITIALIZER,
-      useFactory: (configService: ConfigService) => () => configService.load(),
-      deps: [ConfigService],
-      multi: true
-    }
-  ],
-  bootstrap: [ AppComponent ]
-})
+@NgModule({ declarations: [
+        AppComponent,
+        DashboardComponent,
+        ManagementComponent,
+        ComicDetailComponent,
+        MessagesComponent,
+        ComicSearchComponent,
+        LoadGoCollectFormComponent,
+        LoginComponent,
+        AccountRequestComponent,
+        AdminUsersComponent,
+        HowItWorksComponent,
+        CartComponent,
+        AdminOrdersComponent,
+        AccountProfileComponent,
+        OrderHistoryComponent,
+        AdminSalesComponent,
+        ContactComponent,
+        SetDetailComponent,
+        DashboardHeaderComponent
+    ],
+    bootstrap: [AppComponent], imports: [BrowserModule,
+        FormsModule,
+        AppRoutingModule,
+        StandaloneListComponent], providers: [
+        { provide: HTTP_INTERCEPTORS, useClass: HttpLoggingInterceptor, multi: true },
+        { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
+        {
+            provide: APP_INITIALIZER,
+            useFactory: (configService: ConfigService) => () => configService.load(),
+            deps: [ConfigService],
+            multi: true
+        },
+        provideHttpClient(withInterceptorsFromDi())
+    ] })
 export class AppModule { }

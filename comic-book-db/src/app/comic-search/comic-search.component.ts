@@ -10,9 +10,10 @@ import { Comic } from '../comic';
 import { ComicService } from '../comic.service';
 
 @Component({
-  selector: 'app-comic-search',
-  templateUrl: './comic-search.component.html',
-  styleUrls: [ './comic-search.component.css' ]
+    selector: 'app-comic-search',
+    templateUrl: './comic-search.component.html',
+    styleUrls: ['./comic-search.component.css'],
+    standalone: false
 })
 export class ComicSearchComponent implements OnInit {
 

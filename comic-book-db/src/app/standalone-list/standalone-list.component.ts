@@ -12,11 +12,10 @@ import { DeleteButtonCellRendererComponent } from './delete-button-cell-renderer
 import { NumberCellEditorComponent } from './number-cell-editor.component';
 
 @Component({
-  selector: 'app-standalone-list',
-  templateUrl: './standalone-list.component.html',
-  styleUrls: ['./standalone-list.component.css'],
-  standalone: true,
-  imports: [AgGridModule, DeleteButtonCellRendererComponent, NumberCellEditorComponent, FormsModule, CommonModule]
+    selector: 'app-standalone-list',
+    templateUrl: './standalone-list.component.html',
+    styleUrls: ['./standalone-list.component.css'],
+    imports: [AgGridModule, FormsModule, CommonModule]
 })
 export class StandaloneListComponent implements OnInit, OnDestroy {
 

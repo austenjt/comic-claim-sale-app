@@ -5,9 +5,10 @@ import { ArchivedOrder } from '../archived-order';
 import { ConfigService } from '../config.service';
 
 @Component({
-  selector: 'app-admin-orders',
-  templateUrl: './admin-orders.component.html',
-  styleUrls: ['./admin-orders.component.css']
+    selector: 'app-admin-orders',
+    templateUrl: './admin-orders.component.html',
+    styleUrls: ['./admin-orders.component.css'],
+    standalone: false
 })
 export class AdminOrdersComponent implements OnInit {
   orders: Cart[] = [];

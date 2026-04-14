@@ -3,9 +3,10 @@ import { ComicService, CsvUploadResult } from '../comic.service';
 import { Comic } from '../comic';
 
 @Component({
-  selector: 'app-load-gocollect-form',
-  templateUrl: './load-gocollect-form.component.html',
-  styleUrls: ['./load-gocollect-form.component.css']
+    selector: 'app-load-gocollect-form',
+    templateUrl: './load-gocollect-form.component.html',
+    styleUrls: ['./load-gocollect-form.component.css'],
+    standalone: false
 })
 export class LoadGoCollectFormComponent {
 

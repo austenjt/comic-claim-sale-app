@@ -2,9 +2,10 @@ import { Component } from '@angular/core';
 import { UserService } from '../user.service';
 
 @Component({
-  selector: 'app-account-request',
-  templateUrl: './account-request.component.html',
-  styleUrls: ['./account-request.component.css']
+    selector: 'app-account-request',
+    templateUrl: './account-request.component.html',
+    styleUrls: ['./account-request.component.css'],
+    standalone: false
 })
 export class AccountRequestComponent {
   name = '';
