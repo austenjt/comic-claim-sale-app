@@ -377,3 +377,14 @@
   font-size: 0.85rem;
   margin-bottom: 8px;
 }
+
+.qa-field.qa-field-error label {
+  color: #c0634c;
+}
+
+.qa-field.qa-field-error input[type="text"],
+.qa-field.qa-field-error input[type="number"],
+.qa-field.qa-field-error select {
+  border-color: #c0634c;
+  background: #f9ece8;
+}

@@ -132,7 +132,7 @@ public class DiscountService {
                 case "RAW_PERCENTAGE": {
                     double savings = subtotal * d.getPercentageOff() / 100.0;
                     totalSavings += savings;
-                    descriptions.add(String.format("%.0f%% off (%.2f)", d.getPercentageOff(), savings));
+                    descriptions.add(String.format("%.0f%% off ($-%.2f)", d.getPercentageOff(), savings));
                     break;
                 }
                 case "BUY_X_GET_ONE_FREE": {
@@ -145,7 +145,7 @@ public class DiscountService {
                         double savings = prices.subList(0, Math.min(freeCount, prices.size()))
                             .stream().mapToDouble(Double::doubleValue).sum();
                         totalSavings += savings;
-                        descriptions.add(String.format("Buy %d get 1 free (%d free, -%.2f)", d.getXBooks(), freeCount, savings));
+                        descriptions.add(String.format("Buy %d get 1 free (%d free, $-%.2f)", d.getXBooks(), freeCount, savings));
                     }
                     break;
                 }
@@ -155,7 +155,7 @@ public class DiscountService {
                     if (effectivePct > 0) {
                         double savings = subtotal * effectivePct / 100.0;
                         totalSavings += savings;
-                        descriptions.add(String.format("%.0f%% per %d books (%.0f%% total, -%.2f)", d.getPercentageOff(), d.getXBooks(), effectivePct, savings));
+                        descriptions.add(String.format("%.0f%% off per %d books (%.0f%% total, $-%.2f)", d.getPercentageOff(), d.getXBooks(), effectivePct, savings));
                     }
                     break;
                 }

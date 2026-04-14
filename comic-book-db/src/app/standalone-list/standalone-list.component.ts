@@ -635,6 +635,7 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
   qaSaving = false;
   qaSuccess: string | false = false;
   qaError = '';
+  qaShowFieldErrors = false;
   qaSeries: string[] = [];
   private qaLastSeries = '';
 
@@ -696,18 +697,22 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
   }
 
   qaNext() {
+    this.qaShowFieldErrors = true;
     this.qaError = '';
     if (!this.qa.title.trim()) { this.qaError = 'Title is required.'; return; }
+    this.qaShowFieldErrors = false;
     this.qaStep = 2;
   }
 
   qaToGraded() {
+    this.qaShowFieldErrors = true;
     this.qaError = '';
     if (!this.qa.title.trim()) { this.qaError = 'Title is required.'; return; }
     if (!this.qa.number.trim()) { this.qaError = 'Number is required.'; return; }
     if (this.qa.isForSale && (this.qa.salePrice === null || this.qa.salePrice === undefined)) {
       this.qaError = 'Sale Price is required when For Sale is checked.'; return;
     }
+    this.qaShowFieldErrors = false;
     this.qaStep = 3;
   }
 
@@ -718,6 +723,7 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
     this.qaSaving = false;
     this.qaSuccess = false;
     this.qaError = '';
+    this.qaShowFieldErrors = false;
     this.qa = {
       title: '', series: this.qaLastSeries, number: '', publisher: '', era: '', publishedDate: '',
       variant: '', barCode: '', printRun: null, keyIssue: '', writer: '', artist: '',
@@ -729,8 +735,11 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
   }
 
   qaSave() {
-    this.qaSaving = true;
+    this.qaShowFieldErrors = true;
     this.qaError = '';
+    if (!this.qaCanSave) return;
+    this.qaShowFieldErrors = false;
+    this.qaSaving = true;
     const numRaw = this.qa.number.trim();
     const parsedNum = parseFloat(numRaw);
     const comicNumber = numRaw === ''

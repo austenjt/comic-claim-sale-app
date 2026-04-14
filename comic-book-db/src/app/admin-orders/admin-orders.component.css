@@ -1,5 +1,16 @@
 .orders-container { padding: 24px; max-width: 900px; margin: 0 auto; }
 
+.price-original {
+  text-decoration: line-through;
+  color: #aaa;
+  margin-right: 4px;
+}
+
+.price-discounted {
+  color: #4caf50;
+  font-weight: 600;
+}
+
 .item-count-label {
   font-size: 0.8rem;
   font-weight: 400;

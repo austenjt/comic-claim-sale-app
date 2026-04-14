@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CartService } from '../cart.service';
-import { Cart } from '../cart';
-import { ArchivedOrder } from '../archived-order';
+import { Cart, CartItem } from '../cart';
+import { ArchivedOrder, ArchivedOrderItem } from '../archived-order';
 import { ConfigService } from '../config.service';
 
 @Component({
@@ -182,6 +182,32 @@ export class AdminOrdersComponent implements OnInit {
 
   itemsTotal(items: { price: number }[]): number {
     return items.reduce((sum, item) => sum + item.price, 0);
+  }
+
+  showItemDiscounts(cart: Cart): boolean {
+    return (cart.discountAmount ?? 0) > 0 && cart.status !== 'OPEN';
+  }
+
+  showArchivedItemDiscounts(order: ArchivedOrder): boolean {
+    return (order.discountAmount ?? 0) > 0;
+  }
+
+  discountedItemPrice(item: CartItem, cart: Cart): number {
+    if (item.wonViaBid) return item.price;
+    const discount = cart.discountAmount ?? 0;
+    const visibleNonBid = cart.items.filter(i => !i.isSetContainer && !i.wonViaBid);
+    const base = visibleNonBid.reduce((sum, i) => sum + i.price, 0);
+    if (discount <= 0 || base <= 0) return item.price;
+    const factor = Math.max(0, base - discount) / base;
+    return Math.round(item.price * factor * 100) / 100;
+  }
+
+  discountedArchivedItemPrice(item: ArchivedOrderItem, order: ArchivedOrder): number {
+    const discount = order.discountAmount ?? 0;
+    const base = order.items.reduce((sum, i) => sum + i.price, 0);
+    if (discount <= 0 || base <= 0) return item.price;
+    const factor = Math.max(0, base - discount) / base;
+    return Math.round(item.price * factor * 100) / 100;
   }
 
   cartTotal(cart: Cart): number {

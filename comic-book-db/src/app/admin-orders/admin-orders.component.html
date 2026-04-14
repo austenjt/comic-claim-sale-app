@@ -29,7 +29,13 @@
         <ng-container *ngFor="let item of order.items">
           <tr *ngIf="!item.isSetContainer">
             <td><a [routerLink]="['/detail', item.comicId]">{{ item.comicTitle }}{{ item.comicNumber ? ' ' + item.comicNumber : '' }}</a><span *ngIf="item.collectionGroup && item.collectionGroup > 0" class="set-tag">Set {{ item.collectionGroup }}</span></td>
-            <td>{{ item.price | currency }}</td>
+            <td>
+              <ng-container *ngIf="showItemDiscounts(order) && !item.wonViaBid; else plainOrderPrice">
+                <span class="price-original">{{ item.price | currency }}</span>
+                <span class="price-discounted">{{ discountedItemPrice(item, order) | currency }}</span>
+              </ng-container>
+              <ng-template #plainOrderPrice>{{ item.price | currency }}</ng-template>
+            </td>
             <td>{{ item.claimedAt | date:'short' }}</td>
             <td>
               <button *ngIf="!item.wonViaBid && !(item.collectionGroup && item.collectionGroup > 0)"
@@ -194,7 +200,13 @@
       <tbody>
         <tr *ngFor="let item of order.items">
           <td>{{ item.comicTitle }}{{ item.comicNumber ? ' ' + item.comicNumber : '' }}</td>
-          <td>{{ item.price | currency }}</td>
+          <td>
+            <ng-container *ngIf="showArchivedItemDiscounts(order); else plainArchivedPrice">
+              <span class="price-original">{{ item.price | currency }}</span>
+              <span class="price-discounted">{{ discountedArchivedItemPrice(item, order) | currency }}</span>
+            </ng-container>
+            <ng-template #plainArchivedPrice>{{ item.price | currency }}</ng-template>
+          </td>
           <td>{{ item.claimedAt | date:'short' }}</td>
         </tr>
       </tbody>

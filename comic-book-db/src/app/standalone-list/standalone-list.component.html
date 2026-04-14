@@ -11,7 +11,7 @@
 
   <!-- Step 1 — Identity -->
   <div *ngIf="qaStep === 1" class="qa-fields">
-    <div class="qa-field">
+    <div class="qa-field" [class.qa-field-error]="qaShowFieldErrors && !qa.title.trim()">
       <label>Title</label>
       <input type="text" [(ngModel)]="qa.title" (blur)="qaDefaultSeries()" placeholder="e.g. Amazing Spider-Man" />
     </div>
@@ -22,7 +22,7 @@
         <option *ngFor="let s of qaSeries" [value]="s"></option>
       </datalist>
     </div>
-    <div class="qa-field">
+    <div class="qa-field" [class.qa-field-error]="qaShowFieldErrors && !qa.number.trim()">
       <label>Number</label>
       <input type="text" [(ngModel)]="qa.number" placeholder="e.g. 1, 121, NN" />
     </div>
@@ -72,7 +72,7 @@
 
   <!-- Step 2 — Pricing / Acquisition / Notes -->
   <div *ngIf="qaStep === 2" class="qa-fields">
-    <div class="qa-field">
+    <div class="qa-field" [class.qa-field-error]="qaShowFieldErrors && qa.isForSale && (qa.salePrice === null || qa.salePrice === undefined)">
       <label>Sale Price ($)</label>
       <input type="number" [(ngModel)]="qa.salePrice" min="0" step="0.25" placeholder="leave blank if not priced" />
     </div>
@@ -124,14 +124,14 @@
 
   <!-- Step 3 — Grading -->
   <div *ngIf="qaStep === 3" class="qa-fields">
-    <div class="qa-field">
+    <div class="qa-field" [class.qa-field-error]="qaShowFieldErrors && !qa.gradingCompany">
       <label>Grading Company</label>
       <select [(ngModel)]="qa.gradingCompany">
         <option value="">— select —</option>
         <option *ngFor="let gc of enums.gradingCompanies" [value]="gc">{{ gc }}</option>
       </select>
     </div>
-    <div class="qa-field">
+    <div class="qa-field" [class.qa-field-error]="qaShowFieldErrors && (qa.grade === null || qa.grade === undefined)">
       <label>Grade</label>
       <select [(ngModel)]="qa.grade">
         <option [ngValue]="null">— select —</option>
@@ -162,12 +162,12 @@
   <div class="qa-actions">
     <button *ngIf="qaStep > 1" class="qa-btn qa-btn-back" (click)="qaBack()">&#8592; Back</button>
     <button class="qa-btn qa-btn-reset" (click)="qaReset()">Clear</button>
-    <button *ngIf="qaStep === 1" class="qa-btn qa-btn-next" (click)="qaNext()" [disabled]="!qaCanNext">Next &#8594;</button>
-    <button *ngIf="qaStep === 2" class="qa-btn qa-btn-save" (click)="qaSave()" [disabled]="qaSaving || !qaCanSave">
+    <button *ngIf="qaStep === 1" class="qa-btn qa-btn-next" (click)="qaNext()">Next &#8594;</button>
+    <button *ngIf="qaStep === 2" class="qa-btn qa-btn-save" (click)="qaSave()" [disabled]="qaSaving">
       {{ qaSaving ? 'Saving…' : 'Save' }}
     </button>
     <button *ngIf="qaStep === 2" class="qa-btn qa-btn-graded" (click)="qaToGraded()">Graded &#8594;</button>
-    <button *ngIf="qaStep === 3" class="qa-btn qa-btn-save" (click)="qaSave()" [disabled]="qaSaving || !qaCanSave">
+    <button *ngIf="qaStep === 3" class="qa-btn qa-btn-save" (click)="qaSave()" [disabled]="qaSaving">
       {{ qaSaving ? 'Saving…' : 'Save' }}
     </button>
   </div>
