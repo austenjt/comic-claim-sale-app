@@ -23,6 +23,5 @@ export class DashboardHeaderComponent {
   @Output() biddableOnlyChange = new EventEmitter<boolean>();
   @Input() sortOrder: string = 'oldest-first';
   @Output() sortOrderChange = new EventEmitter<string>();
-  @Output() prevPage = new EventEmitter<void>();
-  @Output() nextPage = new EventEmitter<void>();
+  @Output() goToPage = new EventEmitter<number>();
 }

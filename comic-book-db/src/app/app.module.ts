@@ -40,6 +40,7 @@ import { AdminSalesComponent } from './admin-sales/admin-sales.component';
 import { ContactComponent } from './contact/contact.component';
 import { SetDetailComponent } from './set-detail/set-detail.component';
 import { DashboardHeaderComponent } from './dashboard-header/dashboard-header.component';
+import { PaginationBarComponent } from './pagination-bar/pagination-bar.component';
 
 @NgModule({
     declarations: [
@@ -63,6 +64,7 @@ import { DashboardHeaderComponent } from './dashboard-header/dashboard-header.co
         ContactComponent,
         SetDetailComponent,
         DashboardHeaderComponent,
+        PaginationBarComponent,
     ],
     bootstrap: [AppComponent],
     imports: [

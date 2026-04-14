@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.functions.client.CosmosDbClient;
 import org.example.functions.model.User;
 import org.example.functions.model.UserIdentity;
+import org.example.functions.model.UserStatus;
 import org.example.functions.util.EnvHelper;
 import org.example.functions.util.Mappers;
 
@@ -51,13 +52,13 @@ public class UserService {
         user.setName(identity.getDisplayName() != null ? identity.getDisplayName() : identity.getEmail());
         user.setEmail(identity.getEmail());
         user.setEntraOid(identity.getOid());
-        user.setStatus("PENDING");
+        user.setStatus(UserStatus.PENDING);
         user.setCreatedDate(Instant.now().toString());
 
         String adminEmail = EnvHelper.getAdminEmail();
         if (adminEmail != null && adminEmail.equalsIgnoreCase(identity.getEmail())) {
             user.setAdmin(true);
-            user.setStatus("APPROVED");
+            user.setStatus(UserStatus.APPROVED);
             user.setApprovedDate(Instant.now().toString());
         }
 
@@ -132,7 +133,7 @@ public class UserService {
             throw new IllegalArgumentException("User not found: " + userId);
         }
         User user = optUser.get();
-        user.setStatus("APPROVED");
+        user.setStatus(UserStatus.APPROVED);
         user.setApprovedDate(Instant.now().toString());
 
         saveUser(user);
@@ -189,7 +190,7 @@ public class UserService {
     public void suspendUser(String userId) {
         User user = findById(userId)
             .orElseThrow(() -> new IllegalArgumentException("User not found: " + userId));
-        user.setStatus("SUSPENDED");
+        user.setStatus(UserStatus.SUSPENDED);
         saveUser(user);
         log.info("Suspended user: {}", userId);
     }
@@ -197,7 +198,7 @@ public class UserService {
     public void reactivateUser(String userId) {
         User user = findById(userId)
             .orElseThrow(() -> new IllegalArgumentException("User not found: " + userId));
-        user.setStatus("APPROVED");
+        user.setStatus(UserStatus.APPROVED);
         saveUser(user);
         log.info("Reactivated user: {}", userId);
     }

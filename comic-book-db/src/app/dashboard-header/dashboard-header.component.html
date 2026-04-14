@@ -37,9 +37,9 @@
       </div>
     </div>
   </div>
-  <div *ngIf="totalPages > 1" class="pagination-bar">
-    <button class="pagination-btn" (click)="prevPage.emit()" [disabled]="currentPage === 1">&#8249; Prev</button>
-    <span class="pagination-label">Page {{ currentPage }} of {{ totalPages }}</span>
-    <button class="pagination-btn" (click)="nextPage.emit()" [disabled]="currentPage === totalPages">Next &#8250;</button>
-  </div>
+  <app-pagination-bar
+    [currentPage]="currentPage"
+    [totalPages]="totalPages"
+    (goToPage)="goToPage.emit($event)">
+  </app-pagination-bar>
 </div>

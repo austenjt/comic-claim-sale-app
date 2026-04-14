@@ -4,6 +4,7 @@ import com.microsoft.azure.functions.HttpRequestMessage;
 import org.example.functions.auth.EntraJwtValidator;
 import org.example.functions.model.User;
 import org.example.functions.model.UserIdentity;
+import org.example.functions.model.UserStatus;
 import org.example.functions.service.UserService;
 
 /** Shared authentication helpers used by all trigger classes. */
@@ -37,7 +38,7 @@ public final class AuthHelper {
     public static User requireApproved(HttpRequestMessage<?> request) {
         User user = requireSession(request);
         if (user == null) return null;
-        if (!"APPROVED".equals(user.getStatus()) && !user.isAdmin()) return null;
+        if (UserStatus.APPROVED != user.getStatus() && !user.isAdmin()) return null;
         return user;
     }
 

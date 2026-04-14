@@ -7,8 +7,7 @@
   [(showPricedOnly)]="showPricedOnly"
   [(biddableOnly)]="biddableOnly"
   [(sortOrder)]="sortOrder"
-  (prevPage)="prevPage()"
-  (nextPage)="nextPage()">
+  (goToPage)="goToPage($event)">
 </app-dashboard-header>
 
 <!-- Award modal -->
@@ -237,11 +236,11 @@
   </ng-container>
 </div>
 
-<div *ngIf="totalPages > 1" class="pagination-bar">
-  <button class="pagination-btn" (click)="prevPage()" [disabled]="currentPage === 1">&#8249; Prev</button>
-  <span class="pagination-label">Page {{ currentPage }} of {{ totalPages }}</span>
-  <button class="pagination-btn" (click)="nextPage()" [disabled]="currentPage === totalPages">Next &#8250;</button>
-</div>
+<app-pagination-bar
+  [currentPage]="currentPage"
+  [totalPages]="totalPages"
+  (goToPage)="goToPage($event)">
+</app-pagination-bar>
 
 <footer class="dashboard-footer">
   <div class="footer-main-row">

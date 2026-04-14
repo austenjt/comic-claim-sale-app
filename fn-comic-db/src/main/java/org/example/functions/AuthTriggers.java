@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.functions.auth.EntraJwtValidator;
 import org.example.functions.model.User;
 import org.example.functions.model.UserIdentity;
+import org.example.functions.model.UserStatus;
 import org.example.functions.service.UserService;
 import org.example.functions.util.Mappers;
 
@@ -90,13 +91,13 @@ public class AuthTriggers {
                 user.setEntraOid(identity.getOid());
             }
 
-            if ("SUSPENDED".equals(user.getStatus())) {
+            if (UserStatus.SUSPENDED == user.getStatus()) {
                 return cors(request.createResponseBuilder(HttpStatus.FORBIDDEN))
                     .body("Account suspended")
                     .build();
             }
 
-            if ("PENDING".equals(user.getStatus())) {
+            if (UserStatus.PENDING == user.getStatus()) {
                 return cors(request.createResponseBuilder(HttpStatus.FORBIDDEN))
                     .body("Account pending approval")
                     .build();
@@ -129,7 +130,7 @@ public class AuthTriggers {
         node.put("paypalHandle",  user.getPaypalHandle());
         node.put("ebayUsername",  user.getEbayUsername());
         node.put("cashAppHandle", user.getCashAppHandle());
-        node.put("status",        user.getStatus());
+        node.put("status",        user.getStatus() != null ? user.getStatus().getValue() : null);
         node.put("isAdmin",       user.isAdmin());
         node.put("createdDate",   user.getCreatedDate());
         node.put("approvedDate",  user.getApprovedDate());

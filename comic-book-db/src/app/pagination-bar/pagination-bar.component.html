@@ -1,0 +1,22 @@
+<div class="pagination-bar" *ngIf="totalPages > 1">
+  <button class="page-btn page-nav"
+          (click)="goToPage.emit(currentPage - 1)"
+          [disabled]="currentPage === 1"
+          title="Previous page">&#8249;</button>
+
+  <ng-container *ngFor="let p of pages">
+    <span *ngIf="p === null" class="page-ellipsis">…</span>
+    <button *ngIf="p !== null"
+            class="page-btn"
+            [class.page-btn-active]="p === currentPage"
+            (click)="goToPage.emit(p)"
+            [disabled]="p === currentPage">
+      {{ p }}
+    </button>
+  </ng-container>
+
+  <button class="page-btn page-nav"
+          (click)="goToPage.emit(currentPage + 1)"
+          [disabled]="currentPage === totalPages"
+          title="Next page">&#8250;</button>
+</div>

@@ -207,22 +207,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }, 10000);
   }
 
-  nextPage(): void {
-    if (this.currentPage < this.totalPages) {
-      this.currentPage++;
-      this.savePrefs();
-      this.loadPage();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-  }
-
-  prevPage(): void {
-    if (this.currentPage > 1) {
-      this.currentPage--;
-      this.savePrefs();
-      this.loadPage();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
+  goToPage(page: number): void {
+    if (page < 1 || page > this.totalPages || page === this.currentPage) return;
+    this.currentPage = page;
+    this.savePrefs();
+    this.loadPage();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   // ─── Bidding helpers ───────────────────────────────────────────────────────
