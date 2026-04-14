@@ -174,6 +174,33 @@
   font-style: italic;
 }
 
+.sl-field-hint {
+  font-size: 0.75rem;
+  color: #7b8f4b;
+  font-style: italic;
+}
+
+.sl-modal-field input[readonly] {
+  background: #c8d4a8;
+  color: #79675c;
+  cursor: default;
+}
+
+.sl-item-row-plain {
+  cursor: default;
+}
+
+.sl-item-row-plain:hover {
+  background: inherit;
+}
+
+.sl-item-count {
+  font-size: 0.75rem;
+  color: #79675c;
+  margin-left: auto;
+  white-space: nowrap;
+}
+
 .sl-search-input {
   width: 100%;
   box-sizing: border-box;

@@ -24,6 +24,11 @@
                 "glob": "staticwebapp.config.json",
                 "input": "src",
                 "output": "/"
+              },
+              {
+                "glob": "sitemap.xml",
+                "input": "src",
+                "output": "/"
               }
             ],
             "styles": [

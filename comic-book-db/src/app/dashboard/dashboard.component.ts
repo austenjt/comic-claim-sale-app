@@ -1,4 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Title, Meta } from '@angular/platform-browser';
 import { Comic, PagedResponse } from '../comic';
 import { ComicService } from '../comic.service';
 import { ImageService } from '../image.service';
@@ -119,7 +120,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
     private cartService: CartService,
     public logService: LogService,
     private userService: UserService,
-    public configService: ConfigService
+    public configService: ConfigService,
+    private title: Title,
+    private meta: Meta,
   ) {}
 
   private savePrefs(): void {
@@ -146,6 +149,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.title.setTitle('Comics for Sale — Lightning Comics PDX');
+    this.meta.updateTag({ name: 'description', content: 'Browse graded and raw comics available for claim. CGC, CBCS, and raw books from Golden Age to Modern. Oregon City, OR.' });
     this.restorePrefs();
     this.loadPage();
     this.loadClaimedMap();

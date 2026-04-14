@@ -1,4 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Title, Meta } from '@angular/platform-browser';
 import { ActivatedRoute } from '@angular/router';
 import { Location } from '@angular/common';
 
@@ -57,7 +58,9 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
     private logService: LogService,
     public auth: AuthService,
     public configService: ConfigService,
-    private location: Location
+    private location: Location,
+    private titleService: Title,
+    private meta: Meta,
   ) {}
 
   get activeLargeImageId(): string | null | undefined {
@@ -302,12 +305,28 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
     });
   }
 
+  private buildPageMeta(comic: Comic): void {
+    const heading = this.comicHeading;
+    const parts: string[] = [];
+    if (comic.era) parts.push(comic.era);
+    if (comic.comicCondition?.cgcCondition?.grade) parts.push(`CGC ${comic.comicCondition.cgcCondition.grade}`);
+    else if (comic.comicCondition?.cbcsCondition?.grade) parts.push(`CBCS ${comic.comicCondition.cbcsCondition.grade}`);
+    else if (comic.comicCondition?.notCertifiedGrade) parts.push(`Grade ${comic.comicCondition.notCertifiedGrade}`);
+    if (comic.publisher) parts.push(comic.publisher);
+    const desc = parts.length
+      ? `${heading}. ${parts.join(', ')}. Available for claim at Lightning Comics PDX.`
+      : `${heading}. Available for claim at Lightning Comics PDX in Oregon City, OR.`;
+    this.titleService.setTitle(`${heading} — Lightning Comics PDX`);
+    this.meta.updateTag({ name: 'description', content: desc });
+  }
+
   getComic(): void {
     const id = parseInt(this.route.snapshot.paramMap.get('id')!, 10);
     this.comicService.getComic(id)
       .subscribe(comic => {
         this.comic = comic;
         this.loading = false;
+        if (comic) this.buildPageMeta(comic);
         if (comic?.bidStartedAt) {
           const endsAt = new Date(comic.bidStartedAt).getTime() +
                          this.configService.biddingCycleMins * 60000;

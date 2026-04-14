@@ -590,10 +590,17 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
   // ── Add Set modal ─────────────────────────────────────────────────────────
   showAddSetModal = false;
   addSetCollectionGroup: number | null = null;
+  addSetGroupAutoSet = false;
   addSetName = '';
   addSetSaving = false;
   addSetError = '';
   addSetExistingGroups: number[] = [];
+
+  // ── View Sets modal ───────────────────────────────────────────────────────
+  showViewSetsModal = false;
+  viewSetsList: Comic[] = [];
+  viewSetsLoading = false;
+  viewSetsError = '';
 
   // ── Delete Set modal ──────────────────────────────────────────────────────
   showDeleteSetModal = false;
@@ -664,8 +671,37 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
     if (!this.qa.series && !this.qaLastSeries) this.qa.series = this.qa.title;
   }
 
-  qaNext() { this.qaStep = 2; }
-  qaToGraded() { this.qaStep = 3; }
+  get qaCanNext(): boolean {
+    return !!this.qa.title.trim();
+  }
+
+  get qaCanSave(): boolean {
+    if (!this.qa.title.trim()) return false;
+    if (!this.qa.number.trim()) return false;
+    if (this.qa.isForSale && (this.qa.salePrice === null || this.qa.salePrice === undefined)) return false;
+    if (this.qaStep === 3) {
+      if (!this.qa.gradingCompany) return false;
+      if (this.qa.grade === null || this.qa.grade === undefined) return false;
+    }
+    return true;
+  }
+
+  qaNext() {
+    this.qaError = '';
+    if (!this.qa.title.trim()) { this.qaError = 'Title is required.'; return; }
+    this.qaStep = 2;
+  }
+
+  qaToGraded() {
+    this.qaError = '';
+    if (!this.qa.title.trim()) { this.qaError = 'Title is required.'; return; }
+    if (!this.qa.number.trim()) { this.qaError = 'Number is required.'; return; }
+    if (this.qa.isForSale && (this.qa.salePrice === null || this.qa.salePrice === undefined)) {
+      this.qaError = 'Sale Price is required when For Sale is checked.'; return;
+    }
+    this.qaStep = 3;
+  }
+
   qaBack() { this.qaStep--; }
 
   qaReset() {
@@ -902,12 +938,18 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
 
   openAddSet(): void {
     this.addSetCollectionGroup = null;
+    this.addSetGroupAutoSet = false;
     this.addSetName = '';
     this.addSetError = '';
     this.comicService.getSets().subscribe(sets => {
       this.addSetExistingGroups = sets
         .filter(c => c.collectionGroup != null)
         .map(c => c.collectionGroup!);
+      const next = this.addSetExistingGroups.length > 0
+        ? Math.max(...this.addSetExistingGroups) + 1
+        : 1;
+      this.addSetCollectionGroup = next;
+      this.addSetGroupAutoSet = true;
     });
     this.showAddSetModal = true;
   }
@@ -915,9 +957,28 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
   cancelAddSet(): void {
     this.showAddSetModal = false;
     this.addSetCollectionGroup = null;
+    this.addSetGroupAutoSet = false;
     this.addSetName = '';
     this.addSetError = '';
     this.addSetExistingGroups = [];
+  }
+
+  openViewSets(): void {
+    this.showViewSetsModal = true;
+    this.viewSetsLoading = true;
+    this.viewSetsError = '';
+    this.comicService.getSets().subscribe({
+      next: sets => {
+        this.viewSetsList = sets
+          .filter(c => c.docType === 'SET')
+          .sort((a, b) => (a.collectionGroup ?? 0) - (b.collectionGroup ?? 0));
+        this.viewSetsLoading = false;
+      },
+      error: () => {
+        this.viewSetsError = 'Failed to load sets.';
+        this.viewSetsLoading = false;
+      }
+    });
   }
 
   confirmAddSet(): void {

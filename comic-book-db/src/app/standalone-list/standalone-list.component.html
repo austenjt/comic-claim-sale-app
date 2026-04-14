@@ -162,12 +162,12 @@
   <div class="qa-actions">
     <button *ngIf="qaStep > 1" class="qa-btn qa-btn-back" (click)="qaBack()">&#8592; Back</button>
     <button class="qa-btn qa-btn-reset" (click)="qaReset()">Clear</button>
-    <button *ngIf="qaStep === 1" class="qa-btn qa-btn-next" (click)="qaNext()">Next &#8594;</button>
-    <button *ngIf="qaStep === 2" class="qa-btn qa-btn-save" (click)="qaSave()" [disabled]="qaSaving">
+    <button *ngIf="qaStep === 1" class="qa-btn qa-btn-next" (click)="qaNext()" [disabled]="!qaCanNext">Next &#8594;</button>
+    <button *ngIf="qaStep === 2" class="qa-btn qa-btn-save" (click)="qaSave()" [disabled]="qaSaving || !qaCanSave">
       {{ qaSaving ? 'Saving…' : 'Save' }}
     </button>
     <button *ngIf="qaStep === 2" class="qa-btn qa-btn-graded" (click)="qaToGraded()">Graded &#8594;</button>
-    <button *ngIf="qaStep === 3" class="qa-btn qa-btn-save" (click)="qaSave()" [disabled]="qaSaving">
+    <button *ngIf="qaStep === 3" class="qa-btn qa-btn-save" (click)="qaSave()" [disabled]="qaSaving || !qaCanSave">
       {{ qaSaving ? 'Saving…' : 'Save' }}
     </button>
   </div>
@@ -183,6 +183,7 @@
     <button class="toolbar-btn add-btn" (click)="openAddSet()">Add Set</button>
     <button class="toolbar-btn add-btn" (click)="openAddToSet()">Add To Set</button>
     <button class="toolbar-btn delete-btn" (click)="openDeleteSet()">Delete Set</button>
+    <button class="toolbar-btn" (click)="openViewSets()">View Sets</button>
   </div>
 </div>
 <!-- ───────────────────────────────────────────────────────────────────────── -->
@@ -198,7 +199,8 @@
     </div>
     <div class="sl-modal-field">
       <label>Collection Group ID</label>
-      <input type="number" [(ngModel)]="addSetCollectionGroup" min="1" max="9999" placeholder="e.g. 5" />
+      <input type="number" [(ngModel)]="addSetCollectionGroup" min="1" max="9999" placeholder="e.g. 5" [readonly]="addSetGroupAutoSet" />
+      <span *ngIf="addSetGroupAutoSet" class="sl-field-hint">Auto-assigned — next available ID</span>
     </div>
     <div *ngIf="addSetGroupConflict" class="qa-error">Group {{ addSetCollectionGroup }} already exists. Choose a different number.</div>
     <div *ngIf="addSetCollectionGroup != null && addSetGroupInvalid && !addSetGroupConflict" class="qa-error">Number must be between 1 and 9999.</div>
@@ -325,6 +327,27 @@
       </div>
     </ng-container>
 
+  </div>
+</div>
+<!-- ───────────────────────────────────────────────────────────────────────── -->
+
+<!-- ── View Sets Modal ────────────────────────────────────────────────────── -->
+<div class="sl-modal-overlay" *ngIf="showViewSetsModal" (click)="showViewSetsModal = false">
+  <div class="sl-modal sl-modal-wide" (click)="$event.stopPropagation()">
+    <h3 class="sl-modal-title">Existing Sets</h3>
+    <p class="sl-modal-subtitle" *ngIf="viewSetsLoading">Loading…</p>
+    <p class="sl-modal-subtitle" *ngIf="!viewSetsLoading && viewSetsList.length === 0 && !viewSetsError">No sets found.</p>
+    <div *ngIf="viewSetsError" class="qa-error">{{ viewSetsError }}</div>
+    <ul class="sl-item-list" *ngIf="viewSetsList.length > 0">
+      <li *ngFor="let set of viewSetsList" class="sl-item-row sl-item-row-plain">
+        <span class="sl-item-badge">Group {{ set.collectionGroup }}</span>
+        <span class="sl-item-name">{{ set.title }}</span>
+        <span class="sl-item-count" *ngIf="set.items?.length">{{ set.items!.length }} book{{ set.items!.length !== 1 ? 's' : '' }}</span>
+      </li>
+    </ul>
+    <div class="sl-modal-actions">
+      <button class="qa-btn qa-btn-reset" (click)="showViewSetsModal = false">Close</button>
+    </div>
   </div>
 </div>
 <!-- ───────────────────────────────────────────────────────────────────────── -->

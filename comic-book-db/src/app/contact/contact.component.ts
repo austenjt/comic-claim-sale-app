@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Title, Meta } from '@angular/platform-browser';
 import { ConfigService } from '../config.service';
 
 @Component({
@@ -8,7 +9,7 @@ import { ConfigService } from '../config.service';
     styleUrls: ['./contact.component.css'],
     standalone: false
 })
-export class ContactComponent {
+export class ContactComponent implements OnInit {
   private readonly apiBase = 'https://fn-comicBook-db-1703810588398.azurewebsites.net/api';
 
   name = '';
@@ -19,7 +20,12 @@ export class ContactComponent {
   sent = false;
   sendError = '';
 
-  constructor(private http: HttpClient, private configService: ConfigService) {}
+  constructor(private http: HttpClient, private configService: ConfigService, private title: Title, private meta: Meta) {}
+
+  ngOnInit(): void {
+    this.title.setTitle('Contact — Lightning Comics PDX');
+    this.meta.updateTag({ name: 'description', content: 'Get in touch with Lightning Comics PDX — a comic book collector and seller based in Oregon City, Oregon.' });
+  }
 
   get emailEnabled(): boolean {
     return this.configService.emailEnabled;

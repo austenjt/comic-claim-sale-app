@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Title, Meta } from '@angular/platform-browser';
 import { ActivatedRoute } from '@angular/router';
 import { Location } from '@angular/common';
 import { Observable, of } from 'rxjs';
@@ -40,7 +41,9 @@ export class SetDetailComponent implements OnInit {
     private cartService: CartService,
     private logService: LogService,
     public auth: AuthService,
-    private location: Location
+    private location: Location,
+    private titleService: Title,
+    private meta: Meta,
   ) {}
 
   ngOnInit(): void {
@@ -50,6 +53,11 @@ export class SetDetailComponent implements OnInit {
       this.container = comic;
       this.setMembers = comic?.items ?? [];
       this.loading = false;
+      if (comic) {
+        const count = (comic.items ?? []).length;
+        this.titleService.setTitle(`${comic.title} Set — Lightning Comics PDX`);
+        this.meta.updateTag({ name: 'description', content: `${comic.title} — set of ${count} comic${count !== 1 ? 's' : ''} available for claim at Lightning Comics PDX in Oregon City, OR.` });
+      }
     });
 
     this.cartService.getClaimedMap().subscribe({ next: m => this.claimedMap = m, error: () => {} });
