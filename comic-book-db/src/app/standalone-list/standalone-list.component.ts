@@ -602,6 +602,15 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
   viewSetsLoading = false;
   viewSetsError = '';
 
+  // ── Edit Set Name modal ───────────────────────────────────────────────────
+  showEditSetNameModal = false;
+  editSetNameStep = 1;
+  editSetNameAvailableSets: Comic[] = [];
+  editSetNameSelected: Comic | null = null;
+  editSetNameNewName = '';
+  editSetNameSaving = false;
+  editSetNameError = '';
+
   // ── Delete Set modal ──────────────────────────────────────────────────────
   showDeleteSetModal = false;
   deleteSetAvailableSets: Comic[] = [];
@@ -979,6 +988,63 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
         this.viewSetsLoading = false;
       }
     });
+  }
+
+  openEditSetName(): void {
+    this.editSetNameStep = 1;
+    this.editSetNameSelected = null;
+    this.editSetNameNewName = '';
+    this.editSetNameError = '';
+    this.editSetNameSaving = false;
+    this.comicService.getSets().subscribe({
+      next: sets => {
+        this.editSetNameAvailableSets = sets
+          .filter(c => c.docType === 'SET')
+          .sort((a, b) => (a.collectionGroup ?? 0) - (b.collectionGroup ?? 0));
+        this.showEditSetNameModal = true;
+      },
+      error: () => {
+        this.editSetNameError = 'Failed to load sets.';
+        this.showEditSetNameModal = true;
+      }
+    });
+  }
+
+  selectSetForRename(set: Comic): void {
+    this.editSetNameSelected = set;
+    this.editSetNameNewName = set.title ?? '';
+    this.editSetNameError = '';
+    this.editSetNameStep = 2;
+  }
+
+  confirmEditSetName(): void {
+    if (!this.editSetNameSelected || !this.editSetNameNewName.trim()) return;
+    this.editSetNameSaving = true;
+    this.editSetNameError = '';
+    const updated: Comic = { ...this.editSetNameSelected, title: this.editSetNameNewName.trim() };
+    this.comicService.updateComic(updated).subscribe({
+      next: () => {
+        const idx = this.comics.findIndex(c => c.id === updated.id);
+        if (idx !== -1) {
+          this.comics[idx] = { ...this.comics[idx], title: updated.title };
+          this.comics = [...this.comics];
+        }
+        this.editSetNameSaving = false;
+        this.showEditSetNameModal = false;
+      },
+      error: () => {
+        this.editSetNameError = 'Failed to rename set. Please try again.';
+        this.editSetNameSaving = false;
+      }
+    });
+  }
+
+  cancelEditSetName(): void {
+    this.showEditSetNameModal = false;
+    this.editSetNameSelected = null;
+    this.editSetNameNewName = '';
+    this.editSetNameError = '';
+    this.editSetNameSaving = false;
   }
 
   confirmAddSet(): void {
