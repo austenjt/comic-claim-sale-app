@@ -5,6 +5,7 @@ export interface ArchivedOrderItem {
   price: number;
   claimedAt: string;
   collectionGroup?: number | null;
+  wonViaBid?: boolean;
 }
 
 export interface ArchivedOrder {

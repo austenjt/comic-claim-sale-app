@@ -110,9 +110,9 @@ public class DiscountService {
         }
 
         // Bid-won items count toward tier thresholds but never receive a discount themselves.
-        // Awarded ($0) items are excluded from both counting and discount application.
+        // Awarded (isAwarded flag) and free ($0.00) items are excluded from both counting and discount application.
         List<CartItem> countableItems = cart.getItems().stream()
-            .filter(i -> !i.isAwarded())
+            .filter(i -> !i.isAwarded() && i.getPrice() > 0)
             .collect(Collectors.toList());
 
         List<CartItem> discountableItems = countableItems.stream()

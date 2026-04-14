@@ -24,11 +24,34 @@
       <tbody>
         <tr *ngFor="let item of order.items">
           <td>{{ item.comicTitle }}{{ item.comicNumber ? ' ' + item.comicNumber : '' }}<span *ngIf="item.collectionGroup && item.collectionGroup > 0" class="set-tag">Set {{ item.collectionGroup }}</span></td>
-          <td>{{ item.price | currency }}</td>
+          <td>
+            <ng-container *ngIf="showItemDiscounts(order) && !item.wonViaBid; else plainPrice">
+              <span class="price-original">{{ item.price | currency }}</span>
+              <span class="price-discounted">{{ discountedItemPrice(order, item) | currency }}</span>
+            </ng-container>
+            <ng-template #plainPrice>{{ item.price | currency }}</ng-template>
+          </td>
           <td>{{ item.claimedAt | date:'mediumDate' }}</td>
         </tr>
       </tbody>
       <tfoot>
+        <tr *ngIf="order.discountAmount && order.discountAmount > 0">
+          <td>Subtotal <span class="item-count-label">({{ order.items.length }} book{{ order.items.length !== 1 ? 's' : '' }})</span></td>
+          <td>{{ orderSubtotal(order) | currency }}</td>
+          <td></td>
+        </tr>
+        <tr *ngIf="order.discountAmount && order.discountAmount > 0">
+          <td>Discount</td>
+          <td class="discount-savings">-{{ order.discountAmount | currency }}
+            <span *ngIf="order.discountDescription" class="discount-desc">({{ order.discountDescription }})</span>
+          </td>
+          <td></td>
+        </tr>
+        <tr *ngIf="order.shippingCost && order.shippingCost > 0">
+          <td>Shipping</td>
+          <td class="shipping-cost">{{ order.shippingCost | currency }}</td>
+          <td></td>
+        </tr>
         <tr>
           <td><strong>Total</strong></td>
           <td><strong>{{ orderTotal(order) | currency }}</strong></td>

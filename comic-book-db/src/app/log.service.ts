@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Subject, Subscription, timer } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { CartService, ClaimNotification } from './cart.service';
-import { ConfigService } from './config.service';
+import { InactivityService } from './inactivity.service';
 
 export interface LogEntry {
   message: string;
@@ -24,11 +24,18 @@ export class LogService {
 
   constructor(
     private cartService: CartService,
-    private configService: ConfigService,
+    private inactivityService: InactivityService,
     private http: HttpClient
   ) {
     this.startPolling();
     this.loadPersistedLogs();
+    this.inactivityService.isIdle$.subscribe(idle => {
+      if (idle) {
+        this.pollSub?.unsubscribe();
+      } else {
+        this.startPolling();
+      }
+    });
   }
 
   private loadPersistedLogs(): void {
@@ -77,7 +84,6 @@ export class LogService {
   }
 
   log(message: string, isError = false): void {
-    if (this.configService.pauseNotifications) return;
     this.persistToLog(message, isError);
   }
 

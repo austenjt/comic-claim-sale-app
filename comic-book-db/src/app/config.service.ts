@@ -73,14 +73,6 @@ export class ConfigService {
     return this._config.biddingCycleMins ?? 10;
   }
 
-  get pauseNotifications(): boolean {
-    try { return localStorage.getItem('pauseNotifications') === 'true'; } catch { return false; }
-  }
-
-  togglePauseNotifications(): void {
-    try { localStorage.setItem('pauseNotifications', String(!this.pauseNotifications)); } catch { /* ignore */ }
-  }
-
   getEnums(): ComicEnums {
     return {
       coverVariants: this._config.coverVariants,
