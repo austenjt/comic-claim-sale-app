@@ -17,8 +17,8 @@
                 (click)="showPricedOnlyChange.emit(!showPricedOnly)">
           {{ showPricedOnly ? 'Show Unpriced' : 'Exclude Unpriced' }}
         </button>
-        <button class="btn-claim-sale"
-                [class.btn-claim-sale-active]="biddableOnly"
+        <button class="btn-exclude-claimed"
+                [class.btn-exclude-claimed-active]="biddableOnly"
                 (click)="biddableOnlyChange.emit(!biddableOnly)">
           {{ biddableOnly ? 'Show All' : 'Only Bidding' }}
         </button>

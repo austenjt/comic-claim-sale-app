@@ -93,7 +93,7 @@
   position: absolute;
   top: calc(100% + 10px);
   right: 0;
-  background: #fff;
+  background: #7b8f4b;
   border: 1px solid #ddd;
   border-radius: 8px;
   box-shadow: 0 4px 16px rgba(0,0,0,0.15);
@@ -134,12 +134,11 @@
 }
 
 .dropdown-logout {
-  color: #c0392b;
   border-top: 1px solid #eee;
 }
 
 .dropdown-logout:hover {
-  background-color: #fff5f5;
+  background-color: #f5f5f5;
 }
 
 
