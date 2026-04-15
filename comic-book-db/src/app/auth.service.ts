@@ -73,8 +73,14 @@ export class AuthService {
    * - Re-throws 403 (PENDING/SUSPENDED) so callers can show the appropriate message.
    */
   loadCurrentUser(): Observable<User | null> {
-    return this.http.get<User>(this.meUrl).pipe(
-      map(user => {
+    return this.http.get<User>(this.meUrl, { observe: 'response' }).pipe(
+      map(response => {
+        if (response.status === 202) {
+          // First signup — backend created a PENDING record. 202 is a 2xx so HttpClient
+          // treats it as success; throw here so catchError can route to pending-approval.
+          throw new HttpErrorResponse({ status: 202, error: 'Account pending approval' });
+        }
+        const user = response.body!;
         this.currentUser$.next(user);
         return user;
       }),
@@ -86,8 +92,8 @@ export class AuthService {
           this.currentUser$.next(null);
           return of(null);
         }
-        // 202 ACCEPTED means PENDING — treat as a rejection for the UI
-        // 403 means PENDING or SUSPENDED — re-throw so callers can route to the right page
+        // 202 (new PENDING user) and 403 (returning PENDING/SUSPENDED) both re-throw
+        // so AppComponent can navigate to /pending-approval.
         return throwError(() => err);
       }),
     );
