@@ -63,6 +63,33 @@
   </div>
 </div>
 
+<!-- First-bid price confirmation modal -->
+<div *ngIf="firstBidConfirmComic" class="bid-modal-overlay" (click)="cancelFirstBidConfirm()">
+  <div class="bid-modal" (click)="$event.stopPropagation()">
+    <div class="bid-modal-title">Starting Bid Notice</div>
+    <div class="bid-modal-comic-name">"{{ firstBidConfirmComic.title }}"</div>
+    <div class="bid-modal-info">
+      <div class="bid-modal-info-row">
+        <span>Listed Price</span>
+        <strong>${{ (firstBidConfirmComic.salePrice ?? 0).toFixed(2) }}</strong>
+      </div>
+      <div class="bid-modal-info-row">
+        <span>Starting Bid</span>
+        <strong>${{ (firstBidConfirmComic.highBid ?? 0).toFixed(2) }}</strong>
+      </div>
+    </div>
+    <p class="bid-modal-label" style="margin-top:12px">
+      The starting bid for this book has been set higher than its listed price.
+      You will be bidding at <strong>${{ (firstBidConfirmComic.highBid ?? 0).toFixed(2) }}</strong> to start.
+      Do you want to continue?
+    </p>
+    <div class="bid-modal-actions">
+      <button class="bid-modal-submit-btn" (click)="confirmFirstBid()">Yes, Place Bid</button>
+      <button class="bid-modal-cancel-btn" (click)="cancelFirstBidConfirm()">Cancel</button>
+    </div>
+  </div>
+</div>
+
 <!-- Bid modal -->
 <div *ngIf="bidModalComic" class="bid-modal-overlay" (click)="closeBidModal()">
   <div class="bid-modal" (click)="$event.stopPropagation()">

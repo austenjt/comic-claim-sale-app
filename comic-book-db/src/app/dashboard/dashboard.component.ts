@@ -376,7 +376,30 @@ export class DashboardComponent implements OnInit, OnDestroy {
     });
   }
 
+  firstBidConfirmComic: Comic | null = null;
+
   startBidding(comic: Comic): void {
+    const adminFloor = comic.highBid ?? 0;
+    const listedPrice = comic.salePrice ?? 0;
+    if (!comic.bidStartedAt && adminFloor > listedPrice) {
+      this.firstBidConfirmComic = comic;
+      return;
+    }
+    this.doStartBidding(comic);
+  }
+
+  cancelFirstBidConfirm(): void {
+    this.firstBidConfirmComic = null;
+  }
+
+  confirmFirstBid(): void {
+    const comic = this.firstBidConfirmComic;
+    if (!comic) return;
+    this.firstBidConfirmComic = null;
+    this.doStartBidding(comic);
+  }
+
+  private doStartBidding(comic: Comic): void {
     this.cartService.startBid(String(comic.id)).subscribe({
       next: updatedComic => {
         const idx = this.pageItems.findIndex(c => c.id === comic.id);

@@ -120,9 +120,10 @@ public class BidService {
         bid.setCurrentBidderId(user.getId());
         bid.setCurrentBidderName(user.getName());
 
-        BigDecimal startingBid = comic.getSalePrice() != null
-            ? comic.getSalePrice().max(BigDecimal.ONE)
-            : BigDecimal.ONE;
+        BigDecimal existingHigh = bid.getHighBid();
+        BigDecimal startingBid = (existingHigh != null && existingHigh.compareTo(BigDecimal.ZERO) > 0)
+            ? existingHigh.max(BigDecimal.ONE)
+            : (comic.getSalePrice() != null ? comic.getSalePrice().max(BigDecimal.ONE) : BigDecimal.ONE);
         bid.setHighBid(startingBid);
 
         if (bid.getBidHistory() == null) {
