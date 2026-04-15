@@ -34,6 +34,17 @@ export class SetDetailComponent implements OnInit {
   backImageUploadError = '';
   linkCopied = false;
 
+  removingId: number | null = null;
+
+  // ── Add Book to Set modal ──────────────────────────────────────────────
+  showAddBookModal = false;
+  addBookSearchTerm = '';
+  addBookSearchResults: Comic[] = [];
+  addBookSearching = false;
+  addBookSaving = false;
+  addBookError = '';
+  private addBookSearchTimer: any = null;
+
   constructor(
     private route: ActivatedRoute,
     private comicService: ComicService,
@@ -182,6 +193,63 @@ export class SetDetailComponent implements OnInit {
         this.backImageUploading = false;
         this.backImageUploadError = 'Upload failed. Image may be too large or an invalid format.';
         input.value = '';
+      }
+    });
+  }
+
+  removeFromSet(comic: Comic): void {
+    this.removingId = comic.id;
+    const updated: Comic = { ...comic, collectionGroup: null };
+    this.comicService.updateComic(updated).subscribe({
+      next: () => {
+        this.setMembers = this.setMembers.filter(m => m.id !== comic.id);
+        this.removingId = null;
+      },
+      error: () => { this.removingId = null; }
+    });
+  }
+
+  openAddBookModal(): void {
+    this.addBookSearchTerm = '';
+    this.addBookSearchResults = [];
+    this.addBookSearching = false;
+    this.addBookError = '';
+    this.showAddBookModal = true;
+  }
+
+  filterAddBookResults(): void {
+    if (this.addBookSearchTimer) clearTimeout(this.addBookSearchTimer);
+    const term = this.addBookSearchTerm.trim();
+    if (!term) {
+      this.addBookSearchResults = [];
+      this.addBookSearching = false;
+      return;
+    }
+    this.addBookSearching = true;
+    this.addBookSearchTimer = setTimeout(() => {
+      this.comicService.searchComics(term).subscribe(results => {
+        this.addBookSearchResults = results.filter(
+          c => c.docType !== 'SET' && (!c.collectionGroup || c.collectionGroup <= 0)
+        );
+        this.addBookSearching = false;
+      });
+    }, 300);
+  }
+
+  confirmAddBook(comic: Comic): void {
+    if (!this.container) return;
+    this.addBookSaving = true;
+    this.addBookError = '';
+    const updated: Comic = { ...comic, collectionGroup: this.container.collectionGroup };
+    this.comicService.updateComic(updated).subscribe({
+      next: () => {
+        this.setMembers = [...this.setMembers, updated];
+        this.addBookSaving = false;
+        this.showAddBookModal = false;
+      },
+      error: () => {
+        this.addBookError = 'Failed to add book to set. Please try again.';
+        this.addBookSaving = false;
       }
     });
   }

@@ -132,9 +132,41 @@
     </div>
   </div>
 
+  <!-- Add Book to Set modal -->
+  <div class="add-book-overlay" *ngIf="showAddBookModal" (click)="showAddBookModal = false">
+    <div class="add-book-modal" (click)="$event.stopPropagation()">
+      <h3 class="add-book-title">Add Book to "{{ container?.title }}"</h3>
+      <p class="add-book-subtitle">Results exclude books already assigned to a set.</p>
+      <input class="add-book-search" type="text" autofocus
+             [(ngModel)]="addBookSearchTerm"
+             (ngModelChange)="filterAddBookResults()"
+             placeholder="Search by title…" />
+      <div *ngIf="addBookError" class="add-book-error">{{ addBookError }}</div>
+      <p class="add-book-hint" *ngIf="!addBookSearchTerm">Start typing to search…</p>
+      <p class="add-book-hint" *ngIf="addBookSearchTerm && addBookSearching">Searching…</p>
+      <p class="add-book-hint" *ngIf="addBookSearchTerm && !addBookSearching && addBookSearchResults.length === 0">No matching books found.</p>
+      <ul class="add-book-list" *ngIf="addBookSearchResults.length > 0">
+        <li *ngFor="let comic of addBookSearchResults"
+            class="add-book-row"
+            [class.add-book-row-disabled]="addBookSaving"
+            (click)="confirmAddBook(comic)">
+          <span class="add-book-name">{{ comic.title }}{{ comicNumberLabel(comic) }}</span>
+          <span class="add-book-badge" *ngIf="comic.series">{{ comic.series }}</span>
+        </li>
+      </ul>
+      <div class="add-book-actions">
+        <button class="add-book-cancel" (click)="showAddBookModal = false" [disabled]="addBookSaving">Cancel</button>
+        <span *ngIf="addBookSaving" class="add-book-saving">Saving…</span>
+      </div>
+    </div>
+  </div>
+
   <!-- Member comics list -->
-  <div class="set-members-section" *ngIf="setMembers.length > 0">
-    <div class="set-members-title">Books in This Set</div>
+  <div class="set-members-section">
+    <div class="set-members-title-row">
+      <span class="set-members-title">Books in This Set</span>
+      <button *ngIf="auth.isAdmin()" class="btn-add-book" (click)="openAddBookModal()">+ Add Book</button>
+    </div>
     <div class="comics-list">
       <a *ngFor="let member of displayMembers" routerLink="/detail/{{ member.id }}">
         <div class="image-container" [class.two-images]="member.smallBackImageId">
@@ -158,7 +190,13 @@
             <span *ngIf="member.comicCondition?.cgcCondition?.grade || member.comicCondition?.cbcsCondition?.grade"
                   class="badge-graded">Graded</span>
           </div>
-          <div class="footer-actions"></div>
+          <div class="footer-actions">
+            <button *ngIf="auth.isAdmin()" class="btn-remove-from-set"
+              [disabled]="removingId === member.id"
+              (click)="$event.preventDefault(); $event.stopPropagation(); removeFromSet(member)">
+              {{ removingId === member.id ? 'Removing…' : 'Remove' }}
+            </button>
+          </div>
         </div>
       </a>
     </div>

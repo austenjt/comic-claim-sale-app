@@ -1,6 +1,5 @@
 
 import { Component, OnInit, OnDestroy, Output, EventEmitter } from '@angular/core';
-import { forkJoin } from 'rxjs';
 import { AgGridModule } from 'ag-grid-angular';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -619,16 +618,6 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
   deleteSetError = '';
   deleteSetConfirmFull = false;
 
-  // ── Add To Set modal ──────────────────────────────────────────────────────
-  showAddToSetModal = false;
-  addToSetStep = 1;
-  addToSetAvailableSets: Comic[] = [];
-  addToSetUnassigned: Comic[] = [];
-  addToSetSelectedSet: Comic | null = null;
-  addToSetSearchTerm = '';
-  addToSetSearchResults: Comic[] = [];
-  addToSetSaving = false;
-  addToSetError = '';
 
   // ── Quick Add wizard ──────────────────────────────────────────────────────
   qaStep = 1;
@@ -1124,57 +1113,6 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
       error: () => {
         this.addSetError = 'Failed to create set. Please try again.';
         this.addSetSaving = false;
-      }
-    });
-  }
-
-  openAddToSet(): void {
-    forkJoin([this.comicService.getSets(), this.comicService.getSingleComics()]).subscribe(([sets, singles]) => {
-      this.addToSetAvailableSets = sets;
-      this.addToSetUnassigned = singles;
-      this.addToSetStep = 1;
-      this.addToSetSelectedSet = null;
-      this.addToSetSearchTerm = '';
-      this.addToSetSearchResults = [];
-      this.addToSetError = '';
-      this.showAddToSetModal = true;
-    });
-  }
-
-  selectSetForAddTo(set: Comic): void {
-    this.addToSetSelectedSet = set;
-    this.addToSetSearchTerm = '';
-    this.addToSetSearchResults = [];
-    this.addToSetError = '';
-    this.addToSetStep = 2;
-  }
-
-  filterAddToSetResults(): void {
-    const term = this.addToSetSearchTerm.trim().toLowerCase();
-    if (!term) {
-      this.addToSetSearchResults = [];
-      return;
-    }
-    this.addToSetSearchResults = this.addToSetUnassigned.filter(c =>
-      c.title?.toLowerCase().includes(term) ||
-      c.series?.toLowerCase().includes(term)
-    );
-  }
-
-  confirmAddToSet(comic: Comic): void {
-    if (!this.addToSetSelectedSet) return;
-    this.addToSetSaving = true;
-    this.addToSetError = '';
-    const updated: Comic = { ...comic, collectionGroup: this.addToSetSelectedSet.collectionGroup };
-    this.comicService.updateComic(updated).subscribe({
-      next: () => {
-        this.comics = this.comics.map(c => c.id === updated.id ? updated : c);
-        this.addToSetSaving = false;
-        this.showAddToSetModal = false;
-      },
-      error: () => {
-        this.addToSetError = 'Failed to add to set. Please try again.';
-        this.addToSetSaving = false;
       }
     });
   }

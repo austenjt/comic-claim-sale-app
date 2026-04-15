@@ -249,15 +249,189 @@ button {
   margin-top: 32px;
 }
 
+.set-members-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 2px solid #a98467;
+  padding-bottom: 4px;
+  margin-bottom: 16px;
+}
+
 .set-members-title {
   font-size: 0.7rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.09em;
   color: #a98467;
-  border-bottom: 2px solid #a98467;
-  padding-bottom: 4px;
-  margin-bottom: 16px;
+}
+
+.btn-add-book {
+  padding: 4px 12px;
+  background: #7b8f4b;
+  color: #f0ead2;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  margin: 0;
+}
+
+.btn-add-book:hover { background: #6b7e3e; }
+
+.btn-remove-from-set {
+  padding: 3px 10px;
+  background: transparent;
+  color: #c0634c;
+  border: 1px solid #c0634c;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin: 0;
+}
+
+.btn-remove-from-set:hover:not(:disabled) {
+  background: rgba(192, 99, 76, 0.1);
+}
+
+.btn-remove-from-set:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* ── Add Book modal ─────────────────────────────────────────────────────── */
+
+.add-book-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.add-book-modal {
+  background: #f0ead2;
+  border: 1px solid #b8c89a;
+  border-radius: 8px;
+  padding: 24px;
+  min-width: 320px;
+  max-width: 560px;
+  width: 100%;
+}
+
+.add-book-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #6c584c;
+  margin: 0 0 6px;
+}
+
+.add-book-subtitle {
+  font-size: 0.82rem;
+  color: #79675c;
+  margin: 0 0 14px;
+}
+
+.add-book-hint {
+  font-size: 0.82rem;
+  color: #79675c;
+  margin: 4px 0 8px;
+}
+
+.add-book-error {
+  color: #c0634c;
+  font-size: 0.85rem;
+  margin-bottom: 8px;
+}
+
+.add-book-search {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 7px 10px;
+  border: 1px solid #b8c89a;
+  border-radius: 4px;
+  background: #dde5b6;
+  color: #6c584c;
+  font-size: 0.88rem;
+  margin-bottom: 8px;
+}
+
+.add-book-search:focus {
+  border-color: #7b8f4b;
+  outline: none;
+}
+
+.add-book-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 4px;
+  max-height: 260px;
+  overflow-y: auto;
+  border: 1px solid #b8c89a;
+  border-radius: 4px;
+}
+
+.add-book-row {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 8px 12px;
+  cursor: pointer;
+  border-bottom: 1px solid #b8c89a;
+  transition: background 0.12s;
+}
+
+.add-book-row:last-child { border-bottom: none; }
+.add-book-row:hover { background: #c8d4a8; }
+
+.add-book-row-disabled {
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.add-book-name {
+  font-size: 0.88rem;
+  color: #6c584c;
+}
+
+.add-book-badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #7b8f4b;
+  white-space: nowrap;
+  margin-left: auto;
+}
+
+.add-book-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: 16px;
+}
+
+.add-book-cancel {
+  padding: 6px 16px;
+  background: transparent;
+  border: 1px solid #b8c89a;
+  border-radius: 4px;
+  color: #79675c;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin: 0;
+}
+
+.add-book-cancel:hover:not(:disabled) { background: #c8d4a8; }
+.add-book-cancel:disabled { opacity: 0.6; cursor: default; }
+
+.add-book-saving {
+  font-size: 0.82rem;
+  color: #79675c;
+  font-style: italic;
 }
 
 .comics-list {

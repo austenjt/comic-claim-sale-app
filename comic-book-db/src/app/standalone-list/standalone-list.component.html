@@ -181,7 +181,6 @@
   </div>
   <div class="add-set-buttons">
     <button class="toolbar-btn add-btn" (click)="openAddSet()">Add Set</button>
-    <button class="toolbar-btn add-btn" (click)="openAddToSet()">Add To Set</button>
     <button class="toolbar-btn delete-btn" (click)="openDeleteSet()">Delete Set</button>
     <button class="toolbar-btn" (click)="openEditSetName()">Edit Set Name</button>
     <button class="toolbar-btn" (click)="openViewSets()">View Sets</button>
@@ -217,59 +216,6 @@
 </div>
 <!-- ───────────────────────────────────────────────────────────────────────── -->
 
-<!-- ── Add To Set Modal ───────────────────────────────────────────────────── -->
-<div class="sl-modal-overlay" *ngIf="showAddToSetModal" (click)="showAddToSetModal = false">
-  <div class="sl-modal sl-modal-wide" (click)="$event.stopPropagation()">
-
-    <!-- Step 1: pick a set -->
-    <ng-container *ngIf="addToSetStep === 1">
-      <h3 class="sl-modal-title">Select a Set</h3>
-      <p class="sl-modal-subtitle" *ngIf="addToSetAvailableSets.length === 0">
-        No sets found. Use <strong>Add Set</strong> to create one first.
-      </p>
-      <ul class="sl-item-list" *ngIf="addToSetAvailableSets.length > 0">
-        <li *ngFor="let set of addToSetAvailableSets"
-            class="sl-item-row"
-            (click)="selectSetForAddTo(set)">
-          <span class="sl-item-badge">Group {{ set.collectionGroup }}</span>
-          <span class="sl-item-name">{{ set.title }}</span>
-        </li>
-      </ul>
-      <div class="sl-modal-actions">
-        <button class="qa-btn qa-btn-reset" (click)="showAddToSetModal = false">Cancel</button>
-      </div>
-    </ng-container>
-
-    <!-- Step 2: search and pick a book -->
-    <ng-container *ngIf="addToSetStep === 2">
-      <h3 class="sl-modal-title">Add Book to "{{ addToSetSelectedSet?.title }}"</h3>
-      <p class="sl-modal-subtitle">Group {{ addToSetSelectedSet?.collectionGroup }} — results exclude books already assigned to a set.</p>
-      <input class="sl-search-input" type="text"
-             [(ngModel)]="addToSetSearchTerm"
-             (ngModelChange)="filterAddToSetResults()"
-             placeholder="Search by title or series…" />
-      <div *ngIf="addToSetError" class="qa-error">{{ addToSetError }}</div>
-      <p class="sl-modal-hint" *ngIf="!addToSetSearchTerm">Start typing to search…</p>
-      <p class="sl-modal-hint" *ngIf="addToSetSearchTerm && addToSetSearchResults.length === 0">No matching books found.</p>
-      <ul class="sl-item-list" *ngIf="addToSetSearchResults.length > 0">
-        <li *ngFor="let comic of addToSetSearchResults"
-            class="sl-item-row"
-            [class.sl-item-row-disabled]="addToSetSaving"
-            (click)="confirmAddToSet(comic)">
-          <span class="sl-item-name">{{ comic.title }}{{ comicNumberLabel(comic) }}</span>
-          <span class="sl-item-badge" *ngIf="comic.series">{{ comic.series }}</span>
-        </li>
-      </ul>
-      <div class="sl-modal-actions">
-        <button class="qa-btn qa-btn-back" (click)="addToSetStep = 1" [disabled]="addToSetSaving">← Back</button>
-        <button class="qa-btn qa-btn-reset" (click)="showAddToSetModal = false">Cancel</button>
-        <span *ngIf="addToSetSaving" class="sl-saving-hint">Saving…</span>
-      </div>
-    </ng-container>
-
-  </div>
-</div>
-<!-- ───────────────────────────────────────────────────────────────────────── -->
 
 <!-- ── Delete Set Modal ───────────────────────────────────────────────────── -->
 <div class="sl-modal-overlay" *ngIf="showDeleteSetModal" (click)="cancelDeleteSet()">
