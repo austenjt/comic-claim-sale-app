@@ -286,7 +286,7 @@ public class UserTriggers {
         node.put("paypalHandle",  user.getPaypalHandle());
         node.put("ebayUsername",  user.getEbayUsername());
         node.put("cashAppHandle", user.getCashAppHandle());
-        node.put("status",        user.getStatus());
+        node.put("status",        user.getStatus() != null ? user.getStatus().getValue() : null);
         node.put("isAdmin",       user.isAdmin());
         node.put("createdDate",   user.getCreatedDate());
         node.put("approvedDate",  user.getApprovedDate());
