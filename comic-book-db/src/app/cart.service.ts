@@ -113,8 +113,10 @@ export class CartService {
     return this.http.post<Cart>(`${this.apiBase}/awards`, { comicId, userId });
   }
 
-  openBid(comicId: string): Observable<Comic> {
-    return this.http.post<Comic>(`${this.apiBase}/bid/open`, { comicId });
+  openBid(comicId: string, startingBid?: number): Observable<Comic> {
+    const body: any = { comicId };
+    if (startingBid != null) body.startingBid = startingBid;
+    return this.http.post<Comic>(`${this.apiBase}/bid/open`, body);
   }
 
   cancelBid(comicId: string): Observable<Comic> {

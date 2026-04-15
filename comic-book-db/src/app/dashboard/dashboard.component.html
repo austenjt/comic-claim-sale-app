@@ -33,6 +33,36 @@
   </div>
 </div>
 
+<!-- Start Bid modal -->
+<div *ngIf="startBidModalComic" class="bid-modal-overlay" (click)="cancelOpenBid()">
+  <div class="bid-modal" (click)="$event.stopPropagation()">
+    <div class="bid-modal-title">Start Bid</div>
+    <div class="bid-modal-comic-name">"{{ startBidModalComic.title }}"</div>
+    <div class="bid-modal-input-group">
+      <label class="bid-modal-label">Starting Bid — in $0.25 increments</label>
+      <div class="bid-modal-input-row">
+        <span class="bid-modal-dollar">$</span>
+        <input type="number"
+               class="bid-modal-input"
+               [(ngModel)]="startBidModalPrice"
+               [min]="0"
+               step="0.25"
+               placeholder="0.00"
+               (keyup.enter)="confirmOpenBid()"
+               [disabled]="startBidModalSubmitting"
+               autofocus>
+      </div>
+    </div>
+    <div *ngIf="startBidModalError" class="bid-modal-error">{{ startBidModalError }}</div>
+    <div class="bid-modal-actions">
+      <button class="bid-modal-submit-btn" (click)="confirmOpenBid()" [disabled]="startBidModalSubmitting || startBidModalPrice == null">
+        {{ startBidModalSubmitting ? 'Opening…' : 'Open Bidding' }}
+      </button>
+      <button class="bid-modal-cancel-btn" (click)="cancelOpenBid()" [disabled]="startBidModalSubmitting">Cancel</button>
+    </div>
+  </div>
+</div>
+
 <!-- Bid modal -->
 <div *ngIf="bidModalComic" class="bid-modal-overlay" (click)="closeBidModal()">
   <div class="bid-modal" (click)="$event.stopPropagation()">
@@ -205,7 +235,7 @@
                 <!-- Not yet opened: show Start Bid button -->
                 <ng-container *ngIf="!comic.bidOpenedAt && !isBiddingActive(comic)">
                   <button class="btn-start-bid"
-                    (click)="$event.preventDefault(); $event.stopPropagation(); openBid(comic)">
+                    (click)="$event.preventDefault(); $event.stopPropagation(); openBidModal(comic)">
                     Start Bid
                   </button>
                 </ng-container>

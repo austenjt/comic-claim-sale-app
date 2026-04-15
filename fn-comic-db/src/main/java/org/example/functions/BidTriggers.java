@@ -82,7 +82,12 @@ public class BidTriggers {
             String comicId = HttpHelper.getString(body, "comicId");
             if (comicId == null) return badRequest(request, "comicId is required");
 
-            ComicBook comic = BidService.getServiceInstance().openBid(comicId);
+            BigDecimal startingBid = null;
+            if (body.has("startingBid") && !body.get("startingBid").isNull()) {
+                startingBid = body.get("startingBid").decimalValue();
+            }
+
+            ComicBook comic = BidService.getServiceInstance().openBid(comicId, startingBid);
             return cors(request.createResponseBuilder(HttpStatus.OK))
                 .header("Content-Type", "application/json")
                 .body(OBJECT_MAPPER.writeValueAsString(comic)).build();

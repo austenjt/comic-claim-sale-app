@@ -50,7 +50,7 @@ public class BidService {
      * Admin: open a bid-enabled comic for bidding. Sets bidOpenedAt so users can see the Bid button.
      * The countdown timer does not start until the first user actually places a bid.
      */
-    public ComicBook openBid(String comicId) {
+    public ComicBook openBid(String comicId, BigDecimal startingBid) {
         if (!EnvHelper.isBiddingModeEnabled()) {
             throw new IllegalStateException("Bidding mode is not enabled.");
         }
@@ -70,8 +70,11 @@ public class BidService {
         }
 
         bid.setBidOpenedAt(Instant.now().toString());
+        if (startingBid != null) {
+            bid.setHighBid(startingBid);
+        }
         ComicService.getServiceInstance().updateComic(comic, "system:bid-open");
-        log.info("Bidding opened on comic {} by admin", comicId);
+        log.info("Bidding opened on comic {} by admin, startingBid={}", comicId, startingBid);
         return comic;
     }
 

@@ -75,6 +75,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
   bidModalError = '';
   bidModalSubmitting = false;
 
+  startBidModalComic: Comic | null = null;
+  startBidModalPrice: number | null = null;
+  startBidModalError = '';
+  startBidModalSubmitting = false;
+
   get bidModalComic(): Comic | null {
     if (this.bidModalComicId == null) return null;
     return this.pageItems.find(c => c.id === this.bidModalComicId) ?? null;
@@ -328,16 +333,45 @@ export class DashboardComponent implements OnInit, OnDestroy {
     });
   }
 
-  openBid(comic: Comic): void {
-    this.cartService.openBid(String(comic.id)).subscribe({
+  openBidModal(comic: Comic): void {
+    this.startBidModalComic = comic;
+    this.startBidModalPrice = comic.salePrice ?? 0;
+    this.startBidModalError = '';
+    this.startBidModalSubmitting = false;
+  }
+
+  cancelOpenBid(): void {
+    this.startBidModalComic = null;
+    this.startBidModalPrice = null;
+    this.startBidModalError = '';
+    this.startBidModalSubmitting = false;
+  }
+
+  confirmOpenBid(): void {
+    const comic = this.startBidModalComic;
+    if (!comic) return;
+    const price = this.startBidModalPrice;
+    if (price == null || price < 0) {
+      this.startBidModalError = 'Please enter a valid starting price.';
+      return;
+    }
+    if (Math.round(price * 100) % 25 !== 0) {
+      this.startBidModalError = 'Price must be in $0.25 increments.';
+      return;
+    }
+    this.startBidModalSubmitting = true;
+    this.startBidModalError = '';
+    this.cartService.openBid(String(comic.id), price).subscribe({
       next: updatedComic => {
         const idx = this.pageItems.findIndex(c => c.id === comic.id);
         if (idx >= 0) this.pageItems[idx] = { ...this.pageItems[idx], ...updatedComic };
-        this.logService.logBid(`Bidding opened for "${comic.title}" — waiting for first bid.`);
+        this.logService.logBid(`Bidding opened for "${comic.title}" — starting at $${price.toFixed(2)} — waiting for first bid.`);
+        this.cancelOpenBid();
       },
       error: err => {
         const msg: string = typeof err?.error === 'string' ? err.error : '';
-        this.logService.log(msg || 'Failed to open bidding.', true);
+        this.startBidModalError = msg || 'Failed to open bidding.';
+        this.startBidModalSubmitting = false;
       }
     });
   }
