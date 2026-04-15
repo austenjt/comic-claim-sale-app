@@ -44,7 +44,6 @@ public class ConfigTriggers {
             Map<String, Object> response = new LinkedHashMap<>();
             response.put("emailEnabled", EnvHelper.isEmailEnabled());
             response.put("awardModeEnabled", EnvHelper.isAwardModeEnabled());
-            response.put("finalizeHours", EnvHelper.getFinalizeHours());
             response.put("biddingMode", EnvHelper.isBiddingModeEnabled());
             response.put("biddingCycleMins", EnvHelper.getBiddingCycleMins());
 
