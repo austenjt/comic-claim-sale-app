@@ -22,6 +22,7 @@ export class AdminSalesComponent implements OnInit {
   formActive = true;
   formPercentageOff = 0;
   formXBooks = 1;
+  formExcludeSets = false;
 
   readonly typeOptions: { value: DiscountType; label: string }[] = [
     { value: 'RAW_PERCENTAGE', label: 'Flat % Off' },
@@ -50,6 +51,7 @@ export class AdminSalesComponent implements OnInit {
     this.formActive = true;
     this.formPercentageOff = 0;
     this.formXBooks = 1;
+    this.formExcludeSets = false;
     this.showForm = true;
   }
 
@@ -60,6 +62,7 @@ export class AdminSalesComponent implements OnInit {
     this.formActive = d.isActive;
     this.formPercentageOff = d.percentageOff;
     this.formXBooks = d.xBooks || 1;
+    this.formExcludeSets = d.excludeSets ?? false;
     this.showForm = true;
   }
 
@@ -74,7 +77,8 @@ export class AdminSalesComponent implements OnInit {
       type: this.formType,
       isActive: this.formActive,
       percentageOff: this.formPercentageOff,
-      xBooks: Number(this.formXBooks) || 1
+      xBooks: Number(this.formXBooks) || 1,
+      excludeSets: this.formExcludeSets
     };
 
     if (this.editingId) {
@@ -118,13 +122,14 @@ export class AdminSalesComponent implements OnInit {
   }
 
   describeDiscount(d: Discount): string {
+    const setsNote = d.excludeSets ? ' (sets excluded)' : '';
     switch (d.type) {
       case 'RAW_PERCENTAGE':
-        return `${d.percentageOff}% off`;
+        return `${d.percentageOff}% off${setsNote}`;
       case 'BUY_X_GET_ONE_FREE':
-        return `Buy ${d.xBooks || '?'} get 1 free`;
+        return `Buy ${d.xBooks || '?'} get 1 free${setsNote}`;
       case 'PERCENTAGE_PER_X_BOOKS':
-        return `${d.percentageOff}% per ${d.xBooks || '?'} books`;
+        return `${d.percentageOff}% per ${d.xBooks || '?'} books${setsNote}`;
     }
   }
 }

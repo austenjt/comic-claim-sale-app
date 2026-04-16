@@ -37,6 +37,12 @@
       <input type="checkbox" [(ngModel)]="formActive" />
     </div>
 
+    <div class="form-row">
+      <label>Exclude Sets</label>
+      <input type="checkbox" [(ngModel)]="formExcludeSets" />
+      <span class="field-hint">When checked, comics that are part of a set will not receive this discount.</span>
+    </div>
+
     <div class="rule-preview">
       <strong>Preview:</strong> {{ rulePreview }}
     </div>
@@ -55,6 +61,7 @@
         <th>Type</th>
         <th>Parameters</th>
         <th>Active</th>
+        <th>Excl. Sets</th>
         <th *ngIf="auth.isAdmin()"></th>
       </tr>
     </thead>
@@ -67,6 +74,10 @@
           <span class="badge" [class.badge-active]="d.isActive" [class.badge-inactive]="!d.isActive">
             {{ d.isActive ? 'Yes' : 'No' }}
           </span>
+        </td>
+        <td>
+          <span *ngIf="d.excludeSets" class="badge badge-excl-sets">Yes</span>
+          <span *ngIf="!d.excludeSets" class="text-muted">—</span>
         </td>
         <td class="actions" *ngIf="auth.isAdmin()">
           <button class="btn-edit" (click)="openEdit(d)">Edit</button>

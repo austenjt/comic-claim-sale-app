@@ -133,6 +133,21 @@ tr.inactive td {
   color: #c0634c;
 }
 
+.badge-excl-sets {
+  background: rgba(169,132,103,0.15);
+  color: #a98467;
+}
+
+.text-muted {
+  color: var(--color-text-muted);
+}
+
+.field-hint {
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+  font-style: italic;
+}
+
 .actions {
   display: flex;
   gap: 0.5rem;

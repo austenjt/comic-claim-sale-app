@@ -111,28 +111,36 @@ public class DiscountService {
 
         // Bid-won items count toward tier thresholds but never receive a discount themselves.
         // Awarded (isAwarded flag) and free ($0.00) items are excluded from both counting and discount application.
-        List<CartItem> countableItems = cart.getItems().stream()
+        List<CartItem> baseItems = cart.getItems().stream()
             .filter(i -> !i.isAwarded() && i.getPrice() > 0)
             .collect(Collectors.toList());
-
-        List<CartItem> discountableItems = countableItems.stream()
-            .filter(i -> !i.isWonViaBid())
-            .collect(Collectors.toList());
-
-        double subtotal = discountableItems.stream()
-            .mapToDouble(CartItem::getPrice)
-            .sum();
-        int itemCount = countableItems.size();
 
         double totalSavings = 0.0;
         List<String> descriptions = new ArrayList<>();
 
         for (Discount d : active) {
+            // When excludeSets is true, set member items (collectionGroup > 0) are excluded from
+            // both the threshold count and discount eligibility for this rule.
+            List<CartItem> countableItems = baseItems.stream()
+                .filter(i -> !(d.isExcludeSets() && i.getCollectionGroup() != null && i.getCollectionGroup() > 0))
+                .collect(Collectors.toList());
+
+            List<CartItem> discountableItems = countableItems.stream()
+                .filter(i -> !i.isWonViaBid())
+                .collect(Collectors.toList());
+
+            double subtotal = discountableItems.stream()
+                .mapToDouble(CartItem::getPrice)
+                .sum();
+            int itemCount = countableItems.size();
+
+            String excludeNote = d.isExcludeSets() ? " (sets excluded)" : "";
+
             switch (d.getType()) {
                 case "RAW_PERCENTAGE": {
                     double savings = subtotal * d.getPercentageOff() / 100.0;
                     totalSavings += savings;
-                    descriptions.add(String.format("%.0f%% off ($-%.2f)", d.getPercentageOff(), savings));
+                    descriptions.add(String.format("%.0f%% off ($-%.2f)%s", d.getPercentageOff(), savings, excludeNote));
                     break;
                 }
                 case "BUY_X_GET_ONE_FREE": {
@@ -145,7 +153,7 @@ public class DiscountService {
                         double savings = prices.subList(0, Math.min(freeCount, prices.size()))
                             .stream().mapToDouble(Double::doubleValue).sum();
                         totalSavings += savings;
-                        descriptions.add(String.format("Buy %d get 1 free (%d free, $-%.2f)", d.getXBooks(), freeCount, savings));
+                        descriptions.add(String.format("Buy %d get 1 free (%d free, $-%.2f)%s", d.getXBooks(), freeCount, savings, excludeNote));
                     }
                     break;
                 }
@@ -155,7 +163,7 @@ public class DiscountService {
                     if (effectivePct > 0) {
                         double savings = subtotal * effectivePct / 100.0;
                         totalSavings += savings;
-                        descriptions.add(String.format("%.0f%% off per %d books (%.0f%% total, $-%.2f)", d.getPercentageOff(), d.getXBooks(), effectivePct, savings));
+                        descriptions.add(String.format("%.0f%% off per %d books (%.0f%% total, $-%.2f)%s", d.getPercentageOff(), d.getXBooks(), effectivePct, savings, excludeNote));
                     }
                     break;
                 }

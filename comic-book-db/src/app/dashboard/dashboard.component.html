@@ -165,6 +165,7 @@
         <div class="card-footer">
           <div class="footer-badges">
             <span class="badge-set">Set {{ comic.collectionGroup }}</span>
+            <span *ngIf="setHasKeyIssue(comic)" class="badge-key-issue">Key Issue</span>
           </div>
           <div class="footer-actions">
             <span *ngIf="isSetClaimedByOther(comic)" class="comic-claimed-status">Claimed</span>

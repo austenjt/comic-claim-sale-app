@@ -562,6 +562,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
     return members.reduce((sum, m) => sum + (m.salePrice ?? 0), 0);
   }
 
+  setHasKeyIssue(container: Comic): boolean {
+    return (container.items ?? []).some(m => !!m.keyIssue);
+  }
+
   isInMyCart(comicId: number): boolean {
     return this.myCart?.items.some(i => i.comicId === String(comicId)) ?? false;
   }

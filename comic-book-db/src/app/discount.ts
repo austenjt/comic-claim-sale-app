@@ -7,5 +7,6 @@ export interface Discount {
   isActive: boolean;
   percentageOff: number;
   xBooks: number;
+  excludeSets: boolean;
   createdAt: string;
 }
