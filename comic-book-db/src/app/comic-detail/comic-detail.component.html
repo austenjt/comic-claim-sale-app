@@ -288,7 +288,7 @@
           <span class="detail-value">No</span>
         </div>
         <div class="detail-item" *ngIf="!auth.isAdmin() && !comic.comicCondition?.cgcCondition && !comic.comicCondition?.cbcsCondition && comic.comicCondition?.notCertifiedGrade">
-          <span class="detail-label">Raw Grade</span>
+          <span class="detail-label">Estimated Grade</span>
           <span class="detail-value">{{comic.comicCondition!.notCertifiedGrade | number:'1.1-1'}}</span>
         </div>
 
@@ -421,7 +421,7 @@
           </div>
 
           <div class="detail-item" *ngIf="auth.isAdmin() || comic.comicCondition?.notCertifiedGrade">
-            <span class="detail-label">Grade</span>
+            <span class="detail-label">Estimated Grade</span>
             <span *ngIf="!auth.isAdmin()" class="detail-value">{{comic.comicCondition!.notCertifiedGrade | number:'1.1-1'}}</span>
             <select *ngIf="auth.isAdmin()" class="detail-edit-select" [(ngModel)]="editComic!.comicCondition!.notCertifiedGrade">
               <option [ngValue]="null">—</option>
@@ -430,7 +430,7 @@
           </div>
 
           <div class="detail-item" *ngIf="auth.isAdmin() || comic.comicCondition?.notCertifiedPageQuality">
-            <span class="detail-label">Page Quality</span>
+            <span class="detail-label">Estimated Page Quality</span>
             <span *ngIf="!auth.isAdmin()" class="detail-value">{{comic.comicCondition!.notCertifiedPageQuality}}</span>
             <select *ngIf="auth.isAdmin()" class="detail-edit-select" [(ngModel)]="editComic!.comicCondition!.notCertifiedPageQuality">
               <option [ngValue]="null">—</option>

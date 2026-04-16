@@ -1,8 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Title, Meta } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Location } from '@angular/common';
-import { Observable, of } from 'rxjs';
+import { Observable, of, Subscription } from 'rxjs';
 
 import { Comic } from '../comic';
 import { Cart } from '../cart';
@@ -19,7 +19,7 @@ import { DashboardNavService, NavItem } from '../dashboard-nav.service';
     styleUrls: ['./set-detail.component.css'],
     standalone: false
 })
-export class SetDetailComponent implements OnInit {
+export class SetDetailComponent implements OnInit, OnDestroy {
 
   container: Comic | undefined;
   setMembers: Comic[] = [];
@@ -49,6 +49,7 @@ export class SetDetailComponent implements OnInit {
   addBookSaving = false;
   addBookError = '';
   private addBookSearchTimer: any = null;
+  private routeParamSub: Subscription | null = null;
 
   constructor(
     private route: ActivatedRoute,
@@ -65,24 +66,40 @@ export class SetDetailComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    const id = parseInt(this.route.snapshot.paramMap.get('id')!, 10);
+    // Subscribe to paramMap so navigating set→set (same route, different :id)
+    // properly reloads the container even when Angular reuses the component instance.
+    this.routeParamSub = this.route.paramMap.subscribe(params => {
+      const id = parseInt(params.get('id')!, 10);
+      this.container = undefined;
+      this.setMembers = [];
+      this.loading = true;
+      this.claimError = '';
+      this.editContainer = null;
+      this.linkCopied = false;
+      this.activeImage = 'front';
 
-    this.comicService.getComic(id).subscribe(comic => {
-      this.container = comic;
-      this.setMembers = comic?.items ?? [];
-      this.loading = false;
-      if (comic) {
-        this.editContainer = structuredClone(comic);
-        const count = (comic.items ?? []).length;
-        this.titleService.setTitle(`${comic.title} Set — Lightning Comics PDX`);
-        this.meta.updateTag({ name: 'description', content: `${comic.title} — set of ${count} comic${count !== 1 ? 's' : ''} available for claim at Lightning Comics PDX in Oregon City, OR.` });
+      this.comicService.getComic(id).subscribe(comic => {
+        this.container = comic;
+        this.setMembers = comic?.items ?? [];
+        this.loading = false;
+        if (comic) {
+          this.editContainer = structuredClone(comic);
+          const count = (comic.items ?? []).length;
+          this.titleService.setTitle(`${comic.title} Set — Lightning Comics PDX`);
+          this.meta.updateTag({ name: 'description', content: `${comic.title} — set of ${count} comic${count !== 1 ? 's' : ''} available for claim at Lightning Comics PDX in Oregon City, OR.` });
+        }
+      });
+
+      this.cartService.getClaimedMap().subscribe({ next: m => this.claimedMap = m, error: () => {} });
+      if (this.auth.isApproved()) {
+        this.cartService.getMyCart().subscribe({ next: cart => this.myCart = cart, error: () => {} });
       }
     });
+  }
 
-    this.cartService.getClaimedMap().subscribe({ next: m => this.claimedMap = m, error: () => {} });
-    if (this.auth.isApproved()) {
-      this.cartService.getMyCart().subscribe({ next: cart => this.myCart = cart, error: () => {} });
-    }
+  ngOnDestroy(): void {
+    if (this.routeParamSub) this.routeParamSub.unsubscribe();
+    if (this.addBookSearchTimer) clearTimeout(this.addBookSearchTimer);
   }
 
   get totalPrice(): number {

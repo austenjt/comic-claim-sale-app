@@ -34,6 +34,7 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
   private bidTimerInterval: any = null;
   private bidPollInterval: any = null;
   private claimEventSub: Subscription | null = null;
+  private routeParamSub: Subscription | null = null;
   imageUploading = false;
   imageUploadErrorSummary = '';
   imageUploadErrorDetail = '';
@@ -92,11 +93,51 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.enums = this.configService.getEnums();
-    this.getComic();
-    this.cartService.getClaimedMap().subscribe({ next: m => this.claimedMap = m, error: () => {} });
-    if (this.auth.isApproved() && !this.auth.isAdmin()) {
-      this.cartService.getMyCart().subscribe({ next: cart => this.myCart = cart, error: () => {} });
-    }
+    // Subscribe to paramMap so navigating detail→detail (same route, different :id)
+    // properly reloads the comic even when Angular reuses the component instance.
+    this.routeParamSub = this.route.paramMap.subscribe(params => {
+      const id = parseInt(params.get('id')!, 10);
+      this.resetForNewComic();
+      this.loadComic(id);
+      this.cartService.getClaimedMap().subscribe({ next: m => this.claimedMap = m, error: () => {} });
+      if (this.auth.isApproved() && !this.auth.isAdmin()) {
+        this.cartService.getMyCart().subscribe({ next: cart => this.myCart = cart, error: () => {} });
+      }
+    });
+  }
+
+  private resetForNewComic(): void {
+    this.comic = undefined;
+    this.loading = true;
+    this.activeImage = 'front';
+    this.zoomOpen = false;
+    this.claimError = '';
+    this.actionLoading = false;
+    this.bidSecondsRemaining = 0;
+    this.linkCopied = false;
+    this.pendingDelete = false;
+    this.deleting = false;
+    this.editComic = null;
+    this.editWritersStr = '';
+    this.editArtistsStr = '';
+    this.saving = false;
+    this.saveError = '';
+    this.saveDone = false;
+    this.bidModalOpen = false;
+    this.bidModalAmount = null;
+    this.bidModalError = '';
+    this.bidModalSubmitting = false;
+    this.imageUploading = false;
+    this.imageUploadErrorSummary = '';
+    this.imageUploadErrorDetail = '';
+    this.imageUploadErrorExpanded = false;
+    this.backImageUploading = false;
+    this.backImageUploadErrorSummary = '';
+    this.backImageUploadErrorDetail = '';
+    this.backImageUploadErrorExpanded = false;
+    if (this.bidTimerInterval) { clearInterval(this.bidTimerInterval); this.bidTimerInterval = null; }
+    if (this.bidPollInterval) { clearInterval(this.bidPollInterval); this.bidPollInterval = null; }
+    if (this.claimEventSub) { this.claimEventSub.unsubscribe(); this.claimEventSub = null; }
   }
 
   claimedDate(comicId: number): string | null {
@@ -162,6 +203,7 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
     if (this.bidTimerInterval) clearInterval(this.bidTimerInterval);
     if (this.bidPollInterval) clearInterval(this.bidPollInterval);
     if (this.claimEventSub) this.claimEventSub.unsubscribe();
+    if (this.routeParamSub) this.routeParamSub.unsubscribe();
   }
 
   isBiddingActive(): boolean {
@@ -377,8 +419,7 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
     });
   }
 
-  getComic(): void {
-    const id = parseInt(this.route.snapshot.paramMap.get('id')!, 10);
+  private loadComic(id: number): void {
     this.comicService.getComic(id)
       .subscribe(comic => {
         this.comic = comic;
