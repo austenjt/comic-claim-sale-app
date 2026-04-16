@@ -31,7 +31,8 @@
 
     <!-- User avatar — always visible; shows Login or Profile/Logout depending on auth state -->
     <div class="header-user">
-      <button class="avatar-btn" (click)="profileOpen = !profileOpen" [class.open]="profileOpen" aria-label="User menu">
+      <button class="avatar-btn" (click)="profileOpen = !profileOpen" [class.open]="profileOpen" aria-label="User menu"
+              [title]="(auth.currentUser$ | async)?.name || 'Anonymous'">
         <img src="assets/user-profile.svg" alt="Profile" class="avatar-icon">
       </button>
       <div class="profile-dropdown" *ngIf="profileOpen" (click)="profileOpen = false">
