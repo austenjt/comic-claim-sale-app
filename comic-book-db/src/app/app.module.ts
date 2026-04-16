@@ -17,7 +17,6 @@ import { HttpLoggingInterceptor } from './http-logging.interceptor';
 import { msalGuardConfig, msalInstanceFactory, msalInterceptorConfig } from './auth.config';
 
 import { AppRoutingModule } from './app-routing.module';
-import { AgGridModule } from 'ag-grid-angular';
 
 import { AppComponent } from './app.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
@@ -72,7 +71,6 @@ import { PaginationBarComponent } from './pagination-bar/pagination-bar.componen
         FormsModule,
         AppRoutingModule,
         StandaloneListComponent,
-        AgGridModule,
     ],
     providers: [
         // Load app config (biddingMode, awardModeEnabled, etc.) before any component renders

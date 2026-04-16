@@ -1,8 +1,5 @@
 /* Global Styles */
 
-@import 'ag-grid-community/styles/ag-grid.css';
-@import 'ag-grid-community/styles/ag-theme-alpine.css';
-
 /* ── Warm-up / loading indicator (shared across dashboard, comic-detail, set-detail) ── */
 .warming-up {
   display: flex;
@@ -160,51 +157,3 @@ hr {
   margin: 1.5rem 0;
 }
 
-/* ── AG Grid — Sunny Olive theme overrides ─────────────────────────────────── */
-.ag-theme-alpine {
-  --ag-alpine-active-color: #7b8f4b;
-  --ag-background-color: #dde5b6;
-  --ag-foreground-color: #6c584c;
-  --ag-border-color: #b8c89a;
-  --ag-secondary-border-color: #b8c89a;
-  --ag-row-border-color: #b8c89a;
-  --ag-cell-horizontal-border: solid #b8c89a;
-
-  --ag-header-background-color: #adc178;
-  --ag-header-foreground-color: #6c584c;
-  --ag-header-column-separator-color: #b8c89a;
-  --ag-header-column-resize-handle-color: #7b8f4b;
-
-  --ag-odd-row-background-color: #f0ead2;
-  --ag-row-hover-color: rgba(123, 143, 75, 0.1);
-  --ag-selected-row-background-color: rgba(123, 143, 75, 0.2);
-  --ag-column-hover-color: rgba(123, 143, 75, 0.06);
-
-  --ag-range-selection-border-color: #7b8f4b;
-  --ag-range-selection-background-color: rgba(123, 143, 75, 0.15);
-
-  --ag-input-border-color: #b8c89a;
-  --ag-input-focus-border-color: #7b8f4b;
-  --ag-input-focus-box-shadow: 0 0 0 3px rgba(123, 143, 75, 0.25);
-
-  --ag-checkbox-background-color: #dde5b6;
-  --ag-checkbox-checked-color: #7b8f4b;
-  --ag-checkbox-unchecked-color: #b8c89a;
-  --ag-checkbox-indeterminate-color: #7b8f4b;
-
-  --ag-chip-background-color: #b8c89a;
-  --ag-disabled-foreground-color: #a0927e;
-
-  --ag-control-panel-background-color: #adc178;
-  --ag-subheader-background-color: #adc178;
-  --ag-tool-panel-background-color: #adc178;
-  --ag-tool-panel-separator-color: #b8c89a;
-
-  --ag-menu-background-color: #dde5b6;
-  --ag-menu-border-color: #b8c89a;
-
-  --ag-value-change-value-highlight-background-color: rgba(123, 143, 75, 0.3);
-
-  --ag-modal-overlay-background-color: rgba(108, 88, 76, 0.5);
-  --ag-icon-color: #79675c;
-}

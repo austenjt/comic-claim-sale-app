@@ -76,7 +76,7 @@ npx @azure/static-web-apps-cli deploy dist/comic-book-db \
 
 **`ComicService`** is the central data service. It eagerly loads all comics into a `BehaviorSubject` on startup (`loadInitialData()`). Components consume `getCachedComics()` for in-memory data or call remote methods for fresh data. The base URL points to the deployed Azure Function App — to develop against local functions, uncomment the `localhost:7071` line in `ComicService`.
 
-**AG Grid** (`ag-grid-angular` v31) is used in `StandaloneListComponent` for the inline-editable admin list view. Column definitions and cell renderers live in `standalone-list/`.
+**Admin editing**: All comic fields are edited inline on the Comic Detail page (`comic-detail/`) and Set Detail page (`set-detail/`). When an admin is logged in, value fields render as editable inputs/selects/checkboxes and a Save button appears in the page nav. Saves call `PUT /api/comics`. The Inventory page (`standalone-list/`) retains the Quick Add wizard and Set management (Add/Delete/Rename/View Sets) but no longer contains a bulk-edit grid.
 
 **Images**: Comics have up to four image IDs (`smallCachedImageId`, `largeCachedImageId`, `smallBackImageId`, `largeBackImageId`). Missing images fall back to `src/assets/comic-book-small.png` (dashboard) or `src/assets/comic-book-large.png` (detail page).
 

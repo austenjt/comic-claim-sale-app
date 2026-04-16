@@ -344,38 +344,3 @@
 </div>
 <!-- ───────────────────────────────────────────────────────────────────────── -->
 
-<div class="qa-section">
-  <div class="qa-header">
-    <span class="qa-title">Mass Edit</span>
-  </div>
-  <div class="grid-toolbar">
-    <button class="toolbar-btn refresh-btn" (click)="refreshGrid()" [disabled]="refreshing">
-      {{ refreshing ? 'Loading…' : '&#8635; Refresh' }}
-    </button>
-    <input *ngIf="dataLoaded" class="grid-search" type="search" placeholder="Search…" [(ngModel)]="gridSearch" />
-  </div>
-
-  <div *ngIf="!dataLoaded" class="grid-placeholder">
-    <span>Click <strong>Refresh</strong> to load the latest data before making edits.</span>
-  </div>
-
-  <div class="grid-resize-wrapper">
-    <ag-grid-angular
-          *ngIf="dataLoaded"
-          pagination
-          class="ag-theme-alpine"
-          style="height: 100%; width: 100%;"
-          [rowData]="comics"
-          [columnDefs]="columnDefs"
-          [getRowId]="getRowId"
-          (cellClicked)="onCellClicked($event)"
-          rowSelection="single"
-          (rowClicked)="onRowClicked($event)"
-          (cellValueChanged)="onCellValueChanged($event)"
-          [stopEditingWhenCellsLoseFocus]="true"
-          [quickFilterText]="gridSearch"
-          (firstDataRendered)="onFirstDataRendered($event)"
-    >
-    </ag-grid-angular>
-  </div>
-</div>
