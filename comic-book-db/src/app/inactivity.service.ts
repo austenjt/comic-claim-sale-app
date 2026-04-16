@@ -1,6 +1,6 @@
 import { Injectable, OnDestroy } from '@angular/core';
-import { fromEvent, merge, Observable } from 'rxjs';
-import { debounceTime, distinctUntilChanged, map, shareReplay, startWith } from 'rxjs/operators';
+import { fromEvent, merge, Observable, of, timer } from 'rxjs';
+import { distinctUntilChanged, map, shareReplay, startWith, switchMap } from 'rxjs/operators';
 
 const IDLE_TIMEOUT_MS = 15 * 60 * 1000;
 
@@ -19,8 +19,10 @@ export class InactivityService implements OnDestroy {
 
   constructor() {
     this.isIdle$ = this.activityEvents$.pipe(
-      debounceTime(IDLE_TIMEOUT_MS),
-      map(() => true),
+      switchMap(() => merge(
+        of(false),
+        timer(IDLE_TIMEOUT_MS).pipe(map(() => true))
+      )),
       startWith(false),
       distinctUntilChanged(),
       shareReplay(1),

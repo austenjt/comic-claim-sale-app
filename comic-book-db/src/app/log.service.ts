@@ -27,7 +27,6 @@ export class LogService {
     private inactivityService: InactivityService,
     private http: HttpClient
   ) {
-    this.startPolling();
     this.loadPersistedLogs();
     this.inactivityService.isIdle$.subscribe(idle => {
       if (idle) {
