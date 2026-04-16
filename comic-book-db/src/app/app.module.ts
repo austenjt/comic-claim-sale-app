@@ -31,7 +31,7 @@ import { LoginComponent } from './login/login.component';
 import { AuthCallbackComponent } from './auth-callback/auth-callback.component';
 import { PendingApprovalComponent } from './pending-approval/pending-approval.component';
 import { AdminUsersComponent } from './admin-users/admin-users.component';
-import { HowItWorksComponent } from './how-it-works/how-it-works.component';
+import { DocumentationComponent } from './documentation/documentation.component';
 import { CartComponent } from './cart/cart.component';
 import { AdminOrdersComponent } from './admin-orders/admin-orders.component';
 import { AccountProfileComponent } from './account-profile/account-profile.component';
@@ -55,7 +55,7 @@ import { PaginationBarComponent } from './pagination-bar/pagination-bar.componen
         AuthCallbackComponent,
         PendingApprovalComponent,
         AdminUsersComponent,
-        HowItWorksComponent,
+        DocumentationComponent,
         CartComponent,
         AdminOrdersComponent,
         AccountProfileComponent,

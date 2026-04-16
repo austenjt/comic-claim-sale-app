@@ -18,13 +18,13 @@
         </ng-container>
 
         <ng-container *ngIf="auth.isAdmin()">
-          <a routerLink="/admin/orders" routerLinkActive="active">Manage Orders</a>
-          <a routerLink="/comics" routerLinkActive="active">Comics Management</a>
-          <a routerLink="/admin/users" routerLinkActive="active">User Admin</a>
+          <a routerLink="/admin/orders" routerLinkActive="active">Orders</a>
+          <a routerLink="/comics" routerLinkActive="active">Inventory</a>
+          <a routerLink="/admin/users" routerLinkActive="active">Admin</a>
           <a routerLink="/admin/sales" routerLinkActive="active">Sales</a>
         </ng-container>
 
-        <a *ngIf="!auth.isAdmin()" routerLink="/how-it-works" routerLinkActive="active" class="nav-start-here">Documentation</a>
+        <a *ngIf="!auth.isAdmin()" routerLink="/documentation" routerLinkActive="active" class="nav-start-here">Documentation</a>
         <a *ngIf="!auth.isAdmin()" routerLink="/contact" routerLinkActive="active">Contact</a>
       </nav>
     </div>

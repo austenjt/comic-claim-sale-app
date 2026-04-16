@@ -9,7 +9,7 @@ import { AuthCallbackComponent } from './auth-callback/auth-callback.component';
 import { PendingApprovalComponent } from './pending-approval/pending-approval.component';
 import { AdminUsersComponent } from './admin-users/admin-users.component';
 import { AdminGuard } from './admin.guard';
-import { HowItWorksComponent } from './how-it-works/how-it-works.component';
+import { DocumentationComponent } from './documentation/documentation.component';
 import { CartComponent } from './cart/cart.component';
 import { AdminOrdersComponent } from './admin-orders/admin-orders.component';
 import { AuthGuard } from './auth.guard';
@@ -29,7 +29,7 @@ const routes: Routes = [
   { path: 'auth-callback', component: AuthCallbackComponent },
   { path: 'pending-approval', component: PendingApprovalComponent },
   { path: 'admin/users',   component: AdminUsersComponent,   canActivate: [AdminGuard] },
-  { path: 'how-it-works',  component: HowItWorksComponent },
+  { path: 'documentation',  component: DocumentationComponent },
   { path: 'cart',          component: CartComponent,         canActivate: [AuthGuard] },
   { path: 'profile',       component: AccountProfileComponent, canActivate: [AuthGuard] },
   { path: 'admin/orders',  component: AdminOrdersComponent,  canActivate: [AdminGuard] },
