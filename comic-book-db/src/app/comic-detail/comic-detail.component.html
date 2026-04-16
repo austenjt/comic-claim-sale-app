@@ -287,10 +287,6 @@
           <span class="detail-label">Graded</span>
           <span class="detail-value">No</span>
         </div>
-        <div class="detail-item" *ngIf="!auth.isAdmin() && !comic.comicCondition?.cgcCondition && !comic.comicCondition?.cbcsCondition && comic.comicCondition?.notCertifiedGrade">
-          <span class="detail-label">Estimated Grade</span>
-          <span class="detail-value">{{comic.comicCondition!.notCertifiedGrade | number:'1.1-1'}}</span>
-        </div>
 
         <!-- CGC -->
         <ng-container *ngIf="comic.comicCondition?.cgcCondition">
