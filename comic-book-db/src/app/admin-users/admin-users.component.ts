@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { UserService } from '../user.service';
 import { User } from '../user';
+import { CartService } from '../cart.service';
 
 @Component({
     selector: 'app-admin-users',
@@ -14,7 +15,12 @@ export class AdminUsersComponent implements OnInit {
   loading = false;
   error = '';
 
-  constructor(private userService: UserService) {}
+  resetConfirmText = '';
+  resetInProgress = false;
+  resetSuccess = '';
+  resetError = '';
+
+  constructor(private userService: UserService, private cartService: CartService) {}
 
   ngOnInit() {
     this.loadAll();
@@ -59,6 +65,23 @@ export class AdminUsersComponent implements OnInit {
         next: users => { this.existingUsers = users; }
       }),
       error: () => { this.error = 'Failed to reactivate user.'; }
+    });
+  }
+
+  resetDatabase() {
+    this.resetInProgress = true;
+    this.resetSuccess = '';
+    this.resetError = '';
+    this.cartService.resetDatabase().subscribe({
+      next: () => {
+        this.resetSuccess = 'Database reset complete. All comics, images, carts, discounts, and sessions have been cleared.';
+        this.resetConfirmText = '';
+        this.resetInProgress = false;
+      },
+      error: () => {
+        this.resetError = 'Reset failed. Check the server logs.';
+        this.resetInProgress = false;
+      }
     });
   }
 }

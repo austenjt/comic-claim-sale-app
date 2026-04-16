@@ -284,7 +284,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.cartService.finalizeBid(String(comic.id)).subscribe({
       next: () => {
         this.claimedMap[String(comic.id)] = new Date().toISOString();
-        this.logService.logBid(`Bidding ended for "${comic.title}" — added to winner's cart.`);
+        this.logService.logBid(`Bidding ended for "${comic.title}${this.comicNumberLabel(comic)}" — added to winner's cart.`);
         if (!this.auth.isAdmin()) this.refreshMyCart();
       },
       error: () => { this.loadClaimedMap(); }
@@ -365,7 +365,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       next: updatedComic => {
         const idx = this.pageItems.findIndex(c => c.id === comic.id);
         if (idx >= 0) this.pageItems[idx] = { ...this.pageItems[idx], ...updatedComic };
-        this.logService.logBid(`Bidding opened for "${comic.title}" — starting at $${price.toFixed(2)} — waiting for first bid.`);
+        this.logService.logBid(`Bidding opened for "${comic.title}${this.comicNumberLabel(comic)}" — starting at $${price.toFixed(2)} — waiting for first bid.`);
         this.cancelOpenBid();
       },
       error: err => {

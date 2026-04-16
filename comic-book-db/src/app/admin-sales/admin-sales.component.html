@@ -80,24 +80,4 @@
     No discount rules configured yet.
   </p>
 
-  <!-- Database Reset -->
-  <div class="section-divider"></div>
-  <h3 class="danger-title">Reset Database</h3>
-  <p class="reset-warning">
-    This will permanently delete all comics, images, shopping carts, discounts, and user sessions (except yours).
-    Fulfilled order history will be preserved. This action cannot be undone.
-  </p>
-
-  <div *ngIf="resetSuccess" class="success-message">{{ resetSuccess }}</div>
-  <div *ngIf="resetError" class="error-message">{{ resetError }}</div>
-
-  <div class="reset-confirm-row">
-    <input type="text" [(ngModel)]="resetConfirmText" placeholder='Type "RESET" to confirm' class="reset-confirm-input" />
-    <button
-      class="btn-danger"
-      [disabled]="resetConfirmText !== 'RESET' || resetInProgress"
-      (click)="resetDatabase()">
-      {{ resetInProgress ? 'Resetting…' : 'Reset Database' }}
-    </button>
-  </div>
 </div>

@@ -37,7 +37,7 @@
       </button>
       <div class="profile-dropdown" *ngIf="profileOpen" (click)="profileOpen = false">
         <ng-container *ngIf="auth.isLoggedIn(); else loggedOut">
-          <div class="dropdown-name">{{ (auth.currentUser$ | async)?.name }}</div>
+          <div class="dropdown-name">{{ auth.currentUser$.value?.name }}</div>
           <a routerLink="/profile" class="dropdown-item">My Profile</a>
           <button class="dropdown-item dropdown-logout" (click)="logout()">Logout</button>
         </ng-container>

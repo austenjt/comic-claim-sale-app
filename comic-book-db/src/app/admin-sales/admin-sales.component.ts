@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { DiscountService } from '../discount.service';
 import { Discount, DiscountType } from '../discount';
-import { CartService } from '../cart.service';
 
 @Component({
     selector: 'app-admin-sales',
@@ -29,15 +28,7 @@ export class AdminSalesComponent implements OnInit {
     { value: 'PERCENTAGE_PER_X_BOOKS', label: '% Per X Books' }
   ];
 
-  resetConfirmText = '';
-  resetInProgress = false;
-  resetSuccess = '';
-  resetError = '';
-
-  constructor(
-    private discountService: DiscountService,
-    private cartService: CartService
-  ) {}
+  constructor(private discountService: DiscountService) {}
 
   ngOnInit() {
     this.load();
@@ -123,24 +114,6 @@ export class AdminSalesComponent implements OnInit {
 
   needsXBooks(): boolean {
     return this.formType === 'BUY_X_GET_ONE_FREE' || this.formType === 'PERCENTAGE_PER_X_BOOKS';
-  }
-
-  resetDatabase() {
-    this.resetInProgress = true;
-    this.resetSuccess = '';
-    this.resetError = '';
-    this.cartService.resetDatabase().subscribe({
-      next: () => {
-        this.resetSuccess = 'Database reset complete. All comics, images, carts, discounts, and sessions have been cleared.';
-        this.resetConfirmText = '';
-        this.resetInProgress = false;
-        this.load();
-      },
-      error: () => {
-        this.resetError = 'Reset failed. Check the server logs.';
-        this.resetInProgress = false;
-      }
-    });
   }
 
   describeDiscount(d: Discount): string {
