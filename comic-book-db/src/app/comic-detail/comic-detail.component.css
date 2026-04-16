@@ -34,6 +34,12 @@ button {
   border-color: #adc178;
 }
 
+.nav-position {
+  font-size: 0.8rem;
+  color: #888;
+  white-space: nowrap;
+}
+
 .comic-heading {
   display: flex;
   align-items: center;

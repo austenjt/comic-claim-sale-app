@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Title, Meta } from '@angular/platform-browser';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Location } from '@angular/common';
 
 import { Comic } from '../comic';
@@ -11,6 +11,7 @@ import { CartService } from '../cart.service';
 import { LogService } from '../log.service';
 import { AuthService } from '../auth.service';
 import { ConfigService, ComicEnums } from '../config.service';
+import { DashboardNavService, NavItem } from '../dashboard-nav.service';
 import { Observable, of, map, Subscription } from 'rxjs';
 
 @Component({
@@ -59,12 +60,14 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
 
   constructor(
     private route: ActivatedRoute,
+    private router: Router,
     private comicService: ComicService,
     private imageService: ImageService,
     private cartService: CartService,
     private logService: LogService,
     public auth: AuthService,
     public configService: ConfigService,
+    private navService: DashboardNavService,
     private location: Location,
     private titleService: Title,
     private meta: Meta,
@@ -517,8 +520,29 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
     });
   }
 
+  get prevItem(): NavItem | null {
+    if (!this.comic) return null;
+    return this.navService.getAdjacent(this.comic.id).prev;
+  }
+
+  get nextItem(): NavItem | null {
+    if (!this.comic) return null;
+    return this.navService.getAdjacent(this.comic.id).next;
+  }
+
+  get navPosition(): { index: number; total: number } {
+    if (!this.comic) return { index: 0, total: 0 };
+    return this.navService.getPosition(this.comic.id);
+  }
+
+  navigateTo(item: NavItem): void {
+    const route = item.docType === 'SET' ? ['/set', item.id] : ['/detail', item.id];
+    this.router.navigate(route);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
   goBack(): void {
-    this.location.back();
+    this.router.navigate(['/dashboard']);
   }
 
   copyShareLink(): void {

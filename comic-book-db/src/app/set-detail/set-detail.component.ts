@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Title, Meta } from '@angular/platform-browser';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Location } from '@angular/common';
 import { Observable, of } from 'rxjs';
 
@@ -11,6 +11,7 @@ import { ImageService } from '../image.service';
 import { CartService } from '../cart.service';
 import { LogService } from '../log.service';
 import { AuthService } from '../auth.service';
+import { DashboardNavService, NavItem } from '../dashboard-nav.service';
 
 @Component({
     selector: 'app-set-detail',
@@ -51,11 +52,13 @@ export class SetDetailComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
+    private router: Router,
     private comicService: ComicService,
     private imageService: ImageService,
     private cartService: CartService,
     private logService: LogService,
     public auth: AuthService,
+    private navService: DashboardNavService,
     private location: Location,
     private titleService: Title,
     private meta: Meta,
@@ -278,8 +281,29 @@ export class SetDetailComponent implements OnInit {
     });
   }
 
+  get prevItem(): NavItem | null {
+    if (!this.container) return null;
+    return this.navService.getAdjacent(this.container.id).prev;
+  }
+
+  get nextItem(): NavItem | null {
+    if (!this.container) return null;
+    return this.navService.getAdjacent(this.container.id).next;
+  }
+
+  get navPosition(): { index: number; total: number } {
+    if (!this.container) return { index: 0, total: 0 };
+    return this.navService.getPosition(this.container.id);
+  }
+
+  navigateTo(item: NavItem): void {
+    const route = item.docType === 'SET' ? ['/set', item.id] : ['/detail', item.id];
+    this.router.navigate(route);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
   goBack(): void {
-    this.location.back();
+    this.router.navigate(['/dashboard']);
   }
 
   copyShareLink(): void {

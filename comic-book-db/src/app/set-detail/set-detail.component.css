@@ -13,6 +13,12 @@ button {
   margin-bottom: 1rem;
 }
 
+.nav-position {
+  font-size: 0.8rem;
+  color: #888;
+  white-space: nowrap;
+}
+
 .btn-share {
   padding: 5px 14px;
   background: transparent;

@@ -51,6 +51,9 @@
 <div *ngIf="comic">
   <div class="page-nav">
     <button type="button" (click)="goBack()">go back</button>
+    <button type="button" class="btn-nav-prev" [disabled]="!prevItem" (click)="prevItem && navigateTo(prevItem)">&#8592; Prev</button>
+    <button type="button" class="btn-nav-next" [disabled]="!nextItem" (click)="nextItem && navigateTo(nextItem)">Next &#8594;</button>
+    <span *ngIf="navPosition.total > 0" class="nav-position">{{ navPosition.index }} of {{ navPosition.total }}</span>
     <button class="btn-share" (click)="copyShareLink()">
       {{ linkCopied ? '✓ Link Copied!' : '&#128279; Share' }}
     </button>

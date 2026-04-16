@@ -8,6 +8,7 @@ import { CartService } from '../cart.service';
 import { LogService } from '../log.service';
 import { UserService } from '../user.service';
 import { ConfigService } from '../config.service';
+import { DashboardNavService } from '../dashboard-nav.service';
 import { Cart } from '../cart';
 import { User } from '../user';
 import { Observable, of, Subscription } from 'rxjs';
@@ -126,6 +127,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     public logService: LogService,
     private userService: UserService,
     public configService: ConfigService,
+    private navService: DashboardNavService,
     private title: Title,
     private meta: Meta,
   ) {}
@@ -196,6 +198,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         this.totalCount = response.totalCount;
         this.totalPages = response.totalPages;
         this.loading = false;
+        this.navService.setList(this.pageItems);
         this.initBidCountdowns();
       },
       error: () => {

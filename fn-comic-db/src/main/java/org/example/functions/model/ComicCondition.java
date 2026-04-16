@@ -44,7 +44,7 @@ public class ComicCondition {
     @Setter(AccessLevel.NONE)
     private CBCSCondition cbcsCondition;
 
-    // Not certified
+    // Not certified, opinionated values
     private String notCertifiedLabel;
     @JsonSerialize(using = GradeSerializer.class)
     private ComicGrade notCertifiedGrade;
