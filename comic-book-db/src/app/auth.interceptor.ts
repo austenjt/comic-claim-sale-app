@@ -3,6 +3,7 @@ import { HttpInterceptor, HttpRequest, HttpHandler, HttpEvent } from '@angular/c
 import { Observable, from } from 'rxjs';
 import { catchError, switchMap } from 'rxjs/operators';
 import { MsalService } from '@azure/msal-angular';
+import { InteractionRequiredAuthError } from '@azure/msal-browser';
 import { apiBase, clientId } from './auth.config';
 
 /**
@@ -37,7 +38,16 @@ export class AuthInterceptor implements HttpInterceptor {
       switchMap(result =>
         next.handle(req.clone({ setHeaders: { Authorization: `Bearer ${result.accessToken}` } }))
       ),
-      catchError(() => next.handle(req)),
+      catchError((err) => {
+        if (err instanceof InteractionRequiredAuthError) {
+          // Silent refresh failed because user interaction is required (e.g. Safari/Firefox
+          // blocked the hidden iframe). Trigger a redirect login so the token is refreshed.
+          this.msal.loginRedirect({ scopes: [`${clientId}/.default`] });
+        }
+        // For any other error pass through without a token — the API will return 401
+        // and the user will be redirected to login naturally.
+        return next.handle(req);
+      }),
     );
   }
 }

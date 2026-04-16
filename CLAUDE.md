@@ -72,7 +72,7 @@ npx @azure/static-web-apps-cli deploy dist/comic-book-db \
 
 ### Frontend (comic-book-db)
 
-**Angular 16** SPA using `HashLocationStrategy`. All routes are in `app-routing.module.ts`. Auth routes use `AuthGuard`; admin routes use `AdminGuard`. Auth state is held in `AuthService` via a `BehaviorSubject<User | null>` and persisted in `localStorage` as a session token.
+**Angular 16** SPA using standard `PathLocationStrategy` (HTML5 routing). Hash-based routing was removed because it conflicted with MSAL's redirect flow. Azure Static Web Apps serves the Angular app for all routes via rewrite rules. All routes are in `app-routing.module.ts`. Auth routes use `AuthGuard`; admin routes use `AdminGuard`. Auth state is held in `AuthService` via a `BehaviorSubject<User | null>` and persisted in `localStorage` as a session token.
 
 **`ComicService`** is the central data service. It eagerly loads all comics into a `BehaviorSubject` on startup (`loadInitialData()`). Components consume `getCachedComics()` for in-memory data or call remote methods for fresh data. The base URL points to the deployed Azure Function App — to develop against local functions, uncomment the `localhost:7071` line in `ComicService`.
 

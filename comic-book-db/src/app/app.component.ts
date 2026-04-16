@@ -35,6 +35,12 @@ export class AppComponent implements OnInit {
     // and processes the token response when returning from Entra's login page.
     this.msal.initialize().subscribe(() => {
       this.msal.handleRedirectObservable().subscribe({
+        error: () => {
+          // MSAL failed to process the redirect — most commonly Safari ITP clearing
+          // sessionStorage during the round-trip, causing a state_not_found error.
+          // Navigate to login so the user can try again.
+          this.router.navigate(['/login']);
+        },
         next: (result) => {
           if (result?.account) {
             this.msal.instance.setActiveAccount(result.account);

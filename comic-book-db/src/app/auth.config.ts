@@ -36,7 +36,9 @@ export function msalInstanceFactory(): IPublicClientApplication {
     },
     cache: {
       cacheLocation: BrowserCacheLocation.LocalStorage,
-      storeAuthStateInCookie: false,
+      // Required for Safari (ITP) and Firefox (ETP): sessionStorage is cleared during
+      // cross-origin redirects, so MSAL must also persist auth state in a cookie.
+      storeAuthStateInCookie: true,
     },
     system: {
       loggerOptions: {
