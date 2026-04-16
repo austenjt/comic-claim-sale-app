@@ -33,7 +33,6 @@ public class DiscountTriggers {
             methods = {HttpMethod.GET}, authLevel = AuthorizationLevel.ANONYMOUS)
         HttpRequestMessage<Optional<String>> request)
     {
-        if (AuthHelper.requireAdmin(request) == null) return unauthorized(request);
         try {
             List<Discount> discounts = DiscountService.getServiceInstance().getAllDiscounts();
             return cors(request.createResponseBuilder(HttpStatus.OK))

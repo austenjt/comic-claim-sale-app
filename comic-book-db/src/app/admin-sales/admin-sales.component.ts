@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { DiscountService } from '../discount.service';
 import { Discount, DiscountType } from '../discount';
+import { AuthService } from '../auth.service';
 
 @Component({
     selector: 'app-admin-sales',
@@ -28,7 +29,7 @@ export class AdminSalesComponent implements OnInit {
     { value: 'PERCENTAGE_PER_X_BOOKS', label: '% Per X Books' }
   ];
 
-  constructor(private discountService: DiscountService) {}
+  constructor(private discountService: DiscountService, public auth: AuthService) {}
 
   ngOnInit() {
     this.load();

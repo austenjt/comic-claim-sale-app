@@ -34,7 +34,7 @@ const routes: Routes = [
   { path: 'profile',       component: AccountProfileComponent, canActivate: [AuthGuard] },
   { path: 'admin/orders',  component: AdminOrdersComponent,  canActivate: [AdminGuard] },
   { path: 'orders',        component: OrderHistoryComponent, canActivate: [AuthGuard] },
-  { path: 'admin/sales',   component: AdminSalesComponent,   canActivate: [AdminGuard] },
+  { path: 'sales',         component: AdminSalesComponent },
   { path: 'contact',       component: ContactComponent },
 ];
 

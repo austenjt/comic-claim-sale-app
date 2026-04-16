@@ -4,10 +4,10 @@
   <div *ngIf="error" class="error-message">{{ error }}</div>
   <div *ngIf="loading">Loading…</div>
 
-  <button class="btn-create" (click)="openCreate()" *ngIf="!showForm">+ New Rule</button>
+  <button class="btn-create" (click)="openCreate()" *ngIf="!showForm && auth.isAdmin()">+ New Rule</button>
 
-  <!-- Create / Edit Form -->
-  <div *ngIf="showForm" class="discount-form">
+  <!-- Create / Edit Form (admin only) -->
+  <div *ngIf="showForm && auth.isAdmin()" class="discount-form">
     <h3>{{ editingId ? 'Edit Rule' : 'New Rule' }}</h3>
 
     <div class="form-row">
@@ -55,7 +55,7 @@
         <th>Type</th>
         <th>Parameters</th>
         <th>Active</th>
-        <th></th>
+        <th *ngIf="auth.isAdmin()"></th>
       </tr>
     </thead>
     <tbody>
@@ -68,7 +68,7 @@
             {{ d.isActive ? 'Yes' : 'No' }}
           </span>
         </td>
-        <td class="actions">
+        <td class="actions" *ngIf="auth.isAdmin()">
           <button class="btn-edit" (click)="openEdit(d)">Edit</button>
           <button class="btn-delete" (click)="delete(d)">Delete</button>
         </td>
