@@ -10,7 +10,7 @@ import { ImageService } from '../image.service';
 import { CartService } from '../cart.service';
 import { LogService } from '../log.service';
 import { AuthService } from '../auth.service';
-import { ConfigService } from '../config.service';
+import { ConfigService, ComicEnums } from '../config.service';
 import { Observable, of, map, Subscription } from 'rxjs';
 
 @Component({
@@ -45,6 +45,13 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
   linkCopied = false;
   pendingDelete = false;
   deleting = false;
+  editComic: Comic | null = null;
+  editWritersStr = '';
+  editArtistsStr = '';
+  saving = false;
+  saveError = '';
+  saveDone = false;
+  enums: ComicEnums = { coverVariants: [], gradingCompanies: [], grades: [], pageQualities: [] };
   bidModalOpen = false;
   bidModalAmount: number | null = null;
   bidModalError = '';
@@ -81,6 +88,7 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.enums = this.configService.getEnums();
     this.getComic();
     this.cartService.getClaimedMap().subscribe({ next: m => this.claimedMap = m, error: () => {} });
     if (this.auth.isApproved() && !this.auth.isAdmin()) {
@@ -320,6 +328,52 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
     this.meta.updateTag({ name: 'description', content: desc });
   }
 
+  private initEditComic(comic: Comic): void {
+    this.editComic = structuredClone(comic);
+    if (!this.editComic.number) {
+      this.editComic.number = { volume: null, number: null, sentinel: null };
+    }
+    if (!this.editComic.comicCondition) {
+      this.editComic.comicCondition = {
+        isGraded: false, certificationCompany: null, certificationId: null,
+        cgcCondition: null, cbcsCondition: null,
+        notCertifiedLabel: null, notCertifiedGrade: null, notCertifiedPageQuality: null,
+        notCertifiedPedigree: null, notCertifiedDegreeOfRestoration: null, notCertifiedSignature: null
+      };
+    }
+    if (!this.editComic.goCollectInfo) {
+      this.editComic.goCollectInfo = { gcIndex: null, gcSlug: null, gcUrl: null, gcSeries: null, importDate: null };
+    }
+    if (!this.editComic.grandComicDBInfo) {
+      this.editComic.grandComicDBInfo = { gcdbIssueId: null, gcdbSeriesId: null, issueUrl: null, seriesUrl: null };
+    }
+    this.editWritersStr = (this.editComic.writer ?? []).join(', ');
+    this.editArtistsStr = (this.editComic.artist ?? []).join(', ');
+  }
+
+  saveComic(): void {
+    if (!this.editComic) return;
+    const writers = this.editWritersStr.split(',').map((s: string) => s.trim()).filter((s: string) => s.length > 0);
+    this.editComic.writer = writers.length > 0 ? writers : null;
+    const artists = this.editArtistsStr.split(',').map((s: string) => s.trim()).filter((s: string) => s.length > 0);
+    this.editComic.artist = artists.length > 0 ? artists : null;
+    this.saving = true;
+    this.saveError = '';
+    this.saveDone = false;
+    this.comicService.updateComic(this.editComic).subscribe({
+      next: () => {
+        this.comic = structuredClone(this.editComic!);
+        this.saving = false;
+        this.saveDone = true;
+        setTimeout(() => this.saveDone = false, 2000);
+      },
+      error: (err: any) => {
+        this.saving = false;
+        this.saveError = err?.error || 'Save failed.';
+      }
+    });
+  }
+
   getComic(): void {
     const id = parseInt(this.route.snapshot.paramMap.get('id')!, 10);
     this.comicService.getComic(id)
@@ -327,6 +381,7 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
         this.comic = comic;
         this.loading = false;
         if (comic) this.buildPageMeta(comic);
+        if (comic) this.initEditComic(comic);
         if (comic?.bidStartedAt) {
           const endsAt = new Date(comic.bidStartedAt).getTime() +
                          this.configService.biddingCycleMins * 60000;

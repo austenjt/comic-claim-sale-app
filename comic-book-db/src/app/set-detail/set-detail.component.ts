@@ -35,6 +35,10 @@ export class SetDetailComponent implements OnInit {
   linkCopied = false;
 
   removingId: number | null = null;
+  editContainer: Comic | null = null;
+  saving = false;
+  saveError = '';
+  saveDone = false;
 
   // ── Add Book to Set modal ──────────────────────────────────────────────
   showAddBookModal = false;
@@ -65,6 +69,7 @@ export class SetDetailComponent implements OnInit {
       this.setMembers = comic?.items ?? [];
       this.loading = false;
       if (comic) {
+        this.editContainer = structuredClone(comic);
         const count = (comic.items ?? []).length;
         this.titleService.setTitle(`${comic.title} Set — Lightning Comics PDX`);
         this.meta.updateTag({ name: 'description', content: `${comic.title} — set of ${count} comic${count !== 1 ? 's' : ''} available for claim at Lightning Comics PDX in Oregon City, OR.` });
@@ -250,6 +255,25 @@ export class SetDetailComponent implements OnInit {
       error: () => {
         this.addBookError = 'Failed to add book to set. Please try again.';
         this.addBookSaving = false;
+      }
+    });
+  }
+
+  saveContainer(): void {
+    if (!this.editContainer) return;
+    this.saving = true;
+    this.saveError = '';
+    this.saveDone = false;
+    this.comicService.updateComic(this.editContainer).subscribe({
+      next: () => {
+        this.container = structuredClone(this.editContainer!);
+        this.saving = false;
+        this.saveDone = true;
+        setTimeout(() => this.saveDone = false, 2000);
+      },
+      error: (err: any) => {
+        this.saving = false;
+        this.saveError = err?.error || 'Save failed.';
       }
     });
   }

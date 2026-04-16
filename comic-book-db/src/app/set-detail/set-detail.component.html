@@ -9,6 +9,12 @@
     <button class="btn-share" (click)="copyShareLink()">
       {{ linkCopied ? '✓ Link Copied!' : '&#128279; Share' }}
     </button>
+    <ng-container *ngIf="auth.isAdmin()">
+      <button class="btn-save" [class.btn-save-done]="saveDone" (click)="saveContainer()" [disabled]="saving">
+        {{ saving ? 'Saving…' : saveDone ? '✓ Saved' : 'Save' }}
+      </button>
+      <span *ngIf="saveError" class="save-error">{{ saveError }}</span>
+    </ng-container>
   </div>
 
   <div class="set-heading">
@@ -67,27 +73,50 @@
 
       <div class="detail-section">
         <div class="detail-section-title">Set Details</div>
-        <div class="detail-item" *ngIf="container.series && container.series !== ''">
+
+        <div class="detail-item" *ngIf="auth.isAdmin() || (container.series && container.series !== '')">
           <span class="detail-label">Series</span>
-          <span class="detail-value">{{ container.series }}</span>
+          <span *ngIf="!auth.isAdmin()" class="detail-value">{{ container.series }}</span>
+          <input *ngIf="auth.isAdmin()" class="detail-edit-input" type="text" [(ngModel)]="editContainer!.series">
         </div>
-        <div class="detail-item" *ngIf="container.publisher">
+
+        <div class="detail-item" *ngIf="auth.isAdmin() || container.publisher">
           <span class="detail-label">Publisher</span>
-          <span class="detail-value">{{ container.publisher }}</span>
+          <span *ngIf="!auth.isAdmin()" class="detail-value">{{ container.publisher }}</span>
+          <input *ngIf="auth.isAdmin()" class="detail-edit-input" type="text" [(ngModel)]="editContainer!.publisher">
         </div>
+
         <div class="detail-item">
           <span class="detail-label">Books in Set</span>
           <span class="detail-value">{{ setMembers.length }}</span>
         </div>
+
         <div class="detail-item" *ngIf="totalPrice > 0">
           <span class="detail-label">Total Price</span>
           <span class="detail-value">{{ totalPrice | currency:'USD':'symbol':'1.2-2' }}</span>
         </div>
-        <div class="detail-item" *ngIf="container.publicNotes">
+
+        <div class="detail-item" *ngIf="auth.isAdmin() || container.publicNotes">
           <span class="detail-label">Notes</span>
-          <span class="detail-value">{{ container.publicNotes }}</span>
+          <span *ngIf="!auth.isAdmin()" class="detail-value">{{ container.publicNotes }}</span>
+          <textarea *ngIf="auth.isAdmin()" class="detail-edit-textarea" [(ngModel)]="editContainer!.publicNotes"></textarea>
         </div>
       </div>
+
+      <!-- Admin-only sale / collection fields -->
+      <ng-container *ngIf="auth.isAdmin()">
+        <div class="detail-section">
+          <div class="detail-section-title">Sale Info</div>
+          <div class="detail-item">
+            <span class="detail-label">For Sale</span>
+            <input class="detail-edit-checkbox" type="checkbox" [(ngModel)]="editContainer!.isForSale">
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Storage Location</span>
+            <input class="detail-edit-input" type="text" [(ngModel)]="editContainer!.storageLocation">
+          </div>
+        </div>
+      </ng-container>
 
       <div class="detail-section">
         <div class="detail-section-title">Claim Status</div>

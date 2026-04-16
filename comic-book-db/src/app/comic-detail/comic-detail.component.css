@@ -586,3 +586,94 @@ button {
   cursor: pointer;
 }
 .bid-modal-cancel-btn:hover:not(:disabled) { background: rgba(255,255,255,0.05); }
+
+/* Inline edit controls (admin-only) */
+.detail-edit-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid #7b8f4b;
+  color: var(--color-text);
+  font-size: 0.9rem;
+  font-family: inherit;
+  padding: 2px 4px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.detail-edit-input:focus {
+  border-bottom-color: #adc178;
+  background: rgba(123, 143, 75, 0.06);
+}
+
+.detail-edit-select {
+  width: 100%;
+  background: var(--color-surface, #1e1e1e);
+  border: none;
+  border-bottom: 1px solid #7b8f4b;
+  color: var(--color-text);
+  font-size: 0.9rem;
+  font-family: inherit;
+  padding: 2px 4px;
+  outline: none;
+  cursor: pointer;
+}
+
+.detail-edit-select:focus {
+  border-bottom-color: #adc178;
+}
+
+.detail-edit-textarea {
+  width: 100%;
+  background: transparent;
+  border: 1px solid #7b8f4b;
+  border-radius: 3px;
+  color: var(--color-text);
+  font-size: 0.9rem;
+  font-family: inherit;
+  padding: 4px 6px;
+  outline: none;
+  resize: vertical;
+  min-height: 58px;
+  box-sizing: border-box;
+}
+
+.detail-edit-textarea:focus {
+  border-color: #adc178;
+}
+
+.detail-edit-checkbox {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: #7b8f4b;
+  margin-top: 3px;
+}
+
+/* Save button */
+.btn-save {
+  padding: 5px 18px;
+  background: #7b8f4b;
+  color: #f0ead2;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+  margin-bottom: 1rem;
+}
+
+.btn-save:hover:not(:disabled) { background: #6b7e3e; }
+.btn-save:disabled { opacity: 0.6; cursor: default; }
+
+.btn-save-done {
+  background: #adc178;
+  color: #1a2010;
+}
+
+.save-error {
+  color: #c0634c;
+  font-size: 0.82rem;
+  margin-bottom: 1rem;
+}
