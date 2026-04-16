@@ -439,7 +439,8 @@ h2 {
 /* ── Footer badges ─────────────────────────────────────────────────────────── */
 
 .badge-graded,
-.badge-set {
+.badge-set,
+.badge-key-issue {
   display: inline-block;
   font-size: 0.65rem;
   font-weight: 700;
@@ -452,6 +453,11 @@ h2 {
 
 .badge-graded {
   background: #7b8f4b;
+  color: #f0ead2;
+}
+
+.badge-key-issue {
+  background: #b5451b;
   color: #f0ead2;
 }
 

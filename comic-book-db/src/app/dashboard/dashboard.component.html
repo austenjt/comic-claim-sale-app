@@ -200,7 +200,7 @@
               <div *ngIf="comic.number?.number != null || comic.number?.sentinel != null" class="comic-number">
                 Number: <b>{{ comic.number?.sentinel ?? comic.number?.number }}</b>
               </div>
-              <div *ngIf="comic.comicCondition?.notCertifiedGrade" class="comic-grade-est">Grade: <b>{{comic.comicCondition?.notCertifiedGrade | number:'1.1-1'}}</b></div>
+              <div *ngIf="comic.comicCondition?.notCertifiedGrade" class="comic-grade-est">Est. Grade: <b>{{comic.comicCondition?.notCertifiedGrade | number:'1.1-1'}}</b></div>
               <div *ngIf="comic.salePrice && !comic.soldTo" class="comic-price">Price: <b>{{ comic.salePrice | currency:'USD':'symbol':'1.2-2' }}</b></div>
             </div>
         </div>
@@ -208,6 +208,7 @@
           <div class="footer-badges">
             <span *ngIf="comic.comicCondition?.cgcCondition?.grade || comic.comicCondition?.cbcsCondition?.grade"
                   class="badge-graded">Graded</span>
+            <span *ngIf="comic.docType !== 'SET' && comic.keyIssue" class="badge-key-issue">Key Issue</span>
           </div>
           <div class="footer-actions">
             <ng-container *ngIf="comic.soldTo; else notSold">

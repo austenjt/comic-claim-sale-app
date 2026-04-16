@@ -488,7 +488,7 @@
       <div class="detail-section">
         <div class="detail-section-title">Sale Info</div>
         <div class="detail-item">
-          <span class="detail-label">Biddable</span>
+          <span class="detail-label">Bidding Enabled</span>
           <input class="detail-edit-checkbox" type="checkbox" [(ngModel)]="editComic!.enableBid">
         </div>
         <div class="detail-item">
@@ -580,7 +580,7 @@
       <div class="detail-section" *ngIf="!auth.isAdmin()">
         <div class="detail-section-title">Sale Info</div>
         <div class="detail-item">
-          <span class="detail-label">Biddable</span>
+          <span class="detail-label">Bidding Enabled</span>
           <span class="detail-value">{{ (comic.enableBid && !comic.sold) ? 'Yes' : 'No' }}</span>
         </div>
       </div>
