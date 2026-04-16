@@ -146,7 +146,7 @@ public class UserService {
             String body       = "Hi " + user.getName() + ",\n\n"
                 + "Your account request has been approved. You can now log in at:\n\n"
                 + siteUrl + "\n\n"
-                + "Sign in using the Microsoft account associated with " + user.getEmail() + ".\n\n"
+                + "Sign in using the LightningComics.rocks account associated with " + user.getEmail() + ".\n\n"
                 + "Happy collecting!";
             try {
                 EmailService.getServiceInstance().send(List.of(user.getEmail()), adminEmail, adminEmail, subject, body);

@@ -54,7 +54,7 @@ public class EnvHelper {
 
     public static String getSiteUrl() {
         String val = getProp("SITE_URL");
-        return val != null ? val : "the site";
+        return val != null ? val : "https://lightningcomics.rocks";
     }
 
     public static String getSmtpHost() {
