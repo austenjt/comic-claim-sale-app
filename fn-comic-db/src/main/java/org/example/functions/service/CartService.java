@@ -263,6 +263,7 @@ public class CartService {
         cart.setDiscountAmount(discountResult.getAmount());
         cart.setDiscountDescription(discountResult.getDescription());
         cart.setDiscountExcludesSets(discountResult.isExcludedSets() ? Boolean.TRUE : null);
+        cart.setDiscountBreakdown(discountResult.getBreakdown());
         int bookCount = (int) cart.getItems().stream().filter(i -> !i.isSetContainer()).count();
         cart.setShippingCost(ShippingCalculator.estimate(bookCount).getEstimatedCost());
         cart.setStatus("FINALIZING");

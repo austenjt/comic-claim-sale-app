@@ -260,6 +260,10 @@ export class AdminOrdersComponent implements OnInit {
     return items.reduce((sum, item) => sum + item.price, 0);
   }
 
+  visibleCartItems(cart: Cart): CartItem[] {
+    return cart.items.filter(i => !i.isSetContainer);
+  }
+
   showItemDiscounts(cart: Cart): boolean {
     return (cart.discountAmount ?? 0) > 0 && cart.status !== 'OPEN';
   }
@@ -289,7 +293,7 @@ export class AdminOrdersComponent implements OnInit {
   }
 
   cartTotal(cart: Cart): number {
-    return this.itemsTotal(cart.items) + (cart.shippingCost ?? 0);
+    return this.itemsTotal(this.visibleCartItems(cart));
   }
 
   archivedTotal(order: ArchivedOrder): number {

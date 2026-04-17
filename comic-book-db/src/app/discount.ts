@@ -1,4 +1,4 @@
-export type DiscountType = 'RAW_PERCENTAGE' | 'BUY_X_GET_ONE_FREE' | 'PERCENTAGE_PER_X_BOOKS';
+export type DiscountType = 'RAW_PERCENTAGE' | 'BUY_X_GET_ONE_FREE' | 'PERCENT_OFF_OVER_X_BOOKS';
 
 export interface Discount {
   id: string;

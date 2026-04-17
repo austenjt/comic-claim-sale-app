@@ -207,6 +207,19 @@
         </ng-container>
       </tbody>
       <tfoot>
+        <tr>
+          <td>Subtotal <span class="item-count-label">({{ visibleCartItems(cart).length }} book{{ visibleCartItems(cart).length !== 1 ? 's' : '' }})</span></td>
+          <td>{{ cartTotal(cart) | currency }}</td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr *ngIf="(cart.discountAmount ?? 0) > 0">
+          <td>Discount</td>
+          <td colspan="2" style="color:#2e7d32">-{{ cart.discountAmount | currency }}
+            <span *ngIf="cart.discountDescription" style="font-size:0.85em;color:#555;margin-left:0.4rem">({{ cart.discountDescription }})</span>
+          </td>
+          <td></td>
+        </tr>
         <tr *ngIf="cart.shippingCost && cart.shippingCost > 0">
           <td>Shipping</td>
           <td>{{ cart.shippingCost | currency }}</td>
@@ -215,7 +228,7 @@
         </tr>
         <tr>
           <td><strong>Total</strong></td>
-          <td><strong>{{ cartTotal(cart) | currency }}</strong></td>
+          <td><strong>{{ (cartTotal(cart) - (cart.discountAmount || 0) + (cart.shippingCost || 0)) | currency }}</strong></td>
           <td></td>
           <td></td>
         </tr>

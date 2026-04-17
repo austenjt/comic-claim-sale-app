@@ -20,7 +20,8 @@ public class Cart {
     private String fulfilledAt;
     private double discountAmount;       // snapshotted at submit time
     private String discountDescription;  // human-readable summary of applied discounts
-    private Boolean discountExcludesSets; // true when the active discount rule excluded set items
+    private Boolean discountExcludesSets; // true when any active discount rule excluded set items
+    private List<CartDiscount> discountBreakdown = new ArrayList<>(); // per-rule breakdown for frontend per-item display
     private double shippingCost;         // snapshotted at submit time
     private String paymentStatus;        // UNPAID | PARTIAL | PAID — set by admin
     private String customerNotes;        // optional message from user, captured at submit time
@@ -78,4 +79,9 @@ public class Cart {
 
     public Boolean getDiscountExcludesSets() { return discountExcludesSets; }
     public void setDiscountExcludesSets(Boolean discountExcludesSets) { this.discountExcludesSets = discountExcludesSets; }
+
+    public List<CartDiscount> getDiscountBreakdown() { return discountBreakdown; }
+    public void setDiscountBreakdown(List<CartDiscount> discountBreakdown) {
+        this.discountBreakdown = discountBreakdown != null ? discountBreakdown : new ArrayList<>();
+    }
 }

@@ -173,7 +173,7 @@
   <!-- Add Book to Set modal -->
   <div class="add-book-overlay" *ngIf="showAddBookModal" (click)="showAddBookModal = false">
     <div class="add-book-modal" (click)="$event.stopPropagation()">
-      <h3 class="add-book-title">Add Book to "{{ container?.title }}"</h3>
+      <h3 class="add-book-title">Add Book to "{{ container.title }}"</h3>
       <p class="add-book-subtitle">Results exclude books already assigned to a set.</p>
       <input class="add-book-search" type="text" autofocus
              [(ngModel)]="addBookSearchTerm"

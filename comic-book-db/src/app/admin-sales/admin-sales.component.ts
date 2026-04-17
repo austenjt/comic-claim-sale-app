@@ -27,7 +27,7 @@ export class AdminSalesComponent implements OnInit {
   readonly typeOptions: { value: DiscountType; label: string }[] = [
     { value: 'RAW_PERCENTAGE', label: 'Flat % Off' },
     { value: 'BUY_X_GET_ONE_FREE', label: 'Buy X Get One Free' },
-    { value: 'PERCENTAGE_PER_X_BOOKS', label: '% Per X Books' }
+    { value: 'PERCENT_OFF_OVER_X_BOOKS', label: '% Off Over X Books' }
   ];
 
   constructor(private discountService: DiscountService, public auth: AuthService) {}
@@ -108,17 +108,17 @@ export class AdminSalesComponent implements OnInit {
         return `${this.formPercentageOff}% off the cart total.`;
       case 'BUY_X_GET_ONE_FREE':
         return `Every ${(this.formXBooks || 1) + 1} books: cheapest book is free.`;
-      case 'PERCENTAGE_PER_X_BOOKS':
-        return `${this.formPercentageOff}% off for every ${this.formXBooks} books in cart (stacks, capped at 100%).`;
+      case 'PERCENT_OFF_OVER_X_BOOKS':
+        return `${this.formPercentageOff}% off when cart has more than ${this.formXBooks} book${this.formXBooks === 1 ? '' : 's'}.`;
     }
   }
 
   needsPercentage(): boolean {
-    return this.formType === 'RAW_PERCENTAGE' || this.formType === 'PERCENTAGE_PER_X_BOOKS';
+    return this.formType === 'RAW_PERCENTAGE' || this.formType === 'PERCENT_OFF_OVER_X_BOOKS';
   }
 
   needsXBooks(): boolean {
-    return this.formType === 'BUY_X_GET_ONE_FREE' || this.formType === 'PERCENTAGE_PER_X_BOOKS';
+    return this.formType === 'BUY_X_GET_ONE_FREE' || this.formType === 'PERCENT_OFF_OVER_X_BOOKS';
   }
 
   describeDiscount(d: Discount): string {
@@ -128,8 +128,8 @@ export class AdminSalesComponent implements OnInit {
         return `${d.percentageOff}% off${setsNote}`;
       case 'BUY_X_GET_ONE_FREE':
         return `Buy ${d.xBooks || '?'} get 1 free${setsNote}`;
-      case 'PERCENTAGE_PER_X_BOOKS':
-        return `${d.percentageOff}% per ${d.xBooks || '?'} books${setsNote}`;
+      case 'PERCENT_OFF_OVER_X_BOOKS':
+        return `${d.percentageOff}% off over ${d.xBooks || '?'} books${setsNote}`;
     }
   }
 }

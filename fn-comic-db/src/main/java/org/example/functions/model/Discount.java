@@ -3,6 +3,7 @@ package org.example.functions.model;
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.example.functions.model.enums.DiscountType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,8 +19,7 @@ import lombok.Setter;
 public class Discount {
     private String id;
     private String name;
-    /** RAW_PERCENTAGE | BUY_X_GET_ONE_FREE | PERCENTAGE_PER_X_BOOKS */
-    private String type;
+    private DiscountType type;
     @JsonProperty("isActive")
     private boolean isActive;
     private double percentageOff;

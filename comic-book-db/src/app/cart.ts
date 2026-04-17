@@ -1,3 +1,9 @@
+export interface CartDiscount {
+  amount: number;
+  description: string;
+  excludesSets: boolean;
+}
+
 export interface ShippingEstimate {
   bookCount: number;
   packagingTier: 'GEMINI_MAILER' | 'COMIC_BOX' | 'LARGE_BOX' | 'SHORT_BOX' | 'NONE';
@@ -32,6 +38,7 @@ export interface Cart {
   discountAmount?: number;
   discountDescription?: string | null;
   discountExcludesSets?: boolean | null;
+  discountBreakdown?: CartDiscount[] | null;
   shippingCost?: number;
   paymentStatus?: 'UNPAID' | 'PARTIAL' | 'PAID' | null;
   customerNotes?: string | null;

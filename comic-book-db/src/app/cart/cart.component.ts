@@ -5,7 +5,7 @@ import { LogService } from '../log.service';
 import { ConfigService } from '../config.service';
 import { ComicService } from '../comic.service';
 import { AuthService } from '../auth.service';
-import { Cart, CartItem } from '../cart';
+import { Cart, CartDiscount, CartItem } from '../cart';
 import { Comic } from '../comic';
 
 interface CartRow {
@@ -211,40 +211,56 @@ export class CartComponent implements OnInit, OnDestroy {
   }
 
   get discountedTotal(): number {
-    const shipping = this.cart?.status !== 'OPEN' ? this.shippingAmount : 0;
-    return Math.max(0, this.cartTotal - (this.cart?.discountAmount ?? 0)) + shipping;
+    return Math.max(0, this.cartTotal - (this.cart?.discountAmount ?? 0)) + this.shippingAmount;
   }
 
   get showItemDiscounts(): boolean {
     return this.cart?.status !== 'OPEN' && (this.cart?.discountAmount ?? 0) > 0;
   }
 
-  /** True when the active discount rule excluded set items. */
-  get setDiscountExcluded(): boolean {
-    return this.cart?.discountExcludesSets === true;
-  }
-
-  /** Total of only the items the discount actually applies to. */
-  private get discountableTotal(): number {
+  /**
+   * Returns the eligible base price total for a given discount rule — i.e. the sum of prices
+   * for all non-bid items that this rule applies to.
+   */
+  private eligibleBaseForRule(rule: CartDiscount): number {
     return this.visibleItems
       .filter(i => !i.wonViaBid &&
-        !(this.setDiscountExcluded && i.collectionGroup != null && i.collectionGroup > 0))
+        !(rule.excludesSets && i.collectionGroup != null && i.collectionGroup > 0))
       .reduce((sum, i) => sum + i.price, 0);
   }
 
   /**
-   * Returns the discounted price for a single item.
-   * Items won via bid are never discounted.
-   * The discount factor is computed only against non-bid items,
-   * so bid-won items still count toward quantity thresholds on the backend
-   * but don't absorb any of the discount pool.
+   * Exact discounted price for one item.
+   *
+   * When discountBreakdown is present (orders submitted after this feature shipped), each rule's
+   * savings are distributed proportionally among its eligible items, so individual items absorb
+   * only the rules that apply to them (e.g. set members skip set-excluded rules).
+   *
+   * Falls back to a simple proportional spread across all non-bid items for older orders that
+   * were submitted before the breakdown field existed.
    */
   discountedItemPrice(item: CartItem): number {
     if (item.wonViaBid) return item.price;
+
+    const breakdown = this.cart?.discountBreakdown;
+    if (breakdown && breakdown.length > 0) {
+      const isSetMember = item.collectionGroup != null && item.collectionGroup > 0;
+      let totalItemDiscount = 0;
+      for (const rule of breakdown) {
+        if (rule.excludesSets && isSetMember) continue;
+        const base = this.eligibleBaseForRule(rule);
+        if (base <= 0) continue;
+        totalItemDiscount += (item.price / base) * rule.amount;
+      }
+      return Math.max(0, Math.round((item.price - totalItemDiscount) * 100) / 100);
+    }
+
+    // Fallback for orders without breakdown: spread total discount proportionally.
     const discount = this.cart?.discountAmount ?? 0;
-    const base = this.discountableTotal;
+    const base = this.visibleItems.filter(i => !i.wonViaBid).reduce((sum, i) => sum + i.price, 0);
     if (discount <= 0 || base <= 0) return item.price;
-    const factor = Math.max(0, base - discount) / base;
+    const factor = (base - discount) / base;
+    if (factor <= 0) return 0;
     return Math.round(item.price * factor * 100) / 100;
   }
 
