@@ -4,6 +4,7 @@ import { Comic } from './comic';
 export interface NavItem {
   id: number;
   docType: string | null;
+  collectionGroup?: number | null;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -11,7 +12,17 @@ export class DashboardNavService {
   private navList: NavItem[] = [];
 
   setList(comics: Comic[]): void {
-    this.navList = comics.map(c => ({ id: c.id, docType: c.docType ?? null }));
+    this.navList = comics.map(c => ({
+      id: c.id,
+      docType: c.docType ?? null,
+      collectionGroup: c.collectionGroup ?? null,
+    }));
+  }
+
+  /** Returns the ID of the SET container for a given collectionGroup, or null if not found. */
+  getSetContainerId(collectionGroup: number): number | null {
+    const container = this.navList.find(c => c.docType === 'SET' && c.collectionGroup === collectionGroup);
+    return container?.id ?? null;
   }
 
   /** Returns prev/next items with circular wrapping. Both are null only when the list is empty or the id is not found. */

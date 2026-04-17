@@ -561,6 +561,13 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
     });
   }
 
+  /** Returns the SET container's ID when this comic is a member of a set, null otherwise. */
+  get parentSetId(): number | null {
+    const group = this.comic?.collectionGroup;
+    if (!group || this.comic?.docType === 'SET') return null;
+    return this.navService.getSetContainerId(group);
+  }
+
   get prevItem(): NavItem | null {
     if (!this.comic) return null;
     return this.navService.getAdjacent(this.comic.id).prev;

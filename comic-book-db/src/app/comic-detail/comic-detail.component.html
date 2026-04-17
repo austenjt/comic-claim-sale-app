@@ -52,6 +52,7 @@
   <div class="page-nav">
     <div class="nav-left">
       <button type="button" (click)="goBack()">go back</button>
+      <a *ngIf="parentSetId" class="btn-view-set" [routerLink]="['/set', parentSetId]">&#128218; View Set</a>
     </div>
     <div class="nav-center">
       <button type="button" class="btn-nav-prev" [disabled]="!prevItem" (click)="prevItem && navigateTo(prevItem)">&#8592; Prev</button>
