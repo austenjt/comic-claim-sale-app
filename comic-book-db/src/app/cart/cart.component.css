@@ -135,6 +135,18 @@ tfoot td { font-weight: bold; background: #adc178; }
 
 .price-original { text-decoration: line-through; color: var(--color-text-muted); margin-right: 6px; }
 .price-discounted { color: #7b8f4b; font-weight: 600; }
+.price-free-badge {
+  display: inline-block;
+  background: #7b8f4b;
+  color: #f0ead2;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  padding: 1px 6px;
+  border-radius: 3px;
+  vertical-align: middle;
+}
 
 /* Set header row: title, Set tag, claimed date, Release button */
 .set-header-row td {

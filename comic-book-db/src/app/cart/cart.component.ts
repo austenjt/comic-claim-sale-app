@@ -229,12 +229,44 @@ export class CartComponent implements OnInit, OnDestroy {
       .reduce((sum, i) => sum + i.price, 0);
   }
 
+  /** True when the rule is a "Buy X get 1 free" type (description begins with "Buy "). */
+  private isBuyXFreeRule(rule: CartDiscount): boolean {
+    return rule.description.startsWith('Buy ');
+  }
+
+  /**
+   * Identifies which item IDs are free under a BUY_X_GET_ONE_FREE rule.
+   * Mirrors the backend logic: sort eligible (non-bid, non-set-if-excluded) items by price
+   * ascending, then greedily pick the cheapest until their cumulative price equals rule.amount.
+   */
+  private getFreeItemIds(rule: CartDiscount): Set<string> {
+    const eligible = this.visibleItems
+      .filter(i => !i.wonViaBid &&
+        !(rule.excludesSets && i.collectionGroup != null && i.collectionGroup > 0))
+      .slice()
+      .sort((a, b) => a.price - b.price);
+
+    const freeIds = new Set<string>();
+    let remaining = Math.round(rule.amount * 100) / 100;
+    for (const item of eligible) {
+      if (remaining < 0.005) break;
+      if (item.price <= remaining + 0.005) {
+        freeIds.add(item.comicId);
+        remaining = Math.round((remaining - item.price) * 100) / 100;
+      }
+    }
+    return freeIds;
+  }
+
   /**
    * Exact discounted price for one item.
    *
    * When discountBreakdown is present (orders submitted after this feature shipped), each rule's
-   * savings are distributed proportionally among its eligible items, so individual items absorb
-   * only the rules that apply to them (e.g. set members skip set-excluded rules).
+   * savings are distributed based on the rule type:
+   *   - BUY_X_GET_ONE_FREE: the cheapest eligible item(s) are fully free ($0.00); all others
+   *     absorb nothing from this rule (bid items always return their original price).
+   *   - All other rules: savings are distributed proportionally among eligible items, so
+   *     set members skip set-excluded rules.
    *
    * Falls back to a simple proportional spread across all non-bid items for older orders that
    * were submitted before the breakdown field existed.
@@ -248,6 +280,13 @@ export class CartComponent implements OnInit, OnDestroy {
       let totalItemDiscount = 0;
       for (const rule of breakdown) {
         if (rule.excludesSets && isSetMember) continue;
+        if (this.isBuyXFreeRule(rule)) {
+          // Free items absorb their full price from this rule; all others absorb nothing.
+          if (this.getFreeItemIds(rule).has(item.comicId)) {
+            totalItemDiscount += item.price;
+          }
+          continue;
+        }
         const base = this.eligibleBaseForRule(rule);
         if (base <= 0) continue;
         totalItemDiscount += (item.price / base) * rule.amount;
