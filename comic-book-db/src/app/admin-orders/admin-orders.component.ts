@@ -273,6 +273,14 @@ export class AdminOrdersComponent implements OnInit {
     return cart.items.filter(i => !i.isSetContainer);
   }
 
+  discountedSetTotal(row: AdminCartRow, cart: Cart): number {
+    return row.items.reduce((sum, item) => sum + this.discountedItemPrice(item, cart), 0);
+  }
+
+  discountedArchivedSetTotal(row: ArchivedCartRow, order: ArchivedOrder): number {
+    return row.items.reduce((sum, item) => sum + this.discountedArchivedItemPrice(item, order), 0);
+  }
+
   showItemDiscounts(cart: Cart): boolean {
     return (cart.discountAmount ?? 0) > 0 && cart.status !== 'OPEN';
   }

@@ -53,7 +53,13 @@
                 </a>
                 <span class="set-tag">Set {{ row.collectionGroup }}</span>
               </td>
-              <td class="set-total-price">{{ row.totalPrice | currency }}</td>
+              <td class="set-total-price">
+                <ng-container *ngIf="showItemDiscounts && !row.wonViaBid">
+                  <span class="price-original">{{ row.totalPrice | currency }}</span>
+                  <span class="price-discounted">{{ discountedSetTotal(row) | currency }}</span>
+                </ng-container>
+                <span *ngIf="!showItemDiscounts || row.wonViaBid">{{ row.totalPrice | currency }}</span>
+              </td>
               <td>{{ row.claimedAt | date:'short' }}</td>
               <td *ngIf="canRemove()">
                 <button *ngIf="!row.wonViaBid" class="btn-release" (click)="removeItem(row.removeId)">Release</button>

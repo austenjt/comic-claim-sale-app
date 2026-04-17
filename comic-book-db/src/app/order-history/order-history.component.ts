@@ -78,6 +78,10 @@ export class OrderHistoryComponent implements OnInit {
     return Math.max(0, this.orderSubtotal(order) - (order.discountAmount ?? 0)) + (order.shippingCost ?? 0);
   }
 
+  discountedSetTotal(order: ArchivedOrder, row: OrderHistoryRow): number {
+    return row.items.reduce((sum, item) => sum + this.discountedItemPrice(order, item), 0);
+  }
+
   showItemDiscounts(order: ArchivedOrder): boolean {
     return (order.discountAmount ?? 0) > 0;
   }

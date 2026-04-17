@@ -51,7 +51,13 @@
                 <a class="set-header-link" [routerLink]="['/set', row.containerId ?? row.items[0].comicId]">{{ row.containerTitle ?? row.items[0].comicTitle }}</a>
                 <span class="set-tag">Set {{ row.collectionGroup }}</span>
               </td>
-              <td class="set-total-price">{{ row.totalPrice | currency }}</td>
+              <td class="set-total-price">
+                <ng-container *ngIf="showItemDiscounts(order) && !row.wonViaBid">
+                  <span class="price-original">{{ row.totalPrice | currency }}</span>
+                  <span class="price-discounted">{{ discountedSetTotal(row, order) | currency }}</span>
+                </ng-container>
+                <span *ngIf="!showItemDiscounts(order) || row.wonViaBid">{{ row.totalPrice | currency }}</span>
+              </td>
               <td>{{ row.claimedAt | date:'short' }}</td>
               <td>
                 <button class="btn-release" (click)="openAdminReleaseConfirm(row)"
@@ -287,7 +293,13 @@
                 <span class="set-header-link">{{ row.containerTitle ?? row.items[0].comicTitle }}</span>
                 <span class="set-tag">Set {{ row.collectionGroup }}</span>
               </td>
-              <td class="set-total-price">{{ row.totalPrice | currency }}</td>
+              <td class="set-total-price">
+                <ng-container *ngIf="showArchivedItemDiscounts(order)">
+                  <span class="price-original">{{ row.totalPrice | currency }}</span>
+                  <span class="price-discounted">{{ discountedArchivedSetTotal(row, order) | currency }}</span>
+                </ng-container>
+                <span *ngIf="!showArchivedItemDiscounts(order)">{{ row.totalPrice | currency }}</span>
+              </td>
               <td>{{ row.claimedAt | date:'short' }}</td>
             </tr>
             <tr *ngFor="let comic of row.items" class="set-member-row">

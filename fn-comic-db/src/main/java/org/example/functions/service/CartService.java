@@ -329,10 +329,9 @@ public class CartService {
         log.info("Cart {} marked as FULFILLED", cartId);
         ArchiveService.getServiceInstance().archiveCart(cart);
         sendFulfillmentEmail(cart);
-        // Stamp soldTo/dateSold on each comic (skip set container rows)
+        // Stamp soldTo/dateSold on each comic, including set container rows
         String soldDate = Instant.now().toString();
         for (CartItem item : cart.getItems()) {
-            if (item.isSetContainer()) continue;
             try {
                 ComicService.getServiceInstance().getComicById(Integer.parseInt(item.getComicId()))
                     .ifPresent(comic -> {

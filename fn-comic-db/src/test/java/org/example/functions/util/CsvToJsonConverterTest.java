@@ -80,7 +80,7 @@ class CsvToJsonConverterTest {
         ArgumentCaptor<Object> bodyCaptor = stubResponseChain();
 
         CsvToJsonConverter converter = new CsvToJsonConverter(csvData, comicService);
-        converter.loadGoCollectCsvData(request, null, false);
+        converter.loadGoCollectCsvData(request, null, false, true);
 
         // Verify all 12 records were uploaded
         ArgumentCaptor<ComicBook> comicCaptor = ArgumentCaptor.forClass(ComicBook.class);
@@ -144,7 +144,7 @@ class CsvToJsonConverterTest {
         ArgumentCaptor<Object> bodyCaptor = stubResponseChain();
 
         CsvToJsonConverter converter = new CsvToJsonConverter(csvData, comicService);
-        converter.loadGoCollectCsvData(request, null, false);
+        converter.loadGoCollectCsvData(request, null, false, true);
 
         // Verify all 19 records were uploaded
         ArgumentCaptor<ComicBook> comicCaptor = ArgumentCaptor.forClass(ComicBook.class);

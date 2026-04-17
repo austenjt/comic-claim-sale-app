@@ -214,6 +214,10 @@ export class CartComponent implements OnInit, OnDestroy {
     return Math.max(0, this.cartTotal - (this.cart?.discountAmount ?? 0)) + this.shippingAmount;
   }
 
+  discountedSetTotal(row: CartRow): number {
+    return row.items.reduce((sum, item) => sum + this.discountedItemPrice(item), 0);
+  }
+
   get showItemDiscounts(): boolean {
     return this.cart?.status !== 'OPEN' && (this.cart?.discountAmount ?? 0) > 0;
   }
