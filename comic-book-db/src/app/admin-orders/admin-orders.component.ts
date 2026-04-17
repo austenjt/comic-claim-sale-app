@@ -279,6 +279,29 @@ export class AdminOrdersComponent implements OnInit {
       .reduce((sum, i) => sum + i.price, 0);
   }
 
+  private isBuyXFreeRule(rule: CartDiscount): boolean {
+    return rule.description.startsWith('Buy ');
+  }
+
+  private getFreeItemIds(rule: CartDiscount, cart: Cart): Set<string> {
+    const eligible = this.visibleCartItems(cart)
+      .filter(i => !i.wonViaBid &&
+        !(rule.excludesSets && i.collectionGroup != null && i.collectionGroup > 0))
+      .slice()
+      .sort((a, b) => a.price - b.price);
+
+    const freeIds = new Set<string>();
+    let remaining = Math.round(rule.amount * 100) / 100;
+    for (const item of eligible) {
+      if (remaining < 0.005) break;
+      if (item.price <= remaining + 0.005) {
+        freeIds.add(item.comicId);
+        remaining = Math.round((remaining - item.price) * 100) / 100;
+      }
+    }
+    return freeIds;
+  }
+
   discountedItemPrice(item: CartItem, cart: Cart): number {
     if (item.wonViaBid) return item.price;
 
@@ -288,6 +311,12 @@ export class AdminOrdersComponent implements OnInit {
       let totalItemDiscount = 0;
       for (const rule of breakdown) {
         if (rule.excludesSets && isSetMember) continue;
+        if (this.isBuyXFreeRule(rule)) {
+          if (this.getFreeItemIds(rule, cart).has(item.comicId)) {
+            totalItemDiscount += item.price;
+          }
+          continue;
+        }
         const base = this.eligibleBaseForRule(rule, cart);
         if (base <= 0) continue;
         totalItemDiscount += (item.price / base) * rule.amount;

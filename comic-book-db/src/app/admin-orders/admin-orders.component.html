@@ -33,7 +33,8 @@
             <td>
               <ng-container *ngIf="showItemDiscounts(order) && !row.wonViaBid; else plainOrderPrice">
                 <span class="price-original">{{ row.items[0].price | currency }}</span>
-                <span class="price-discounted">{{ discountedItemPrice(row.items[0], order) | currency }}</span>
+                <span *ngIf="discountedItemPrice(row.items[0], order) === 0" class="price-free-badge">FREE</span>
+                <span *ngIf="discountedItemPrice(row.items[0], order) !== 0" class="price-discounted">{{ discountedItemPrice(row.items[0], order) | currency }}</span>
               </ng-container>
               <ng-template #plainOrderPrice>{{ row.items[0].price | currency }}</ng-template>
             </td>
@@ -64,7 +65,8 @@
               <td class="set-member-price">
                 <ng-container *ngIf="showItemDiscounts(order) && !comic.wonViaBid; else plainSetMemberPrice">
                   <span class="price-original">{{ comic.price | currency }}</span>
-                  <span class="price-discounted">{{ discountedItemPrice(comic, order) | currency }}</span>
+                  <span *ngIf="discountedItemPrice(comic, order) === 0" class="price-free-badge">FREE</span>
+                  <span *ngIf="discountedItemPrice(comic, order) !== 0" class="price-discounted">{{ discountedItemPrice(comic, order) | currency }}</span>
                 </ng-container>
                 <ng-template #plainSetMemberPrice>{{ comic.price | currency }}</ng-template>
               </td>
