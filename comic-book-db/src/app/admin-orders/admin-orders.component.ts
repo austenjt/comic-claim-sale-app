@@ -369,6 +369,7 @@ export class AdminOrdersComponent implements OnInit {
   private getArchivedFreeItemIds(rule: { amount: number; excludesSets: boolean }, order: ArchivedOrder): Set<string> {
     const eligible = order.items
       .filter(i => i.comicNumber !== '#SET' &&   // exclude set containers
+        !i.wonViaBid &&                           // exclude bid-won items
         i.price > 0 &&                            // exclude $0 items (containers, awarded)
         !!i.comicId &&
         !(rule.excludesSets && i.collectionGroup != null && i.collectionGroup > 0))
@@ -405,6 +406,7 @@ export class AdminOrdersComponent implements OnInit {
           }
           const base = order.items
             .filter(i => i.comicNumber !== '#SET' &&
+              !i.wonViaBid &&
               !(rule.excludesSets && i.collectionGroup != null && i.collectionGroup > 0))
             .reduce((sum, i) => sum + i.price, 0);
           if (base <= 0) continue;

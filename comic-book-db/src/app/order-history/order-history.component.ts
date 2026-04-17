@@ -96,6 +96,7 @@ export class OrderHistoryComponent implements OnInit {
   private getFreeItemIds(rule: { amount: number; excludesSets: boolean }, order: ArchivedOrder): Set<string> {
     const eligible = order.items
       .filter(i => i.comicNumber !== '#SET' &&
+        !i.wonViaBid &&
         i.price > 0 &&
         !!i.comicId &&
         !(rule.excludesSets && i.collectionGroup != null && i.collectionGroup > 0))
@@ -132,6 +133,7 @@ export class OrderHistoryComponent implements OnInit {
           }
           const base = order.items
             .filter(i => i.comicNumber !== '#SET' &&
+              !i.wonViaBid &&
               !(rule.excludesSets && i.collectionGroup != null && i.collectionGroup > 0))
             .reduce((sum, i) => sum + i.price, 0);
           if (base <= 0) continue;
@@ -143,7 +145,7 @@ export class OrderHistoryComponent implements OnInit {
 
     // Fallback for orders with no description.
     const discount = order.discountAmount ?? 0;
-    const base = order.items.filter(i => i.comicNumber !== '#SET').reduce((sum, i) => sum + i.price, 0);
+    const base = order.items.filter(i => i.comicNumber !== '#SET' && !i.wonViaBid).reduce((sum, i) => sum + i.price, 0);
     if (discount <= 0 || base <= 0) return item.price;
     const factor = Math.max(0, base - discount) / base;
     return Math.round(item.price * factor * 100) / 100;

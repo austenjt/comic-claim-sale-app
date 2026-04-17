@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
 import { DashboardComponent } from './dashboard/dashboard.component';
-import { ManagementComponent } from './management/management.component';
+import { InventoryComponent } from './inventory/inventory.component';
 import { ComicDetailComponent } from './comic-detail/comic-detail.component';
 import { LoginComponent } from './login/login.component';
 import { AuthCallbackComponent } from './auth-callback/auth-callback.component';
@@ -24,7 +24,7 @@ const routes: Routes = [
   { path: 'dashboard',     component: DashboardComponent },
   { path: 'detail/:id',    component: ComicDetailComponent },
   { path: 'set/:id',       component: SetDetailComponent },
-  { path: 'comics',        component: ManagementComponent },
+  { path: 'inventory',     component: InventoryComponent },
   { path: 'login',         component: LoginComponent },
   { path: 'auth-callback', component: AuthCallbackComponent },
   { path: 'pending-approval', component: PendingApprovalComponent },

@@ -21,7 +21,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { ComicDetailComponent } from './comic-detail/comic-detail.component';
-import { ManagementComponent } from './management/management.component';
+import { InventoryComponent } from './inventory/inventory.component';
 import { ComicSearchComponent } from './comic-search/comic-search.component';
 import { MessagesComponent } from './messages/messages.component';
 import { StandaloneListComponent } from './standalone-list/standalone-list.component';
@@ -45,7 +45,7 @@ import { PaginationBarComponent } from './pagination-bar/pagination-bar.componen
     declarations: [
         AppComponent,
         DashboardComponent,
-        ManagementComponent,
+        InventoryComponent,
         ComicDetailComponent,
         MessagesComponent,
         ComicSearchComponent,
