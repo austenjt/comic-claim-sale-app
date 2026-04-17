@@ -64,6 +64,49 @@ a:hover { text-decoration: underline; }
 .price-original { text-decoration: line-through; color: var(--color-text-muted); margin-right: 6px; }
 .price-discounted { color: #7b8f4b; font-weight: 600; }
 
+.price-free-badge {
+  display: inline-block;
+  background: #7b8f4b;
+  color: #f0ead2;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  padding: 1px 6px;
+  border-radius: 3px;
+  vertical-align: middle;
+}
+
+.set-header-row td {
+  background: rgba(169, 132, 103, 0.07);
+  font-weight: 600;
+}
+
+.set-total-price {
+  font-weight: 400;
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+}
+
+.set-header-link {
+  color: var(--color-text);
+}
+
+.set-member-row td {
+  background: rgba(169, 132, 103, 0.03);
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+.set-member-comic {
+  padding-left: 24px;
+  font-size: 0.875rem;
+}
+
+.set-member-price {
+  font-size: 0.875rem;
+}
+
 .discount-savings { color: #7b8f4b; font-weight: 500; }
 .discount-desc { font-size: 0.85em; color: var(--color-text-muted); margin-left: 0.4rem; }
 

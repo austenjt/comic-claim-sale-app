@@ -85,9 +85,10 @@
         </tr>
         <tr *ngIf="order.discountAmount && order.discountAmount > 0">
           <td>Discount</td>
-          <td colspan="2" style="color:#2e7d32">-{{ order.discountAmount | currency }}
-            <span *ngIf="order.discountDescription" style="font-size:0.85em;color:#555;margin-left:0.4rem">({{ order.discountDescription }})</span>
+          <td class="discount-savings">-{{ order.discountAmount | currency }}
+            <span *ngIf="order.discountDescription" class="discount-desc">({{ order.discountDescription }})</span>
           </td>
+          <td></td>
           <td></td>
         </tr>
         <tr *ngIf="order.shippingCost && order.shippingCost > 0">
@@ -265,29 +266,57 @@
         <tr><th>Comic</th><th>Price</th><th>Claimed</th></tr>
       </thead>
       <tbody>
-        <tr *ngFor="let item of order.items">
-          <td>{{ item.comicTitle }}{{ item.comicNumber ? ' ' + item.comicNumber : '' }}</td>
-          <td>
-            <ng-container *ngIf="showArchivedItemDiscounts(order) && !item.wonViaBid; else plainArchivedPrice">
-              <span class="price-original">{{ item.price | currency }}</span>
-              <span class="price-discounted">{{ discountedArchivedItemPrice(item, order) | currency }}</span>
-            </ng-container>
-            <ng-template #plainArchivedPrice>{{ item.price | currency }}</ng-template>
-          </td>
-          <td>{{ item.claimedAt | date:'short' }}</td>
-        </tr>
+        <ng-container *ngFor="let row of groupedArchivedRows(order)">
+          <!-- Single comic: one row -->
+          <tr *ngIf="row.type === 'single'">
+            <td>{{ row.items[0].comicTitle }}{{ row.items[0].comicNumber ? ' ' + row.items[0].comicNumber : '' }}</td>
+            <td>
+              <ng-container *ngIf="showArchivedItemDiscounts(order); else plainArchivedPrice">
+                <span class="price-original">{{ row.items[0].price | currency }}</span>
+                <span *ngIf="discountedArchivedItemPrice(row.items[0], order) === 0" class="price-free-badge">FREE</span>
+                <span *ngIf="discountedArchivedItemPrice(row.items[0], order) !== 0" class="price-discounted">{{ discountedArchivedItemPrice(row.items[0], order) | currency }}</span>
+              </ng-container>
+              <ng-template #plainArchivedPrice>{{ row.items[0].price | currency }}</ng-template>
+            </td>
+            <td>{{ row.claimedAt | date:'short' }}</td>
+          </tr>
+          <!-- Set: header row then one row per member comic -->
+          <ng-container *ngIf="row.type === 'set'">
+            <tr class="set-header-row">
+              <td>
+                <span class="set-header-link">{{ row.containerTitle ?? row.items[0].comicTitle }}</span>
+                <span class="set-tag">Set {{ row.collectionGroup }}</span>
+              </td>
+              <td class="set-total-price">{{ row.totalPrice | currency }}</td>
+              <td>{{ row.claimedAt | date:'short' }}</td>
+            </tr>
+            <tr *ngFor="let comic of row.items" class="set-member-row">
+              <td class="set-member-comic">{{ comic.comicTitle }}{{ comic.comicNumber ? ' ' + comic.comicNumber : '' }}</td>
+              <td class="set-member-price">
+                <ng-container *ngIf="showArchivedItemDiscounts(order)">
+                  <span class="price-original">{{ comic.price | currency }}</span>
+                  <span *ngIf="discountedArchivedItemPrice(comic, order) === 0" class="price-free-badge">FREE</span>
+                  <span *ngIf="discountedArchivedItemPrice(comic, order) !== 0" class="price-discounted">{{ discountedArchivedItemPrice(comic, order) | currency }}</span>
+                </ng-container>
+                <span *ngIf="!showArchivedItemDiscounts(order)">{{ comic.price | currency }}</span>
+              </td>
+              <td></td>
+            </tr>
+          </ng-container>
+        </ng-container>
       </tbody>
       <tfoot>
-        <tr *ngIf="order.discountAmount && order.discountAmount > 0">
-          <td>Subtotal <span class="item-count-label">({{ order.items.length }} book{{ order.items.length !== 1 ? 's' : '' }})</span></td>
+        <tr>
+          <td>Subtotal <span class="item-count-label">({{ archivedBookCount(order) }} book{{ archivedBookCount(order) !== 1 ? 's' : '' }})</span></td>
           <td>{{ archivedOrderSubtotal(order) | currency }}</td>
           <td></td>
         </tr>
         <tr *ngIf="order.discountAmount && order.discountAmount > 0">
           <td>Discount</td>
-          <td colspan="2" style="color:#2e7d32">-{{ order.discountAmount | currency }}
-            <span *ngIf="order.discountDescription" style="font-size:0.85em;color:#555;margin-left:0.4rem">({{ order.discountDescription }})</span>
+          <td class="discount-savings">-{{ order.discountAmount | currency }}
+            <span *ngIf="order.discountDescription" class="discount-desc">({{ order.discountDescription }})</span>
           </td>
+          <td></td>
         </tr>
         <tr *ngIf="order.shippingCost && order.shippingCost > 0">
           <td>Shipping</td>

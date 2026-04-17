@@ -11,6 +11,9 @@
   font-weight: 600;
 }
 
+.discount-savings { color: #4caf50; font-weight: 500; }
+.discount-desc { font-size: 0.85em; color: var(--color-text-muted); margin-left: 0.4rem; }
+
 .price-free-badge {
   display: inline-block;
   background: #4caf50;
