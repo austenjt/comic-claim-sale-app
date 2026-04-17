@@ -52,7 +52,7 @@
                 </a>
                 <span class="set-tag">Set {{ row.collectionGroup }}</span>
               </td>
-              <td></td>
+              <td class="set-total-price">{{ row.totalPrice | currency }}</td>
               <td>{{ row.claimedAt | date:'short' }}</td>
               <td *ngIf="canRemove()">
                 <button *ngIf="!row.wonViaBid" class="btn-release" (click)="removeItem(row.removeId)">Release</button>
