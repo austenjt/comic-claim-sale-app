@@ -117,12 +117,16 @@ public class DiscountService {
 
         double totalSavings = 0.0;
         List<String> descriptions = new ArrayList<>();
+        double baseSubtotal = baseItems.stream()
+            .filter(i -> !i.isWonViaBid())
+            .mapToDouble(CartItem::getPrice)
+            .sum();
 
         for (Discount d : active) {
             // When excludeSets is true, set member items (collectionGroup > 0) are excluded from
             // both the threshold count and discount eligibility for this rule.
             List<CartItem> countableItems = baseItems.stream()
-                .filter(i -> !(d.isExcludeSets() && i.getCollectionGroup() != null && i.getCollectionGroup() > 0))
+                .filter(i -> !(Boolean.TRUE.equals(d.getExcludeSets()) && i.getCollectionGroup() != null && i.getCollectionGroup() > 0))
                 .collect(Collectors.toList());
 
             List<CartItem> discountableItems = countableItems.stream()
@@ -134,7 +138,7 @@ public class DiscountService {
                 .sum();
             int itemCount = countableItems.size();
 
-            String excludeNote = d.isExcludeSets() ? " (sets excluded)" : "";
+            String excludeNote = Boolean.TRUE.equals(d.getExcludeSets()) ? " (sets excluded)" : "";
 
             switch (d.getType()) {
                 case "RAW_PERCENTAGE": {
@@ -172,7 +176,7 @@ public class DiscountService {
             }
         }
 
-        totalSavings = Math.min(totalSavings, subtotal);
+        totalSavings = Math.min(totalSavings, baseSubtotal);
         String description = descriptions.isEmpty() ? null : String.join("; ", descriptions);
         return new DiscountResult(totalSavings, description);
     }

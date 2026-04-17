@@ -38,8 +38,8 @@ td { color: var(--color-text); }
 
 tfoot td { font-weight: bold; background: #adc178; }
 
-.btn-remove { padding: 4px 12px; cursor: pointer; color: #c0634c; border: 1px solid #c0634c; background: transparent; border-radius: 4px; }
-.btn-remove:hover { background: rgba(192,99,76,0.1); }
+.btn-release { padding: 4px 12px; cursor: pointer; color: #c0634c; border: 1px solid #c0634c; background: transparent; border-radius: 4px; }
+.btn-release:hover { background: rgba(192,99,76,0.1); }
 
 .cart-actions { margin-top: 16px; }
 .submit-note, .finalized-note { color: var(--color-text-muted); margin-bottom: 12px; line-height: 1.6; }
@@ -136,9 +136,114 @@ tfoot td { font-weight: bold; background: #adc178; }
 .price-original { text-decoration: line-through; color: var(--color-text-muted); margin-right: 6px; }
 .price-discounted { color: #7b8f4b; font-weight: 600; }
 
+/* Top-align all cells in set rows so date/button sit inline with the set name */
+.set-row td { vertical-align: top; }
+
+.set-row-header { font-weight: 500; }
+
+.set-prices-list {
+  margin: 5px 0 0 0;
+  padding-left: 16px;
+  list-style: disc;
+}
+
+.set-prices-list li {
+  padding: 2px 0;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+.set-items-list {
+  margin: 5px 0 0 0;
+  padding-left: 16px;
+  list-style: disc;
+}
+
+.set-items-list li {
+  padding: 2px 0;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+.set-items-list li a {
+  color: #7b8f4b;
+  text-decoration: none;
+}
+
+.set-items-list li a:hover {
+  text-decoration: underline;
+}
+
 .empty-cart { color: var(--color-text-muted); }
 .empty-cart a { color: #7b8f4b; }
 .error-message { color: #c0634c; margin-bottom: 12px; }
+
+/* ── Release confirmation modal ──────────────────────────────────── */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-box {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 28px 32px;
+  max-width: 420px;
+  width: 90%;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+}
+
+.modal-title {
+  margin: 0 0 14px;
+  font-size: 1.1rem;
+  color: var(--color-text);
+}
+
+.modal-body {
+  margin: 0 0 24px;
+  color: var(--color-text-muted);
+  line-height: 1.6;
+  font-size: 0.95rem;
+}
+
+.modal-body strong {
+  color: var(--color-text);
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.modal-btn-cancel {
+  padding: 8px 18px;
+  background: transparent;
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+.modal-btn-cancel:hover { background: var(--color-border); }
+
+.modal-btn-confirm {
+  padding: 8px 18px;
+  background: transparent;
+  color: #c0634c;
+  border: 1px solid #c0634c;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+.modal-btn-confirm:hover { background: rgba(192, 99, 76, 0.1); }
 
 .bid-block-notice {
   background: rgba(169,132,103,0.1);

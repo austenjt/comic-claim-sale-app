@@ -8,6 +8,18 @@ import { AuthService } from '../auth.service';
 import { Cart, CartItem } from '../cart';
 import { Comic } from '../comic';
 
+interface CartRow {
+  type: 'single' | 'set';
+  collectionGroup: number | null;
+  items: CartItem[];
+  totalPrice: number;
+  claimedAt: string;
+  removeId: string;
+  wonViaBid: boolean;
+  containerTitle?: string;
+  containerId?: string;
+}
+
 @Component({
     selector: 'app-cart',
     templateUrl: './cart.component.html',
@@ -20,6 +32,13 @@ export class CartComponent implements OnInit, OnDestroy {
   error = '';
   submitting = false;
   customerNotes = '';
+
+  confirmModal: {
+    comicId: string;
+    setTitle: string;
+    bookCount: number;
+    isFinalizing: boolean;
+  } | null = null;
 
   private activeBidComics: Comic[] = [];
   private claimSub!: Subscription;
@@ -80,15 +99,39 @@ export class CartComponent implements OnInit, OnDestroy {
       ? (this.cart?.items.filter(i => i.collectionGroup === item!.collectionGroup && !i.isSetContainer).length ?? 0)
       : 0;
 
-    if (this.cart?.status === 'FINALIZING') {
-      const msg = isSetItem
-        ? `Are you sure you want to remove all ${setCount} books in this set from your established order?`
-        : 'Are you sure you want to remove a book from an established order?';
-      if (!window.confirm(msg)) return;
-    } else if (isSetItem) {
-      if (!window.confirm(`This will return all ${setCount} books in this set to available. Continue?`)) return;
+    if (isSetItem) {
+      // Find the container title for the modal heading
+      const container = this.cart?.items.find(i => i.isSetContainer && i.collectionGroup === item!.collectionGroup);
+      this.confirmModal = {
+        comicId,
+        setTitle: container?.comicTitle ?? item?.comicTitle ?? 'this set',
+        bookCount: setCount,
+        isFinalizing: this.cart?.status === 'FINALIZING'
+      };
+      return;
     }
 
+    if (this.cart?.status === 'FINALIZING') {
+      if (!window.confirm('Are you sure you want to remove a book from an established order?')) return;
+    }
+
+    this.executeRelease(comicId, item, false, 0);
+  }
+
+  confirmRelease() {
+    if (!this.confirmModal) return;
+    const { comicId } = this.confirmModal;
+    const item = this.cart?.items.find(i => i.comicId === comicId);
+    const setCount = this.confirmModal.bookCount;
+    this.confirmModal = null;
+    this.executeRelease(comicId, item, true, setCount);
+  }
+
+  cancelRelease() {
+    this.confirmModal = null;
+  }
+
+  private executeRelease(comicId: string, item: CartItem | undefined, isSetItem: boolean, setCount: number) {
     this.cartService.removeItem(comicId).subscribe({
       next: cart => {
         this.cart = cart;
@@ -116,6 +159,45 @@ export class CartComponent implements OnInit, OnDestroy {
 
   get visibleItems() {
     return this.cart?.items.filter(i => !i.isSetContainer) ?? [];
+  }
+
+  get groupedRows(): CartRow[] {
+    const all = this.cart?.items ?? [];
+    const nonContainers = all.filter(i => !i.isSetContainer);
+    const containers = all.filter(i => i.isSetContainer);
+    const rows: CartRow[] = [];
+    const seenGroups = new Set<number>();
+
+    for (const item of nonContainers) {
+      if (item.collectionGroup && item.collectionGroup > 0) {
+        if (seenGroups.has(item.collectionGroup)) continue;
+        seenGroups.add(item.collectionGroup);
+        const setItems = nonContainers.filter(i => i.collectionGroup === item.collectionGroup);
+        const container = containers.find(c => c.collectionGroup === item.collectionGroup);
+        rows.push({
+          type: 'set',
+          collectionGroup: item.collectionGroup,
+          items: setItems,
+          totalPrice: setItems.reduce((sum, i) => sum + i.price, 0),
+          claimedAt: setItems[0].claimedAt,
+          removeId: setItems[0].comicId,
+          wonViaBid: setItems.some(i => !!i.wonViaBid),
+          containerTitle: container?.comicTitle,
+          containerId: container?.comicId
+        });
+      } else {
+        rows.push({
+          type: 'single',
+          collectionGroup: null,
+          items: [item],
+          totalPrice: item.price,
+          claimedAt: item.claimedAt,
+          removeId: item.comicId,
+          wonViaBid: !!item.wonViaBid
+        });
+      }
+    }
+    return rows;
   }
 
   get cartTotal(): number {

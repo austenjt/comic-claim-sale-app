@@ -27,6 +27,6 @@ public class Discount {
     @JsonAlias("XBooks")
     private int xBooks;
     @JsonProperty("excludeSets")
-    private boolean excludeSets;
+    private Boolean excludeSets;
     private String createdAt;
 }

@@ -33,13 +33,13 @@
     </div>
 
     <div class="form-row">
-      <label>Active</label>
-      <input type="checkbox" [(ngModel)]="formActive" />
+      <label for="formActive">Active</label>
+      <input type="checkbox" id="formActive" [(ngModel)]="formActive" name="formActive" />
     </div>
 
     <div class="form-row">
-      <label>Exclude Sets</label>
-      <input type="checkbox" [(ngModel)]="formExcludeSets" />
+      <label for="formExcludeSets">Exclude Sets</label>
+      <input type="checkbox" id="formExcludeSets" [(ngModel)]="formExcludeSets" name="formExcludeSets" />
       <span class="field-hint">When checked, comics that are part of a set will not receive this discount.</span>
     </div>
 
