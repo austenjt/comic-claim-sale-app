@@ -106,7 +106,7 @@ public class DiscountService {
     public DiscountResult applyDiscounts(Cart cart) {
         List<Discount> active = getActiveDiscounts();
         if (active.isEmpty()) {
-            return new DiscountResult(0.0, null);
+            return new DiscountResult(0.0, null, false);
         }
 
         // Bid-won items count toward tier thresholds but never receive a discount themselves.
@@ -116,6 +116,7 @@ public class DiscountService {
             .collect(Collectors.toList());
 
         double totalSavings = 0.0;
+        boolean anySetsExcluded = false;
         List<String> descriptions = new ArrayList<>();
         double baseSubtotal = baseItems.stream()
             .filter(i -> !i.isWonViaBid())
@@ -123,6 +124,9 @@ public class DiscountService {
             .sum();
 
         for (Discount d : active) {
+            if (Boolean.TRUE.equals(d.getExcludeSets())) {
+                anySetsExcluded = true;
+            }
             // When excludeSets is true, set member items (collectionGroup > 0) are excluded from
             // both the threshold count and discount eligibility for this rule.
             List<CartItem> countableItems = baseItems.stream()
@@ -178,19 +182,22 @@ public class DiscountService {
 
         totalSavings = Math.min(totalSavings, baseSubtotal);
         String description = descriptions.isEmpty() ? null : String.join("; ", descriptions);
-        return new DiscountResult(totalSavings, description);
+        return new DiscountResult(totalSavings, description, anySetsExcluded);
     }
 
     public static class DiscountResult {
         private final double amount;
         private final String description;
+        private final boolean excludedSets;
 
-        public DiscountResult(double amount, String description) {
+        public DiscountResult(double amount, String description, boolean excludedSets) {
             this.amount = amount;
             this.description = description;
+            this.excludedSets = excludedSets;
         }
 
         public double getAmount() { return amount; }
         public String getDescription() { return description; }
+        public boolean isExcludedSets() { return excludedSets; }
     }
 }

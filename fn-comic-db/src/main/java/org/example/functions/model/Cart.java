@@ -20,6 +20,7 @@ public class Cart {
     private String fulfilledAt;
     private double discountAmount;       // snapshotted at submit time
     private String discountDescription;  // human-readable summary of applied discounts
+    private Boolean discountExcludesSets; // true when the active discount rule excluded set items
     private double shippingCost;         // snapshotted at submit time
     private String paymentStatus;        // UNPAID | PARTIAL | PAID — set by admin
     private String customerNotes;        // optional message from user, captured at submit time
@@ -74,4 +75,7 @@ public class Cart {
 
     public String getAdminNotes() { return adminNotes; }
     public void setAdminNotes(String adminNotes) { this.adminNotes = adminNotes; }
+
+    public Boolean getDiscountExcludesSets() { return discountExcludesSets; }
+    public void setDiscountExcludesSets(Boolean discountExcludesSets) { this.discountExcludesSets = discountExcludesSets; }
 }

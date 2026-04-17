@@ -3,7 +3,8 @@ button {
 }
 
 .page-nav {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
   gap: 10px;
   margin-bottom: 0;
@@ -11,6 +12,24 @@ button {
 
 .page-nav button {
   margin-bottom: 1rem;
+}
+
+.nav-left {
+  display: flex;
+  align-items: center;
+}
+
+.nav-center {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
 }
 
 .nav-position {

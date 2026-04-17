@@ -50,19 +50,25 @@
 
 <div *ngIf="comic">
   <div class="page-nav">
-    <button type="button" (click)="goBack()">go back</button>
-    <button type="button" class="btn-nav-prev" [disabled]="!prevItem" (click)="prevItem && navigateTo(prevItem)">&#8592; Prev</button>
-    <button type="button" class="btn-nav-next" [disabled]="!nextItem" (click)="nextItem && navigateTo(nextItem)">Next &#8594;</button>
-    <span *ngIf="navPosition.total > 0" class="nav-position">{{ navPosition.index }} of {{ navPosition.total }}</span>
-    <button class="btn-share" (click)="copyShareLink()">
-      {{ linkCopied ? '✓ Link Copied!' : '&#128279; Share' }}
-    </button>
-    <ng-container *ngIf="auth.isAdmin()">
-      <button class="btn-save" [class.btn-save-done]="saveDone" (click)="saveComic()" [disabled]="saving">
-        {{ saving ? 'Saving…' : saveDone ? '✓ Saved' : 'Save' }}
+    <div class="nav-left">
+      <button type="button" (click)="goBack()">go back</button>
+    </div>
+    <div class="nav-center">
+      <button type="button" class="btn-nav-prev" [disabled]="!prevItem" (click)="prevItem && navigateTo(prevItem)">&#8592; Prev</button>
+      <span *ngIf="navPosition.total > 0" class="nav-position">{{ navPosition.index }} of {{ navPosition.total }}</span>
+      <button type="button" class="btn-nav-next" [disabled]="!nextItem" (click)="nextItem && navigateTo(nextItem)">Next &#8594;</button>
+    </div>
+    <div class="nav-right">
+      <button class="btn-share" (click)="copyShareLink()">
+        {{ linkCopied ? '✓ Link Copied!' : '&#128279; Share' }}
       </button>
-      <span *ngIf="saveError" class="save-error">{{ saveError }}</span>
-    </ng-container>
+      <ng-container *ngIf="auth.isAdmin()">
+        <button class="btn-save" [class.btn-save-done]="saveDone" (click)="saveComic()" [disabled]="saving">
+          {{ saving ? 'Saving…' : saveDone ? '✓ Saved' : 'Save' }}
+        </button>
+        <span *ngIf="saveError" class="save-error">{{ saveError }}</span>
+      </ng-container>
+    </div>
   </div>
   <div class="comic-heading">
     <span *ngIf="comic.comicCondition?.cgcCondition?.grade || comic.comicCondition?.cbcsCondition?.grade"

@@ -254,3 +254,101 @@ tfoot td { font-weight: bold; }
   font-size: 0.88rem;
   margin: -0.5rem 0 1rem;
 }
+
+/* ── Set rows ──────────────────────────────────────────────────────── */
+.set-header-row td {
+  background: rgba(169, 132, 103, 0.07);
+  font-weight: 600;
+}
+
+.set-header-link {
+  color: var(--color-text);
+  text-decoration: none;
+}
+.set-header-link:hover { text-decoration: underline; }
+
+.set-member-row td {
+  background: rgba(169, 132, 103, 0.03);
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+.set-member-comic {
+  padding-left: 24px;
+}
+
+.set-member-comic a {
+  color: #7b8f4b;
+  text-decoration: none;
+  font-size: 0.875rem;
+}
+.set-member-comic a:hover { text-decoration: underline; }
+
+.set-member-price {
+  font-size: 0.875rem;
+}
+
+/* ── Release confirmation modal ────────────────────────────────────── */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-box {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 28px 32px;
+  max-width: 420px;
+  width: 90%;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+}
+
+.modal-title {
+  margin: 0 0 14px;
+  font-size: 1.1rem;
+  color: var(--color-text);
+}
+
+.modal-body {
+  margin: 0 0 24px;
+  color: var(--color-text-muted);
+  line-height: 1.6;
+  font-size: 0.95rem;
+}
+
+.modal-body strong { color: var(--color-text); }
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.modal-btn-cancel {
+  padding: 8px 18px;
+  background: transparent;
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+.modal-btn-cancel:hover { background: var(--color-border); }
+
+.modal-btn-confirm {
+  padding: 8px 18px;
+  background: transparent;
+  color: #c0634c;
+  border: 1px solid #c0634c;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+.modal-btn-confirm:hover { background: rgba(192, 99, 76, 0.1); }

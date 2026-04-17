@@ -136,42 +136,38 @@ tfoot td { font-weight: bold; background: #adc178; }
 .price-original { text-decoration: line-through; color: var(--color-text-muted); margin-right: 6px; }
 .price-discounted { color: #7b8f4b; font-weight: 600; }
 
-/* Top-align all cells in set rows so date/button sit inline with the set name */
-.set-row td { vertical-align: top; }
-
-.set-row-header { font-weight: 500; }
-
-.set-prices-list {
-  margin: 5px 0 0 0;
-  padding-left: 16px;
-  list-style: disc;
+/* Set header row: title, Set tag, claimed date, Release button */
+.set-header-row td {
+  background: rgba(169, 132, 103, 0.07);
+  font-weight: 600;
 }
 
-.set-prices-list li {
-  padding: 2px 0;
-  font-size: 0.875rem;
-  color: var(--color-text-muted);
-}
-
-.set-items-list {
-  margin: 5px 0 0 0;
-  padding-left: 16px;
-  list-style: disc;
-}
-
-.set-items-list li {
-  padding: 2px 0;
-  font-size: 0.875rem;
-  color: var(--color-text-muted);
-}
-
-.set-items-list li a {
-  color: #7b8f4b;
+.set-header-link {
+  color: var(--color-text);
   text-decoration: none;
 }
+.set-header-link:hover { text-decoration: underline; }
 
-.set-items-list li a:hover {
-  text-decoration: underline;
+/* Set member rows: one per comic in the set */
+.set-member-row td {
+  background: rgba(169, 132, 103, 0.03);
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+.set-member-comic {
+  padding-left: 24px;
+}
+
+.set-member-comic a {
+  color: #7b8f4b;
+  text-decoration: none;
+  font-size: 0.875rem;
+}
+.set-member-comic a:hover { text-decoration: underline; }
+
+.set-member-price {
+  font-size: 0.875rem;
 }
 
 .empty-cart { color: var(--color-text-muted); }

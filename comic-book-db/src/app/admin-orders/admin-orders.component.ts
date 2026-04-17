@@ -4,6 +4,18 @@ import { Cart, CartItem } from '../cart';
 import { ArchivedOrder, ArchivedOrderItem } from '../archived-order';
 import { ConfigService } from '../config.service';
 
+interface AdminCartRow {
+  type: 'single' | 'set';
+  collectionGroup: number | null;
+  items: CartItem[];
+  totalPrice: number;
+  claimedAt: string;
+  removeId: string;
+  wonViaBid: boolean;
+  containerTitle?: string;
+  containerId?: string;
+}
+
 @Component({
     selector: 'app-admin-orders',
     templateUrl: './admin-orders.component.html',
@@ -60,6 +72,70 @@ export class AdminOrdersComponent implements OnInit {
   pendingFulfillId: string | null = null;
   pendingDeleteId: string | null = null;
   pendingFullDeleteId: string | null = null;
+
+  adminConfirmModal: {
+    comicId: string;
+    setTitle: string;
+    bookCount: number;
+  } | null = null;
+
+  groupedRows(cart: Cart): AdminCartRow[] {
+    const all = cart.items ?? [];
+    const nonContainers = all.filter(i => !i.isSetContainer);
+    const containers = all.filter(i => i.isSetContainer);
+    const rows: AdminCartRow[] = [];
+    const seenGroups = new Set<number>();
+
+    for (const item of nonContainers) {
+      if (item.collectionGroup && item.collectionGroup > 0) {
+        if (seenGroups.has(item.collectionGroup)) continue;
+        seenGroups.add(item.collectionGroup);
+        const setItems = nonContainers.filter(i => i.collectionGroup === item.collectionGroup);
+        const container = containers.find(c => c.collectionGroup === item.collectionGroup);
+        rows.push({
+          type: 'set',
+          collectionGroup: item.collectionGroup,
+          items: setItems,
+          totalPrice: setItems.reduce((sum, i) => sum + i.price, 0),
+          claimedAt: setItems[0].claimedAt,
+          removeId: setItems[0].comicId,
+          wonViaBid: setItems.some(i => !!i.wonViaBid),
+          containerTitle: container?.comicTitle,
+          containerId: container?.comicId
+        });
+      } else {
+        rows.push({
+          type: 'single',
+          collectionGroup: null,
+          items: [item],
+          totalPrice: item.price,
+          claimedAt: item.claimedAt,
+          removeId: item.comicId,
+          wonViaBid: !!item.wonViaBid
+        });
+      }
+    }
+    return rows;
+  }
+
+  openAdminReleaseConfirm(row: AdminCartRow) {
+    this.adminConfirmModal = {
+      comicId: row.removeId,
+      setTitle: row.containerTitle ?? `Set ${row.collectionGroup}`,
+      bookCount: row.items.length
+    };
+  }
+
+  confirmAdminRelease() {
+    if (!this.adminConfirmModal) return;
+    const id = this.adminConfirmModal.comicId;
+    this.adminConfirmModal = null;
+    this.unclaim(id);
+  }
+
+  cancelAdminRelease() {
+    this.adminConfirmModal = null;
+  }
 
   fulfill(cart: Cart) {
     if (this.pendingFulfillId !== cart.id) {
@@ -195,7 +271,9 @@ export class AdminOrdersComponent implements OnInit {
   discountedItemPrice(item: CartItem, cart: Cart): number {
     if (item.wonViaBid) return item.price;
     const discount = cart.discountAmount ?? 0;
-    const visibleNonBid = cart.items.filter(i => !i.isSetContainer && !i.wonViaBid);
+    const excludeSets = cart.discountExcludesSets === true;
+    const visibleNonBid = cart.items.filter(i => !i.isSetContainer && !i.wonViaBid
+      && !(excludeSets && i.collectionGroup != null && i.collectionGroup > 0));
     const base = visibleNonBid.reduce((sum, i) => sum + i.price, 0);
     if (discount <= 0 || base <= 0) return item.price;
     const factor = Math.max(0, base - discount) / base;

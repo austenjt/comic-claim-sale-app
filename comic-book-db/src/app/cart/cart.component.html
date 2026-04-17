@@ -23,58 +23,59 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let row of groupedRows" [class.set-row]="row.type === 'set'">
-          <td>
-            <!-- Single comic -->
-            <ng-container *ngIf="row.type === 'single'">
+        <ng-container *ngFor="let row of groupedRows">
+          <!-- Single comic: one row -->
+          <tr *ngIf="row.type === 'single'">
+            <td>
               <a [routerLink]="['/detail', row.items[0].comicId]">
                 {{ row.items[0].comicTitle }}{{ row.items[0].comicNumber ? ' ' + row.items[0].comicNumber : '' }}
               </a>
-            </ng-container>
-            <!-- Set group: header + nested list -->
-            <ng-container *ngIf="row.type === 'set'">
-              <div class="set-row-header">
-                <a [routerLink]="['/set', row.containerId ?? row.items[0].comicId]">
-                  {{ row.containerTitle ?? row.items[0].comicTitle }}
-                </a>
-                <span class="set-tag">Set {{ row.collectionGroup }}</span>
-              </div>
-              <ul class="set-items-list">
-                <li *ngFor="let comic of row.items">
-                  <a [routerLink]="['/set', comic.comicId]">
-                    {{ comic.comicTitle }}{{ comic.comicNumber ? ' ' + comic.comicNumber : '' }}
-                  </a>
-                </li>
-              </ul>
-            </ng-container>
-          </td>
-          <td>
-            <!-- Single comic price -->
-            <ng-container *ngIf="row.type === 'single'">
+            </td>
+            <td>
               <ng-container *ngIf="showItemDiscounts && !row.wonViaBid; else plainPrice">
                 <span class="price-original">{{ row.items[0].price | currency }}</span>
                 <span class="price-discounted">{{ discountedItemPrice(row.items[0]) | currency }}</span>
               </ng-container>
               <ng-template #plainPrice>{{ row.items[0].price | currency }}</ng-template>
-            </ng-container>
-            <!-- Set: per-item price list -->
-            <ng-container *ngIf="row.type === 'set'">
-              <ul class="set-prices-list">
-                <li *ngFor="let comic of row.items">
-                  <ng-container *ngIf="showItemDiscounts && !comic.wonViaBid">
-                    <span class="price-original">{{ comic.price | currency }}</span>
-                    <span class="price-discounted">{{ discountedItemPrice(comic) | currency }}</span>
-                  </ng-container>
-                  <span *ngIf="!showItemDiscounts || comic.wonViaBid">{{ comic.price | currency }}</span>
-                </li>
-              </ul>
-            </ng-container>
-          </td>
-          <td>{{ row.claimedAt | date:'short' }}</td>
-          <td *ngIf="canRemove()">
-            <button *ngIf="!row.wonViaBid" class="btn-release" (click)="removeItem(row.removeId)">Release</button>
-          </td>
-        </tr>
+            </td>
+            <td>{{ row.claimedAt | date:'short' }}</td>
+            <td *ngIf="canRemove()">
+              <button *ngIf="!row.wonViaBid" class="btn-release" (click)="removeItem(row.removeId)">Release</button>
+            </td>
+          </tr>
+          <!-- Set: header row (title + date + release) then one row per member comic -->
+          <ng-container *ngIf="row.type === 'set'">
+            <tr class="set-header-row">
+              <td>
+                <a class="set-header-link" [routerLink]="['/set', row.containerId ?? row.items[0].comicId]">
+                  {{ row.containerTitle ?? row.items[0].comicTitle }}
+                </a>
+                <span class="set-tag">Set {{ row.collectionGroup }}</span>
+              </td>
+              <td></td>
+              <td>{{ row.claimedAt | date:'short' }}</td>
+              <td *ngIf="canRemove()">
+                <button *ngIf="!row.wonViaBid" class="btn-release" (click)="removeItem(row.removeId)">Release</button>
+              </td>
+            </tr>
+            <tr *ngFor="let comic of row.items" class="set-member-row">
+              <td class="set-member-comic">
+                <a [routerLink]="['/detail', comic.comicId]">
+                  {{ comic.comicTitle }}{{ comic.comicNumber ? ' ' + comic.comicNumber : '' }}
+                </a>
+              </td>
+              <td class="set-member-price">
+                <ng-container *ngIf="showItemDiscounts && !comic.wonViaBid && !setDiscountExcluded">
+                  <span class="price-original">{{ comic.price | currency }}</span>
+                  <span class="price-discounted">{{ discountedItemPrice(comic) | currency }}</span>
+                </ng-container>
+                <span *ngIf="!showItemDiscounts || comic.wonViaBid || setDiscountExcluded">{{ comic.price | currency }}</span>
+              </td>
+              <td></td>
+              <td *ngIf="canRemove()"></td>
+            </tr>
+          </ng-container>
+        </ng-container>
       </tbody>
       <tfoot>
         <tr *ngIf="cart.status !== 'OPEN'">

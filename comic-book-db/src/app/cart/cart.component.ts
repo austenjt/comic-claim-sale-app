@@ -219,10 +219,16 @@ export class CartComponent implements OnInit, OnDestroy {
     return this.cart?.status !== 'OPEN' && (this.cart?.discountAmount ?? 0) > 0;
   }
 
-  /** Total of only the non-bid-won items — the pool the discount is spread across. */
+  /** True when the active discount rule excluded set items. */
+  get setDiscountExcluded(): boolean {
+    return this.cart?.discountExcludesSets === true;
+  }
+
+  /** Total of only the items the discount actually applies to. */
   private get discountableTotal(): number {
     return this.visibleItems
-      .filter(i => !i.wonViaBid)
+      .filter(i => !i.wonViaBid &&
+        !(this.setDiscountExcluded && i.collectionGroup != null && i.collectionGroup > 0))
       .reduce((sum, i) => sum + i.price, 0);
   }
 
