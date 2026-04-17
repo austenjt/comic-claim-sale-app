@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CartService } from '../cart.service';
-import { Cart, CartItem } from '../cart';
+import { Cart, CartDiscount, CartItem } from '../cart';
 import { ArchivedOrder, ArchivedOrderItem } from '../archived-order';
 import { ConfigService } from '../config.service';
 
@@ -272,11 +272,32 @@ export class AdminOrdersComponent implements OnInit {
     return (order.discountAmount ?? 0) > 0;
   }
 
+  private eligibleBaseForRule(rule: CartDiscount, cart: Cart): number {
+    return this.visibleCartItems(cart)
+      .filter(i => !i.wonViaBid &&
+        !(rule.excludesSets && i.collectionGroup != null && i.collectionGroup > 0))
+      .reduce((sum, i) => sum + i.price, 0);
+  }
+
   discountedItemPrice(item: CartItem, cart: Cart): number {
     if (item.wonViaBid) return item.price;
+
+    const breakdown = cart.discountBreakdown;
+    if (breakdown && breakdown.length > 0) {
+      const isSetMember = item.collectionGroup != null && item.collectionGroup > 0;
+      let totalItemDiscount = 0;
+      for (const rule of breakdown) {
+        if (rule.excludesSets && isSetMember) continue;
+        const base = this.eligibleBaseForRule(rule, cart);
+        if (base <= 0) continue;
+        totalItemDiscount += (item.price / base) * rule.amount;
+      }
+      return Math.max(0, Math.round((item.price - totalItemDiscount) * 100) / 100);
+    }
+
     const discount = cart.discountAmount ?? 0;
     const excludeSets = cart.discountExcludesSets === true;
-    const visibleNonBid = cart.items.filter(i => !i.isSetContainer && !i.wonViaBid
+    const visibleNonBid = this.visibleCartItems(cart).filter(i => !i.wonViaBid
       && !(excludeSets && i.collectionGroup != null && i.collectionGroup > 0));
     const base = visibleNonBid.reduce((sum, i) => sum + i.price, 0);
     if (discount <= 0 || base <= 0) return item.price;
@@ -284,12 +305,25 @@ export class AdminOrdersComponent implements OnInit {
     return Math.round(item.price * factor * 100) / 100;
   }
 
+  orderDiscountedTotal(order: Cart): number {
+    return Math.max(0, this.cartTotal(order) - (order.discountAmount || 0)) + (order.shippingCost || 0);
+  }
+
   discountedArchivedItemPrice(item: ArchivedOrderItem, order: ArchivedOrder): number {
+    if (item.wonViaBid) return item.price;
     const discount = order.discountAmount ?? 0;
-    const base = order.items.reduce((sum, i) => sum + i.price, 0);
+    const base = order.items.filter(i => !i.wonViaBid).reduce((sum, i) => sum + i.price, 0);
     if (discount <= 0 || base <= 0) return item.price;
     const factor = Math.max(0, base - discount) / base;
     return Math.round(item.price * factor * 100) / 100;
+  }
+
+  archivedOrderSubtotal(order: ArchivedOrder): number {
+    return order.items.reduce((sum, i) => sum + i.price, 0);
+  }
+
+  archivedOrderTotal(order: ArchivedOrder): number {
+    return Math.max(0, this.archivedOrderSubtotal(order) - (order.discountAmount || 0)) + (order.shippingCost || 0);
   }
 
   cartTotal(cart: Cart): number {

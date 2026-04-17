@@ -62,11 +62,11 @@
                 <a [routerLink]="['/detail', comic.comicId]">{{ comic.comicTitle }}{{ comic.comicNumber ? ' ' + comic.comicNumber : '' }}</a>
               </td>
               <td class="set-member-price">
-                <ng-container *ngIf="showItemDiscounts(order) && !comic.wonViaBid && !order.discountExcludesSets">
+                <ng-container *ngIf="showItemDiscounts(order) && !comic.wonViaBid; else plainSetMemberPrice">
                   <span class="price-original">{{ comic.price | currency }}</span>
                   <span class="price-discounted">{{ discountedItemPrice(comic, order) | currency }}</span>
                 </ng-container>
-                <span *ngIf="!showItemDiscounts(order) || comic.wonViaBid || order.discountExcludesSets">{{ comic.price | currency }}</span>
+                <ng-template #plainSetMemberPrice>{{ comic.price | currency }}</ng-template>
               </td>
               <td></td>
               <td></td>
@@ -76,8 +76,8 @@
       </tbody>
       <tfoot>
         <tr>
-          <td>Subtotal <span class="item-count-label">({{ order.items.length }} book{{ order.items.length !== 1 ? 's' : '' }})</span></td>
-          <td>{{ itemsTotal(order.items) | currency }}</td>
+          <td>Subtotal <span class="item-count-label">({{ visibleCartItems(order).length }} book{{ visibleCartItems(order).length !== 1 ? 's' : '' }})</span></td>
+          <td>{{ cartTotal(order) | currency }}</td>
           <td></td>
           <td></td>
         </tr>
@@ -96,7 +96,7 @@
         </tr>
         <tr>
           <td><strong>Total</strong></td>
-          <td><strong>{{ (itemsTotal(order.items) - (order.discountAmount || 0) + (order.shippingCost || 0)) | currency }}</strong></td>
+          <td><strong>{{ orderDiscountedTotal(order) | currency }}</strong></td>
           <td></td>
           <td></td>
         </tr>
@@ -266,7 +266,7 @@
         <tr *ngFor="let item of order.items">
           <td>{{ item.comicTitle }}{{ item.comicNumber ? ' ' + item.comicNumber : '' }}</td>
           <td>
-            <ng-container *ngIf="showArchivedItemDiscounts(order); else plainArchivedPrice">
+            <ng-container *ngIf="showArchivedItemDiscounts(order) && !item.wonViaBid; else plainArchivedPrice">
               <span class="price-original">{{ item.price | currency }}</span>
               <span class="price-discounted">{{ discountedArchivedItemPrice(item, order) | currency }}</span>
             </ng-container>
@@ -276,6 +276,11 @@
         </tr>
       </tbody>
       <tfoot>
+        <tr *ngIf="order.discountAmount && order.discountAmount > 0">
+          <td>Subtotal <span class="item-count-label">({{ order.items.length }} book{{ order.items.length !== 1 ? 's' : '' }})</span></td>
+          <td>{{ archivedOrderSubtotal(order) | currency }}</td>
+          <td></td>
+        </tr>
         <tr *ngIf="order.discountAmount && order.discountAmount > 0">
           <td>Discount</td>
           <td colspan="2" style="color:#2e7d32">-{{ order.discountAmount | currency }}
@@ -289,7 +294,7 @@
         </tr>
         <tr>
           <td><strong>Total</strong></td>
-          <td><strong>{{ (itemsTotal(order.items) - (order.discountAmount || 0) + (order.shippingCost || 0)) | currency }}</strong></td>
+          <td><strong>{{ archivedOrderTotal(order) | currency }}</strong></td>
           <td></td>
         </tr>
       </tfoot>
