@@ -92,7 +92,7 @@ public class ComicService {
      * and (isForSale, salePrice) before deploying.
      */
     public PagedResponse<ComicBook> getTopLevelComicsPaged(
-            int pageNumber, int pageSize, String sort, boolean onlyPriced, boolean onlyBiddable) {
+            int pageNumber, int pageSize, String sort, boolean onlyPriced, boolean onlyBiddable, boolean admin) {
         int offset = (pageNumber - 1) * pageSize;
 
         // WHERE: top-level only (standalone comics + SET containers, no members)
@@ -101,8 +101,13 @@ public class ComicService {
              .append(" OR NOT IS_DEFINED(c.collectionGroup)")
              .append(" OR c.collectionGroup = null")
              .append(" OR c.collectionGroup <= 0)");
-        // Match frontend logic: isForSale !== false — includes null/undefined (old comics without the field)
-        where.append(" AND (NOT IS_DEFINED(c.isForSale) OR c.isForSale = null OR c.isForSale = true)");
+        if (admin) {
+            // Admins see all comics that aren't explicitly hidden (isForSale = null/undefined counts as staging)
+            where.append(" AND (NOT IS_DEFINED(c.isForSale) OR c.isForSale = null OR c.isForSale = true)");
+        } else {
+            // Non-admins only see comics explicitly marked for sale
+            where.append(" AND c.isForSale = true");
+        }
         where.append(" AND (NOT IS_DEFINED(c.dateSold) OR c.dateSold = null OR c.dateSold = '')");
         if (onlyPriced) {
             // SETs are always included; individual comics must have a price

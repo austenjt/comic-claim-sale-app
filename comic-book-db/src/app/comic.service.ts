@@ -196,7 +196,7 @@ export class ComicService {
    * Reads a CSV file and POSTs its text content to the data load endpoint.
    * Returns an Observable so callers can track progress and handle errors.
    */
-  public uploadCSVFile(csvFile: File, collectionGroup?: number, setPriceToPricePaid = false): Observable<CsvUploadResult> {
+  public uploadCSVFile(csvFile: File, collectionGroup?: number, setPriceToPricePaid = false, markForSale = true): Observable<CsvUploadResult> {
     const readFile = new Promise<string>((resolve, reject) => {
       const reader = new FileReader();
       reader.onload = () => resolve(reader.result as string);
@@ -207,6 +207,7 @@ export class ComicService {
     const params: string[] = [];
     if (collectionGroup != null) params.push(`collectionGroup=${collectionGroup}`);
     if (setPriceToPricePaid) params.push(`setPriceToPricePaid=true`);
+    if (!markForSale) params.push(`markForSale=false`);
     const url = params.length > 0 ? `${this.dataLoadUrl}?${params.join('&')}` : this.dataLoadUrl;
     const headers = new HttpHeaders({ 'Content-Type': 'text/plain' });
     const empty: CsvUploadResult = { succeeded: [], failed: [], duplicates: [] };

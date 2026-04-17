@@ -202,7 +202,7 @@ public class CsvToJsonConverter {
    * @return an HTTP response with succeeded/failed/duplicate results
    * @throws JsonProcessingException if JSON serialization fails
    */
-  public HttpResponseMessage loadGoCollectCsvData(HttpRequestMessage<Optional<String>> request, Integer targetCollectionGroup, boolean setPriceToPricePaid) throws JsonProcessingException {
+  public HttpResponseMessage loadGoCollectCsvData(HttpRequestMessage<Optional<String>> request, Integer targetCollectionGroup, boolean setPriceToPricePaid, boolean markForSale) throws JsonProcessingException {
     log.info("Attempting to parse GoCollect CSV data...");
     List<ComicBook> loaded = new ArrayList<>();
     List<ComicBook> failedToLoad = new ArrayList<>();
@@ -338,6 +338,11 @@ public class CsvToJsonConverter {
           // Images (defaults)
           comicBook.setSmallCachedImageId("");
           comicBook.setLargeCachedImageId("");
+
+          // Mark for sale
+          if (markForSale) {
+              comicBook.setIsForSale(true);
+          }
 
           // Cert ID uniqueness check — only for graded comics
           if (Boolean.TRUE.equals(comicBook.getComicCondition().getIsGraded())

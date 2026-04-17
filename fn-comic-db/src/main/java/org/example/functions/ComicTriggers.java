@@ -55,7 +55,7 @@ public class ComicTriggers {
                 String sort = request.getQueryParameters().getOrDefault("sort", "oldest-first");
                 boolean onlyPriced = "true".equalsIgnoreCase(request.getQueryParameters().get("onlyPriced"));
                 boolean onlyBiddable = "true".equalsIgnoreCase(request.getQueryParameters().get("onlyBiddable"));
-                PagedResponse<ComicBook> paged = comicService.getTopLevelComicsPaged(pageNumber, pageSize, sort, onlyPriced, onlyBiddable);
+                PagedResponse<ComicBook> paged = comicService.getTopLevelComicsPaged(pageNumber, pageSize, sort, onlyPriced, onlyBiddable, admin);
                 String body = admin
                     ? OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(paged)
                     : OBJECT_MAPPER.writerWithView(Views.Public.class).writeValueAsString(paged);
@@ -492,8 +492,9 @@ public class ComicTriggers {
             try { collectionGroup = Integer.parseInt(collectionGroupStr); } catch (NumberFormatException ignored) {}
         }
         boolean setPriceToPricePaid = "true".equalsIgnoreCase(request.getQueryParameters().get("setPriceToPricePaid"));
+        boolean markForSale = !"false".equalsIgnoreCase(request.getQueryParameters().get("markForSale"));
         try {
-            return csvToJsonConverter.loadGoCollectCsvData(request, collectionGroup, setPriceToPricePaid);
+            return csvToJsonConverter.loadGoCollectCsvData(request, collectionGroup, setPriceToPricePaid, markForSale);
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Data load failed to return results.", e);
         }

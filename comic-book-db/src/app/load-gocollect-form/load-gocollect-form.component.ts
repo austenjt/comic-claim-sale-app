@@ -17,6 +17,7 @@ export class LoadGoCollectFormComponent {
 
   importAsSet = false;
   setPriceToPricePaid = false;
+  markForSale = true;
   availableSets: Comic[] = [];
   selectedSet: Comic | null = null;
 
@@ -57,7 +58,7 @@ export class LoadGoCollectFormComponent {
     const collectionGroup = this.importAsSet && this.selectedSet?.collectionGroup != null
       ? this.selectedSet.collectionGroup
       : undefined;
-    this.comicService.uploadCSVFile(this.selectedFile!, collectionGroup, this.setPriceToPricePaid).subscribe({
+    this.comicService.uploadCSVFile(this.selectedFile!, collectionGroup, this.setPriceToPricePaid, this.markForSale).subscribe({
       next: (result: CsvUploadResult) => {
         this.status = result.errors?.length ? 'error' : 'success';
         this.statusMessage =

@@ -104,6 +104,11 @@ public class CartService {
         ComicBook comic = ComicService.getServiceInstance().getComicById(Integer.parseInt(comicId))
             .orElseThrow(() -> new IllegalArgumentException("Comic not found: " + comicId));
 
+        // Standalone claims require a sale price; bid-won items use the override price so they are exempt
+        if (!wonViaBid && comic.getSalePrice() == null) {
+            throw new IllegalStateException("Comic " + comicId + " does not have a sale price and cannot be claimed.");
+        }
+
         CartItem item = new CartItem();
         item.setComicId(comicId);
         item.setComicTitle(comic.getTitle());
