@@ -593,7 +593,7 @@ button {
   padding-right: 4px;
 }
 
-.comic-series, .comic-publisher, .comic-grade-certified, .comic-grade-est {
+.comic-series, .comic-publisher, .comic-published, .comic-grade-certified, .comic-grade-est {
   font-size: 0.8rem;
   color: var(--color-text-muted);
   margin-bottom: 3px;

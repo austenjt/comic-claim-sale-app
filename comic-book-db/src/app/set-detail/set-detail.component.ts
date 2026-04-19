@@ -84,6 +84,11 @@ export class SetDetailComponent implements OnInit, OnDestroy {
         this.setMembers = comic?.items ?? [];
         this.loading = false;
         if (comic) {
+          // Populate nav so Prev/Next work when viewing member comics.
+          // Include the container first (docType='SET') so getSetContainerId() still resolves
+          // the "View Set" link on the comic-detail page.
+          const members = (comic.items ?? []).filter(m => m.docType !== 'SET');
+          this.navService.setList([comic, ...members]);
           this.editContainer = structuredClone(comic);
           const count = (comic.items ?? []).length;
           this.titleService.setTitle(`${comic.title} Set — Lightning Comics PDX`);

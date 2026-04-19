@@ -197,6 +197,7 @@
             <div class="meta-grid">
               <div *ngIf="comic.series && comic.series !== ''" class="comic-series">Series: <b>{{comic.series}}</b></div>
               <div *ngIf="comic.publisher" class="comic-publisher">Publisher: <b>{{comic.publisher}}</b></div>
+              <div *ngIf="comic.publishedDate" class="comic-published">Published: <b>{{comic.publishedDate}}</b></div>
               <div *ngIf="comic.number?.number != null || comic.number?.sentinel != null" class="comic-number">
                 Number: <b>{{ comic.number?.sentinel ?? comic.number?.number }}</b>
               </div>
