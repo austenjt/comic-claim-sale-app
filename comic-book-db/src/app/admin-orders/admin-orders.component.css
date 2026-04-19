@@ -86,7 +86,7 @@
 table { width: 100%; border-collapse: collapse; }
 th, td { padding: 10px 16px; border-bottom: 1px solid var(--color-border); text-align: left; color: var(--color-text); }
 th { font-weight: bold; background: #adc178; }
-tfoot td { font-weight: bold; }
+tfoot td { font-weight: bold; background: #adc178; }
 
 .order-actions { padding: 12px 16px; background: #6c584c; border-top: 1px solid var(--color-border); }
 
