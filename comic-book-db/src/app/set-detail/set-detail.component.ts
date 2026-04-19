@@ -48,6 +48,7 @@ export class SetDetailComponent implements OnInit, OnDestroy {
   addBookSearching = false;
   addBookSaving = false;
   addBookError = '';
+  zoomOpen = false;
   private addBookSearchTimer: any = null;
   private routeParamSub: Subscription | null = null;
 
@@ -112,6 +113,10 @@ export class SetDetailComponent implements OnInit, OnDestroy {
 
   selectImage(which: 'front' | 'back'): void {
     this.activeImage = which;
+  }
+
+  toggleZoom(): void {
+    this.zoomOpen = !this.zoomOpen;
   }
 
   get displayMembers(): Comic[] {

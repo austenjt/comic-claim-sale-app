@@ -102,8 +102,7 @@ public class ComicService {
              .append(" OR c.collectionGroup = null")
              .append(" OR c.collectionGroup <= 0)");
         if (admin) {
-            // Admins see all comics that aren't explicitly hidden (isForSale = null/undefined counts as staging)
-            where.append(" AND (NOT IS_DEFINED(c.isForSale) OR c.isForSale = null OR c.isForSale = true)");
+            // Admins see all comics regardless of isForSale — isForSale=false is a "hidden from buyers" flag only
         } else {
             // Non-admins only see comics explicitly marked for sale
             where.append(" AND c.isForSale = true");

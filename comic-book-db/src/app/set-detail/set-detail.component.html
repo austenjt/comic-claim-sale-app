@@ -38,7 +38,8 @@
 
       <!-- Single large image viewer -->
       <div class="large-image">
-        <img [src]="getImageURL(activeLargeImageId) | async" alt="Set Cover" loading="lazy">
+        <img [src]="getImageURL(activeLargeImageId) | async" alt="Set Cover" loading="lazy"
+             class="zoomable" (click)="toggleZoom()">
         <div *ngIf="auth.isAdmin()" class="img-update-bar">
           <ng-container *ngIf="activeImage === 'front'">
             <button class="img-update-btn" (click)="imageFileInput.click()" [disabled]="imageUploading">
@@ -75,6 +76,10 @@
       <input #backImageFileInput type="file" accept="image/png,image/jpeg" style="display:none"
              (change)="onBackImageFileSelected($event)">
 
+    </div>
+
+    <div class="zoom-overlay" *ngIf="zoomOpen" (click)="toggleZoom()">
+      <img [src]="getImageURL(activeLargeImageId) | async" alt="Zoomed Set Cover">
     </div>
 
     <!-- Set metadata -->
