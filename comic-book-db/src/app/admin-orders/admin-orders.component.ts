@@ -206,6 +206,22 @@ export class AdminOrdersComponent implements OnInit {
   readonly paymentStatuses = ['UNPAID', 'PAID'];
 
   adminNoteDrafts: Record<string, string> = {};
+  trackingDrafts: Record<string, string> = {};
+  archivedTrackingDrafts: Record<string, string> = {};
+
+  // Per-order edit mode: true = editing, false = viewing saved value
+  notesEditing: Record<string, boolean> = {};
+  trackingEditing: Record<string, boolean> = {};
+
+  isNotesEditing(orderId: string, adminNotes: string | null | undefined): boolean {
+    if (orderId in this.notesEditing) return this.notesEditing[orderId];
+    return !adminNotes; // no saved note → start in edit mode
+  }
+
+  isTrackingEditing(orderId: string, trackingNumber: string | null | undefined): boolean {
+    if (orderId in this.trackingEditing) return this.trackingEditing[orderId];
+    return !trackingNumber; // no saved tracking → start in edit mode
+  }
 
   saveAdminNotes(cartId: string) {
     const notes = this.adminNoteDrafts[cartId] ?? null;
@@ -213,8 +229,9 @@ export class AdminOrdersComponent implements OnInit {
       next: updated => {
         const order = this.orders.find(o => o.id === cartId);
         if (order) order.adminNotes = updated.adminNotes;
+        this.notesEditing[cartId] = false;
       },
-      error: () => this.error = 'Failed to save admin notes.'
+      error: () => this.error = 'Failed to save seller notes.'
     });
   }
 
@@ -224,8 +241,9 @@ export class AdminOrdersComponent implements OnInit {
       next: updated => {
         const order = this.archivedOrders.find(o => o.id === orderId);
         if (order) order.adminNotes = updated.adminNotes;
+        this.notesEditing[orderId] = false;
       },
-      error: () => this.archivedError = 'Failed to save admin notes.'
+      error: () => this.archivedError = 'Failed to save seller notes.'
     });
   }
 
@@ -236,24 +254,88 @@ export class AdminOrdersComponent implements OnInit {
     return this.adminNoteDrafts[id];
   }
 
-  setPaymentStatus(cartId: string, status: string) {
-    this.cartService.updatePaymentStatus(cartId, status).subscribe({
+  togglePaid(order: Cart) {
+    const newStatus = order.paymentStatus === 'PAID' ? 'UNPAID' : 'PAID';
+    this.cartService.updatePaymentStatus(order.id, newStatus).subscribe({
       next: updated => {
-        const order = this.orders.find(o => o.id === cartId);
-        if (order) order.paymentStatus = updated.paymentStatus;
+        const o = this.orders.find(o => o.id === order.id);
+        if (o) o.paymentStatus = updated.paymentStatus;
       },
       error: () => this.error = 'Failed to update payment status.'
     });
   }
 
-  setArchivedPaymentStatus(orderId: string, status: string) {
-    this.cartService.updateArchivedPaymentStatus(orderId, status).subscribe({
+  toggleShipped(order: Cart) {
+    const newShipped = !order.shipped;
+    const tracking = this.trackingDrafts[order.id] ?? order.trackingNumber ?? null;
+    this.cartService.updateShipping(order.id, newShipped, tracking || null).subscribe({
       next: updated => {
-        const order = this.archivedOrders.find(o => o.id === orderId);
-        if (order) order.paymentStatus = updated.paymentStatus;
+        const o = this.orders.find(o => o.id === order.id);
+        if (o) { o.shipped = updated.shipped; o.trackingNumber = updated.trackingNumber; }
+      },
+      error: () => this.error = 'Failed to update shipping status.'
+    });
+  }
+
+  saveTracking(order: Cart) {
+    const tracking = this.trackingDrafts[order.id] ?? order.trackingNumber ?? null;
+    this.cartService.updateShipping(order.id, true, tracking || null).subscribe({
+      next: updated => {
+        const o = this.orders.find(o => o.id === order.id);
+        if (o) o.trackingNumber = updated.trackingNumber;
+        this.trackingEditing[order.id] = false;
+      },
+      error: () => this.error = 'Failed to save tracking number.'
+    });
+  }
+
+  initTrackingDraft(cartId: string, existing: string | null | undefined): string {
+    if (!(cartId in this.trackingDrafts)) {
+      this.trackingDrafts[cartId] = existing ?? '';
+    }
+    return this.trackingDrafts[cartId];
+  }
+
+  toggleArchivedPaid(order: ArchivedOrder) {
+    const newStatus = order.paymentStatus === 'PAID' ? 'UNPAID' : 'PAID';
+    this.cartService.updateArchivedPaymentStatus(order.id, newStatus).subscribe({
+      next: updated => {
+        const o = this.archivedOrders.find(o => o.id === order.id);
+        if (o) o.paymentStatus = updated.paymentStatus;
       },
       error: () => this.archivedError = 'Failed to update payment status.'
     });
+  }
+
+  toggleArchivedShipped(order: ArchivedOrder) {
+    const newShipped = !order.shipped;
+    const tracking = this.archivedTrackingDrafts[order.id] ?? order.trackingNumber ?? null;
+    this.cartService.updateArchivedShipping(order.id, newShipped, tracking || null).subscribe({
+      next: updated => {
+        const o = this.archivedOrders.find(o => o.id === order.id);
+        if (o) { o.shipped = updated.shipped; o.trackingNumber = updated.trackingNumber; }
+      },
+      error: () => this.archivedError = 'Failed to update shipping status.'
+    });
+  }
+
+  saveArchivedTracking(order: ArchivedOrder) {
+    const tracking = this.archivedTrackingDrafts[order.id] ?? order.trackingNumber ?? null;
+    this.cartService.updateArchivedShipping(order.id, true, tracking || null).subscribe({
+      next: updated => {
+        const o = this.archivedOrders.find(o => o.id === order.id);
+        if (o) o.trackingNumber = updated.trackingNumber;
+        this.trackingEditing[order.id] = false;
+      },
+      error: () => this.archivedError = 'Failed to save tracking number.'
+    });
+  }
+
+  initArchivedTrackingDraft(orderId: string, existing: string | null | undefined): string {
+    if (!(orderId in this.archivedTrackingDrafts)) {
+      this.archivedTrackingDrafts[orderId] = existing ?? '';
+    }
+    return this.archivedTrackingDrafts[orderId];
   }
 
   paymentLabel(status: string | null | undefined): string {
@@ -494,16 +576,17 @@ export class AdminOrdersComponent implements OnInit {
   }
 
   canFulfill(order: Cart): boolean {
-    if (order.status === 'FINALIZED') return true;
-    if (order.status === 'FINALIZING') return order.paymentStatus === 'PAID';
-    return false;
+    if (order.status !== 'FINALIZING' && order.status !== 'FINALIZED') return false;
+    return order.paymentStatus === 'PAID' && order.shipped === true;
   }
 
   fulfillTitle(order: Cart): string {
     if (this.canFulfill(order)) return '';
-    if (order.status === 'FINALIZING') {
-      return 'Mark the order as Paid to enable fulfillment';
+    if (order.status !== 'FINALIZING' && order.status !== 'FINALIZED') {
+      return 'Order must be submitted before fulfillment';
     }
-    return 'Order must be submitted before fulfillment';
+    if (order.paymentStatus !== 'PAID') return 'Mark the order as Paid to enable fulfillment';
+    if (!order.shipped) return 'Mark the order as Shipped to enable fulfillment';
+    return '';
   }
 }

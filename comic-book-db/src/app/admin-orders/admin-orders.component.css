@@ -142,31 +142,63 @@ tfoot td { font-weight: bold; }
 }
 .btn-save-notes:hover { background: rgba(169,132,103,0.08); }
 
-.payment-status-group {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-right: auto;
+.saved-note-text {
+  flex: 1;
+  white-space: pre-wrap;
+  color: var(--color-text);
+  font-size: 0.88rem;
 }
 
-.payment-label {
+.btn-edit-note {
+  padding: 3px 10px;
+  background: transparent;
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  font-size: 0.78rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.btn-edit-note:hover { background: var(--color-border); }
+
+.tracking-note-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  background: rgba(173,193,120,0.05);
+}
+
+.fulfillment-checks {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-right: auto;
+  flex-wrap: wrap;
+}
+
+.fulfillment-check-label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
   font-size: 0.85rem;
   color: rgba(240,234,210,0.7);
   font-weight: 500;
+  cursor: pointer;
+  user-select: none;
 }
+.fulfillment-check-label.check-active { color: #adc178; }
+.fulfillment-check-label input[type="checkbox"] { cursor: pointer; accent-color: #adc178; }
 
-.payment-select {
-  padding: 4px 10px;
+.tracking-input {
+  padding: 4px 8px;
   border-radius: 4px;
   border: 1px solid var(--color-border);
   background: #6c584c;
   color: #f0ead2;
-  font-size: 0.85rem;
-  cursor: pointer;
+  font-size: 0.82rem;
+  width: 200px;
 }
-.payment-select.payment-unpaid { border-color: #c0634c; color: #c0634c; }
-.payment-select.payment-partial { border-color: #a98467; color: #a98467; }
-.payment-select.payment-paid { border-color: #adc178; color: #adc178; }
 
 .btn-unsubmit {
   padding: 8px 20px;

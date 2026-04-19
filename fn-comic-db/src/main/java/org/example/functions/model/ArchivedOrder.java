@@ -27,6 +27,8 @@ public class ArchivedOrder {
     private String createdAt;
     private String fulfilledAt;
     private String paymentStatus; // UNPAID | PARTIAL | PAID
+    private Boolean shipped;
+    private String trackingNumber;
     private String customerNotes;
     private String adminNotes;
 }

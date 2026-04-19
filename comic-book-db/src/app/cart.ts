@@ -41,6 +41,8 @@ export interface Cart {
   discountBreakdown?: CartDiscount[] | null;
   shippingCost?: number;
   paymentStatus?: 'UNPAID' | 'PARTIAL' | 'PAID' | null;
+  shipped?: boolean | null;
+  trackingNumber?: string | null;
   customerNotes?: string | null;
   adminNotes?: string | null;
   shippingEstimate?: ShippingEstimate | null;

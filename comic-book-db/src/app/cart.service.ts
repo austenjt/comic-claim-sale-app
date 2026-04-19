@@ -93,8 +93,16 @@ export class CartService {
     return this.http.post<Cart>(`${this.apiBase}/orders/${cartId}/payment`, { status });
   }
 
+  updateShipping(cartId: string, shipped: boolean, trackingNumber: string | null): Observable<Cart> {
+    return this.http.post<Cart>(`${this.apiBase}/orders/${cartId}/shipping`, { shipped, trackingNumber });
+  }
+
   updateArchivedPaymentStatus(orderId: string, status: string): Observable<ArchivedOrder> {
     return this.http.post<ArchivedOrder>(`${this.apiBase}/orders/archived/${orderId}/payment`, { status });
+  }
+
+  updateArchivedShipping(orderId: string, shipped: boolean, trackingNumber: string | null): Observable<ArchivedOrder> {
+    return this.http.post<ArchivedOrder>(`${this.apiBase}/orders/archived/${orderId}/shipping`, { shipped, trackingNumber });
   }
 
   adminUnclaim(comicId: string): Observable<void> {

@@ -158,6 +158,11 @@
       <p class="notes-value">{{ cart.customerNotes }}</p>
     </div>
 
+    <div class="cart-actions seller-notes-display" *ngIf="cart.adminNotes">
+      <p class="notes-label">Seller notes:</p>
+      <p class="notes-value">{{ cart.adminNotes }}</p>
+    </div>
+
     <div class="cart-actions" *ngIf="cart.status === 'FINALIZED'">
       <p class="finalized-note">
         Your order is finalized and with the seller. Payment details will be arranged directly.

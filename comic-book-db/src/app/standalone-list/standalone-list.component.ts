@@ -308,9 +308,8 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
       this.addSetExistingGroups = sets
         .filter(c => c.collectionGroup != null)
         .map(c => c.collectionGroup!);
-      const next = this.addSetExistingGroups.length > 0
-        ? Math.max(...this.addSetExistingGroups) + 1
-        : 1;
+    });
+    this.comicService.getNextSetGroupId().subscribe(next => {
       this.addSetCollectionGroup = next;
       this.addSetGroupAutoSet = true;
     });

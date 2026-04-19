@@ -426,6 +426,45 @@ public class ComicTriggers {
         }
     }
 
+    @FunctionName("getNextSetGroupId")
+    public HttpResponseMessage getNextSetGroupId(
+        @HttpTrigger(
+            name = "getNextSetGroupId",
+            route = "sets/next-group-id",
+            methods = {HttpMethod.GET},
+            authLevel = AuthorizationLevel.ANONYMOUS)
+        HttpRequestMessage<Optional<String>> request)
+    {
+        log.info("Processing getNextSetGroupId function.");
+        if (!AuthHelper.isAdminRequest(request)) {
+            return request.createResponseBuilder(HttpStatus.FORBIDDEN)
+                .header("Access-Control-Allow-Origin", "*")
+                .body("Admin access required.")
+                .build();
+        }
+        try {
+            // Max across currently active sets
+            int activeMax = ComicService.getServiceInstance().getSetsList().stream()
+                .filter(s -> s.getCollectionGroup() != null)
+                .mapToInt(ComicBook::getCollectionGroup)
+                .max().orElse(0);
+            // Max across all archived (fulfilled) orders
+            int archivedMax = ArchiveService.getServiceInstance().getMaxCollectionGroup();
+            int next = Math.max(activeMax, archivedMax) + 1;
+            return request.createResponseBuilder(HttpStatus.OK)
+                .header("Access-Control-Allow-Origin", "*")
+                .header("Content-Type", "application/json")
+                .body("{\"nextGroupId\":" + next + "}")
+                .build();
+        } catch (Exception e) {
+            log.error("Error in getNextSetGroupId.", e);
+            return request.createResponseBuilder(HttpStatus.INTERNAL_SERVER_ERROR)
+                .header("Access-Control-Allow-Origin", "*")
+                .body(e.getMessage())
+                .build();
+        }
+    }
+
     @FunctionName("getSingleComics")
     public HttpResponseMessage getSingleComics(
         @HttpTrigger(

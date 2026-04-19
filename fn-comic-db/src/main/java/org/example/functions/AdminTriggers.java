@@ -198,32 +198,6 @@ public class AdminTriggers {
         }
     }
 
-    // ─── POST /api/orders/archived/{orderId}/notes ────────────────────────────
-
-    @FunctionName("updateArchivedOrderAdminNotes")
-    public HttpResponseMessage updateArchivedOrderAdminNotes(
-        @HttpTrigger(name = "updateArchivedOrderAdminNotes", route = "orders/archived/{orderId}/notes",
-            methods = {HttpMethod.POST}, authLevel = AuthorizationLevel.ANONYMOUS)
-        HttpRequestMessage<Optional<String>> request,
-        @BindingName("orderId") String orderId)
-    {
-        if (AuthHelper.requireAdmin(request) == null) return unauthorized(request);
-        try {
-            String body = request.getBody().orElse("{}");
-            ObjectNode payload = OBJECT_MAPPER.readValue(body, ObjectNode.class);
-            String notes = payload.has("adminNotes") ? payload.get("adminNotes").asText(null) : null;
-            ArchivedOrder order = ArchiveService.getServiceInstance().updateAdminNotes(orderId, notes);
-            return cors(request.createResponseBuilder(HttpStatus.OK))
-                .header("Content-Type", "application/json")
-                .body(OBJECT_MAPPER.writeValueAsString(order)).build();
-        } catch (IllegalArgumentException e) {
-            return cors(request.createResponseBuilder(HttpStatus.NOT_FOUND)).body(e.getMessage()).build();
-        } catch (Exception e) {
-            log.error("updateArchivedOrderAdminNotes error", e);
-            return serverError(request, e);
-        }
-    }
-
     // ─── POST /api/orders/{cartId}/payment ───────────────────────────────────
 
     private static final java.util.Set<String> VALID_PAYMENT_STATUSES =
@@ -257,6 +231,34 @@ public class AdminTriggers {
         }
     }
 
+    // ─── POST /api/orders/{cartId}/shipping ──────────────────────────────────
+
+    @FunctionName("updateShipping")
+    public HttpResponseMessage updateShipping(
+        @HttpTrigger(name = "updateShipping", route = "orders/{cartId}/shipping",
+            methods = {HttpMethod.POST}, authLevel = AuthorizationLevel.ANONYMOUS)
+        HttpRequestMessage<Optional<String>> request,
+        @BindingName("cartId") String cartId)
+    {
+        if (AuthHelper.requireAdmin(request) == null) return unauthorized(request);
+        try {
+            String body = request.getBody().orElse("{}");
+            ObjectNode payload = OBJECT_MAPPER.readValue(body, ObjectNode.class);
+            boolean shipped = payload.has("shipped") && payload.get("shipped").asBoolean();
+            String trackingNumber = payload.has("trackingNumber") && !payload.get("trackingNumber").isNull()
+                ? payload.get("trackingNumber").asText(null) : null;
+            Cart cart = CartService.getServiceInstance().updateShipping(cartId, shipped, trackingNumber);
+            return cors(request.createResponseBuilder(HttpStatus.OK))
+                .header("Content-Type", "application/json")
+                .body(OBJECT_MAPPER.writeValueAsString(cart)).build();
+        } catch (IllegalArgumentException e) {
+            return cors(request.createResponseBuilder(HttpStatus.NOT_FOUND)).body(e.getMessage()).build();
+        } catch (Exception e) {
+            log.error("updateShipping error", e);
+            return serverError(request, e);
+        }
+    }
+
     // ─── POST /api/orders/archived/{orderId}/payment ──────────────────────────
 
     @FunctionName("updateArchivedPaymentStatus")
@@ -283,6 +285,61 @@ public class AdminTriggers {
             return cors(request.createResponseBuilder(HttpStatus.NOT_FOUND)).body(e.getMessage()).build();
         } catch (Exception e) {
             log.error("updateArchivedPaymentStatus error", e);
+            return serverError(request, e);
+        }
+    }
+
+    // ─── POST /api/orders/archived/{orderId}/notes ───────────────────────────
+
+    @FunctionName("updateArchivedAdminNotes")
+    public HttpResponseMessage updateArchivedAdminNotes(
+        @HttpTrigger(name = "updateArchivedAdminNotes", route = "orders/archived/{orderId}/notes",
+            methods = {HttpMethod.POST}, authLevel = AuthorizationLevel.ANONYMOUS)
+        HttpRequestMessage<Optional<String>> request,
+        @BindingName("orderId") String orderId)
+    {
+        if (AuthHelper.requireAdmin(request) == null) return unauthorized(request);
+        try {
+            String body = request.getBody().orElse("{}");
+            ObjectNode payload = OBJECT_MAPPER.readValue(body, ObjectNode.class);
+            String notes = payload.has("adminNotes") && !payload.get("adminNotes").isNull()
+                ? payload.get("adminNotes").asText(null) : null;
+            ArchivedOrder order = ArchiveService.getServiceInstance().updateAdminNotes(orderId, notes);
+            return cors(request.createResponseBuilder(HttpStatus.OK))
+                .header("Content-Type", "application/json")
+                .body(OBJECT_MAPPER.writeValueAsString(order)).build();
+        } catch (IllegalArgumentException e) {
+            return cors(request.createResponseBuilder(HttpStatus.NOT_FOUND)).body(e.getMessage()).build();
+        } catch (Exception e) {
+            log.error("updateArchivedAdminNotes error", e);
+            return serverError(request, e);
+        }
+    }
+
+    // ─── POST /api/orders/archived/{orderId}/shipping ────────────────────────
+
+    @FunctionName("updateArchivedShipping")
+    public HttpResponseMessage updateArchivedShipping(
+        @HttpTrigger(name = "updateArchivedShipping", route = "orders/archived/{orderId}/shipping",
+            methods = {HttpMethod.POST}, authLevel = AuthorizationLevel.ANONYMOUS)
+        HttpRequestMessage<Optional<String>> request,
+        @BindingName("orderId") String orderId)
+    {
+        if (AuthHelper.requireAdmin(request) == null) return unauthorized(request);
+        try {
+            String body = request.getBody().orElse("{}");
+            ObjectNode payload = OBJECT_MAPPER.readValue(body, ObjectNode.class);
+            boolean shipped = payload.has("shipped") && payload.get("shipped").asBoolean();
+            String trackingNumber = payload.has("trackingNumber") && !payload.get("trackingNumber").isNull()
+                ? payload.get("trackingNumber").asText(null) : null;
+            ArchivedOrder order = ArchiveService.getServiceInstance().updateShipping(orderId, shipped, trackingNumber);
+            return cors(request.createResponseBuilder(HttpStatus.OK))
+                .header("Content-Type", "application/json")
+                .body(OBJECT_MAPPER.writeValueAsString(order)).build();
+        } catch (IllegalArgumentException e) {
+            return cors(request.createResponseBuilder(HttpStatus.NOT_FOUND)).body(e.getMessage()).build();
+        } catch (Exception e) {
+            log.error("updateArchivedShipping error", e);
             return serverError(request, e);
         }
     }

@@ -68,7 +68,7 @@
         </ng-container>
       </tbody>
       <tfoot>
-        <tr *ngIf="order.discountAmount && order.discountAmount > 0">
+        <tr *ngIf="(order.discountAmount && order.discountAmount > 0) || (order.shippingCost && order.shippingCost > 0)">
           <td>Subtotal <span class="item-count-label">({{ bookCount(order) }} book{{ bookCount(order) !== 1 ? 's' : '' }})</span></td>
           <td>{{ orderSubtotal(order) | currency }}</td>
           <td></td>
@@ -92,5 +92,20 @@
         </tr>
       </tfoot>
     </table>
+
+    <div *ngIf="order.trackingNumber" class="order-info tracking-panel">
+      <span class="info-label">Tracking #:</span>
+      <span class="info-value">{{ order.trackingNumber }}</span>
+    </div>
+
+    <div *ngIf="order.adminNotes" class="order-info seller-notes-panel">
+      <span class="info-label">Seller notes:</span>
+      <p class="info-value">{{ order.adminNotes }}</p>
+    </div>
+
+    <div *ngIf="order.customerNotes" class="order-info customer-notes-panel">
+      <span class="info-label">Your notes:</span>
+      <p class="info-value">{{ order.customerNotes }}</p>
+    </div>
   </div>
 </div>

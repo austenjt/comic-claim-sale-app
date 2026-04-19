@@ -131,6 +131,18 @@ public class ArchiveService {
         }
     }
 
+    /** Admin: update shipped status and tracking number on an archived order. */
+    public ArchivedOrder updateShipping(String orderId, boolean shipped, String trackingNumber) {
+        ArchivedOrder order = getArchivedOrderById(orderId)
+            .orElseThrow(() -> new IllegalArgumentException("Archived order not found: " + orderId));
+        order.setShipped(shipped);
+        order.setTrackingNumber(trackingNumber);
+        ObjectNode node = OBJECT_MAPPER.valueToTree(order);
+        archivedOrdersContainer.replaceItem(node, orderId, new PartitionKey(orderId), new CosmosItemRequestOptions());
+        log.info("Shipping updated for archived order {}: shipped={}, tracking={}", orderId, shipped, trackingNumber);
+        return order;
+    }
+
     /** Permanently deletes an archived order by ID. */
     public void deleteArchivedOrder(String orderId) {
         archivedOrdersContainer.deleteItem(orderId, new PartitionKey(orderId), new CosmosItemRequestOptions());
@@ -145,6 +157,21 @@ public class ArchiveService {
         } catch (Exception e) {
             return java.util.Optional.empty();
         }
+    }
+
+    /** Returns the highest collectionGroup value seen across all archived orders, or 0 if none. */
+    public int getMaxCollectionGroup() {
+        SqlQuerySpec query = new SqlQuerySpec(
+            "SELECT item.collectionGroup FROM c JOIN item IN c.items " +
+            "WHERE IS_DEFINED(item.collectionGroup) AND item.collectionGroup != null AND item.collectionGroup > 0");
+        int max = 0;
+        for (ObjectNode node : archivedOrdersContainer.queryItems(query, new CosmosQueryRequestOptions(), ObjectNode.class)) {
+            try {
+                int val = node.get("collectionGroup").asInt(0);
+                if (val > max) max = val;
+            } catch (Exception ignored) {}
+        }
+        return max;
     }
 
     /** Returns true if any archived order contains an item with the given collectionGroup. */
@@ -204,6 +231,8 @@ public class ArchiveService {
             .createdAt(cart.getCreatedAt())
             .fulfilledAt(cart.getFulfilledAt())
             .paymentStatus(cart.getPaymentStatus())
+            .shipped(cart.getShipped())
+            .trackingNumber(cart.getTrackingNumber())
             .customerNotes(cart.getCustomerNotes())
             .adminNotes(cart.getAdminNotes())
             .build();

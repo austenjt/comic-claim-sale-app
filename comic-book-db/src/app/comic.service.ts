@@ -88,6 +88,14 @@ export class ComicService {
     );
   }
 
+  getNextSetGroupId(): Observable<number> {
+    return this.http.get<{ nextGroupId: number }>(`${this.setsUrl}/next-group-id`).pipe(
+      tap(() => this.log('fetched next set group id')),
+      map(r => r.nextGroupId),
+      catchError(this.handleError<number>('getNextSetGroupId', 1))
+    );
+  }
+
   /** GET standalone comics not belonging to any set (admin use only). */
   getSingleComics(): Observable<Comic[]> {
     return this.http.get<Comic[]>(`${this.comicsUrl}/single`).pipe(

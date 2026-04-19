@@ -303,6 +303,16 @@ public class CartService {
         return cart;
     }
 
+    /** Admin: record shipped status and optional tracking number for a cart. */
+    public Cart updateShipping(String cartId, boolean shipped, String trackingNumber) {
+        Cart cart = findCartById(cartId);
+        cart.setShipped(shipped);
+        cart.setTrackingNumber(trackingNumber);
+        save(cart);
+        log.info("Cart {} shipped={}, trackingNumber={}", cartId, shipped, trackingNumber);
+        return cart;
+    }
+
     /** Admin: revert a submitted cart back to OPEN so the user can add more items. */
     public Cart unsubmitOrder(String cartId) {
         Cart cart = findCartById(cartId);
@@ -315,6 +325,10 @@ public class CartService {
         cart.setDiscountAmount(0.0);
         cart.setDiscountDescription(null);
         cart.setShippingCost(0.0);
+        cart.setAdminNotes(null);
+        cart.setTrackingNumber(null);
+        cart.setShipped(null);
+        cart.setCustomerNotes(null);
         save(cart);
         log.info("Cart {} reverted to OPEN by admin", cartId);
         return cart;
@@ -719,17 +733,76 @@ public class CartService {
     private void sendFulfillmentEmail(Cart cart) {
         if (cart.getUserEmail() == null) return;
         try {
+            // Build item list, grouping set members under their set name
             StringBuilder itemsText = new StringBuilder();
-            for (CartItem item : cart.getItems()) {
-                if (item.isSetContainer()) continue;
-                String num = item.getComicNumber() != null ? " " + item.getComicNumber() : "";
-                itemsText.append(String.format("  %s%s%n", item.getComicTitle(), num));
+            List<CartItem> nonContainers = cart.getItems().stream()
+                .filter(i -> !i.isSetContainer()).toList();
+            java.util.Map<Integer, List<CartItem>> byGroup = new java.util.LinkedHashMap<>();
+            List<CartItem> singles = new java.util.ArrayList<>();
+            for (CartItem item : nonContainers) {
+                if (item.getCollectionGroup() != null && item.getCollectionGroup() > 0) {
+                    byGroup.computeIfAbsent(item.getCollectionGroup(), k -> new java.util.ArrayList<>()).add(item);
+                } else {
+                    singles.add(item);
+                }
             }
+            for (CartItem item : singles) {
+                String num = item.getComicNumber() != null ? " " + item.getComicNumber() : "";
+                itemsText.append(String.format("  %s%s  ($%.2f)%n", item.getComicTitle(), num, item.getPrice()));
+            }
+            for (java.util.Map.Entry<Integer, List<CartItem>> entry : byGroup.entrySet()) {
+                CartItem container = cart.getItems().stream()
+                    .filter(i -> i.isSetContainer() && entry.getKey().equals(i.getCollectionGroup()))
+                    .findFirst().orElse(null);
+                String setName = container != null ? container.getComicTitle() : "Set " + entry.getKey();
+                double setTotal = entry.getValue().stream().mapToDouble(CartItem::getPrice).sum();
+                itemsText.append(String.format("  %s (Set)  ($%.2f)%n", setName, setTotal));
+                for (CartItem member : entry.getValue()) {
+                    String num = member.getComicNumber() != null ? " " + member.getComicNumber() : "";
+                    itemsText.append(String.format("    - %s%s%n", member.getComicTitle(), num));
+                }
+            }
+
+            // Order summary
+            double subtotal = nonContainers.stream().mapToDouble(CartItem::getPrice).sum();
+            double discount = cart.getDiscountAmount();
+            double shipping = cart.getShippingCost();
+            double grandTotal = Math.max(0, subtotal - discount) + shipping;
+
+            StringBuilder summary = new StringBuilder();
+            summary.append(String.format("  Subtotal:  $%.2f%n", subtotal));
+            if (discount > 0) {
+                summary.append(String.format("  Discount:  -$%.2f", discount));
+                if (cart.getDiscountDescription() != null && !cart.getDiscountDescription().isBlank()) {
+                    summary.append("  (").append(cart.getDiscountDescription()).append(")");
+                }
+                summary.append("\n");
+            }
+            if (shipping > 0) {
+                summary.append(String.format("  Shipping:  $%.2f%n", shipping));
+            }
+            summary.append(String.format("  Total:     $%.2f%n", grandTotal));
+
+            // Optional sections
+            String trackingLine = (cart.getTrackingNumber() != null && !cart.getTrackingNumber().isBlank())
+                ? "\nTracking Number: " + cart.getTrackingNumber() + "\n"
+                : "";
+            String sellerNotesLine = (cart.getAdminNotes() != null && !cart.getAdminNotes().isBlank())
+                ? "\nNote from seller:\n" + cart.getAdminNotes() + "\n"
+                : "";
+
             String body = "Hi " + cart.getUserName() + ",\n\n"
                 + "Lightning Comics has fulfilled your order and it's on the way!\n\n"
+                + "ORDER SUMMARY\n"
+                + "─────────────────────────────\n"
                 + itemsText
+                + "\n"
+                + summary
+                + trackingLine
+                + sellerNotesLine
                 + "\nThank you for your business. We hope you enjoy your comics!\n\n"
                 + "Lightning Comics\n";
+
             String adminEmail = EnvHelper.getAdminEmail();
             EmailService.getServiceInstance().send(
                 List.of(cart.getUserEmail()), adminEmail, adminEmail,

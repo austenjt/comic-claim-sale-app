@@ -20,6 +20,8 @@ export interface ArchivedOrder {
   createdAt: string;
   fulfilledAt: string;
   paymentStatus?: 'UNPAID' | 'PARTIAL' | 'PAID' | null;
+  shipped?: boolean | null;
+  trackingNumber?: string | null;
   customerNotes?: string | null;
   adminNotes?: string | null;
 }

@@ -24,6 +24,8 @@ public class Cart {
     private List<CartDiscount> discountBreakdown = new ArrayList<>(); // per-rule breakdown for frontend per-item display
     private double shippingCost;         // snapshotted at submit time
     private String paymentStatus;        // UNPAID | PARTIAL | PAID — set by admin
+    private Boolean shipped;             // true once admin marks order as shipped
+    private String trackingNumber;       // optional shipping tracking number
     private String customerNotes;        // optional message from user, captured at submit time
     private String adminNotes;           // internal notes from admin
 
@@ -70,6 +72,12 @@ public class Cart {
 
     public String getPaymentStatus() { return paymentStatus; }
     public void setPaymentStatus(String paymentStatus) { this.paymentStatus = paymentStatus; }
+
+    public Boolean getShipped() { return shipped; }
+    public void setShipped(Boolean shipped) { this.shipped = shipped; }
+
+    public String getTrackingNumber() { return trackingNumber; }
+    public void setTrackingNumber(String trackingNumber) { this.trackingNumber = trackingNumber; }
 
     public String getCustomerNotes() { return customerNotes; }
     public void setCustomerNotes(String customerNotes) { this.customerNotes = customerNotes; }

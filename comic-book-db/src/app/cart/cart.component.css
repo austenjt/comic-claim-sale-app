@@ -93,6 +93,13 @@ tfoot td { font-weight: bold; background: #adc178; }
   border-radius: 4px;
 }
 
+.seller-notes-display {
+  background: rgba(173,193,120,0.08);
+  border-left: 3px solid #adc178;
+  padding: 10px 14px;
+  border-radius: 4px;
+}
+
 .notes-value {
   margin: 4px 0 0;
   color: var(--color-text-muted);

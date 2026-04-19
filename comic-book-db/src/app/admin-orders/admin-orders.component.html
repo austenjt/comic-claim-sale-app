@@ -117,24 +117,46 @@
     </div>
 
     <div class="order-notes admin-notes-row">
-      <span class="notes-heading">Admin notes:</span>
-      <textarea class="admin-notes-textarea"
-                rows="2"
-                placeholder="Internal notes…"
-                [value]="initNoteDraft(order.id, order.adminNotes)"
-                (input)="adminNoteDrafts[order.id] = $any($event.target).value"></textarea>
-      <button class="btn-save-notes" (click)="saveAdminNotes(order.id)">Save</button>
+      <span class="notes-heading">Seller notes:</span>
+      <ng-container *ngIf="!isNotesEditing(order.id, order.adminNotes)">
+        <span class="saved-note-text">{{ order.adminNotes }}</span>
+        <button class="btn-edit-note" (click)="notesEditing[order.id] = true">Edit</button>
+      </ng-container>
+      <ng-container *ngIf="isNotesEditing(order.id, order.adminNotes)">
+        <textarea class="admin-notes-textarea"
+                  rows="2"
+                  placeholder="Notes visible to customer…"
+                  [value]="initNoteDraft(order.id, order.adminNotes)"
+                  (input)="adminNoteDrafts[order.id] = $any($event.target).value"></textarea>
+        <button class="btn-save-notes" (click)="saveAdminNotes(order.id)">Save</button>
+      </ng-container>
+    </div>
+
+    <div *ngIf="order.shipped" class="order-notes tracking-note-row">
+      <span class="notes-heading">Tracking #:</span>
+      <ng-container *ngIf="!isTrackingEditing(order.id, order.trackingNumber)">
+        <span class="saved-note-text">{{ order.trackingNumber }}</span>
+        <button class="btn-edit-note" (click)="trackingEditing[order.id] = true">Edit</button>
+      </ng-container>
+      <ng-container *ngIf="isTrackingEditing(order.id, order.trackingNumber)">
+        <input type="text" class="tracking-input"
+               placeholder="Tracking number (optional)"
+               [value]="initTrackingDraft(order.id, order.trackingNumber)"
+               (input)="trackingDrafts[order.id] = $any($event.target).value">
+        <button class="btn-save-notes" (click)="saveTracking(order)">Save</button>
+      </ng-container>
     </div>
 
     <div class="order-actions">
-      <div class="payment-status-group">
-        <span class="payment-label">Payment:</span>
-        <select class="payment-select"
-                [ngClass]="'payment-' + (order.paymentStatus || 'UNPAID').toLowerCase()"
-                [value]="order.paymentStatus || 'UNPAID'"
-                (change)="setPaymentStatus(order.id, $any($event.target).value)">
-          <option *ngFor="let s of paymentStatuses" [value]="s" [selected]="s === (order.paymentStatus || 'UNPAID')">{{ paymentLabel(s) }}</option>
-        </select>
+      <div class="fulfillment-checks">
+        <label class="fulfillment-check-label" [class.check-active]="order.paymentStatus === 'PAID'">
+          <input type="checkbox" [checked]="order.paymentStatus === 'PAID'" (change)="togglePaid(order)">
+          Paid
+        </label>
+        <label class="fulfillment-check-label" [class.check-active]="order.shipped">
+          <input type="checkbox" [checked]="order.shipped" (change)="toggleShipped(order)">
+          Shipped
+        </label>
       </div>
       <button
         class="btn-unsubmit"
@@ -348,24 +370,46 @@
     </div>
 
     <div class="order-notes admin-notes-row">
-      <span class="notes-heading">Admin notes:</span>
-      <textarea class="admin-notes-textarea"
-                rows="2"
-                placeholder="Internal notes…"
-                [value]="initNoteDraft(order.id, order.adminNotes)"
-                (input)="adminNoteDrafts[order.id] = $any($event.target).value"></textarea>
-      <button class="btn-save-notes" (click)="saveArchivedAdminNotes(order.id)">Save</button>
+      <span class="notes-heading">Seller notes:</span>
+      <ng-container *ngIf="!isNotesEditing(order.id, order.adminNotes)">
+        <span class="saved-note-text">{{ order.adminNotes }}</span>
+        <button class="btn-edit-note" (click)="notesEditing[order.id] = true">Edit</button>
+      </ng-container>
+      <ng-container *ngIf="isNotesEditing(order.id, order.adminNotes)">
+        <textarea class="admin-notes-textarea"
+                  rows="2"
+                  placeholder="Notes visible to customer…"
+                  [value]="initNoteDraft(order.id, order.adminNotes)"
+                  (input)="adminNoteDrafts[order.id] = $any($event.target).value"></textarea>
+        <button class="btn-save-notes" (click)="saveArchivedAdminNotes(order.id)">Save</button>
+      </ng-container>
+    </div>
+
+    <div *ngIf="order.shipped" class="order-notes tracking-note-row">
+      <span class="notes-heading">Tracking #:</span>
+      <ng-container *ngIf="!isTrackingEditing(order.id, order.trackingNumber)">
+        <span class="saved-note-text">{{ order.trackingNumber }}</span>
+        <button class="btn-edit-note" (click)="trackingEditing[order.id] = true">Edit</button>
+      </ng-container>
+      <ng-container *ngIf="isTrackingEditing(order.id, order.trackingNumber)">
+        <input type="text" class="tracking-input"
+               placeholder="Tracking number (optional)"
+               [value]="initArchivedTrackingDraft(order.id, order.trackingNumber)"
+               (input)="archivedTrackingDrafts[order.id] = $any($event.target).value">
+        <button class="btn-save-notes" (click)="saveArchivedTracking(order)">Save</button>
+      </ng-container>
     </div>
 
     <div class="order-actions">
-      <div class="payment-status-group">
-        <span class="payment-label">Payment:</span>
-        <select class="payment-select"
-                [ngClass]="'payment-' + (order.paymentStatus || 'UNPAID').toLowerCase()"
-                [value]="order.paymentStatus || 'UNPAID'"
-                (change)="setArchivedPaymentStatus(order.id, $any($event.target).value)">
-          <option *ngFor="let s of paymentStatuses" [value]="s" [selected]="s === (order.paymentStatus || 'UNPAID')">{{ paymentLabel(s) }}</option>
-        </select>
+      <div class="fulfillment-checks">
+        <label class="fulfillment-check-label" [class.check-active]="order.paymentStatus === 'PAID'">
+          <input type="checkbox" [checked]="order.paymentStatus === 'PAID'" (change)="toggleArchivedPaid(order)">
+          Paid
+        </label>
+        <label class="fulfillment-check-label" [class.check-active]="order.shipped">
+          <input type="checkbox" [checked]="order.shipped" (change)="toggleArchivedShipped(order)">
+          Shipped
+        </label>
       </div>
       <button
         class="btn-delete"
