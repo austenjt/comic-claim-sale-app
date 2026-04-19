@@ -146,10 +146,12 @@ export class AdminOrdersComponent implements OnInit {
     this.adminConfirmModal = null;
   }
 
+  trackByOrderId(_index: number, order: Cart): string { return order.id; }
+  trackByArchivedOrderId(_index: number, order: ArchivedOrder): string { return order.id; }
+
   fulfill(cart: Cart) {
     if (this.pendingFulfillId !== cart.id) {
       this.pendingFulfillId = cart.id;
-      this.loadOrders();
       return;
     }
     this.pendingFulfillId = null;

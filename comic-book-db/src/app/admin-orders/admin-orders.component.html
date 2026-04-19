@@ -6,7 +6,7 @@
   <div *ngIf="loading">Loading…</div>
   <div *ngIf="!loading && orders.length === 0 && !error">No active orders.</div>
 
-  <div *ngFor="let order of orders" class="order-card">
+  <div *ngFor="let order of orders; trackBy: trackByOrderId" class="order-card">
     <div class="order-header">
       <div class="order-buyer">
         <strong>{{ order.userName }}</strong>
@@ -183,7 +183,7 @@
   <div *ngIf="openCartsError" class="error-message">{{ openCartsError }}</div>
   <div *ngIf="!loadingOpen && !openCartsError && openCarts.length === 0">No open shopping carts.</div>
 
-  <div *ngFor="let cart of openCarts" class="order-card open-cart-card">
+  <div *ngFor="let cart of openCarts; trackBy: trackByOrderId" class="order-card open-cart-card">
     <div class="order-header">
       <div class="order-buyer">
         <strong>{{ cart.userName }}</strong>
@@ -276,7 +276,7 @@
   <div *ngIf="archivedError" class="error-message">{{ archivedError }}</div>
   <div *ngIf="!loadingArchived && !archivedError && archivedOrders.length === 0">No archived orders yet.</div>
 
-  <div *ngFor="let order of archivedOrders" class="order-card archived-card">
+  <div *ngFor="let order of archivedOrders; trackBy: trackByArchivedOrderId" class="order-card archived-card">
     <div class="order-header">
       <div class="order-buyer">
         <strong>{{ order.userName }}</strong>
