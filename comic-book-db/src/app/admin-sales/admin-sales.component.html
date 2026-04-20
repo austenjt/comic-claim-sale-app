@@ -76,8 +76,9 @@
           </span>
         </td>
         <td>
-          <span *ngIf="d.excludeSets" class="badge badge-excl-sets">Yes</span>
-          <span *ngIf="!d.excludeSets" class="text-muted">—</span>
+          <span class="badge" [class.badge-excl-sets]="d.excludeSets" [class.badge-inactive]="!d.excludeSets">
+            {{ d.excludeSets ? 'Yes' : 'No' }}
+          </span>
         </td>
         <td class="actions" *ngIf="auth.isAdmin()">
           <button class="btn-edit" (click)="openEdit(d)">Edit</button>

@@ -112,6 +112,10 @@ export class SetDetailComponent implements OnInit, OnDestroy {
     return this.setMembers.reduce((sum, m) => sum + (m.salePrice ?? 0), 0);
   }
 
+  get totalCost(): number {
+    return this.setMembers.reduce((sum, m) => sum + (m.pricePaid ?? 0), 0);
+  }
+
   get activeLargeImageId(): string | null | undefined {
     return this.activeImage === 'front' ? this.container?.largeCachedImageId : this.container?.largeBackImageId;
   }

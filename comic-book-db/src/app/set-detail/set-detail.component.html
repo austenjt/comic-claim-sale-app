@@ -129,6 +129,10 @@
             <span class="detail-label">Storage Location</span>
             <input class="detail-edit-input" type="text" [(ngModel)]="editContainer!.storageLocation">
           </div>
+          <div class="detail-item" *ngIf="totalCost > 0">
+            <span class="detail-label">Total Cost</span>
+            <span class="detail-value">{{ totalCost | currency:'USD':'symbol':'1.2-2' }}</span>
+          </div>
         </div>
       </ng-container>
 
