@@ -113,7 +113,7 @@
         <div class="detail-item" *ngIf="auth.isAdmin() || container.publicNotes">
           <span class="detail-label">Notes</span>
           <span *ngIf="!auth.isAdmin()" class="detail-value">{{ container.publicNotes }}</span>
-          <textarea *ngIf="auth.isAdmin()" class="detail-edit-textarea" [(ngModel)]="editContainer!.publicNotes"></textarea>
+          <textarea *ngIf="auth.isAdmin()" class="detail-edit-textarea" rows="7" [(ngModel)]="editContainer!.publicNotes"></textarea>
         </div>
       </div>
 

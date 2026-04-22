@@ -215,7 +215,7 @@
         <div class="detail-item" *ngIf="auth.isAdmin() || comic.salePrice">
           <span class="detail-label">Sale Price</span>
           <span *ngIf="!auth.isAdmin()" class="detail-value">{{ comic.salePrice | currency:'USD':'symbol':'1.2-2' }}</span>
-          <input *ngIf="auth.isAdmin()" class="detail-edit-input" type="number" step="0.01" [(ngModel)]="editComic!.salePrice">
+          <input *ngIf="auth.isAdmin()" class="detail-edit-input" type="text" inputmode="decimal" [(ngModel)]="salePriceStr" (blur)="onSalePriceBlur()">
         </div>
       </div>
 
@@ -504,7 +504,7 @@
         </div>
         <div class="detail-item">
           <span class="detail-label">Sale Price</span>
-          <input class="detail-edit-input" type="number" step="0.01" [(ngModel)]="editComic!.salePrice">
+          <input class="detail-edit-input" type="text" inputmode="decimal" [(ngModel)]="salePriceStr" (blur)="onSalePriceBlur()">
         </div>
         <div class="detail-item" *ngIf="comic.dateSold">
           <span class="detail-label">Date Sold</span>

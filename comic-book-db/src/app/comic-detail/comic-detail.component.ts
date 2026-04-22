@@ -50,6 +50,7 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
   editComic: Comic | null = null;
   editWritersStr = '';
   editArtistsStr = '';
+  salePriceStr = '';
   saving = false;
   saveError = '';
   saveDone = false;
@@ -120,6 +121,7 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
     this.editComic = null;
     this.editWritersStr = '';
     this.editArtistsStr = '';
+    this.salePriceStr = '';
     this.saving = false;
     this.saveError = '';
     this.saveDone = false;
@@ -394,6 +396,9 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
     }
     this.editWritersStr = (this.editComic.writer ?? []).join(', ');
     this.editArtistsStr = (this.editComic.artist ?? []).join(', ');
+    this.salePriceStr = this.editComic.salePrice != null
+      ? Number(this.editComic.salePrice).toFixed(2)
+      : '';
   }
 
   saveComic(): void {
@@ -419,13 +424,30 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
     });
   }
 
+  onSalePriceBlur(): void {
+    if (!this.editComic) return;
+    const parsed = parseFloat(this.salePriceStr);
+    if (!isNaN(parsed) && parsed >= 0) {
+      this.editComic.salePrice = parseFloat(parsed.toFixed(2));
+      this.salePriceStr = this.editComic.salePrice.toFixed(2);
+    } else if (this.salePriceStr.trim() === '') {
+      this.editComic.salePrice = null;
+      this.salePriceStr = '';
+    } else {
+      // Revert invalid input to last good value
+      this.salePriceStr = this.editComic.salePrice != null
+        ? this.editComic.salePrice.toFixed(2)
+        : '';
+    }
+  }
+
   private loadComic(id: number): void {
     this.comicService.getComic(id)
       .subscribe(comic => {
         this.comic = comic;
         this.loading = false;
         if (comic) this.buildPageMeta(comic);
-        if (comic) this.initEditComic(comic);
+        if (comic && this.auth.isAdmin()) this.initEditComic(comic);
         if (comic?.bidStartedAt) {
           const endsAt = new Date(comic.bidStartedAt).getTime() +
                          this.configService.biddingCycleMins * 60000;
