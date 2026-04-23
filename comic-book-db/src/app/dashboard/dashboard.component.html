@@ -17,9 +17,11 @@
        (click)="$event.stopPropagation()">
     <h3 id="award-modal-title" class="modal__title">Award "{{ awardingComic.title }}"</h3>
     <p class="award-subtitle">Select a user to add this book to their cart at $0.00:</p>
-    <div *ngIf="awardError" class="award-error">{{ awardError }}</div>
+    <div *ngIf="awardError" id="award-error" role="alert" class="award-error">{{ awardError }}</div>
     <div *ngIf="awardLoading" class="award-loading">Awarding…</div>
-    <ul class="award-user-list">
+    <ul class="award-user-list" role="radiogroup" aria-label="Select user to award"
+        [attr.aria-describedby]="awardError ? 'award-error' : null"
+        [attr.aria-invalid]="awardError ? 'true' : null">
       <li *ngFor="let user of approvedUsers" class="award-user-row">
         <label class="award-radio-label">
           <input type="radio" name="awardUser" [value]="user.id" [(ngModel)]="selectedUserId" [disabled]="awardLoading" />
@@ -43,10 +45,11 @@
     <div id="start-bid-modal-title" class="bid-modal-title">Start Bid</div>
     <div class="bid-modal-comic-name">"{{ startBidModalComic.title }}"</div>
     <div class="bid-modal-input-group">
-      <label class="bid-modal-label">Starting Bid — in $0.25 increments</label>
+      <label for="start-bid-amount" class="bid-modal-label">Starting Bid — in $0.25 increments</label>
       <div class="bid-modal-input-row">
         <span class="bid-modal-dollar">$</span>
         <input type="number"
+               id="start-bid-amount"
                class="bid-modal-input"
                [(ngModel)]="startBidModalPrice"
                [min]="0"
@@ -54,10 +57,12 @@
                placeholder="0.00"
                (keyup.enter)="confirmOpenBid()"
                [disabled]="startBidModalSubmitting"
+               aria-describedby="start-bid-error"
+               [attr.aria-invalid]="startBidModalError ? 'true' : null"
                autofocus>
       </div>
     </div>
-    <div *ngIf="startBidModalError" class="bid-modal-error">{{ startBidModalError }}</div>
+    <div *ngIf="startBidModalError" id="start-bid-error" role="alert" class="bid-modal-error">{{ startBidModalError }}</div>
     <div class="bid-modal-actions">
       <button class="bid-modal-submit-btn" (click)="confirmOpenBid()" [disabled]="startBidModalSubmitting || startBidModalPrice == null">
         {{ startBidModalSubmitting ? 'Opening…' : 'Open Bidding' }}
@@ -118,10 +123,11 @@
       </div>
     </div>
     <div class="bid-modal-input-group">
-      <label class="bid-modal-label">Your Bid — min ${{ minNextBid(bidModalComic.highBid ?? 0).toFixed(2) }}, in $0.25 increments</label>
+      <label for="dashboard-bid-amount" class="bid-modal-label">Your Bid — min ${{ minNextBid(bidModalComic.highBid ?? 0).toFixed(2) }}, in $0.25 increments</label>
       <div class="bid-modal-input-row">
         <span class="bid-modal-dollar">$</span>
         <input type="number"
+               id="dashboard-bid-amount"
                class="bid-modal-input"
                [(ngModel)]="bidModalAmount"
                [min]="minNextBid(bidModalComic.highBid ?? 0)"
@@ -129,11 +135,13 @@
                placeholder="0.00"
                (keyup.enter)="submitBid()"
                [disabled]="bidModalSubmitting"
+               aria-describedby="dashboard-bid-warning dashboard-bid-error"
+               [attr.aria-invalid]="bidModalError ? 'true' : null"
                autofocus>
       </div>
     </div>
-    <div *ngIf="bidModalWarning" class="bid-modal-warning">⚠ {{ bidModalWarning }}</div>
-    <div *ngIf="bidModalError" class="bid-modal-error">{{ bidModalError }}</div>
+    <div *ngIf="bidModalWarning" id="dashboard-bid-warning" role="status" aria-live="polite" class="bid-modal-warning">⚠ {{ bidModalWarning }}</div>
+    <div *ngIf="bidModalError" id="dashboard-bid-error" role="alert" class="bid-modal-error">{{ bidModalError }}</div>
     <div class="bid-modal-actions">
       <button class="bid-modal-submit-btn" (click)="submitBid()" [disabled]="bidModalSubmitting || !bidModalAmount">
         {{ bidModalSubmitting ? 'Placing…' : 'Place Bid' }}

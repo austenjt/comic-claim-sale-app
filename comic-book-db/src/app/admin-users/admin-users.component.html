@@ -105,10 +105,12 @@
   </p>
 
   <div *ngIf="resetSuccess" class="success-message">{{ resetSuccess }}</div>
-  <div *ngIf="resetError" class="error-message reset-error-message">{{ resetError }}</div>
+  <div *ngIf="resetError" id="reset-confirm-error" role="alert" class="error-message reset-error-message">{{ resetError }}</div>
 
   <div class="reset-confirm-row">
-    <input type="text" [(ngModel)]="resetConfirmText" placeholder='Type "RESET" to confirm' class="reset-confirm-input" />
+    <input type="text" [(ngModel)]="resetConfirmText" placeholder='Type "RESET" to confirm' class="reset-confirm-input"
+           aria-describedby="reset-confirm-error"
+           [attr.aria-invalid]="resetError ? 'true' : null" />
     <button
       class="btn-danger"
       [disabled]="resetConfirmText !== 'RESET' || resetInProgress"

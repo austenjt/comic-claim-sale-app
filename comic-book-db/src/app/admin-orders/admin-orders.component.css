@@ -285,8 +285,8 @@ tfoot td { font-weight: bold; background: #adc178; }
   letter-spacing: 0.03em;
 }
 
-.success-message { color: #7b8f4b; margin-bottom: 16px; }
-.error-message { color: #c0634c; margin-bottom: 12px; }
+.success-message { color: var(--color-success); margin-bottom: var(--space-4); }
+.error-message { color: var(--color-danger); margin-bottom: var(--space-3); }
 
 .section-divider {
   border: none;

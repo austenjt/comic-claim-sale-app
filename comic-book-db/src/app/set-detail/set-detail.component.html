@@ -78,7 +78,9 @@
 
     </div>
 
-    <div class="zoom-overlay" *ngIf="zoomOpen" (click)="toggleZoom()">
+    <div class="modal-overlay modal-overlay--image" *ngIf="zoomOpen"
+         role="dialog" aria-modal="true" aria-label="Zoomed set cover"
+         (click)="toggleZoom()">
       <img [src]="getImageURL(activeLargeImageId) | async" alt="Zoomed Set Cover">
     </div>
 

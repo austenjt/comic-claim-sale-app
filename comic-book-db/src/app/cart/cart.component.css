@@ -227,8 +227,8 @@ tfoot td { font-weight: bold; background: #adc178; }
 }
 
 .empty-cart { color: var(--color-text-muted); }
-.empty-cart a { color: #7b8f4b; }
-.error-message { color: #c0634c; margin-bottom: 12px; }
+.empty-cart a { color: var(--color-primary); }
+.error-message { color: var(--color-danger); margin-bottom: var(--space-3); }
 
 /* ── Release confirmation modal ──────────────────────────────────── */
 /* Chrome (overlay/dialog/title/body/actions) is provided by the shared

@@ -20,10 +20,11 @@
       </div>
     </div>
     <div class="bid-modal-input-group">
-      <label class="bid-modal-label">Your Bid — min ${{ minNextBid(comic?.highBid ?? 0).toFixed(2) }}, in $0.25 increments</label>
+      <label for="comic-detail-bid-amount" class="bid-modal-label">Your Bid — min ${{ minNextBid(comic?.highBid ?? 0).toFixed(2) }}, in $0.25 increments</label>
       <div class="bid-modal-input-row">
         <span class="bid-modal-dollar">$</span>
         <input type="number"
+               id="comic-detail-bid-amount"
                class="bid-modal-input"
                [(ngModel)]="bidModalAmount"
                [min]="minNextBid(comic?.highBid ?? 0)"
@@ -31,11 +32,13 @@
                placeholder="0.00"
                (keyup.enter)="submitBid()"
                [disabled]="bidModalSubmitting"
+               aria-describedby="comic-detail-bid-warning comic-detail-bid-error"
+               [attr.aria-invalid]="bidModalError ? 'true' : null"
                autofocus>
       </div>
     </div>
-    <div *ngIf="bidModalWarning" class="bid-modal-warning">⚠ {{ bidModalWarning }}</div>
-    <div *ngIf="bidModalError" class="bid-modal-error">{{ bidModalError }}</div>
+    <div *ngIf="bidModalWarning" id="comic-detail-bid-warning" role="status" aria-live="polite" class="bid-modal-warning">⚠ {{ bidModalWarning }}</div>
+    <div *ngIf="bidModalError" id="comic-detail-bid-error" role="alert" class="bid-modal-error">{{ bidModalError }}</div>
     <div class="bid-modal-actions">
       <button class="bid-modal-submit-btn" (click)="submitBid()" [disabled]="bidModalSubmitting || !bidModalAmount">
         {{ bidModalSubmitting ? 'Placing…' : 'Place Bid' }}
@@ -137,7 +140,9 @@
 
     </div>
 
-    <div class="zoom-overlay" *ngIf="zoomOpen" (click)="toggleZoom()">
+    <div class="modal-overlay modal-overlay--image" *ngIf="zoomOpen"
+         role="dialog" aria-modal="true" aria-label="Zoomed comic image"
+         (click)="toggleZoom()">
       <img [src]="getFullImageURLByName(activeLargeImageId) | async" alt="Zoomed Comic Image">
     </div>
     <div class="details">

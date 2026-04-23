@@ -98,7 +98,8 @@
   border-radius: 8px;
   box-shadow: 0 4px 16px rgba(0,0,0,0.15);
   min-width: 180px;
-  z-index: 1000;
+  /* Sits above page content but below modals. --z-dropdown = 100. */
+  z-index: var(--z-dropdown);
   overflow: hidden;
 }
 

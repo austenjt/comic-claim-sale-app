@@ -179,25 +179,8 @@ button {
   cursor: zoom-in;
 }
 
-.zoom-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.85);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  cursor: zoom-out;
-}
-
-.zoom-overlay img {
-  width: calc(380px * 3);
-  max-width: 95vw;
-  max-height: 95vh;
-  object-fit: contain;
-  border-radius: 4px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.7);
-}
+/* Image-zoom lightbox lives in styles.css as .modal-overlay--image
+   (shared with set-detail). Only the thumbnail trigger cursor is local. */
 
 .details {
   flex-grow: 1;
@@ -330,15 +313,15 @@ button {
 .img-upload-error {
   margin-top: 6px;
   font-size: 0.78rem;
-  color: #c0634c;
+  color: var(--color-danger);
 }
 
 .img-upload-error-toggle {
   margin-left: 8px;
   font-size: 0.75rem;
-  color: #c0634c;
+  color: var(--color-danger);
   background: none;
-  border: 1px solid #c0634c;
+  border: 1px solid var(--color-danger);
   border-radius: 3px;
   padding: 1px 6px;
   cursor: pointer;
@@ -349,7 +332,7 @@ button {
   margin-top: 6px;
   padding: 6px 8px;
   background: #2a1a1a;
-  border: 1px solid #c0634c55;
+  border: 1px solid rgba(168, 85, 63, 0.33);
   border-radius: 4px;
   font-size: 0.72rem;
   color: #e0a090;
@@ -425,7 +408,7 @@ button {
 .btn-release-detail:disabled { opacity: 0.55; cursor: default; }
 
 .claim-error {
-  color: #c0634c;
+  color: var(--color-danger);
   font-size: 0.85rem;
   margin-bottom: 6px;
 }
@@ -441,7 +424,7 @@ button {
 }
 
 .bid-timer-value {
-  color: #c0392b;
+  color: var(--color-danger);
   font-weight: 700;
   font-size: 1rem;
 }
@@ -489,7 +472,7 @@ button {
 .admin-delete-warning {
   margin-left: 12px;
   font-size: 0.82rem;
-  color: #c0634c;
+  color: var(--color-danger);
 }
 
 .bid-history-table {
@@ -557,7 +540,7 @@ button {
 }
 
 .bid-modal-timer {
-  color: #c0392b;
+  color: var(--color-danger);
 }
 
 .bid-modal-label {
@@ -596,7 +579,7 @@ button {
 }
 
 .bid-modal-error {
-  color: #c0634c;
+  color: var(--color-danger);
   font-size: 0.85rem;
   margin-top: 8px;
 }

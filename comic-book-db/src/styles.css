@@ -787,6 +787,27 @@ hr {
 .modal--lg { max-width: 640px; }
 .modal--xl { max-width: 820px; }
 
+/* Image-zoom lightbox variant — darker scrim for photographic contrast, no
+   container chrome, click-anywhere-to-close, zoom-out cursor. Reuses the
+   shared overlay's z-index tokens, fade-in keyframe, and reduced-motion
+   handling. Place the <img> directly inside .modal-overlay--image (no inner
+   .modal wrapper needed, since there is no dialog chrome). */
+.modal-overlay--image {
+  background: rgba(0, 0, 0, 0.85);
+  padding: 0;
+  cursor: zoom-out;
+}
+
+.modal-overlay--image img {
+  display: block;
+  width: calc(380px * 3);
+  max-width: 95vw;
+  max-height: 95vh;
+  object-fit: contain;
+  border-radius: var(--radius-sm);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.7);
+}
+
 .modal__title {
   margin: 0 0 var(--space-3);
   font-size: var(--fs-20);

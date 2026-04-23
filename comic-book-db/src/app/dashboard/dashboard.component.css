@@ -157,7 +157,7 @@ h2 {
 
 .comic-key-issue {
   font-size: 0.8rem;
-  color: #c0634c;
+  color: var(--color-danger);
   font-weight: 600;
   margin-bottom: 3px;
 }
@@ -452,7 +452,7 @@ h2 {
 .award-cancel-btn:hover { background: #c8d4a8; }
 
 .award-error {
-  color: #c0634c;
+  color: var(--color-danger);
   font-size: 0.88rem;
   margin-bottom: 10px;
 }
@@ -568,7 +568,7 @@ h2 {
 }
 .footer-log-entry:last-child { border-bottom: none; }
 
-.footer-log-entry.footer-log-error { color: #c0392b; }
+.footer-log-entry.footer-log-error { color: var(--color-danger); }
 
 .footer-log-time {
   color: var(--color-text-muted, #888);
@@ -680,7 +680,7 @@ h2 {
 }
 
 .bid-modal-error {
-  color: #c0634c;
+  color: var(--color-danger);
   font-size: 0.85rem;
   margin-bottom: 12px;
 }

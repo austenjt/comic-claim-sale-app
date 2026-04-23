@@ -86,7 +86,7 @@
 
 .msg-error {
     margin: 8px 0 0;
-    color: #c0634c;
+    color: var(--color-danger);
     font-size: 0.875rem;
 }
 

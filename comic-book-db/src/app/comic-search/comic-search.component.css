@@ -49,15 +49,15 @@ li {
 }
 
 .search-result li a.sold {
-  color: #c0634c;
+  color: var(--color-danger);
 }
 
 .search-result li a.sold .search-result-number {
-  color: #c0634c;
+  color: var(--color-danger);
 }
 
 .search-result li a.sold:hover {
-  background-color: #c0634c;
+  background-color: var(--color-danger);
   color: #f0ead2;
 }
 

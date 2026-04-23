@@ -60,7 +60,7 @@ tfoot td { font-weight: bold; background: #adc178; }
 a { color: var(--color-accent); text-decoration: none; }
 a:hover { text-decoration: underline; }
 
-.error-message { color: #c0634c; margin-bottom: 12px; }
+.error-message { color: var(--color-danger); margin-bottom: var(--space-3); }
 
 .item-count-label { font-size: 0.8rem; font-weight: 400; color: var(--color-text-muted); }
 
