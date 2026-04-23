@@ -945,3 +945,43 @@ hr {
 @media screen and (max-width: 768px) {
   .detail-item { grid-template-columns: 1fr; }
 }
+
+/* ──────────────────────────────────────────────────────────────────────────
+   Order-card patterns
+   Shared chrome for the user-facing Order History page and the admin
+   Admin Orders page. Each order is rendered as a bordered card with a
+   dark Bark header strip carrying meta + status, then a table of items.
+
+   Status badges, table cells, and per-page summary text (.order-buyer,
+   .order-total, etc.) remain scoped per component.
+   ────────────────────────────────────────────────────────────────────────── */
+
+.order-card {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  margin-bottom: var(--space-6);
+  overflow: hidden;
+}
+
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px var(--space-4);
+  background: #6c584c;                      /* Bark — explicit per Phase 1 palette */
+  border-bottom: 1px solid var(--color-border);
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.order-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.order-date {
+  color: rgba(240, 234, 210, 0.7);          /* Parchment @ 70% on Bark — for AA-large */
+  font-size: 0.85rem;
+}

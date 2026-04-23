@@ -53,30 +53,13 @@
   line-height: 1.4;
 }
 
-.order-card {
-  border: 1px solid var(--color-border);
-  border-radius: 6px;
-  margin-bottom: 24px;
-  overflow: hidden;
-}
+/* .order-card, .order-header, .order-meta, .order-date are shared
+   utilities in styles.css (Order-card patterns block). */
 
-.order-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 16px;
-  background: #6c584c;
-  border-bottom: 1px solid var(--color-border);
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
+/* Admin-only buyer block inside .order-header. */
 .order-buyer { display: flex; flex-direction: column; }
 .order-buyer strong { color: #ffffff; }
 .buyer-email { color: rgba(240,234,210,0.7); font-size: 0.88rem; }
-
-.order-meta { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-.order-date { color: rgba(240,234,210,0.7); font-size: 0.85rem; }
 
 /* Order status badge — sits on the dark Bark .order-header background, so
    it uses lighter, higher-luminance tints than the parchment-context .pill.
