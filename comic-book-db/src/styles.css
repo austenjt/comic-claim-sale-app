@@ -893,3 +893,55 @@ hr {
 @keyframes warming-up-spin {
   to { transform: rotate(360deg); }
 }
+
+/* ──────────────────────────────────────────────────────────────────────────
+   Detail-page utilities
+   Shared by the Comic Detail and Set Detail pages. Renders each admin-
+   editable field as a two-column row (168px label, 1fr value) with a
+   thin border-bottom; collapses to a single stacked column below 768px.
+
+   Section-title accent color is NOT baked in — each page sets its own
+   via overriding `color` and `border-bottom-color` on .detail-section-title
+   (olive on comic-detail, --color-warm-accent on set-detail).
+   ────────────────────────────────────────────────────────────────────────── */
+
+.detail-section {
+  margin-bottom: 1.25rem;
+}
+
+.detail-section-title {
+  font-size: 0.7rem;
+  font-weight: var(--fw-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  padding-bottom: var(--space-1);
+  margin-bottom: 6px;
+  border-bottom: 2px solid var(--color-border);  /* default — components override */
+  color: var(--color-text);                      /* default — components override */
+}
+
+.detail-item {
+  display: grid;
+  grid-template-columns: 168px 1fr;
+  gap: var(--space-1);
+  padding: 5px 0;
+  border-bottom: 1px solid var(--color-border);
+  font-size: 0.9rem;
+  line-height: var(--lh-normal);
+}
+
+.detail-label {
+  font-weight: var(--fw-semibold);
+  color: var(--color-text-muted);
+  font-size: var(--fs-14);
+}
+
+.detail-value {
+  color: var(--color-text);
+  word-break: break-word;
+}
+
+/* Mobile collapse — both pages share the same breakpoint. */
+@media screen and (max-width: 768px) {
+  .detail-item { grid-template-columns: 1fr; }
+}

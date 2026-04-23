@@ -196,40 +196,12 @@ button {
   max-width: 560px;
 }
 
-.detail-section {
-  margin-bottom: 1.25rem;
-}
-
+/* .detail-section, .detail-item, .detail-label, .detail-value, and the
+   mobile collapse live in styles.css. Only the page-specific accent color
+   for .detail-section-title is local. */
 .detail-section-title {
-  font-size: 0.7rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.09em;
-  color: #a98467;
-  border-bottom: 2px solid #a98467;
-  padding-bottom: 4px;
-  margin-bottom: 6px;
-}
-
-.detail-item {
-  display: grid;
-  grid-template-columns: 168px 1fr;
-  gap: 4px;
-  padding: 5px 0;
-  border-bottom: 1px solid var(--color-border);
-  font-size: 0.9rem;
-  line-height: 1.4;
-}
-
-.detail-label {
-  font-weight: 600;
-  color: var(--color-text-muted);
-  font-size: 0.875rem;
-}
-
-.detail-value {
-  color: var(--color-text);
-  word-break: break-word;
+  color: var(--color-warm-accent);
+  border-bottom-color: var(--color-warm-accent);
 }
 
 /* Set-page claim status. "mine" is a soft-fill primary pill;
@@ -593,7 +565,7 @@ button {
   .content-container { flex-direction: column; }
   .images-column { width: 100%; }
   .details { max-width: 100%; margin-top: 8px; }
-  .detail-item { grid-template-columns: 1fr; }
+  /* .detail-item mobile collapse is now in styles.css. */
 }
 
 @media screen and (max-width: 600px) {
