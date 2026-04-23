@@ -21,16 +21,19 @@ button {
 }
 
 .btn-view-set {
-  padding: 5px 12px;
-  font-size: 0.82rem;
-  color: #a98467;
-  border: 1px solid #a98467;
-  border-radius: 4px;
+  padding: var(--space-1) var(--space-3);
+  font-size: var(--fs-14);
+  font-weight: var(--fw-semibold);
+  color: var(--color-warm-accent-deep);
+  border: 1px solid var(--color-warm-accent-deep);
+  border-radius: var(--radius-sm);
+  background: transparent;
   text-decoration: none;
   white-space: nowrap;
   margin-bottom: 1rem;
+  transition: background-color var(--duration-base) var(--ease-standard);
 }
-.btn-view-set:hover { background: rgba(169, 132, 103, 0.1); }
+.btn-view-set:hover { background: rgba(140, 103, 80, 0.10); }
 
 .nav-center {
   display: flex;
@@ -46,24 +49,25 @@ button {
 }
 
 .btn-share {
-  padding: 5px 14px;
+  padding: var(--space-1) var(--space-3);
   background: transparent;
-  color: #7b8f4b;
-  border: 1px solid #7b8f4b;
-  border-radius: 4px;
-  font-size: 0.85rem;
-  font-weight: 600;
+  color: var(--color-primary);
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-14);
+  font-weight: var(--fw-semibold);
   cursor: pointer;
-  transition: background 0.15s, color 0.15s;
+  transition: background-color var(--duration-base) var(--ease-standard),
+              color            var(--duration-base) var(--ease-standard);
 }
 
 .btn-share:hover {
-  background: rgba(123,143,75,0.12);
+  background: rgba(79, 110, 47, 0.10);
 }
 
 .btn-share.copied {
-  color: #adc178;
-  border-color: #adc178;
+  color: var(--color-success);
+  border-color: var(--color-success);
 }
 
 .nav-position {
@@ -83,17 +87,21 @@ button {
   margin: 0 0 1rem;
 }
 
+/* Heading-level GRADED tag — solid primary pill, see .pill in styles.css. */
 .graded-badge-lg {
-  background: #7b8f4b;
-  color: #f0ead2;
-  font-size: 0.75rem;
-  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+  font-size: var(--fs-12);
+  font-weight: var(--fw-bold);
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  padding: 4px 12px;
-  border-radius: 4px;
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-sm);
   flex-shrink: 0;
   margin-bottom: 1rem;
+  line-height: 1.4;
 }
 
 .content-container {
@@ -283,17 +291,19 @@ button {
 }
 
 .img-upload-btn {
-  padding: 10px 20px;
-  background-color: #7b8f4b;
-  color: #f0ead2;
-  border: none;
-  border-radius: 6px;
-  font-size: 0.95rem;
+  padding: var(--space-2) var(--space-5);
+  background-color: var(--color-primary);
+  color: var(--color-text-inverse);
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-14);
+  font-weight: var(--fw-semibold);
   cursor: pointer;
+  transition: background-color var(--duration-base) var(--ease-standard);
 }
 
-.img-upload-btn:hover:not(:disabled) { background-color: #6b7e3e; }
-.img-upload-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+.img-upload-btn:hover:not(:disabled) { background-color: var(--color-primary-hover); border-color: var(--color-primary-hover); }
+.img-upload-btn:disabled { opacity: 0.55; cursor: not-allowed; }
 
 .img-update-bar {
   padding: 8px;
@@ -303,17 +313,19 @@ button {
 }
 
 .img-update-btn {
-  padding: 5px 16px;
-  background-color: #7b8f4b;
-  color: #f0ead2;
-  border: none;
-  border-radius: 4px;
-  font-size: 0.85rem;
+  padding: var(--space-1) var(--space-4);
+  background-color: var(--color-primary);
+  color: var(--color-text-inverse);
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-14);
+  font-weight: var(--fw-semibold);
   cursor: pointer;
+  transition: background-color var(--duration-base) var(--ease-standard);
 }
 
-.img-update-btn:hover:not(:disabled) { background-color: #6b7e3e; }
-.img-update-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+.img-update-btn:hover:not(:disabled) { background-color: var(--color-primary-hover); border-color: var(--color-primary-hover); }
+.img-update-btn:disabled { opacity: 0.55; cursor: not-allowed; }
 
 .img-upload-error {
   margin-top: 6px;
@@ -347,63 +359,70 @@ button {
   overflow-y: auto;
 }
 
+/* Claim status text/pills on the comic-detail page.
+   "claimed" / "available" / "sold" are inline text labels (no pill bg).
+   "mine" is a soft-fill primary pill. */
 .claim-status-claimed {
-  color: #79675c;
-  font-weight: 700;
+  color: var(--color-text-muted);
+  font-weight: var(--fw-bold);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
 
 .claim-status-available {
-  color: #7b8f4b;
-  font-weight: 700;
+  color: var(--color-success);
+  font-weight: var(--fw-bold);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
 
 .claim-status-mine {
-  background: rgba(123,143,75,0.15);
-  color: #adc178;
-  font-weight: 700;
+  background: rgba(79, 110, 47, 0.14);
+  color: var(--color-primary);
+  font-weight: var(--fw-bold);
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  padding: 2px 8px;
-  border-radius: 4px;
-  display: inline-block;
+  padding: 2px var(--space-2);
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  line-height: 1.4;
 }
 
 .claim-status-sold {
-  color: #c0634c;
-  font-weight: 700;
+  color: var(--color-danger);
+  font-weight: var(--fw-bold);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
 
 .btn-claim-detail {
-  padding: 7px 20px;
-  background: #7b8f4b;
-  color: #f0ead2;
-  border: none;
-  border-radius: 4px;
-  font-size: 0.9rem;
-  font-weight: 700;
+  padding: var(--space-2) var(--space-5);
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-14);
+  font-weight: var(--fw-bold);
   cursor: pointer;
+  transition: background-color var(--duration-base) var(--ease-standard);
 }
-.btn-claim-detail:hover:not(:disabled) { background: #6b7e3e; }
-.btn-claim-detail:disabled { opacity: 0.6; cursor: default; }
+.btn-claim-detail:hover:not(:disabled) { background: var(--color-primary-hover); border-color: var(--color-primary-hover); }
+.btn-claim-detail:disabled { opacity: 0.55; cursor: default; }
 
 .btn-release-detail {
-  padding: 7px 20px;
+  padding: var(--space-2) var(--space-5);
   background: transparent;
-  color: #c0634c;
-  border: 1px solid #c0634c;
-  border-radius: 4px;
-  font-size: 0.9rem;
-  font-weight: 700;
+  color: var(--color-danger);
+  border: 1px solid var(--color-danger);
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-14);
+  font-weight: var(--fw-bold);
   cursor: pointer;
+  transition: background-color var(--duration-base) var(--ease-standard);
 }
-.btn-release-detail:hover:not(:disabled) { background: rgba(192,99,76,0.1); }
-.btn-release-detail:disabled { opacity: 0.6; cursor: default; }
+.btn-release-detail:hover:not(:disabled) { background: var(--color-danger-bg); }
+.btn-release-detail:disabled { opacity: 0.55; cursor: default; }
 
 .claim-error {
   color: #c0634c;
@@ -417,8 +436,8 @@ button {
 }
 
 .claim-status-bidding {
-  color: #d97706;
-  font-weight: 700;
+  color: var(--color-warning);
+  font-weight: var(--fw-bold);
 }
 
 .bid-timer-value {
@@ -428,38 +447,44 @@ button {
 }
 
 .btn-bid-detail {
-  padding: 8px 22px;
-  background: #d97706;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  font-size: 0.9rem;
-  font-weight: 700;
+  padding: var(--space-2) var(--space-6);
+  background: var(--color-warning);
+  color: var(--color-text-inverse);
+  border: 1px solid var(--color-warning);
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-14);
+  font-weight: var(--fw-bold);
   cursor: pointer;
+  transition: background-color var(--duration-base) var(--ease-standard);
   animation: bid-pulse 1.5s ease-in-out infinite;
 }
-.btn-bid-detail:hover:not(:disabled) { background: #b45309; }
-.btn-bid-detail:disabled { opacity: 0.6; cursor: default; animation: none; }
+.btn-bid-detail:hover:not(:disabled) { background: var(--color-warning-hover); border-color: var(--color-warning-hover); }
+.btn-bid-detail:disabled { opacity: 0.55; cursor: default; animation: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .btn-bid-detail { animation: none; }
+}
 
 @keyframes bid-pulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(217,119,6,0.5); }
-  50% { box-shadow: 0 0 0 6px rgba(217,119,6,0); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(180, 83, 9, 0.5); }
+  50%      { box-shadow: 0 0 0 6px rgba(180, 83, 9, 0); }
 }
 
 .btn-admin-delete {
-  padding: 6px 16px;
+  padding: var(--space-2) var(--space-4);
   background: transparent;
-  color: #c0634c;
-  border: 1px solid #c0634c;
-  border-radius: 4px;
-  font-size: 0.88rem;
-  font-weight: 600;
+  color: var(--color-danger);
+  border: 1px solid var(--color-danger);
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-14);
+  font-weight: var(--fw-semibold);
   cursor: pointer;
+  transition: background-color var(--duration-base) var(--ease-standard);
 }
-.btn-admin-delete:hover:not(:disabled) { background: rgba(192,99,76,0.1); }
-.btn-admin-delete:disabled { opacity: 0.6; cursor: default; }
-.btn-admin-delete-confirm { background: rgba(192,99,76,0.12); }
-.btn-admin-delete-confirm:hover:not(:disabled) { background: rgba(192,99,76,0.22); }
+.btn-admin-delete:hover:not(:disabled) { background: var(--color-danger-bg); }
+.btn-admin-delete:disabled { opacity: 0.55; cursor: default; }
+.btn-admin-delete-confirm { background: var(--color-danger-bg); }
+.btn-admin-delete-confirm:hover:not(:disabled) { background: rgba(168, 85, 63, 0.20); }
 
 .admin-delete-warning {
   margin-left: 12px;
@@ -494,34 +519,16 @@ button {
   color: #d97706;
 }
 
-/* Bid modal */
-.bid-modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.6);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 2000;
-}
-
-.bid-modal {
-  background: var(--color-surface, #1e1e1e);
-  border: 1px solid var(--color-border);
-  border-radius: 10px;
-  padding: 28px 32px;
-  width: 360px;
-  max-width: 95vw;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
-}
-
+/* Bid modal — chrome (overlay/dialog) is provided by the shared
+   .modal-overlay / .modal classes in global styles.css. Only bid-specific
+   inner content styling remains here. */
 .bid-modal-title {
-  font-size: 1.1rem;
-  font-weight: 700;
+  font-size: var(--fs-18);
+  font-weight: var(--fw-bold);
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: #d97706;
-  margin-bottom: 4px;
+  color: var(--color-warning);
+  margin-bottom: var(--space-1);
 }
 
 .bid-modal-comic-name {
@@ -602,28 +609,31 @@ button {
 
 .bid-modal-submit-btn {
   flex: 1;
-  padding: 9px 0;
-  background: #d97706;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  font-size: 0.95rem;
-  font-weight: 700;
+  padding: var(--space-2) 0;
+  background: var(--color-warning);
+  color: var(--color-text-inverse);
+  border: 1px solid var(--color-warning);
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-14);
+  font-weight: var(--fw-bold);
   cursor: pointer;
+  transition: background-color var(--duration-base) var(--ease-standard);
 }
-.bid-modal-submit-btn:hover:not(:disabled) { background: #b45309; }
-.bid-modal-submit-btn:disabled { opacity: 0.6; cursor: default; }
+.bid-modal-submit-btn:hover:not(:disabled) { background: var(--color-warning-hover); border-color: var(--color-warning-hover); }
+.bid-modal-submit-btn:disabled { opacity: 0.55; cursor: default; }
 
 .bid-modal-cancel-btn {
-  padding: 9px 18px;
+  padding: var(--space-2) var(--space-4);
   background: transparent;
-  color: var(--color-text-muted);
-  border: 1px solid var(--color-border);
-  border-radius: 4px;
-  font-size: 0.95rem;
+  color: var(--color-text);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-14);
+  font-weight: var(--fw-semibold);
   cursor: pointer;
+  transition: background-color var(--duration-base) var(--ease-standard);
 }
-.bid-modal-cancel-btn:hover:not(:disabled) { background: rgba(255,255,255,0.05); }
+.bid-modal-cancel-btn:hover:not(:disabled) { background: var(--color-surface-alt); }
 
 /* Inline edit controls (admin-only) */
 .detail-edit-input {
@@ -690,28 +700,29 @@ button {
 
 /* Save button */
 .btn-save {
-  padding: 5px 18px;
-  background: #7b8f4b;
-  color: #f0ead2;
-  border: none;
-  border-radius: 4px;
-  font-size: 0.85rem;
-  font-weight: 600;
+  padding: var(--space-1) var(--space-4);
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-14);
+  font-weight: var(--fw-semibold);
   cursor: pointer;
-  transition: background 0.15s;
+  transition: background-color var(--duration-base) var(--ease-standard);
   margin-bottom: 1rem;
 }
 
-.btn-save:hover:not(:disabled) { background: #6b7e3e; }
-.btn-save:disabled { opacity: 0.6; cursor: default; }
+.btn-save:hover:not(:disabled) { background: var(--color-primary-hover); border-color: var(--color-primary-hover); }
+.btn-save:disabled { opacity: 0.55; cursor: default; }
 
 .btn-save-done {
-  background: #adc178;
-  color: #1a2010;
+  background: var(--color-success);
+  border-color: var(--color-success);
+  color: var(--color-text-inverse);
 }
 
 .save-error {
-  color: #c0634c;
-  font-size: 0.82rem;
+  color: var(--color-danger);
+  font-size: var(--fs-14);
   margin-bottom: 1rem;
 }

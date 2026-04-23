@@ -6,30 +6,38 @@
   color: var(--color-text-muted);
 }
 
+/* Cart "Set" identity tag — solid warm-accent pill, see .pill in styles.css. */
 .set-tag {
-  display: inline-block;
-  margin-left: 6px;
-  padding: 1px 6px;
-  background: #a98467;
-  color: #f0ead2;
+  display: inline-flex;
+  align-items: center;
+  margin-left: var(--space-2);
+  padding: 1px var(--space-2);
+  background: var(--color-warm-accent-deep);
+  color: var(--color-text-inverse);
   font-size: 0.65rem;
-  font-weight: 700;
+  font-weight: var(--fw-bold);
   letter-spacing: 0.07em;
   text-transform: uppercase;
   border-radius: 3px;
   vertical-align: middle;
+  line-height: 1.4;
 }
 
+/* Cart status banner — three-state visual model (open / active / fulfilled).
+   Code still emits four states (OPEN/FINALIZING/FINALIZED/FULFILLED); the
+   visual collapse FINALIZING+FINALIZED → "active" happens in Phase 2.3 (the
+   stepper) via template logic. Until then both .status-finalizing and
+   .status-finalized read as warm "in-progress" / cool "submitted" respectively. */
 .cart-status {
-  padding: 10px 16px;
-  border-radius: 4px;
-  margin-bottom: 20px;
-  font-weight: 500;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--space-5);
+  font-weight: var(--fw-medium);
 }
-.status-open { background: rgba(123,143,75,0.12); color: #6b7e3e; }
-.status-finalizing { background: rgba(169,132,103,0.12); color: #a98467; }
-.status-finalized { background: rgba(59,130,246,0.12); color: #3b82f6; }
-.status-fulfilled { background: rgba(167,139,250,0.12); color: #a78bfa; }
+.status-open       { background: var(--color-success-bg); color: var(--color-success); }
+.status-finalizing { background: var(--color-warning-bg); color: var(--color-warning); }
+.status-finalized  { background: var(--color-info-bg);    color: var(--color-info); }
+.status-fulfilled  { background: rgba(79, 110, 47, 0.14); color: var(--color-primary); }
 
 table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
 th, td { padding: 10px 12px; border: 1px solid var(--color-border); text-align: left; }
@@ -38,8 +46,19 @@ td { color: var(--color-text); }
 
 tfoot td { font-weight: bold; background: #adc178; }
 
-.btn-release { padding: 4px 12px; cursor: pointer; color: #c0634c; border: 1px solid #c0634c; background: transparent; border-radius: 4px; }
-.btn-release:hover { background: rgba(192,99,76,0.1); }
+/* Release: outline-danger, small */
+.btn-release {
+  padding: var(--space-1) var(--space-3);
+  cursor: pointer;
+  color: var(--color-danger);
+  border: 1px solid var(--color-danger);
+  background: transparent;
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-14);
+  font-weight: var(--fw-semibold);
+  transition: background-color var(--duration-base) var(--ease-standard);
+}
+.btn-release:hover { background: var(--color-danger-bg); }
 
 .cart-actions { margin-top: 16px; }
 .submit-note, .finalized-note { color: var(--color-text-muted); margin-bottom: 12px; line-height: 1.6; }
@@ -107,31 +126,40 @@ tfoot td { font-weight: bold; background: #adc178; }
   white-space: pre-wrap;
 }
 
+/* Unsubmit: outline-info (blue) — visually says "this is reversible" */
 .btn-unsubmit {
-  margin-top: 12px;
-  padding: 8px 20px;
+  margin-top: var(--space-3);
+  padding: var(--space-2) var(--space-6);
   background: transparent;
-  color: #3b82f6;
-  border: 1px solid #3b82f6;
-  border-radius: 4px;
-  font-size: 0.9rem;
+  color: var(--color-info);
+  border: 1px solid var(--color-info);
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-14);
   cursor: pointer;
-  font-weight: 600;
+  font-weight: var(--fw-semibold);
+  transition: background-color var(--duration-base) var(--ease-standard);
 }
-.btn-unsubmit:hover { background: rgba(59,130,246,0.1); }
+.btn-unsubmit:hover { background: var(--color-info-bg); }
 
+/* Submit: primary action — Deep Olive fill, AA */
 .btn-submit {
-  padding: 10px 24px;
-  background: #7b8f4b;
-  color: #f0ead2;
-  border: none;
-  border-radius: 4px;
-  font-size: 1rem;
+  padding: var(--space-3) var(--space-6);
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-16);
   cursor: pointer;
-  font-weight: 600;
+  font-weight: var(--fw-semibold);
+  transition:
+    background-color var(--duration-base) var(--ease-standard),
+    border-color     var(--duration-base) var(--ease-standard);
 }
-.btn-submit:hover { background: #6b7e3e; }
-.btn-submit:disabled { opacity: 0.6; cursor: default; }
+.btn-submit:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+  border-color: var(--color-primary-hover);
+}
+.btn-submit:disabled { opacity: 0.55; cursor: not-allowed; }
 
 .shipping-free { color: #7b8f4b; font-weight: 500; }
 .shipping-cost { color: var(--color-text); font-weight: 500; }
@@ -141,18 +169,21 @@ tfoot td { font-weight: bold; background: #adc178; }
 .discount-desc { font-size: 0.85em; color: var(--color-text-muted); margin-left: 0.4rem; }
 
 .price-original { text-decoration: line-through; color: var(--color-text-muted); margin-right: 6px; }
-.price-discounted { color: #7b8f4b; font-weight: 600; }
+.price-discounted { color: var(--color-primary); font-weight: var(--fw-semibold); }
+/* "FREE" identity badge — solid primary, see .pill in styles.css. */
 .price-free-badge {
-  display: inline-block;
-  background: #7b8f4b;
-  color: #f0ead2;
+  display: inline-flex;
+  align-items: center;
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
   font-size: 0.72rem;
-  font-weight: 700;
+  font-weight: var(--fw-bold);
   letter-spacing: 0.07em;
   text-transform: uppercase;
-  padding: 1px 6px;
+  padding: 1px var(--space-2);
   border-radius: 3px;
   vertical-align: middle;
+  line-height: 1.4;
 }
 
 /* Set header row: title, Set tag, claimed date, Release button */
@@ -200,71 +231,39 @@ tfoot td { font-weight: bold; background: #adc178; }
 .error-message { color: #c0634c; margin-bottom: 12px; }
 
 /* ── Release confirmation modal ──────────────────────────────────── */
-.modal-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.45);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
-.modal-box {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: 8px;
-  padding: 28px 32px;
-  max-width: 420px;
-  width: 90%;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
-}
-
-.modal-title {
-  margin: 0 0 14px;
-  font-size: 1.1rem;
-  color: var(--color-text);
-}
-
-.modal-body {
-  margin: 0 0 24px;
-  color: var(--color-text-muted);
-  line-height: 1.6;
-  font-size: 0.95rem;
-}
-
-.modal-body strong {
-  color: var(--color-text);
-}
-
-.modal-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-}
+/* Chrome (overlay/dialog/title/body/actions) is provided by the shared
+   .modal-overlay / .modal / .modal__* classes in global styles.css. Only
+   dialog-specific tweaks live here. */
+.modal-body strong { color: var(--color-text); }
 
 .modal-btn-cancel {
-  padding: 8px 18px;
+  padding: var(--space-2) var(--space-4);
   background: transparent;
-  color: var(--color-text-muted);
-  border: 1px solid var(--color-border);
-  border-radius: 4px;
+  color: var(--color-text);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  font-size: 0.9rem;
+  font-size: var(--fs-14);
+  font-weight: var(--fw-semibold);
+  transition: background-color var(--duration-base) var(--ease-standard);
 }
-.modal-btn-cancel:hover { background: var(--color-border); }
+.modal-btn-cancel:hover { background: var(--color-surface-alt); }
 
 .modal-btn-confirm {
-  padding: 8px 18px;
-  background: transparent;
-  color: #c0634c;
-  border: 1px solid #c0634c;
-  border-radius: 4px;
+  padding: var(--space-2) var(--space-4);
+  background: var(--color-danger);
+  color: var(--color-text-inverse);
+  border: 1px solid var(--color-danger);
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  font-size: 0.9rem;
-  font-weight: 600;
+  font-size: var(--fs-14);
+  font-weight: var(--fw-semibold);
+  transition: background-color var(--duration-base) var(--ease-standard);
 }
-.modal-btn-confirm:hover { background: rgba(192, 99, 76, 0.1); }
+.modal-btn-confirm:hover {
+  background: var(--color-danger-hover);
+  border-color: var(--color-danger-hover);
+}
 
 .bid-block-notice {
   background: rgba(169,132,103,0.1);

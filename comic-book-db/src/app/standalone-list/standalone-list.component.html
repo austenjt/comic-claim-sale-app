@@ -189,9 +189,11 @@
 <!-- ───────────────────────────────────────────────────────────────────────── -->
 
 <!-- ── Add Set Modal ──────────────────────────────────────────────────────── -->
-<div class="sl-modal-overlay" *ngIf="showAddSetModal" (click)="cancelAddSet()">
-  <div class="sl-modal" (click)="$event.stopPropagation()">
-    <h3 class="sl-modal-title">New Set</h3>
+<div class="sl-modal-overlay modal-overlay" *ngIf="showAddSetModal" (click)="cancelAddSet()">
+  <div class="sl-modal modal" role="dialog" aria-modal="true"
+       aria-labelledby="add-set-modal-title"
+       (click)="$event.stopPropagation()">
+    <h3 id="add-set-modal-title" class="sl-modal-title">New Set</h3>
     <p class="sl-modal-subtitle">Both fields are required. All books in the set will share the Collection Group ID.</p>
     <div class="sl-modal-field">
       <label>Set Name</label>
@@ -218,12 +220,14 @@
 
 
 <!-- ── Delete Set Modal ───────────────────────────────────────────────────── -->
-<div class="sl-modal-overlay" *ngIf="showDeleteSetModal" (click)="cancelDeleteSet()">
-  <div class="sl-modal sl-modal-wide" (click)="$event.stopPropagation()">
+<div class="sl-modal-overlay modal-overlay" *ngIf="showDeleteSetModal" (click)="cancelDeleteSet()">
+  <div class="sl-modal sl-modal-wide modal modal--lg" role="dialog" aria-modal="true"
+       aria-labelledby="delete-set-modal-title"
+       (click)="$event.stopPropagation()">
 
     <!-- No set selected yet: pick a set -->
     <ng-container *ngIf="!deleteSetSelected">
-      <h3 class="sl-modal-title">Delete Set — Select a Set</h3>
+      <h3 id="delete-set-modal-title" class="sl-modal-title">Delete Set — Select a Set</h3>
       <p class="sl-modal-subtitle" *ngIf="deleteSetAvailableSets.length === 0">
         No sets found.
       </p>
@@ -242,7 +246,7 @@
 
     <!-- Set selected: action buttons -->
     <ng-container *ngIf="deleteSetSelected && !deleteSetConfirmFull">
-      <h3 class="sl-modal-title">Delete "{{ deleteSetSelected.title }}"</h3>
+      <h3 id="delete-set-modal-title" class="sl-modal-title">Delete "{{ deleteSetSelected.title }}"</h3>
       <p class="sl-modal-subtitle">Group {{ deleteSetSelected.collectionGroup }}</p>
       <div *ngIf="deleteSetError" class="qa-error">{{ deleteSetError }}</div>
       <div class="sl-modal-actions">
@@ -259,7 +263,7 @@
 
     <!-- Full Delete confirmation -->
     <ng-container *ngIf="deleteSetSelected && deleteSetConfirmFull">
-      <h3 class="sl-modal-title">Confirm Full Delete</h3>
+      <h3 id="delete-set-modal-title" class="sl-modal-title">Confirm Full Delete</h3>
       <p class="sl-modal-subtitle">Group {{ deleteSetSelected.collectionGroup }} — "{{ deleteSetSelected.title }}"</p>
       <p class="sl-modal-hint" style="color:#f87171">
         This will permanently delete the set container <strong>and all member comics</strong> from the database. This cannot be undone.
@@ -279,12 +283,14 @@
 <!-- ───────────────────────────────────────────────────────────────────────── -->
 
 <!-- ── Edit Set Name Modal ─────────────────────────────────────────────────── -->
-<div class="sl-modal-overlay" *ngIf="showEditSetNameModal" (click)="cancelEditSetName()">
-  <div class="sl-modal sl-modal-wide" (click)="$event.stopPropagation()">
+<div class="sl-modal-overlay modal-overlay" *ngIf="showEditSetNameModal" (click)="cancelEditSetName()">
+  <div class="sl-modal sl-modal-wide modal modal--lg" role="dialog" aria-modal="true"
+       aria-labelledby="edit-set-name-modal-title"
+       (click)="$event.stopPropagation()">
 
     <!-- Step 1: pick a set -->
     <ng-container *ngIf="editSetNameStep === 1">
-      <h3 class="sl-modal-title">Edit Set Name — Select a Set</h3>
+      <h3 id="edit-set-name-modal-title" class="sl-modal-title">Edit Set Name — Select a Set</h3>
       <div *ngIf="editSetNameError" class="qa-error">{{ editSetNameError }}</div>
       <p class="sl-modal-subtitle" *ngIf="editSetNameAvailableSets.length === 0 && !editSetNameError">No sets found.</p>
       <ul class="sl-item-list" *ngIf="editSetNameAvailableSets.length > 0">
@@ -302,7 +308,7 @@
 
     <!-- Step 2: enter new name -->
     <ng-container *ngIf="editSetNameStep === 2">
-      <h3 class="sl-modal-title">Rename Set</h3>
+      <h3 id="edit-set-name-modal-title" class="sl-modal-title">Rename Set</h3>
       <p class="sl-modal-subtitle">Group {{ editSetNameSelected?.collectionGroup }}</p>
       <div class="sl-modal-field">
         <label>New Set Name</label>
@@ -324,9 +330,11 @@
 <!-- ───────────────────────────────────────────────────────────────────────── -->
 
 <!-- ── View Sets Modal ────────────────────────────────────────────────────── -->
-<div class="sl-modal-overlay" *ngIf="showViewSetsModal" (click)="showViewSetsModal = false">
-  <div class="sl-modal sl-modal-wide" (click)="$event.stopPropagation()">
-    <h3 class="sl-modal-title">Existing Sets</h3>
+<div class="sl-modal-overlay modal-overlay" *ngIf="showViewSetsModal" (click)="showViewSetsModal = false">
+  <div class="sl-modal sl-modal-wide modal modal--lg" role="dialog" aria-modal="true"
+       aria-labelledby="view-sets-modal-title"
+       (click)="$event.stopPropagation()">
+    <h3 id="view-sets-modal-title" class="sl-modal-title">Existing Sets</h3>
     <p class="sl-modal-subtitle" *ngIf="viewSetsLoading">Loading…</p>
     <p class="sl-modal-subtitle" *ngIf="!viewSetsLoading && viewSetsList.length === 0 && !viewSetsError">No sets found.</p>
     <div *ngIf="viewSetsError" class="qa-error">{{ viewSetsError }}</div>

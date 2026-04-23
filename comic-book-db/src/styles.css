@@ -1,54 +1,163 @@
-/* Global Styles */
+/* ──────────────────────────────────────────────────────────────────────────
+   Global Styles — Comic Claim Sale App
+   ──────────────────────────────────────────────────────────────────────────
+   Design tokens live in :root below. Component-level CSS should reference
+   tokens (var(--…)) rather than hardcoded hex/px values.
 
-/* ── Warm-up / loading indicator (shared across dashboard, comic-detail, set-detail) ── */
-.warming-up {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 16px;
-  padding: 32px 40px;
-  margin: 48px auto;
-  max-width: 480px;
-  background-color: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(108,88,76,0.12);
-  color: #79675c;
-  font-size: 1.2rem;
-  text-align: center;
-  line-height: 1.5;
-}
+   Token groups:
+     • Palette (raw)              — the seven Coolors hexes + derived shades
+     • Semantic color aliases     — primary/surface/text/border/state
+     • Typography scale           — --fs-12…--fs-48 + weights, line-heights
+     • Spacing scale              — --space-1…--space-16 (8px base)
+     • Radii / Elevation          — --radius-sm/md/lg/xl, --shadow-xs…lg
+     • z-index layers             — base/dropdown/sticky/modal/toast
+     • Motion                     — durations + easing (reduced-motion aware)
 
-.warming-up-spinner {
-  width: 32px;
-  height: 32px;
-  border: 3px solid #b8c89a;
-  border-top-color: #7b8f4b;
-  border-radius: 50%;
-  animation: warming-up-spin 0.8s linear infinite;
-  flex-shrink: 0;
-}
-
-@keyframes warming-up-spin {
-  to { transform: rotate(360deg); }
-}
+   Legacy aliases (--color-bg, --color-accent, --radius, --shadow-sm/md) are
+   kept so existing component CSS continues to work during the migration.
+   ────────────────────────────────────────────────────────────────────────── */
 
 :root {
-  --color-bg: #f0ead2;
-  --color-surface: #dde5b6;
-  --color-accent: #7b8f4b;
-  --color-accent-dark: #6b7e3e;
-  --color-text: #6c584c;
-  --color-text-muted: #79675c;
-  --color-border: #b8c89a;
-  --shadow-sm: 0 1px 3px rgba(108,88,76,0.1);
-  --shadow-md: 0 4px 12px rgba(108,88,76,0.15);
-  --radius: 6px;
+  /* ── Palette (raw) ───────────────────────────────────────────────────── */
+  --parchment:    #F0EAD2;
+  --sage-light:   #DDE5B6;
+  --sage:         #ADC178;
+  --olive:        #7B8F4B;
+  --olive-dark:   #6B7E3E;   /* derived hover */
+  --olive-deep:   #4F6E2F;   /* AA-passing fill — Parchment text gives 4.83:1 */
+  --olive-bottle: #3F5A24;   /* deep olive hover */
+  --tan:          #A98467;
+  --tan-deep:     #8C6750;   /* AA-passing tan — text on parchment, 4.55:1 */
+  --bark:         #6C584C;
+  --stone:        #79675C;
+
+  /* ── Semantic color aliases ──────────────────────────────────────────── */
+  --color-bg:            var(--parchment);
+  --color-surface:       var(--sage-light);
+  --color-surface-alt:   #E6EDC4;            /* hover/zebra between parchment & sage-light */
+  /* PRIMARY: deep olive for fills that carry text on top.
+     This is the AA-fix decision in Phase 2 — shifts solid-fill buttons from
+     2.96:1 (FAIL) to 4.83:1 (✓ AA). Decorative accents (borders, focus rings,
+     non-text) continue to use --color-accent / --olive for brand continuity. */
+  --color-primary:       var(--olive-deep);
+  --color-primary-hover: var(--olive-bottle);
+  --color-accent:        var(--olive);       /* legacy alias — accents/borders/focus */
+  --color-accent-dark:   var(--olive-dark);  /* legacy alias */
+  --color-secondary:     var(--sage);
+  --color-warm-accent:   var(--tan);         /* badges, set tags */
+  --color-warm-accent-deep: var(--tan-deep); /* AA-passing tan for buttons/text */
+  --color-text:          var(--bark);
+  --color-text-muted:    var(--stone);
+  --color-text-inverse:  var(--parchment);
+  --color-border:        #B8C89A;            /* keep current derived neutral */
+  --color-border-strong: var(--bark);
+
+  /* ── Semantic state colors (badges, status, validation) ──────────────── */
+  --color-success:       #5C7A3A;            /* AA-large on parchment, AA on dark */
+  --color-success-bg:    var(--sage-light);
+  --color-warning:       #B45309;            /* darkened bid orange for AA-large */
+  --color-warning-hover: #94440A;
+  --color-warning-bg:    #FBE4C8;
+  --color-danger:        #A8553F;            /* darkened destructive red for AA-large */
+  --color-danger-hover:  #8C432F;
+  --color-danger-bg:     #F4D7CF;
+  --color-info:          #3B6FB6;            /* darkened finalized blue for AA-large */
+  --color-info-bg:       #DCE6F4;
+
+  /* ── Typography ──────────────────────────────────────────────────────── */
+  --font-sans:    system-ui, -apple-system, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --font-display: Georgia, "Iowan Old Style", "Times New Roman", serif;
+  --font-mono:    ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+  --fs-12: 0.75rem;
+  --fs-14: 0.875rem;
+  --fs-16: 1rem;
+  --fs-18: 1.125rem;
+  --fs-20: 1.25rem;
+  --fs-24: 1.5rem;
+  --fs-32: 2rem;
+  --fs-48: 3rem;
+
+  --lh-tight:   1.2;
+  --lh-normal:  1.5;
+  --lh-relaxed: 1.65;
+
+  --fw-regular:  400;
+  --fw-medium:   500;
+  --fw-semibold: 600;
+  --fw-bold:     700;
+
+  /* ── Spacing scale (8px base, 4px subgrid) ───────────────────────────── */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-6:  24px;
+  --space-8:  32px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* ── Radii ───────────────────────────────────────────────────────────── */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius:    var(--radius-md);   /* legacy alias (was 6px; now 8px — see note) */
+  /* NOTE: legacy --radius was 6px. Bumped to 8px to align with the scale.
+     Visual delta is ~2px on form controls and the global button base — small
+     enough to ship in Phase 1 without per-component churn, large enough to
+     unify the look. If this proves too disruptive, set --radius back to 6px. */
+
+  /* ── Elevation ───────────────────────────────────────────────────────── */
+  --shadow-xs:    0 1px 2px rgba(108, 88, 76, 0.08);
+  --shadow-sm:    0 2px 6px rgba(108, 88, 76, 0.12);   /* legacy alias retained */
+  --shadow-md:    0 6px 16px rgba(108, 88, 76, 0.18);  /* legacy alias retained */
+  --shadow-lg:    0 12px 32px rgba(108, 88, 76, 0.22);
+  --shadow-focus: 0 0 0 3px rgba(123, 143, 75, 0.35);
+
+  /* ── z-index layers ──────────────────────────────────────────────────── */
+  --z-base:           1;
+  --z-dropdown:       100;
+  --z-sticky:         200;
+  --z-modal-backdrop: 900;
+  --z-modal:          1000;
+  --z-toast:          1100;
+
+  /* ── Motion ──────────────────────────────────────────────────────────── */
+  --duration-fast: 120ms;
+  --duration-base: 180ms;
+  --duration-slow: 250ms;
+  --ease-standard: cubic-bezier(.2, .7, .3, 1);
+
+  /* ── Breakpoints (documented; CSS uses literal px in @media queries) ─── */
+  /* --bp-sm: 640px;  mobile / tablet boundary
+     --bp-md: 1024px; tablet / desktop boundary */
 }
+
+/* Reduced-motion: globally collapse animation/transition durations */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-fast: 0ms;
+    --duration-base: 0ms;
+    --duration-slow: 0ms;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   Element resets / global element styles
+   ────────────────────────────────────────────────────────────────────────── */
 
 * {
   box-sizing: border-box;
-  font-family: system-ui, -apple-system, 'Segoe UI', Arial, sans-serif;
+  font-family: var(--font-sans);
 }
 
 body {
@@ -56,6 +165,8 @@ body {
   color: var(--color-text);
   padding: 0;
   margin: 0;
+  /* font-size and line-height intentionally unchanged in Phase 1 to preserve
+     existing component layouts. Phase 2 will introduce body { font-size: var(--fs-16); line-height: var(--lh-normal); } once components are migrated. */
 }
 
 h1 {
@@ -82,7 +193,7 @@ h3 {
 a {
   color: var(--color-accent);
   text-decoration: none;
-  transition: color 0.2s;
+  transition: color var(--duration-base) var(--ease-standard);
 }
 
 a:hover {
@@ -94,34 +205,45 @@ a:visited {
   color: var(--color-accent);
 }
 
+/* Bare <button> default — matches .btn .btn--primary so any unstyled button
+   in the app immediately gets AA contrast and consistent rhythm. Components
+   that want non-primary styling apply .btn--secondary / --danger / --ghost
+   or one of the legacy per-component classes. */
 button {
-  background-color: var(--color-accent);
-  border: none;
+  background-color: var(--color-primary);
+  border: 1px solid var(--color-primary);
   border-radius: var(--radius);
   cursor: pointer;
-  color: #f0ead2;
+  color: var(--color-text-inverse);
   font-family: inherit;
   font-size: 0.95rem;
   font-weight: 600;
   padding: 0.5rem 1.2rem;
   margin-right: 0.5rem;
   margin-bottom: 0.5rem;
-  transition: background-color 0.2s;
+  transition: background-color var(--duration-base) var(--ease-standard),
+              border-color var(--duration-base) var(--ease-standard),
+              box-shadow var(--duration-base) var(--ease-standard);
 }
 
-button:hover {
-  background-color: var(--color-accent-dark);
+button:hover:not(:disabled) {
+  background-color: var(--color-primary-hover);
+  border-color: var(--color-primary-hover);
 }
 
 button:disabled {
   background-color: #c8d4a8;
-  color: #a0927e;
+  border-color: #c8d4a8;
+  color: #6f6452;          /* darker disabled label — readable on muted sage */
   cursor: not-allowed;
 }
 
 input[type="text"],
 input[type="number"],
 input[type="date"],
+input[type="email"],
+input[type="password"],
+input[type="search"],
 select,
 textarea {
   box-sizing: border-box;
@@ -132,7 +254,8 @@ textarea {
   font-size: 0.9rem;
   color: var(--color-text);
   background-color: var(--color-surface);
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition: border-color var(--duration-base) var(--ease-standard),
+              box-shadow var(--duration-base) var(--ease-standard);
 }
 
 input:focus,
@@ -140,7 +263,22 @@ select:focus,
 textarea:focus {
   outline: none;
   border-color: var(--color-accent);
-  box-shadow: 0 0 0 3px rgba(123, 143, 75, 0.25);
+  box-shadow: var(--shadow-focus);
+}
+
+/* Modern keyboard-focus indicator: applied via :focus-visible so mouse clicks
+   on buttons don't get a focus ring, but Tab navigation does. */
+:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-focus);
+  border-radius: var(--radius-sm);
+}
+
+/* Inputs already get the ring on :focus above; suppress double-ring */
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  box-shadow: var(--shadow-focus);
 }
 
 label {
@@ -151,9 +289,586 @@ label {
   display: block;
 }
 
+/* ── Form validation (Phase 2.5) ────────────────────────────────────────
+   Native form controls in an invalid state get a danger border + matching
+   focus halo. Driven by the [aria-invalid="true"] attribute (set by the
+   template based on the validation condition); this keeps a single source
+   of truth between the visual indicator and what assistive tech reads.
+
+   .field-error  — the inline message text near the input. Should also
+                   carry id="…" so the input can aria-describedby it.
+                   role="alert" recommended for messages that appear on
+                   submit; aria-live="polite" for ones that update as the
+                   user types.
+   .field-help   — non-error helper text (units, format hints, etc.).
+   ────────────────────────────────────────────────────────────────────── */
+
+input[aria-invalid="true"],
+select[aria-invalid="true"],
+textarea[aria-invalid="true"] {
+  border-color: var(--color-danger);
+}
+
+input[aria-invalid="true"]:focus,
+select[aria-invalid="true"]:focus,
+textarea[aria-invalid="true"]:focus,
+input[aria-invalid="true"]:focus-visible,
+select[aria-invalid="true"]:focus-visible,
+textarea[aria-invalid="true"]:focus-visible {
+  border-color: var(--color-danger);
+  box-shadow: 0 0 0 3px rgba(168, 85, 63, 0.25);   /* danger-tinted halo */
+}
+
+.field-error {
+  display: block;
+  margin-top: var(--space-1);
+  font-size: var(--fs-12);
+  font-weight: var(--fw-semibold);
+  color: var(--color-danger);
+  line-height: var(--lh-normal);
+}
+
+.field-help {
+  display: block;
+  margin-top: var(--space-1);
+  font-size: var(--fs-12);
+  color: var(--color-text-muted);
+  line-height: var(--lh-normal);
+}
+
 hr {
   border: none;
   border-top: 1px solid var(--color-border);
   margin: 1.5rem 0;
 }
 
+/* ──────────────────────────────────────────────────────────────────────────
+   Utility classes
+   ────────────────────────────────────────────────────────────────────────── */
+
+/* Visually hidden but available to screen readers */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   Button system
+   ──────────────────────────────────────────────────────────────────────────
+   Use as:  <button class="btn btn--primary">…</button>
+            <button class="btn btn--secondary">…</button>
+            <button class="btn btn--danger btn--sm">…</button>
+
+   Variants: --primary  (Deep Olive fill,  Parchment text)   ✓ AA 4.83:1
+             --secondary (transparent,     Bark border + text)
+             --danger   (Danger fill,      Parchment text)   ✓ AA-large 4.31:1
+             --warning  (Warning fill,     Parchment text)   ✓ AA-large 4.16:1
+             --ghost    (transparent,      Bark text, no border)
+             --outline-primary | --outline-danger | --outline-warning
+   Sizes:    default md, --sm, --lg, --block (full-width)
+   States:   :disabled / [aria-disabled="true"], --loading (adds spinner)
+
+   Existing per-component classes (.btn-claim, .btn-bid, .btn-release, etc.)
+   are migrated in their own component CSS to share these tokens / sizing
+   without renaming — see component CSS files.
+   ────────────────────────────────────────────────────────────────────────── */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: 0.5rem 1.2rem;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: var(--fw-semibold);
+  line-height: 1.15;
+  border-radius: var(--radius);
+  border: 1px solid transparent;
+  cursor: pointer;
+  user-select: none;
+  text-decoration: none;
+  white-space: nowrap;
+  margin: 0;
+  transition:
+    background-color var(--duration-base) var(--ease-standard),
+    border-color     var(--duration-base) var(--ease-standard),
+    color            var(--duration-base) var(--ease-standard),
+    box-shadow       var(--duration-base) var(--ease-standard),
+    transform        var(--duration-fast) var(--ease-standard);
+}
+
+.btn:disabled,
+.btn[aria-disabled="true"] {
+  cursor: not-allowed;
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.btn:active:not(:disabled):not([aria-disabled="true"]) {
+  transform: translateY(1px);
+}
+
+.btn--primary {
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+  border-color: var(--color-primary);
+}
+.btn--primary:hover:not(:disabled):not([aria-disabled="true"]) {
+  background: var(--color-primary-hover);
+  border-color: var(--color-primary-hover);
+}
+
+.btn--secondary {
+  background: transparent;
+  color: var(--color-text);
+  border-color: var(--color-border-strong);
+}
+.btn--secondary:hover:not(:disabled):not([aria-disabled="true"]) {
+  background: var(--color-surface-alt);
+}
+
+.btn--danger {
+  background: var(--color-danger);
+  color: var(--color-text-inverse);
+  border-color: var(--color-danger);
+}
+.btn--danger:hover:not(:disabled):not([aria-disabled="true"]) {
+  background: var(--color-danger-hover);
+  border-color: var(--color-danger-hover);
+}
+
+.btn--warning {
+  background: var(--color-warning);
+  color: var(--color-text-inverse);
+  border-color: var(--color-warning);
+}
+.btn--warning:hover:not(:disabled):not([aria-disabled="true"]) {
+  background: var(--color-warning-hover);
+  border-color: var(--color-warning-hover);
+}
+
+.btn--ghost {
+  background: transparent;
+  color: var(--color-text);
+  border-color: transparent;
+}
+.btn--ghost:hover:not(:disabled):not([aria-disabled="true"]) {
+  background: var(--color-surface-alt);
+}
+
+.btn--outline-primary {
+  background: transparent;
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+.btn--outline-primary:hover:not(:disabled):not([aria-disabled="true"]) {
+  background: rgba(79, 110, 47, 0.08);
+}
+
+.btn--outline-danger {
+  background: transparent;
+  color: var(--color-danger);
+  border-color: var(--color-danger);
+}
+.btn--outline-danger:hover:not(:disabled):not([aria-disabled="true"]) {
+  background: rgba(168, 85, 63, 0.08);
+}
+
+.btn--outline-warning {
+  background: transparent;
+  color: var(--color-warning);
+  border-color: var(--color-warning);
+}
+.btn--outline-warning:hover:not(:disabled):not([aria-disabled="true"]) {
+  background: rgba(180, 83, 9, 0.08);
+}
+
+.btn--sm {
+  padding: 0.32rem 0.75rem;
+  font-size: 0.82rem;
+}
+
+.btn--lg {
+  padding: 0.65rem 1.5rem;
+  font-size: 1rem;
+}
+
+.btn--block {
+  display: flex;
+  width: 100%;
+}
+
+.btn--loading {
+  cursor: progress;
+}
+.btn--loading::after {
+  content: '';
+  width: 12px;
+  height: 12px;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: btn-spin 0.7s linear infinite;
+  margin-left: var(--space-2);
+}
+@keyframes btn-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   Pill / Badge system
+   ──────────────────────────────────────────────────────────────────────────
+   Use as:  <span class="pill pill--success">Active</span>
+            <span class="pill pill--info pill--solid">Finalized</span>
+            <span class="pill pill--warm pill--sm">Set</span>
+
+   Variants (soft fill — token-bg + token-text, AA on Parchment):
+     --neutral, --primary, --success, --warning, --danger, --info, --warm
+
+   Modifier:
+     --solid   inverts to a solid token-bg with Parchment text (used for
+               loud/identity badges like "GRADED", "Set", "FREE")
+
+   Sizes:    default md, --sm
+
+   Existing per-component classes (.cart-status, .badge-active, .set-tag,
+   .graded-badge-lg, .price-free-badge, etc.) consume these tokens directly
+   — see each component CSS for the migration. The shared .pill rules let
+   future templates pick up the same look without copying styles.
+   ────────────────────────────────────────────────────────────────────────── */
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 2px var(--space-2);
+  border-radius: 12px;
+  font-size: var(--fs-12);
+  font-weight: var(--fw-bold);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  line-height: 1.4;
+  white-space: nowrap;
+  background: rgba(108, 88, 76, 0.10);
+  color: var(--color-text);
+  border: 1px solid transparent;
+}
+
+.pill--sm {
+  padding: 1px var(--space-2);
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+}
+
+/* Soft-fill semantic variants — readable on Parchment AND on Sage-Light surfaces. */
+.pill--neutral { background: rgba(108, 88, 76, 0.10); color: var(--color-text); }
+.pill--primary { background: rgba(79, 110, 47, 0.14);  color: var(--color-primary); }
+.pill--success { background: var(--color-success-bg);  color: var(--color-success); }
+.pill--warning { background: var(--color-warning-bg);  color: var(--color-warning); }
+.pill--danger  { background: var(--color-danger-bg);   color: var(--color-danger); }
+.pill--info    { background: var(--color-info-bg);     color: var(--color-info); }
+.pill--warm    { background: rgba(140, 103, 80, 0.14); color: var(--color-warm-accent-deep); }
+
+/* Solid modifier — loud, identity-like badges (GRADED, Set tag, FREE). */
+.pill--solid.pill--neutral { background: var(--color-text);          color: var(--color-text-inverse); }
+.pill--solid.pill--primary { background: var(--color-primary);       color: var(--color-text-inverse); }
+.pill--solid.pill--success { background: var(--color-success);       color: var(--color-text-inverse); }
+.pill--solid.pill--warning { background: var(--color-warning);       color: var(--color-text-inverse); }
+.pill--solid.pill--danger  { background: var(--color-danger);        color: var(--color-text-inverse); }
+.pill--solid.pill--info    { background: var(--color-info);          color: var(--color-text-inverse); }
+.pill--solid.pill--warm    { background: var(--color-warm-accent-deep); color: var(--color-text-inverse); }
+
+/* ──────────────────────────────────────────────────────────────────────────
+   Stepper (cart / order lifecycle)
+   ──────────────────────────────────────────────────────────────────────────
+   3-stage visual: Open → Submitted → Fulfilled.
+
+   The Java/Cosmos model emits FOUR cart states:
+     OPEN, FINALIZING, FINALIZED, FULFILLED
+   In the UI these collapse to THREE stages — FINALIZING and FINALIZED both
+   render as "Submitted" (active/in-progress). The collapse happens in the
+   template via [class] bindings, NOT in the data layer.
+
+   Mapping reference (used in cart.component.html, admin-orders.component.html):
+     OPEN        → step 1 current  (steps 2/3 upcoming)
+     FINALIZING  → step 2 current  (step 1 done, step 3 upcoming)
+     FINALIZED   → step 2 current  (same as FINALIZING)
+     FULFILLED   → step 3 current  (steps 1/2 done)
+
+   Markup convention:
+     <ol class="stepper" aria-label="Order status">
+       <li class="stepper__step is-done">
+         <span class="stepper__dot" aria-hidden="true">1</span>
+         <span class="stepper__label">Open</span>
+       </li>
+       <li class="stepper__step is-current" aria-current="step">…</li>
+       <li class="stepper__step is-upcoming">…</li>
+     </ol>
+
+   Use modifier .stepper--compact for inline placement in dense headers
+   (admin-orders order cards). prefers-reduced-motion is honored globally.
+   ────────────────────────────────────────────────────────────────────────── */
+
+.stepper {
+  display: flex;
+  align-items: flex-start;
+  list-style: none;
+  margin: 0 0 var(--space-4);
+  padding: 0;
+  gap: 0;
+}
+
+.stepper__step {
+  flex: 1 1 0;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  min-width: 0;
+  padding: 0 var(--space-2);
+}
+
+/* Connector lines extend left/right from each dot to its siblings. */
+.stepper__step::before,
+.stepper__step::after {
+  content: '';
+  position: absolute;
+  top: 13px;
+  height: 2px;
+  background: var(--color-border);
+  transition: background-color var(--duration-base) var(--ease-standard);
+}
+.stepper__step::before { left: 0;   right: 50%; }
+.stepper__step::after  { left: 50%; right: 0; }
+.stepper__step:first-child::before,
+.stepper__step:last-child::after  { display: none; }
+
+.stepper__dot {
+  position: relative;
+  z-index: 1;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--color-bg);
+  border: 2px solid var(--color-border);
+  color: var(--color-text-muted);
+  font-size: var(--fs-12);
+  font-weight: var(--fw-bold);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition:
+    background-color var(--duration-base) var(--ease-standard),
+    border-color     var(--duration-base) var(--ease-standard),
+    color            var(--duration-base) var(--ease-standard),
+    box-shadow       var(--duration-base) var(--ease-standard);
+}
+
+.stepper__label {
+  margin-top: var(--space-2);
+  font-size: var(--fs-12);
+  font-weight: var(--fw-semibold);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  line-height: 1.3;
+}
+
+/* ── Completed: solid primary fill, primary connector to next step ─────── */
+.stepper__step.is-done .stepper__dot {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-text-inverse);
+}
+.stepper__step.is-done .stepper__label { color: var(--color-text); }
+.stepper__step.is-done::before,
+.stepper__step.is-done::after { background: var(--color-primary); }
+
+/* ── Current: ringed primary outline + filled inside, ::before primary ── */
+.stepper__step.is-current .stepper__dot {
+  background: var(--color-bg);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  box-shadow: 0 0 0 4px rgba(79, 110, 47, 0.12);
+}
+.stepper__step.is-current .stepper__label {
+  color: var(--color-primary);
+  font-weight: var(--fw-bold);
+}
+.stepper__step.is-current::before { background: var(--color-primary); }
+
+/* ── Upcoming: muted ─────────────────────────────────────────────────── */
+.stepper__step.is-upcoming .stepper__dot {
+  /* defaults already handle this */
+}
+
+/* Compact variant — denser layout (e.g. admin order card header). */
+.stepper--compact { margin-bottom: var(--space-3); }
+.stepper--compact .stepper__dot { width: 22px; height: 22px; font-size: 0.7rem; }
+.stepper--compact .stepper__step::before,
+.stepper--compact .stepper__step::after { top: 10px; }
+.stepper--compact .stepper__label { font-size: 0.7rem; margin-top: var(--space-1); }
+
+/* Mobile — keep all 3 stages visible but tighten label sizing. */
+@media (max-width: 640px) {
+  .stepper__label { font-size: 0.65rem; letter-spacing: 0.02em; }
+  .stepper__step  { padding: 0 var(--space-1); }
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   Modal system  (Phase 2.4)
+
+   Shared dialog primitives. Components may keep their existing class hooks
+   (.modal-backdrop, .bid-modal-overlay, .sl-modal-overlay, .add-book-modal,
+   .award-modal-overlay) but should compose these utility classes for the
+   overlay + dialog chrome. Per-component CSS continues to handle layout
+   specifics (form rows, custom widths, etc.).
+
+   Required ARIA on the dialog element:
+     role="dialog" aria-modal="true" aria-labelledby="<title-id>"
+   The title heading should carry id="<title-id>". Click-outside-to-dismiss
+   stays in component templates (already wired via (click)="cancel()" +
+   $event.stopPropagation() on the dialog).
+
+   Markup contract:
+     <div class="modal-overlay" (click)="cancel()">
+       <div class="modal" role="dialog" aria-modal="true"
+            aria-labelledby="x-title" (click)="$event.stopPropagation()">
+         <h3 id="x-title" class="modal__title">…</h3>
+         <div class="modal__body">…</div>
+         <div class="modal__actions">…</div>
+       </div>
+     </div>
+
+   Size modifiers: .modal--sm (360px), default (480px), .modal--lg (640px),
+                   .modal--xl (820px — used by image zoom / set-detail forms).
+   prefers-reduced-motion is honored globally via --duration-* overrides.
+   ────────────────────────────────────────────────────────────────────────── */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal-backdrop);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+  background: rgba(108, 88, 76, 0.55);   /* Bark @ 55% — soft warm scrim */
+  animation: modal-overlay-in var(--duration-base) var(--ease-standard);
+}
+
+.modal {
+  position: relative;
+  z-index: var(--z-modal);
+  width: 100%;
+  max-width: 480px;
+  max-height: calc(100vh - var(--space-8));
+  overflow-y: auto;
+  background: var(--color-bg);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: var(--space-6);
+  animation: modal-in var(--duration-base) var(--ease-standard);
+}
+
+.modal--sm { max-width: 360px; }
+.modal--lg { max-width: 640px; }
+.modal--xl { max-width: 820px; }
+
+.modal__title {
+  margin: 0 0 var(--space-3);
+  font-size: var(--fs-20);
+  font-weight: var(--fw-bold);
+  line-height: var(--lh-tight);
+  color: var(--color-text);
+}
+
+.modal__body {
+  margin: 0 0 var(--space-6);
+  font-size: var(--fs-16);
+  line-height: var(--lh-normal);
+  color: var(--color-text);
+}
+
+.modal__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+/* Mobile — give modal full width minus margin and stack actions block-end. */
+@media (max-width: 640px) {
+  .modal {
+    max-width: 100%;
+    padding: var(--space-4);
+    border-radius: var(--radius-md);
+  }
+  .modal__actions {
+    flex-direction: column-reverse;   /* primary action stays visually last */
+    align-items: stretch;
+  }
+  .modal__actions > * { width: 100%; }
+}
+
+@keyframes modal-overlay-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes modal-in {
+  from { opacity: 0; transform: translateY(8px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0)   scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .modal-overlay,
+  .modal { animation: none; }
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   Shared component fragments
+   ────────────────────────────────────────────────────────────────────────── */
+
+/* Warm-up / loading indicator (shared across dashboard, comic-detail, set-detail) */
+.warming-up {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-8) var(--space-8);
+  margin: var(--space-12) auto;
+  max-width: 480px;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  color: var(--color-text-muted);
+  font-size: 1.2rem;
+  text-align: center;
+  line-height: var(--lh-normal);
+}
+
+.warming-up-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--color-border);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: warming-up-spin 0.8s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes warming-up-spin {
+  to { transform: rotate(360deg); }
+}

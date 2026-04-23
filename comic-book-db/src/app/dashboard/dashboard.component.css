@@ -170,111 +170,148 @@ h2 {
   font-weight: 600;
 }
 
-.btn-claim, .btn-in-cart, .btn-claimed {
-  padding: 6px 18px;
-  border-radius: 4px;
-  font-size: 0.85rem;
-  font-weight: 700;
+/* ── Footer action buttons (cards) ─────────────────────────────────────────
+   All share the same pill geometry; variants differ only in fill / text.
+   Padding/font-size driven by the spacing + type scale from styles.css. */
+.btn-claim,
+.btn-in-cart,
+.btn-claimed,
+.btn-bid,
+.btn-bid-start,
+.btn-start-bid,
+.btn-cancel-bid,
+.btn-award {
+  padding: var(--space-1) var(--space-4);
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-14);
+  font-weight: var(--fw-bold);
+  line-height: 1.15;
   cursor: pointer;
+  border: 1px solid transparent;
+  transition:
+    background-color var(--duration-base) var(--ease-standard),
+    border-color     var(--duration-base) var(--ease-standard),
+    color            var(--duration-base) var(--ease-standard),
+    box-shadow       var(--duration-base) var(--ease-standard);
 }
 
+/* Primary action: Claim — Deep Olive fill, Parchment text (4.83:1 AA) */
 .btn-claim {
-  background: #7b8f4b;
-  color: #f0ead2;
-  border: none;
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+  border-color: var(--color-primary);
 }
-.btn-claim:hover { background: #6b7e3e; }
-.btn-claim:disabled { background: #b8c89a; cursor: not-allowed; }
+.btn-claim:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+  border-color: var(--color-primary-hover);
+}
+.btn-claim:disabled {
+  background: #b8c89a;
+  border-color: #b8c89a;
+  cursor: not-allowed;
+}
 
+/* Bid (pulsing) — Warning fill, Parchment text */
 .btn-bid {
-  padding: 6px 18px;
-  border-radius: 4px;
-  font-size: 0.85rem;
-  font-weight: 700;
-  cursor: pointer;
-  background: #d97706;
-  color: #fff;
-  border: none;
+  background: var(--color-warning);
+  color: var(--color-text-inverse);
+  border-color: var(--color-warning);
   animation: bid-pulse 1.5s ease-in-out infinite;
 }
-.btn-bid:hover { background: #b45309; }
-.btn-bid:disabled { background: #fcd34d; color: #fff; cursor: not-allowed; animation: none; }
+.btn-bid:hover:not(:disabled) {
+  background: var(--color-warning-hover);
+  border-color: var(--color-warning-hover);
+}
+.btn-bid:disabled {
+  background: #E1B36A;
+  border-color: #E1B36A;
+  color: var(--color-text-inverse);
+  cursor: not-allowed;
+  animation: none;
+}
 
-/* Filled orange — used for user's "Bid" (start bidding) button */
+/* Filled warning — user's "Start Bidding" button */
 .btn-bid-start {
-  padding: 6px 18px;
-  border-radius: 4px;
-  font-size: 0.85rem;
-  font-weight: 700;
-  cursor: pointer;
-  background: #d97706;
-  color: #fff;
-  border: none;
+  background: var(--color-warning);
+  color: var(--color-text-inverse);
+  border-color: var(--color-warning);
 }
-.btn-bid-start:hover { background: #b45309; }
-.btn-bid-start:disabled { background: #fcd34d; color: #fff; cursor: not-allowed; }
-.btn-bid-pending:disabled { background: #d1d5db; color: #9ca3af; cursor: not-allowed; }
-
-/* Outline orange — used for admin Start Bid and Cancel buttons */
-.btn-start-bid {
-  background: transparent;
-  color: #d97706;
-  border: 1px solid #d97706;
+.btn-bid-start:hover:not(:disabled) {
+  background: var(--color-warning-hover);
+  border-color: var(--color-warning-hover);
 }
-.btn-start-bid:hover { background: rgba(217,119,6,0.1); }
+.btn-bid-start:disabled {
+  background: #E1B36A;
+  border-color: #E1B36A;
+  color: var(--color-text-inverse);
+  cursor: not-allowed;
+}
+.btn-bid-pending:disabled {
+  background: #d1d5db;
+  border-color: #d1d5db;
+  color: #6f6452;
+  cursor: not-allowed;
+}
 
+/* Outline warning — admin Start Bid + Cancel */
+.btn-start-bid,
 .btn-cancel-bid {
   background: transparent;
-  color: #d97706;
-  border: 1px solid #d97706;
+  color: var(--color-warning);
+  border-color: var(--color-warning);
 }
-.btn-cancel-bid:hover { background: rgba(217,119,6,0.1); }
+.btn-start-bid:hover,
+.btn-cancel-bid:hover {
+  background: rgba(180, 83, 9, 0.08);
+}
 
 @keyframes bid-pulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(217,119,6,0.5); }
-  50% { box-shadow: 0 0 0 6px rgba(217,119,6,0); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(180, 83, 9, 0.45); }
+  50%      { box-shadow: 0 0 0 6px rgba(180, 83, 9, 0); }
 }
 
 .bid-countdown {
-  font-size: 0.78rem;
-  font-weight: 700;
-  color: #c0392b;
+  font-size: var(--fs-12);
+  font-weight: var(--fw-bold);
+  color: var(--color-danger);
   letter-spacing: 0.04em;
 }
 
 .bid-leader {
-  font-size: 0.72rem;
-  color: #79675c;
+  font-size: var(--fs-12);
+  color: var(--color-text-muted);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 140px;
 }
 
+/* In-cart marker — outline primary, non-interactive */
 .btn-in-cart {
   background: transparent;
-  color: #7b8f4b;
-  border: 1px solid #7b8f4b;
+  color: var(--color-primary);
+  border-color: var(--color-primary);
   cursor: default;
 }
 
+/* Claimed marker — muted, non-interactive */
 .btn-claimed {
   background: #c8d4a8;
-  color: #79675c;
-  border: none;
+  color: var(--color-text-muted);
+  border-color: #c8d4a8;
   cursor: default;
 }
 
 .claim-error {
-  color: #c0634c;
+  color: var(--color-danger);
   text-align: center;
-  margin-bottom: 12px;
+  margin-bottom: var(--space-3);
 }
 
 .comic-claimed-status {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: #79675c;
+  font-size: var(--fs-12);
+  font-weight: var(--fw-semibold);
+  color: var(--color-text-muted);
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
@@ -291,64 +328,54 @@ h2 {
 }
 
 .sold-label {
-  font-size: 0.82rem;
-  font-weight: 700;
-  color: #c0634c;
+  font-size: var(--fs-14);
+  font-weight: var(--fw-bold);
+  color: var(--color-danger);
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
 
+/* Award — admin special action.
+   Switched from off-palette purple (#7c3aed) to a deep Tan that's on-palette
+   (warm accent family) and AA-passing with Parchment text (4.83:1 on #8C6750). */
 .btn-award {
-  padding: 6px 18px;
-  border-radius: 4px;
-  font-size: 0.85rem;
-  font-weight: 700;
-  cursor: pointer;
-  background: #7c3aed;
-  color: white;
-  border: none;
+  background: #8C6750;
+  color: var(--color-text-inverse);
+  border-color: #8C6750;
 }
-.btn-award:hover { background: #6d28d9; }
+.btn-award:hover:not(:disabled) {
+  background: #6F523F;
+  border-color: #6F523F;
+}
 
+/* Delete-card — outline danger, smaller geometry */
 .btn-delete-card {
-  padding: 4px 10px;
-  border-radius: 4px;
-  font-size: 0.78rem;
-  font-weight: 600;
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-12);
+  font-weight: var(--fw-semibold);
   cursor: pointer;
   background: transparent;
-  color: #c0634c;
-  border: 1px solid #c0634c;
+  color: var(--color-danger);
+  border: 1px solid var(--color-danger);
+  transition:
+    background-color var(--duration-base) var(--ease-standard),
+    color            var(--duration-base) var(--ease-standard);
 }
-.btn-delete-card:hover { background: rgba(192,99,76,0.1); }
-.btn-delete-card-confirm { border-color: #c0634c; color: #c0634c; background: rgba(192,99,76,0.12); }
-.btn-delete-card-confirm:hover { background: rgba(192,99,76,0.2); }
-
-.award-modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
+.btn-delete-card:hover { background: var(--color-danger-bg); }
+.btn-delete-card-confirm {
+  border-color: var(--color-danger);
+  color: var(--color-danger);
+  background: var(--color-danger-bg);
 }
+.btn-delete-card-confirm:hover { background: rgba(168, 85, 63, 0.22); }
 
+/* Award modal — chrome (overlay/dialog) is provided by the shared
+   .modal-overlay / .modal classes in global styles.css. The .award-modal
+   class only customises the surface tint (sage-light vs parchment) so it
+   stands out as a distinct admin action. */
 .award-modal {
-  background: #dde5b6;
-  border: 1px solid #b8c89a;
-  border-radius: 10px;
-  padding: 28px 32px;
-  min-width: 320px;
-  max-width: 480px;
-  width: 90%;
-  box-shadow: 0 8px 32px rgba(108,88,76,0.25);
-}
-
-.award-modal h3 {
-  margin: 0 0 6px;
-  font-size: 1.1rem;
-  color: #6c584c;
+  background: var(--sage-light);
 }
 
 .award-subtitle {
@@ -438,33 +465,37 @@ h2 {
 
 
 /* ── Footer badges ─────────────────────────────────────────────────────────── */
+/* Identity badges shown on the comic card footer. Solid-fill variants of the
+   shared .pill geometry — semantic tokens drive each color. */
 
 .badge-graded,
 .badge-set,
 .badge-key-issue {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
   font-size: 0.65rem;
-  font-weight: 700;
+  font-weight: var(--fw-bold);
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  padding: 3px 7px;
-  border-radius: 4px;
+  padding: 3px var(--space-2);
+  border-radius: var(--radius-sm);
+  line-height: 1.4;
   pointer-events: none;
 }
 
 .badge-graded {
-  background: #7b8f4b;
-  color: #f0ead2;
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
 }
 
 .badge-key-issue {
-  background: #b5451b;
-  color: #f0ead2;
+  background: var(--color-warning);
+  color: var(--color-text-inverse);
 }
 
 .badge-set {
-  background: #a98467;
-  color: #f0ead2;
+  background: var(--color-warm-accent-deep);
+  color: var(--color-text-inverse);
 }
 
 /* ── Dashboard Footer ──────────────────────────────────────────────────────── */
@@ -555,33 +586,18 @@ h2 {
 }
 
 /* ── Bid Modal ─────────────────────────────────────────────────────────────── */
-
-.bid-modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
+/* Chrome (overlay/dialog) is provided by the shared .modal-overlay / .modal
+   classes in global styles.css. .bid-modal only customises the surface tint
+   so bid dialogs read distinctly from generic confirms. */
 .bid-modal {
-  background: #dde5b6;
-  border: 1px solid #b8c89a;
-  border-radius: 10px;
-  padding: 28px 32px;
-  min-width: 320px;
-  max-width: 420px;
-  width: 90%;
-  box-shadow: 0 8px 32px rgba(108,88,76,0.25);
+  background: var(--sage-light);
 }
 
 .bid-modal-title {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: #6c584c;
-  margin-bottom: 4px;
+  font-size: var(--fs-18);
+  font-weight: var(--fw-bold);
+  color: var(--color-text);
+  margin-bottom: var(--space-1);
 }
 
 .bid-modal-comic-name {

@@ -21,5 +21,5 @@
   background: var(--color-surface);
   color: var(--color-text);
 }
-.error-message { color: #c0634c; margin-bottom: 12px; }
+.error-message { color: var(--color-danger); margin-bottom: var(--space-3); }
 .auth-link { margin-top: 16px; }

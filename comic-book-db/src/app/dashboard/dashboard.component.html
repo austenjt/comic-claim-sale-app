@@ -11,9 +11,11 @@
 </app-dashboard-header>
 
 <!-- Award modal -->
-<div *ngIf="awardingComic" class="award-modal-overlay" (click)="closeAwardModal()">
-  <div class="award-modal" (click)="$event.stopPropagation()">
-    <h3>Award "{{ awardingComic.title }}"</h3>
+<div *ngIf="awardingComic" class="award-modal-overlay modal-overlay" (click)="closeAwardModal()">
+  <div class="award-modal modal modal--lg" role="dialog" aria-modal="true"
+       aria-labelledby="award-modal-title"
+       (click)="$event.stopPropagation()">
+    <h3 id="award-modal-title" class="modal__title">Award "{{ awardingComic.title }}"</h3>
     <p class="award-subtitle">Select a user to add this book to their cart at $0.00:</p>
     <div *ngIf="awardError" class="award-error">{{ awardError }}</div>
     <div *ngIf="awardLoading" class="award-loading">Awarding…</div>
@@ -34,9 +36,11 @@
 </div>
 
 <!-- Start Bid modal -->
-<div *ngIf="startBidModalComic" class="bid-modal-overlay" (click)="cancelOpenBid()">
-  <div class="bid-modal" (click)="$event.stopPropagation()">
-    <div class="bid-modal-title">Start Bid</div>
+<div *ngIf="startBidModalComic" class="bid-modal-overlay modal-overlay" (click)="cancelOpenBid()">
+  <div class="bid-modal modal" role="dialog" aria-modal="true"
+       aria-labelledby="start-bid-modal-title"
+       (click)="$event.stopPropagation()">
+    <div id="start-bid-modal-title" class="bid-modal-title">Start Bid</div>
     <div class="bid-modal-comic-name">"{{ startBidModalComic.title }}"</div>
     <div class="bid-modal-input-group">
       <label class="bid-modal-label">Starting Bid — in $0.25 increments</label>
@@ -64,9 +68,11 @@
 </div>
 
 <!-- First-bid price confirmation modal -->
-<div *ngIf="firstBidConfirmComic" class="bid-modal-overlay" (click)="cancelFirstBidConfirm()">
-  <div class="bid-modal" (click)="$event.stopPropagation()">
-    <div class="bid-modal-title">Starting Bid Notice</div>
+<div *ngIf="firstBidConfirmComic" class="bid-modal-overlay modal-overlay" (click)="cancelFirstBidConfirm()">
+  <div class="bid-modal modal" role="dialog" aria-modal="true"
+       aria-labelledby="first-bid-confirm-modal-title"
+       (click)="$event.stopPropagation()">
+    <div id="first-bid-confirm-modal-title" class="bid-modal-title">Starting Bid Notice</div>
     <div class="bid-modal-comic-name">"{{ firstBidConfirmComic.title }}"</div>
     <div class="bid-modal-info">
       <div class="bid-modal-info-row">
@@ -91,9 +97,11 @@
 </div>
 
 <!-- Bid modal -->
-<div *ngIf="bidModalComic" class="bid-modal-overlay" (click)="closeBidModal()">
-  <div class="bid-modal" (click)="$event.stopPropagation()">
-    <div class="bid-modal-title">Place Bid</div>
+<div *ngIf="bidModalComic" class="bid-modal-overlay modal-overlay" (click)="closeBidModal()">
+  <div class="bid-modal modal" role="dialog" aria-modal="true"
+       aria-labelledby="dashboard-bid-modal-title"
+       (click)="$event.stopPropagation()">
+    <div id="dashboard-bid-modal-title" class="bid-modal-title">Place Bid</div>
     <div class="bid-modal-comic-name">"{{ bidModalComic.title }}"</div>
     <div class="bid-modal-info">
       <div class="bid-modal-info-row">

@@ -7,15 +7,17 @@
 .page-btn {
   min-width: 32px;
   height: 32px;
-  padding: 0 8px;
+  padding: 0 var(--space-2);
   border: 1px solid var(--color-border);
   background: transparent;
-  color: var(--color-text-muted);
-  font-size: 0.85rem;
-  font-weight: 600;
-  border-radius: 4px;
+  color: var(--color-text);
+  font-size: var(--fs-14);
+  font-weight: var(--fw-semibold);
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  transition: background-color var(--duration-base) var(--ease-standard),
+              color            var(--duration-base) var(--ease-standard),
+              border-color     var(--duration-base) var(--ease-standard);
   line-height: 1;
   box-sizing: border-box;
 }
@@ -23,14 +25,14 @@
 .page-btn:hover:not(:disabled) {
   background: var(--color-surface);
   color: var(--color-text);
-  border-color: #a98467;
+  border-color: var(--color-border-strong);
 }
 
 .page-btn-active,
 .page-btn-active:disabled {
-  background: #7b8f4b;
-  color: #f0ead2;
-  border-color: #7b8f4b;
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+  border-color: var(--color-primary);
   cursor: default;
   opacity: 1;
 }

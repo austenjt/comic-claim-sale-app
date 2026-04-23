@@ -1,7 +1,9 @@
 <!-- Bid modal -->
-<div *ngIf="bidModalOpen" class="bid-modal-overlay" (click)="closeBidModal()">
-  <div class="bid-modal" (click)="$event.stopPropagation()">
-    <div class="bid-modal-title">Place Bid</div>
+<div *ngIf="bidModalOpen" class="bid-modal-overlay modal-overlay" (click)="closeBidModal()">
+  <div class="bid-modal modal" role="dialog" aria-modal="true"
+       aria-labelledby="comic-detail-bid-modal-title"
+       (click)="$event.stopPropagation()">
+    <div id="comic-detail-bid-modal-title" class="bid-modal-title">Place Bid</div>
     <div class="bid-modal-comic-name">"{{ comic?.title }}"</div>
     <div class="bid-modal-info">
       <div class="bid-modal-info-row">

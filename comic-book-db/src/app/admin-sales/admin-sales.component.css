@@ -5,21 +5,24 @@
 }
 
 .error-message {
-  color: #c0634c;
-  margin-bottom: 1rem;
+  color: var(--color-danger);
+  margin-bottom: var(--space-4);
 }
 
 .btn-create {
-  margin-bottom: 1.5rem;
-  padding: 0.5rem 1.2rem;
-  background: #7b8f4b;
-  color: #f0ead2;
-  border: none;
-  border-radius: 4px;
+  margin-bottom: var(--space-6);
+  padding: var(--space-2) var(--space-6);
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  font-size: 0.95rem;
-  font-weight: 600;
+  font-size: var(--fs-14);
+  font-weight: var(--fw-semibold);
+  transition: background-color var(--duration-base) var(--ease-standard);
 }
+
+.btn-create:hover { background: var(--color-primary-hover); border-color: var(--color-primary-hover); }
 
 .discount-form {
   background: #dde5b6;
@@ -76,23 +79,30 @@
 }
 
 .btn-save {
-  padding: 0.45rem 1.2rem;
-  background: #7b8f4b;
-  color: #f0ead2;
-  border: none;
-  border-radius: 4px;
+  padding: var(--space-2) var(--space-5);
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  font-weight: 600;
+  font-size: var(--fs-14);
+  font-weight: var(--fw-semibold);
+  transition: background-color var(--duration-base) var(--ease-standard);
 }
+.btn-save:hover { background: var(--color-primary-hover); border-color: var(--color-primary-hover); }
 
 .btn-cancel {
-  padding: 0.45rem 1.2rem;
-  background: #c8d4a8;
-  color: #79675c;
-  border: none;
-  border-radius: 4px;
+  padding: var(--space-2) var(--space-5);
+  background: transparent;
+  color: var(--color-text);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
   cursor: pointer;
+  font-size: var(--fs-14);
+  font-weight: var(--fw-semibold);
+  transition: background-color var(--duration-base) var(--ease-standard);
 }
+.btn-cancel:hover { background: var(--color-surface-alt); }
 
 table {
   width: 100%;
@@ -115,27 +125,26 @@ tr.inactive td {
   color: #79675c;
 }
 
+/* admin-sales badges — see .pill in styles.css. Local class kept for template
+   compatibility; rules now inherit semantic state colors via tokens. */
 .badge {
-  display: inline-block;
-  padding: 0.2rem 0.55rem;
+  display: inline-flex;
+  align-items: center;
+  padding: 2px var(--space-2);
   border-radius: 12px;
-  font-size: 0.8rem;
-  font-weight: 600;
+  font-size: var(--fs-12);
+  font-weight: var(--fw-bold);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  line-height: 1.4;
+  white-space: nowrap;
 }
 
-.badge-active {
-  background: rgba(123,143,75,0.15);
-  color: #7b8f4b;
-}
-
-.badge-inactive {
-  background: rgba(192,99,76,0.15);
-  color: #c0634c;
-}
-
+.badge-active   { background: var(--color-success-bg); color: var(--color-success); }
+.badge-inactive { background: var(--color-danger-bg);  color: var(--color-danger); }
 .badge-excl-sets {
-  background: rgba(169,132,103,0.15);
-  color: #a98467;
+  background: rgba(140, 103, 80, 0.14);
+  color: var(--color-warm-accent-deep);
 }
 
 .text-muted {
@@ -154,24 +163,30 @@ tr.inactive td {
 }
 
 .btn-edit {
-  padding: 0.3rem 0.75rem;
-  background: rgba(169,132,103,0.15);
-  color: #a98467;
-  border: 1px solid #a98467;
-  border-radius: 4px;
+  padding: var(--space-1) var(--space-3);
+  background: transparent;
+  color: var(--color-text);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  font-size: 0.85rem;
+  font-size: var(--fs-14);
+  font-weight: var(--fw-semibold);
+  transition: background-color var(--duration-base) var(--ease-standard);
 }
+.btn-edit:hover { background: var(--color-surface-alt); }
 
 .btn-delete {
-  padding: 0.3rem 0.75rem;
+  padding: var(--space-1) var(--space-3);
   background: transparent;
-  color: #c0634c;
-  border: 1px solid #c0634c;
-  border-radius: 4px;
+  color: var(--color-danger);
+  border: 1px solid var(--color-danger);
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  font-size: 0.85rem;
+  font-size: var(--fs-14);
+  font-weight: var(--fw-semibold);
+  transition: background-color var(--duration-base) var(--ease-standard);
 }
+.btn-delete:hover { background: var(--color-danger-bg); }
 
 .empty-state {
   color: var(--color-text-muted);

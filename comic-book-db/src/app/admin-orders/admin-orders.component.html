@@ -21,6 +21,33 @@
       </div>
     </div>
 
+    <!-- 3-stage stepper. Code emits OPEN/FINALIZING/FINALIZED/FULFILLED;
+         FINALIZING and FINALIZED both render as "Submitted" (active). -->
+    <ol class="stepper stepper--compact" aria-label="Order status">
+      <li class="stepper__step"
+          [class.is-done]="order.status !== 'OPEN'"
+          [class.is-current]="order.status === 'OPEN'"
+          [attr.aria-current]="order.status === 'OPEN' ? 'step' : null">
+        <span class="stepper__dot" aria-hidden="true">{{ order.status !== 'OPEN' ? '✓' : '1' }}</span>
+        <span class="stepper__label">Open</span>
+      </li>
+      <li class="stepper__step"
+          [class.is-done]="order.status === 'FULFILLED'"
+          [class.is-current]="order.status === 'FINALIZING' || order.status === 'FINALIZED'"
+          [class.is-upcoming]="order.status === 'OPEN'"
+          [attr.aria-current]="(order.status === 'FINALIZING' || order.status === 'FINALIZED') ? 'step' : null">
+        <span class="stepper__dot" aria-hidden="true">{{ order.status === 'FULFILLED' ? '✓' : '2' }}</span>
+        <span class="stepper__label">Submitted</span>
+      </li>
+      <li class="stepper__step"
+          [class.is-current]="order.status === 'FULFILLED'"
+          [class.is-upcoming]="order.status !== 'FULFILLED'"
+          [attr.aria-current]="order.status === 'FULFILLED' ? 'step' : null">
+        <span class="stepper__dot" aria-hidden="true">3</span>
+        <span class="stepper__label">Fulfilled</span>
+      </li>
+    </ol>
+
     <table>
       <thead>
         <tr><th>Comic</th><th>Price</th><th>Claimed</th><th></th></tr>
@@ -196,6 +223,22 @@
       </div>
     </div>
 
+    <!-- Open carts are always at stage 1. -->
+    <ol class="stepper stepper--compact" aria-label="Order status">
+      <li class="stepper__step is-current" aria-current="step">
+        <span class="stepper__dot" aria-hidden="true">1</span>
+        <span class="stepper__label">Open</span>
+      </li>
+      <li class="stepper__step is-upcoming">
+        <span class="stepper__dot" aria-hidden="true">2</span>
+        <span class="stepper__label">Submitted</span>
+      </li>
+      <li class="stepper__step is-upcoming">
+        <span class="stepper__dot" aria-hidden="true">3</span>
+        <span class="stepper__label">Fulfilled</span>
+      </li>
+    </ol>
+
     <table>
       <thead>
         <tr><th>Comic</th><th>Price</th><th>Claimed</th><th></th></tr>
@@ -288,6 +331,22 @@
         <span *ngIf="order.fulfilledAt" class="order-date">Fulfilled: {{ order.fulfilledAt | date:'short' }}</span>
       </div>
     </div>
+
+    <!-- Archived orders are always at stage 3 (Fulfilled). -->
+    <ol class="stepper stepper--compact" aria-label="Order status">
+      <li class="stepper__step is-done">
+        <span class="stepper__dot" aria-hidden="true">✓</span>
+        <span class="stepper__label">Open</span>
+      </li>
+      <li class="stepper__step is-done">
+        <span class="stepper__dot" aria-hidden="true">✓</span>
+        <span class="stepper__label">Submitted</span>
+      </li>
+      <li class="stepper__step is-current" aria-current="step">
+        <span class="stepper__dot" aria-hidden="true">3</span>
+        <span class="stepper__label">Fulfilled</span>
+      </li>
+    </ol>
 
     <table>
       <thead>
@@ -428,15 +487,17 @@
   </div>
 
   <!-- Release Set confirmation modal -->
-  <div class="modal-backdrop" *ngIf="adminConfirmModal" (click)="cancelAdminRelease()">
-    <div class="modal-box" (click)="$event.stopPropagation()">
-      <h3 class="modal-title">Release Set?</h3>
-      <p class="modal-body">
+  <div class="modal-backdrop modal-overlay" *ngIf="adminConfirmModal" (click)="cancelAdminRelease()">
+    <div class="modal-box modal" role="dialog" aria-modal="true"
+         aria-labelledby="admin-release-modal-title"
+         (click)="$event.stopPropagation()">
+      <h3 id="admin-release-modal-title" class="modal-title modal__title">Release Set?</h3>
+      <p class="modal-body modal__body">
         <strong>{{ adminConfirmModal.setTitle }}</strong> contains
         <strong>{{ adminConfirmModal.bookCount }} book{{ adminConfirmModal.bookCount !== 1 ? 's' : '' }}</strong>.
         All {{ adminConfirmModal.bookCount }} books will be returned to available.
       </p>
-      <div class="modal-actions">
+      <div class="modal-actions modal__actions">
         <button class="modal-btn-cancel" (click)="cancelAdminRelease()">Cancel</button>
         <button class="modal-btn-confirm" (click)="confirmAdminRelease()">Release Set</button>
       </div>

@@ -1,17 +1,20 @@
 .orders-container { padding: 24px; max-width: 900px; margin: 0 auto; }
 
+/* Order line "Set" identity tag — solid warm-accent. */
 .set-tag {
-  display: inline-block;
-  margin-left: 6px;
-  padding: 1px 6px;
-  background: #a98467;
-  color: #f0ead2;
+  display: inline-flex;
+  align-items: center;
+  margin-left: var(--space-2);
+  padding: 1px var(--space-2);
+  background: var(--color-warm-accent-deep);
+  color: var(--color-text-inverse);
   font-size: 0.65rem;
-  font-weight: 700;
+  font-weight: var(--fw-bold);
   letter-spacing: 0.07em;
   text-transform: uppercase;
   border-radius: 3px;
   vertical-align: middle;
+  line-height: 1.4;
 }
 
 .empty-state { color: var(--color-text-muted); margin-top: 16px; }

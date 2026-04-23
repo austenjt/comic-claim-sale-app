@@ -9,6 +9,35 @@
   </div>
 
   <ng-container *ngIf="cart">
+    <!-- 3-stage visual stepper. Code emits 4 states; FINALIZING and FINALIZED
+         both read as "Submitted" (active/in-progress). See .stepper docs in
+         styles.css. Markup-only collapse — no .ts changes. -->
+    <ol class="stepper" aria-label="Order status">
+      <li class="stepper__step"
+          [class.is-done]="cart.status !== 'OPEN'"
+          [class.is-current]="cart.status === 'OPEN'"
+          [class.is-upcoming]="false"
+          [attr.aria-current]="cart.status === 'OPEN' ? 'step' : null">
+        <span class="stepper__dot" aria-hidden="true">{{ cart.status !== 'OPEN' ? '✓' : '1' }}</span>
+        <span class="stepper__label">Open</span>
+      </li>
+      <li class="stepper__step"
+          [class.is-done]="cart.status === 'FULFILLED'"
+          [class.is-current]="cart.status === 'FINALIZING' || cart.status === 'FINALIZED'"
+          [class.is-upcoming]="cart.status === 'OPEN'"
+          [attr.aria-current]="(cart.status === 'FINALIZING' || cart.status === 'FINALIZED') ? 'step' : null">
+        <span class="stepper__dot" aria-hidden="true">{{ cart.status === 'FULFILLED' ? '✓' : '2' }}</span>
+        <span class="stepper__label">Submitted</span>
+      </li>
+      <li class="stepper__step"
+          [class.is-current]="cart.status === 'FULFILLED'"
+          [class.is-upcoming]="cart.status !== 'FULFILLED'"
+          [attr.aria-current]="cart.status === 'FULFILLED' ? 'step' : null">
+        <span class="stepper__dot" aria-hidden="true">3</span>
+        <span class="stepper__label">Fulfilled</span>
+      </li>
+    </ol>
+
     <div class="cart-status" [ngClass]="'status-' + cart.status.toLowerCase()">
       {{ statusLabel }}
     </div>
@@ -172,10 +201,12 @@
   </ng-container>
 
   <!-- Release confirmation modal -->
-  <div class="modal-backdrop" *ngIf="confirmModal" (click)="cancelRelease()">
-    <div class="modal-box" (click)="$event.stopPropagation()">
-      <h3 class="modal-title">Release Set?</h3>
-      <p class="modal-body">
+  <div class="modal-backdrop modal-overlay" *ngIf="confirmModal" (click)="cancelRelease()">
+    <div class="modal-box modal" role="dialog" aria-modal="true"
+         aria-labelledby="cart-release-modal-title"
+         (click)="$event.stopPropagation()">
+      <h3 id="cart-release-modal-title" class="modal-title modal__title">Release Set?</h3>
+      <p class="modal-body modal__body">
         <strong>{{ confirmModal.setTitle }}</strong> contains
         <strong>{{ confirmModal.bookCount }} book{{ confirmModal.bookCount !== 1 ? 's' : '' }}</strong>.
         <ng-container *ngIf="confirmModal.isFinalizing">
@@ -185,7 +216,7 @@
           All {{ confirmModal.bookCount }} books will be returned to available.
         </ng-container>
       </p>
-      <div class="modal-actions">
+      <div class="modal-actions modal__actions">
         <button class="modal-btn-cancel" (click)="cancelRelease()">Cancel</button>
         <button class="modal-btn-confirm" (click)="confirmRelease()">Release Set</button>
       </div>

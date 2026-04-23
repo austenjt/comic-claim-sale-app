@@ -22,10 +22,17 @@
   color: var(--color-text);
 }
 button {
-  padding: 10px 20px;
-  font-size: 1rem;
+  padding: var(--space-2) var(--space-5);
+  font-size: var(--fs-16);
+  font-weight: var(--fw-semibold);
   cursor: pointer;
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-sm);
+  transition: background-color var(--duration-base) var(--ease-standard);
 }
-.success-message { color: #7b8f4b; font-size: 1.1rem; }
-.error-message { color: #c0634c; margin-bottom: 12px; }
+button:hover:not(:disabled) { background: var(--color-primary-hover); border-color: var(--color-primary-hover); }
+.success-message { color: var(--color-success); font-size: var(--fs-18); font-weight: var(--fw-medium); }
+.error-message { color: var(--color-danger); margin-bottom: var(--space-3); }
 .auth-link { margin-top: 16px; }

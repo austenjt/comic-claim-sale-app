@@ -28,72 +28,125 @@ app-comic-search {
 
 .btn-claim-sale {
   background: transparent;
-  color: #d97706;
-  border: 1px solid #d97706;
-  padding: 0.45rem 1rem;
-  font-size: 0.85rem;
-  font-weight: 600;
+  color: var(--color-warning);
+  border: 1px solid var(--color-warning);
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--fs-14);
+  font-weight: var(--fw-semibold);
+  border-radius: var(--radius-sm);
   white-space: nowrap;
   flex-shrink: 0;
   margin-bottom: 0;
   margin-right: 0;
+  transition:
+    background-color var(--duration-base) var(--ease-standard),
+    color            var(--duration-base) var(--ease-standard);
 }
 
 .btn-claim-sale:hover {
-  background: rgba(217,119,6,0.08);
+  background: rgba(180, 83, 9, 0.08);
 }
 
 .btn-claim-sale-active {
-  background: rgba(217,119,6,0.15);
-  color: #d97706;
-  border-color: #d97706;
+  background: rgba(180, 83, 9, 0.18);
+  color: var(--color-warning);
+  border-color: var(--color-warning);
 }
 
 .btn-claim-sale-active:hover {
-  background: rgba(217,119,6,0.25);
+  background: rgba(180, 83, 9, 0.28);
 }
 
 .items-count {
-  font-size: 0.85rem;
+  font-size: var(--fs-14);
   color: var(--color-text-muted);
 }
 
+/* Filter buttons (Exclude Claimed, Show Unpriced, Only Bidding):
+   Bark text on near-Parchment fill — same readability pass as the top nav. */
 .btn-exclude-claimed {
-  background: transparent;
-  color: var(--color-text-muted);
+  background: rgba(240, 234, 210, 0.65);
+  color: var(--color-text);                     /* Bark, AA on parchment */
   border: 1px solid var(--color-border);
-  padding: 0.45rem 1rem;
-  font-size: 0.85rem;
-  font-weight: 600;
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--fs-14);
+  font-weight: var(--fw-semibold);
+  border-radius: var(--radius-sm);
   white-space: nowrap;
   flex-shrink: 0;
   margin-bottom: 0;
   margin-right: 0;
+  transition:
+    background-color var(--duration-base) var(--ease-standard),
+    border-color     var(--duration-base) var(--ease-standard),
+    color            var(--duration-base) var(--ease-standard);
 }
 
 .btn-exclude-claimed:hover {
-  background: var(--color-surface);
+  background: var(--parchment);
+  border-color: var(--color-border-strong);
   color: var(--color-text);
 }
 
 .btn-exclude-claimed-active {
-  background: rgba(123,143,75,0.15);
-  color: #7b8f4b;
-  border-color: #7b8f4b;
+  background: var(--sage);                      /* Sage fill marks the filter is on */
+  color: var(--color-text);                     /* Bark on Sage = 3.72:1 AA-large @ semibold */
+  border-color: var(--olive-dark);
+  box-shadow: inset 0 -2px 0 var(--olive-dark);
 }
 
 .btn-exclude-claimed-active:hover {
-  background: rgba(123,143,75,0.25);
+  background: var(--olive);
+  color: var(--color-text-inverse);
 }
 
 .sort-select {
-  background: transparent;
-  color: var(--color-text-muted);
+  background: rgba(240, 234, 210, 0.65);
+  color: var(--color-text);                     /* Bark for readability */
   border: 1px solid var(--color-border);
-  padding: 0.45rem 0.6rem;
-  font-size: 0.85rem;
-  font-weight: 600;
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--fs-14);
+  font-weight: var(--fw-semibold);
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  border-radius: 0;
   appearance: auto;
+}
+
+.sort-select:hover {
+  background: var(--parchment);
+  border-color: var(--color-border-strong);
+}
+
+/* ── Mobile: stack search ABOVE filter buttons ─────────────────────────── */
+@media (max-width: 640px) {
+  .search-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  app-comic-search {
+    width: 100%;
+  }
+
+  .filter-panel {
+    align-items: stretch;
+    width: 100%;
+    gap: 8px;
+  }
+
+  .filter-buttons {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .filter-buttons .btn-exclude-claimed,
+  .filter-buttons .sort-select {
+    flex: 1 1 auto;
+    min-width: calc(50% - 3px);
+  }
+
+  .items-count {
+    text-align: center;
+  }
 }

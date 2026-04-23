@@ -14,17 +14,20 @@
 .discount-savings { color: #4caf50; font-weight: 500; }
 .discount-desc { font-size: 0.85em; color: var(--color-text-muted); margin-left: 0.4rem; }
 
+/* "FREE" identity badge — solid primary, see .pill in styles.css. */
 .price-free-badge {
-  display: inline-block;
-  background: #4caf50;
-  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
   font-size: 0.72rem;
-  font-weight: 700;
+  font-weight: var(--fw-bold);
   letter-spacing: 0.07em;
   text-transform: uppercase;
-  padding: 1px 6px;
+  padding: 1px var(--space-2);
   border-radius: 3px;
   vertical-align: middle;
+  line-height: 1.4;
 }
 
 .item-count-label {
@@ -33,18 +36,21 @@
   color: var(--color-text-muted);
 }
 
+/* Order line "Set" identity tag — solid warm-accent. */
 .set-tag {
-  display: inline-block;
-  margin-left: 6px;
-  padding: 1px 6px;
-  background: #a98467;
-  color: #f0ead2;
+  display: inline-flex;
+  align-items: center;
+  margin-left: var(--space-2);
+  padding: 1px var(--space-2);
+  background: var(--color-warm-accent-deep);
+  color: var(--color-text-inverse);
   font-size: 0.65rem;
-  font-weight: 700;
+  font-weight: var(--fw-bold);
   letter-spacing: 0.07em;
   text-transform: uppercase;
   border-radius: 3px;
   vertical-align: middle;
+  line-height: 1.4;
 }
 
 .order-card {
@@ -72,16 +78,24 @@
 .order-meta { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 .order-date { color: rgba(240,234,210,0.7); font-size: 0.85rem; }
 
+/* Order status badge — sits on the dark Bark .order-header background, so
+   it uses lighter, higher-luminance tints than the parchment-context .pill.
+   AA-large @ semibold/bold on Bark (#6C584C) verified for each color. */
 .order-status {
-  padding: 3px 10px;
-  border-radius: 4px;
-  font-size: 0.82rem;
-  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  padding: 3px var(--space-3);
+  border-radius: 12px;
+  font-size: var(--fs-12);
+  font-weight: var(--fw-bold);
+  letter-spacing: 0.04em;
   text-transform: uppercase;
+  line-height: 1.4;
+  white-space: nowrap;
 }
-.status-open { background: rgba(173,193,120,0.25); color: #dde5b6; }
-.status-finalizing { background: rgba(169,132,103,0.25); color: #e5c9b0; }
-.status-finalized { background: rgba(147,197,253,0.2); color: #93c5fd; }
+.status-open       { background: rgba(173, 193, 120, 0.25); color: var(--sage-light); }
+.status-finalizing { background: rgba(169, 132, 103, 0.25); color: #E5C9B0; }
+.status-finalized  { background: rgba(147, 197, 253, 0.20); color: #93C5FD; }
 
 table { width: 100%; border-collapse: collapse; }
 th, td { padding: 10px 16px; border-bottom: 1px solid var(--color-border); text-align: left; color: var(--color-text); }
@@ -130,17 +144,18 @@ tfoot td { font-weight: bold; background: #adc178; }
 }
 
 .btn-save-notes {
-  padding: 5px 14px;
+  padding: var(--space-1) var(--space-3);
   background: transparent;
-  color: #a98467;
-  border: 1px solid #a98467;
-  border-radius: 4px;
-  font-size: 0.82rem;
+  color: var(--color-warm-accent);
+  border: 1px solid var(--color-warm-accent);
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-14);
   cursor: pointer;
-  font-weight: 600;
+  font-weight: var(--fw-semibold);
   white-space: nowrap;
+  transition: background-color var(--duration-base) var(--ease-standard);
 }
-.btn-save-notes:hover { background: rgba(169,132,103,0.08); }
+.btn-save-notes:hover { background: rgba(169, 132, 103, 0.12); }
 
 .saved-note-text {
   flex: 1;
@@ -150,16 +165,18 @@ tfoot td { font-weight: bold; background: #adc178; }
 }
 
 .btn-edit-note {
-  padding: 3px 10px;
+  padding: var(--space-1) var(--space-3);
   background: transparent;
-  color: var(--color-text-muted);
-  border: 1px solid var(--color-border);
-  border-radius: 4px;
-  font-size: 0.78rem;
+  color: var(--color-text);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-12);
+  font-weight: var(--fw-semibold);
   cursor: pointer;
   white-space: nowrap;
+  transition: background-color var(--duration-base) var(--ease-standard);
 }
-.btn-edit-note:hover { background: var(--color-border); }
+.btn-edit-note:hover { background: var(--color-surface-alt); }
 
 .tracking-note-row {
   display: flex;
@@ -200,43 +217,66 @@ tfoot td { font-weight: bold; background: #adc178; }
   width: 200px;
 }
 
+/* The .order-actions footer sits on a Bark (#6c584c) background, so outline
+   buttons need lighter foreground colors to maintain readability:
+   - Sage / pale-blue / parchment for outline variants (3.7+ AA-large @ semibold)
+   - Filled-danger for destructive actions (parchment text on a red fill,
+     replaces the previous red-outline-on-dark which failed AA badly). */
+
 .btn-unsubmit {
-  padding: 8px 20px;
+  padding: var(--space-2) var(--space-6);
   background: transparent;
-  color: #93c5fd;
-  border: 1px solid #93c5fd;
-  border-radius: 4px;
-  font-size: 0.9rem;
+  color: #93C5FD;                       /* light blue — readable on Bark @ semibold */
+  border: 1px solid #93C5FD;
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-14);
   cursor: pointer;
-  font-weight: 600;
+  font-weight: var(--fw-semibold);
+  transition: background-color var(--duration-base) var(--ease-standard);
 }
-.btn-unsubmit:hover { background: rgba(147,197,253,0.1); }
+.btn-unsubmit:hover { background: rgba(147, 197, 253, 0.14); }
 
 .btn-fulfill {
-  padding: 8px 20px;
+  padding: var(--space-2) var(--space-6);
   background: transparent;
-  color: #adc178;
-  border: 1px solid #adc178;
-  border-radius: 4px;
-  font-size: 0.9rem;
+  color: var(--sage);                   /* Sage on Bark = 3.72 AA-large @ semibold */
+  border: 1px solid var(--sage);
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-14);
   cursor: pointer;
-  font-weight: 600;
+  font-weight: var(--fw-semibold);
+  transition: background-color var(--duration-base) var(--ease-standard);
 }
-.btn-fulfill:hover:not(:disabled) { background: rgba(173,193,120,0.1); }
-.btn-fulfill:disabled { background: transparent; color: #c8d4a8; border-color: #c8d4a8; cursor: not-allowed; }
-.btn-fulfill-confirm { border-color: #a98467; color: #a98467; }
-.btn-fulfill-confirm:hover:not(:disabled) { background: rgba(169,132,103,0.1); }
+.btn-fulfill:hover:not(:disabled) { background: rgba(173, 193, 120, 0.14); }
+.btn-fulfill:disabled {
+  background: transparent;
+  color: #c8d4a8;
+  border-color: #c8d4a8;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+.btn-fulfill-confirm {
+  border-color: var(--color-warm-accent);
+  color: #E5C9B0;                       /* warm light tan — readable on Bark */
+}
+.btn-fulfill-confirm:hover:not(:disabled) { background: rgba(169, 132, 103, 0.18); }
 
+/* Release in admin orders: filled-danger (was outline-red on dark, ratio 1.53). */
 .btn-release {
-  padding: 3px 10px;
-  background: transparent;
-  color: #c0634c;
-  border: 1px solid #c0634c;
-  border-radius: 4px;
-  font-size: 0.8rem;
+  padding: var(--space-1) var(--space-3);
+  background: var(--color-danger);
+  color: var(--color-text-inverse);
+  border: 1px solid var(--color-danger);
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-12);
+  font-weight: var(--fw-semibold);
   cursor: pointer;
+  transition: background-color var(--duration-base) var(--ease-standard);
 }
-.btn-release:hover { background: rgba(192,99,76,0.1); }
+.btn-release:hover {
+  background: var(--color-danger-hover);
+  border-color: var(--color-danger-hover);
+}
 
 .bid-won-label {
   font-size: 0.78rem;
@@ -262,40 +302,54 @@ tfoot td { font-weight: bold; background: #adc178; }
   border-color: #b8c89a;
 }
 
+/* Fulfilled badge — same dark-bg context as other .order-status variants. */
 .status-fulfilled {
-  background: rgba(123,143,75,0.15);
-  color: #adc178;
+  background: rgba(173, 193, 120, 0.25);
+  color: var(--sage-light);
+}
+
+/* Stepper sits between the dark .order-header and the items table. Give it
+   breathing room and a parchment background so the dot circles read clean. */
+.order-card .stepper {
+  padding: var(--space-4) var(--space-4) var(--space-2);
+  background: var(--color-bg);
+  margin: 0;
+  border-bottom: 1px solid var(--color-border);
 }
 
 .order-actions { display: flex; gap: 10px; }
 
-.btn-full-delete {
-  padding: 8px 20px;
-  background: transparent;
-  color: #c0634c;
-  border: 1px solid #c0634c;
-  border-radius: 4px;
-  font-size: 0.9rem;
-  cursor: pointer;
-  font-weight: 600;
-}
-.btn-full-delete:hover { background: rgba(192,99,76,0.1); }
-.btn-full-delete-confirm { border-color: #c0634c; color: #c0634c; }
-.btn-full-delete-confirm:hover { background: rgba(192,99,76,0.15); }
-
+/* Full-delete + delete: filled-danger (sit on the dark Bark order-actions footer) */
+.btn-full-delete,
 .btn-delete {
-  padding: 8px 20px;
-  background: transparent;
-  color: #c0634c;
-  border: 1px solid #c0634c;
-  border-radius: 4px;
-  font-size: 0.9rem;
+  padding: var(--space-2) var(--space-6);
+  background: var(--color-danger);
+  color: var(--color-text-inverse);
+  border: 1px solid var(--color-danger);
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-14);
   cursor: pointer;
-  font-weight: 600;
+  font-weight: var(--fw-semibold);
+  transition: background-color var(--duration-base) var(--ease-standard);
 }
-.btn-delete:hover { background: rgba(192,99,76,0.1); }
-.btn-delete-confirm { border-color: #c0634c; color: #c0634c; }
-.btn-delete-confirm:hover { background: rgba(192,99,76,0.15); }
+.btn-full-delete:hover,
+.btn-delete:hover {
+  background: var(--color-danger-hover);
+  border-color: var(--color-danger-hover);
+}
+
+/* Confirm state — slightly darker, with a subtle inset ring to mark "armed" */
+.btn-full-delete-confirm,
+.btn-delete-confirm {
+  background: var(--color-danger-hover);
+  border-color: var(--color-danger-hover);
+  box-shadow: inset 0 0 0 2px rgba(240, 234, 210, 0.35);
+}
+.btn-full-delete-confirm:hover,
+.btn-delete-confirm:hover {
+  background: #6F3324;
+  border-color: #6F3324;
+}
 
 .section-hint {
   color: var(--color-text-muted);
@@ -344,66 +398,36 @@ tfoot td { font-weight: bold; background: #adc178; }
 }
 
 /* ── Release confirmation modal ────────────────────────────────────── */
-.modal-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.45);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
-.modal-box {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: 8px;
-  padding: 28px 32px;
-  max-width: 420px;
-  width: 90%;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
-}
-
-.modal-title {
-  margin: 0 0 14px;
-  font-size: 1.1rem;
-  color: var(--color-text);
-}
-
-.modal-body {
-  margin: 0 0 24px;
-  color: var(--color-text-muted);
-  line-height: 1.6;
-  font-size: 0.95rem;
-}
-
+/* Chrome (overlay/dialog/title/body/actions) is provided by the shared
+   .modal-overlay / .modal / .modal__* classes in global styles.css. Only
+   dialog-specific tweaks live here. */
 .modal-body strong { color: var(--color-text); }
 
-.modal-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-}
-
 .modal-btn-cancel {
-  padding: 8px 18px;
+  padding: var(--space-2) var(--space-4);
   background: transparent;
-  color: var(--color-text-muted);
-  border: 1px solid var(--color-border);
-  border-radius: 4px;
+  color: var(--color-text);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  font-size: 0.9rem;
+  font-size: var(--fs-14);
+  font-weight: var(--fw-semibold);
+  transition: background-color var(--duration-base) var(--ease-standard);
 }
-.modal-btn-cancel:hover { background: var(--color-border); }
+.modal-btn-cancel:hover { background: var(--color-surface-alt); }
 
 .modal-btn-confirm {
-  padding: 8px 18px;
-  background: transparent;
-  color: #c0634c;
-  border: 1px solid #c0634c;
-  border-radius: 4px;
+  padding: var(--space-2) var(--space-4);
+  background: var(--color-danger);
+  color: var(--color-text-inverse);
+  border: 1px solid var(--color-danger);
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  font-size: 0.9rem;
-  font-weight: 600;
+  font-size: var(--fs-14);
+  font-weight: var(--fw-semibold);
+  transition: background-color var(--duration-base) var(--ease-standard);
 }
-.modal-btn-confirm:hover { background: rgba(192, 99, 76, 0.1); }
+.modal-btn-confirm:hover {
+  background: var(--color-danger-hover);
+  border-color: var(--color-danger-hover);
+}

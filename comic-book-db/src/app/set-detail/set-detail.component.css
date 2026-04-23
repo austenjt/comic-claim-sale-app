@@ -63,19 +63,19 @@ button {
 }
 
 .btn-share {
-  padding: 5px 14px;
+  padding: var(--space-1) var(--space-3);
   background: transparent;
-  color: #a98467;
-  border: 1px solid #a98467;
-  border-radius: 4px;
-  font-size: 0.85rem;
-  font-weight: 600;
+  color: var(--color-warm-accent-deep);
+  border: 1px solid var(--color-warm-accent-deep);
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-14);
+  font-weight: var(--fw-semibold);
   cursor: pointer;
-  transition: background 0.15s;
+  transition: background-color var(--duration-base) var(--ease-standard);
 }
 
 .btn-share:hover {
-  background: rgba(169,132,103,0.12);
+  background: rgba(140, 103, 80, 0.10);
 }
 
 
@@ -90,17 +90,21 @@ button {
   margin: 0 0 1rem;
 }
 
+/* Heading-level "SET" identity tag — solid warm-accent pill. */
 .set-badge-lg {
-  background: #a98467;
-  color: #f0ead2;
-  font-size: 0.75rem;
-  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  background: var(--color-warm-accent-deep);
+  color: var(--color-text-inverse);
+  font-size: var(--fs-12);
+  font-weight: var(--fw-bold);
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  padding: 4px 12px;
-  border-radius: 4px;
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-sm);
   flex-shrink: 0;
   margin-bottom: 1rem;
+  line-height: 1.4;
 }
 
 /* ── Top section: images + metadata ─────────────────────────────────────── */
@@ -184,17 +188,19 @@ button {
 }
 
 .img-update-btn {
-  padding: 5px 16px;
-  background-color: #a98467;
-  color: #f0ead2;
-  border: none;
-  border-radius: 4px;
-  font-size: 0.85rem;
+  padding: var(--space-1) var(--space-4);
+  background-color: var(--color-warm-accent-deep);
+  color: var(--color-text-inverse);
+  border: 1px solid var(--color-warm-accent-deep);
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-14);
+  font-weight: var(--fw-semibold);
   cursor: pointer;
+  transition: background-color var(--duration-base) var(--ease-standard);
 }
 
-.img-update-btn:hover:not(:disabled) { background-color: #8f6e52; }
-.img-update-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+.img-update-btn:hover:not(:disabled) { background-color: #6F5240; border-color: #6F5240; }
+.img-update-btn:disabled { opacity: 0.55; cursor: not-allowed; }
 
 .img-upload-error {
   margin-top: 6px;
@@ -243,43 +249,48 @@ button {
   word-break: break-word;
 }
 
+/* Set-page claim status. "mine" is a soft-fill primary pill;
+   "available" / "claimed" are inline labels. */
 .claim-status-available {
-  color: #7b8f4b;
-  font-weight: 700;
+  color: var(--color-success);
+  font-weight: var(--fw-bold);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
 
 .claim-status-mine {
-  background: rgba(123,143,75,0.15);
-  color: #adc178;
-  font-weight: 700;
+  background: rgba(79, 110, 47, 0.14);
+  color: var(--color-primary);
+  font-weight: var(--fw-bold);
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  padding: 2px 8px;
-  border-radius: 4px;
-  display: inline-block;
+  padding: 2px var(--space-2);
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  line-height: 1.4;
 }
 
 .claim-status-claimed {
-  color: #79675c;
-  font-weight: 700;
+  color: var(--color-text-muted);
+  font-weight: var(--fw-bold);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
 
 .btn-claim-detail {
-  padding: 7px 20px;
-  background: #7b8f4b;
-  color: #f0ead2;
-  border: none;
-  border-radius: 4px;
-  font-size: 0.9rem;
-  font-weight: 700;
+  padding: var(--space-2) var(--space-5);
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-14);
+  font-weight: var(--fw-bold);
   cursor: pointer;
+  transition: background-color var(--duration-base) var(--ease-standard);
 }
-.btn-claim-detail:hover:not(:disabled) { background: #6b7e3e; }
-.btn-claim-detail:disabled { opacity: 0.6; cursor: default; }
+.btn-claim-detail:hover:not(:disabled) { background: var(--color-primary-hover); border-color: var(--color-primary-hover); }
+.btn-claim-detail:disabled { opacity: 0.55; cursor: default; }
 
 .claim-error {
   color: #c0634c;
@@ -316,33 +327,35 @@ button {
 }
 
 .btn-add-book {
-  padding: 4px 12px;
-  background: #7b8f4b;
-  color: #f0ead2;
-  border: none;
-  border-radius: 4px;
-  font-size: 0.78rem;
-  font-weight: 700;
+  padding: var(--space-1) var(--space-3);
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-12);
+  font-weight: var(--fw-bold);
   cursor: pointer;
   margin: 0;
+  transition: background-color var(--duration-base) var(--ease-standard);
 }
 
-.btn-add-book:hover { background: #6b7e3e; }
+.btn-add-book:hover { background: var(--color-primary-hover); border-color: var(--color-primary-hover); }
 
 .btn-remove-from-set {
-  padding: 3px 10px;
+  padding: var(--space-1) var(--space-2);
   background: transparent;
-  color: #c0634c;
-  border: 1px solid #c0634c;
-  border-radius: 4px;
-  font-size: 0.75rem;
-  font-weight: 600;
+  color: var(--color-danger);
+  border: 1px solid var(--color-danger);
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-12);
+  font-weight: var(--fw-semibold);
   cursor: pointer;
   margin: 0;
+  transition: background-color var(--duration-base) var(--ease-standard);
 }
 
 .btn-remove-from-set:hover:not(:disabled) {
-  background: rgba(192, 99, 76, 0.1);
+  background: var(--color-danger-bg);
 }
 
 .btn-remove-from-set:disabled {
@@ -351,33 +364,10 @@ button {
 }
 
 /* ── Add Book modal ─────────────────────────────────────────────────────── */
-
-.add-book-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
-.add-book-modal {
-  background: #f0ead2;
-  border: 1px solid #b8c89a;
-  border-radius: 8px;
-  padding: 24px;
-  min-width: 320px;
-  max-width: 560px;
-  width: 100%;
-}
-
-.add-book-title {
-  font-size: 1rem;
-  font-weight: 700;
-  color: #6c584c;
-  margin: 0 0 6px;
-}
+/* Chrome (overlay/dialog/title) is provided by the shared .modal-overlay /
+   .modal / .modal__title classes in global styles.css (see .add-book-modal
+   composed alongside .modal modal--lg). Only inner content styling remains
+   here. */
 
 .add-book-subtitle {
   font-size: 0.82rem;
@@ -463,19 +453,20 @@ button {
 }
 
 .add-book-cancel {
-  padding: 6px 16px;
+  padding: var(--space-2) var(--space-4);
   background: transparent;
-  border: 1px solid #b8c89a;
-  border-radius: 4px;
-  color: #79675c;
-  font-size: 0.88rem;
-  font-weight: 600;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  color: var(--color-text);
+  font-size: var(--fs-14);
+  font-weight: var(--fw-semibold);
   cursor: pointer;
   margin: 0;
+  transition: background-color var(--duration-base) var(--ease-standard);
 }
 
-.add-book-cancel:hover:not(:disabled) { background: #c8d4a8; }
-.add-book-cancel:disabled { opacity: 0.6; cursor: default; }
+.add-book-cancel:hover:not(:disabled) { background: var(--color-surface-alt); }
+.add-book-cancel:disabled { opacity: 0.55; cursor: default; }
 
 .add-book-saving {
   font-size: 0.82rem;
@@ -562,16 +553,19 @@ button {
   gap: 6px;
 }
 
+/* Member-card GRADED badge — solid primary pill. */
 .badge-graded {
-  display: inline-block;
-  background: #7b8f4b;
-  color: #f0ead2;
+  display: inline-flex;
+  align-items: center;
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
   font-size: 0.65rem;
-  font-weight: 700;
+  font-weight: var(--fw-bold);
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  padding: 3px 7px;
-  border-radius: 4px;
+  padding: 3px var(--space-2);
+  border-radius: var(--radius-sm);
+  line-height: 1.4;
   pointer-events: none;
 }
 
@@ -671,28 +665,29 @@ button {
 
 /* Save button */
 .btn-save {
-  padding: 5px 18px;
-  background: #a98467;
-  color: #f0ead2;
-  border: none;
-  border-radius: 4px;
-  font-size: 0.85rem;
-  font-weight: 600;
+  padding: var(--space-1) var(--space-4);
+  background: var(--color-warm-accent-deep);
+  color: var(--color-text-inverse);
+  border: 1px solid var(--color-warm-accent-deep);
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-14);
+  font-weight: var(--fw-semibold);
   cursor: pointer;
-  transition: background 0.15s;
+  transition: background-color var(--duration-base) var(--ease-standard);
   margin-bottom: 1rem;
 }
 
-.btn-save:hover:not(:disabled) { background: #8f6e55; }
-.btn-save:disabled { opacity: 0.6; cursor: default; }
+.btn-save:hover:not(:disabled) { background: #6F5240; border-color: #6F5240; }
+.btn-save:disabled { opacity: 0.55; cursor: default; }
 
 .btn-save-done {
-  background: #c8a882;
-  color: #2a1a0e;
+  background: var(--color-success);
+  border-color: var(--color-success);
+  color: var(--color-text-inverse);
 }
 
 .save-error {
-  color: #c0634c;
-  font-size: 0.82rem;
+  color: var(--color-danger);
+  font-size: var(--fs-14);
   margin-bottom: 1rem;
 }

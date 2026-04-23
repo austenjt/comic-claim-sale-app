@@ -30,44 +30,50 @@
 }
 
 .toolbar-btn {
-  padding: 6px 14px;
-  border: none;
-  border-radius: 4px;
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  font-size: 13px;
-  font-weight: 500;
+  font-size: var(--fs-14);
+  font-weight: var(--fw-semibold);
+  transition: background-color var(--duration-base) var(--ease-standard);
 }
 
 .add-btn {
-  background-color: #7b8f4b;
-  color: #f0ead2;
-  border-color: #7b8f4b;
+  background-color: var(--color-primary);
+  color: var(--color-text-inverse);
+  border-color: var(--color-primary);
 }
 
 .add-btn:hover {
-  background-color: #6b7e3e;
+  background-color: var(--color-primary-hover);
+  border-color: var(--color-primary-hover);
 }
 
 .delete-btn {
-  background-color: #c0634c;
-  color: #f0ead2;
+  background-color: var(--color-danger);
+  color: var(--color-text-inverse);
+  border-color: var(--color-danger);
 }
 
 .delete-btn:hover {
-  background-color: #a8553f;
+  background-color: var(--color-danger-hover);
+  border-color: var(--color-danger-hover);
 }
 
 .refresh-btn {
-  background-color: #7b8f4b;
-  color: #f0ead2;
+  background-color: var(--color-primary);
+  color: var(--color-text-inverse);
+  border-color: var(--color-primary);
 }
 
 .refresh-btn:hover:not(:disabled) {
-  background-color: #6b7e3e;
+  background-color: var(--color-primary-hover);
+  border-color: var(--color-primary-hover);
 }
 
 .refresh-btn:disabled {
-  opacity: 0.6;
+  opacity: 0.55;
   cursor: not-allowed;
 }
 
@@ -94,42 +100,23 @@
 }
 
 /* ── Set Modals ─────────────────────────────────────────────────────────── */
-
-.sl-modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
-.sl-modal {
-  background: #f0ead2;
-  border: 1px solid #b8c89a;
-  border-radius: 8px;
-  padding: 24px;
-  min-width: 320px;
-  max-width: 480px;
-  width: 100%;
-}
-
-.sl-modal-wide {
-  max-width: 560px;
-}
+/* Chrome (overlay/dialog) is provided by the shared .modal-overlay / .modal
+   classes in global styles.css. .sl-modal-wide is preserved as a no-op
+   alias retained for templates that still reference it; new templates use
+   .modal--lg directly via the shared system. */
+.sl-modal-wide { /* kept for backwards-compatibility; size now handled by .modal--lg */ }
 
 .sl-modal-title {
-  font-size: 1rem;
-  font-weight: 700;
-  color: #6c584c;
-  margin: 0 0 6px;
+  font-size: var(--fs-18);
+  font-weight: var(--fw-bold);
+  color: var(--color-text);
+  margin: 0 0 var(--space-1);
 }
 
 .sl-modal-subtitle {
-  font-size: 0.82rem;
-  color: #79675c;
-  margin: 0 0 14px;
+  font-size: var(--fs-14);
+  color: var(--color-text-muted);
+  margin: 0 0 var(--space-3);
 }
 
 .sl-modal-hint {
@@ -339,52 +326,53 @@
 }
 
 .qa-btn {
-  padding: 6px 16px;
-  border: none;
-  border-radius: 4px;
+  padding: var(--space-1) var(--space-4);
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  font-size: 0.88rem;
-  font-weight: 600;
-  color: #f0ead2;
+  font-size: var(--fs-14);
+  font-weight: var(--fw-semibold);
+  color: var(--color-text-inverse);
   margin: 0;
+  transition: background-color var(--duration-base) var(--ease-standard);
 }
 
-.qa-btn-next  { background: #7b8f4b; }
-.qa-btn-next:hover  { background: #6b7e3e; }
+.qa-btn-next  { background: var(--color-primary); border-color: var(--color-primary); }
+.qa-btn-next:hover  { background: var(--color-primary-hover); border-color: var(--color-primary-hover); }
 
-.qa-btn-back  { background: #c8d4a8; color: #79675c; }
-.qa-btn-back:hover  { background: #b8c89a; }
+.qa-btn-back  { background: transparent; color: var(--color-text); border-color: var(--color-border-strong); }
+.qa-btn-back:hover  { background: var(--color-surface-alt); }
 
-.qa-btn-graded { background: #7c3aed; color: white; }
-.qa-btn-graded:hover { background: #6d28d9; }
+.qa-btn-graded { background: var(--color-warm-accent-deep); color: var(--color-text-inverse); border-color: var(--color-warm-accent-deep); }
+.qa-btn-graded:hover { background: #6F5240; border-color: #6F5240; }
 
-.qa-btn-save  { background: #7b8f4b; }
-.qa-btn-save:hover:not(:disabled)  { background: #6b7e3e; }
-.qa-btn-save:disabled { background: #c8d4a8; color: #79675c; cursor: not-allowed; }
+.qa-btn-save  { background: var(--color-primary); border-color: var(--color-primary); }
+.qa-btn-save:hover:not(:disabled)  { background: var(--color-primary-hover); border-color: var(--color-primary-hover); }
+.qa-btn-save:disabled { background: var(--color-surface); color: var(--color-text-muted); border-color: var(--color-border); cursor: not-allowed; }
 
-.qa-btn-reset { background: transparent; border: 1px solid #b8c89a; color: #79675c; }
-.qa-btn-reset:hover { background: #c8d4a8; }
+.qa-btn-reset { background: transparent; border: 1px solid var(--color-border-strong); color: var(--color-text); }
+.qa-btn-reset:hover { background: var(--color-surface-alt); }
 
 .qa-success {
-  color: #7b8f4b;
-  font-size: 0.85rem;
-  font-weight: 600;
-  margin-bottom: 8px;
+  color: var(--color-success);
+  font-size: var(--fs-14);
+  font-weight: var(--fw-semibold);
+  margin-bottom: var(--space-2);
 }
 
 .qa-error {
-  color: #c0634c;
-  font-size: 0.85rem;
-  margin-bottom: 8px;
+  color: var(--color-danger);
+  font-size: var(--fs-14);
+  margin-bottom: var(--space-2);
 }
 
 .qa-field.qa-field-error label {
-  color: #c0634c;
+  color: var(--color-danger);
 }
 
 .qa-field.qa-field-error input[type="text"],
 .qa-field.qa-field-error input[type="number"],
 .qa-field.qa-field-error select {
-  border-color: #c0634c;
-  background: #f9ece8;
+  border-color: var(--color-danger);
+  background: var(--color-danger-bg);
 }

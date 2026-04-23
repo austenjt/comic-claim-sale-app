@@ -159,5 +159,5 @@ h1 {
 
 .msg-error {
   margin-top: 12px;
-  color: #c0634c;
+  color: var(--color-danger);
 }
