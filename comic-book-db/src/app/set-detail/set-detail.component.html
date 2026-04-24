@@ -18,10 +18,11 @@
         {{ linkCopied ? '✓ Link Copied!' : '&#128279; Share' }}
       </button>
       <ng-container *ngIf="auth.isAdmin()">
-        <button class="btn-save" [class.btn-save-done]="saveDone" (click)="saveContainer()" [disabled]="saving">
+        <button class="btn-save" [class.btn-save-done]="saveDone" (click)="saveContainer()" [disabled]="saving"
+                [attr.aria-describedby]="saveError ? 'set-save-error' : null">
           {{ saving ? 'Saving…' : saveDone ? '✓ Saved' : 'Save' }}
         </button>
-        <span *ngIf="saveError" class="save-error">{{ saveError }}</span>
+        <span *ngIf="saveError" id="set-save-error" role="alert" class="save-error">{{ saveError }}</span>
       </ng-container>
     </div>
   </div>

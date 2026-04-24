@@ -586,68 +586,9 @@ button {
 }
 .bid-modal-cancel-btn:hover:not(:disabled) { background: var(--color-surface-alt); }
 
-/* Inline edit controls (admin-only) */
-.detail-edit-input {
-  width: 100%;
-  background: transparent;
-  border: none;
-  border-bottom: 1px solid #7b8f4b;
-  color: var(--color-text);
-  font-size: 0.9rem;
-  font-family: inherit;
-  padding: 2px 4px;
-  outline: none;
-  box-sizing: border-box;
-}
-
-.detail-edit-input:focus {
-  border-bottom-color: #adc178;
-  background: rgba(123, 143, 75, 0.06);
-}
-
-.detail-edit-select {
-  width: 100%;
-  background: var(--color-surface, #1e1e1e);
-  border: none;
-  border-bottom: 1px solid #7b8f4b;
-  color: var(--color-text);
-  font-size: 0.9rem;
-  font-family: inherit;
-  padding: 2px 4px;
-  outline: none;
-  cursor: pointer;
-}
-
-.detail-edit-select:focus {
-  border-bottom-color: #adc178;
-}
-
-.detail-edit-textarea {
-  width: 100%;
-  background: transparent;
-  border: 1px solid #7b8f4b;
-  border-radius: 3px;
-  color: var(--color-text);
-  font-size: 0.9rem;
-  font-family: inherit;
-  padding: 4px 6px;
-  outline: none;
-  resize: vertical;
-  min-height: 58px;
-  box-sizing: border-box;
-}
-
-.detail-edit-textarea:focus {
-  border-color: #adc178;
-}
-
-.detail-edit-checkbox {
-  width: 16px;
-  height: 16px;
-  cursor: pointer;
-  accent-color: #7b8f4b;
-  margin-top: 3px;
-}
+/* Inline edit controls (admin-only) — base styles in styles.css.
+   Comic Detail uses the default olive/sage accent from the shared utility,
+   so no per-component overrides are needed. */
 
 /* Save button */
 .btn-save {

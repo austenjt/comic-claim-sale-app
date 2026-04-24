@@ -414,3 +414,31 @@ tfoot td { font-weight: bold; background: #adc178; }
   background: var(--color-danger-hover);
   border-color: var(--color-danger-hover);
 }
+
+/* ── Responsive (Phase 3.D) ──────────────────────────────────────────
+   Admin Orders sits on a wider container (max 900px) with denser tables
+   and a Bark .order-actions footer that holds checks + 2-3 buttons. On
+   tablets/phones, tighten cells, allow the footer to wrap, and stretch
+   the tracking input and buttons to full width so they remain tappable. */
+@media screen and (max-width: 768px) {
+  .orders-container { padding: var(--space-4) var(--space-3); }
+  th, td { padding: var(--space-2) var(--space-3); font-size: 0.875rem; }
+  .order-actions { flex-wrap: wrap; }
+  .fulfillment-checks { flex-basis: 100%; margin-right: 0; }
+  .tracking-input { flex: 1; min-width: 0; width: auto; }
+}
+
+@media screen and (max-width: 480px) {
+  th, td { padding: 6px var(--space-2); font-size: 0.82rem; }
+  th { font-size: 0.78rem; }
+  .set-member-comic { padding-left: var(--space-3); }
+  /* Hide the "Claimed" date column at the smallest widths — still shown
+     in the order header (Opened / Finalized timestamps). */
+  th:nth-child(3), td:nth-child(3) { display: none; }
+  .btn-unsubmit, .btn-fulfill, .btn-full-delete, .btn-delete {
+    flex: 1;
+    padding: var(--space-2) var(--space-3);
+  }
+  .btn-release { padding: 2px var(--space-2); }
+  .admin-notes-textarea { min-width: 0; }
+}

@@ -48,6 +48,16 @@ h2 {
   }
 }
 
+/* Small phones — tighten gap and inner padding so cards still feel
+   intentional at ~360px wide. */
+@media screen and (max-width: 480px) {
+  .comics-list { gap: var(--space-3); }
+  .image-container { padding: var(--space-2); min-height: 64px; }
+  .image-container img { height: 110px; }
+  .details { padding: var(--space-2) var(--space-3); }
+  .card-footer { padding: var(--space-1) var(--space-2); }
+}
+
 .image-container {
   display: flex;
   justify-content: center;
