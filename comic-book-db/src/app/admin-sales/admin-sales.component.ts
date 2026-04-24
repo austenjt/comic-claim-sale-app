@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { DiscountService } from '../discount.service';
 import { Discount, DiscountType } from '../discount';
 import { AuthService } from '../auth.service';
+import { SalesModalService } from '../sales-modal.service';
 
 @Component({
     selector: 'app-admin-sales',
@@ -30,11 +31,17 @@ export class AdminSalesComponent implements OnInit {
     { value: 'PERCENT_OFF_OVER_X_BOOKS', label: '% Off Over X Books' }
   ];
 
-  constructor(private discountService: DiscountService, public auth: AuthService) {}
+  constructor(
+    private discountService: DiscountService,
+    public auth: AuthService,
+    private salesModal: SalesModalService
+  ) {}
 
   ngOnInit() {
     this.load();
   }
+
+  previewModal(): void { this.salesModal.show(); }
 
   load() {
     this.loading = true;

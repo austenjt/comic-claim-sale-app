@@ -1,0 +1,41 @@
+<div *ngIf="visible" class="modal-overlay" (click)="close()"
+     role="dialog" aria-modal="true" aria-labelledby="sales-modal-title">
+
+  <div class="sales-modal" (click)="$event.stopPropagation()">
+
+    <!-- ── Header ─────────────────────────────────────────────── -->
+    <div class="sales-header">
+      <span class="sales-bolt" aria-hidden="true">⚡</span>
+      <h2 id="sales-modal-title" class="sales-title">Deals &amp; Promotions</h2>
+      <button class="sales-close" (click)="close()" aria-label="Close promotions">✕</button>
+    </div>
+
+    <!-- ── Body ───────────────────────────────────────────────── -->
+    <div class="sales-body">
+      <p class="sales-tagline">Claim comics today and save with these active offers!</p>
+
+      <div *ngIf="loading" class="sales-loading">Loading deals…</div>
+
+      <div *ngIf="!loading && discounts.length === 0" class="sales-empty">
+        No active promotions right now — check back soon!
+      </div>
+
+      <ul *ngIf="!loading && discounts.length > 0" class="deal-list">
+        <li *ngFor="let d of discounts" class="deal-card">
+          <div class="deal-icon" aria-hidden="true">{{ iconText(d) }}</div>
+          <div class="deal-content">
+            <div class="deal-name">{{ d.name }}</div>
+            <div class="deal-desc">{{ describeDiscount(d) }}</div>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <!-- ── Footer ─────────────────────────────────────────────── -->
+    <div class="sales-footer">
+      <button class="btn-browse" (click)="browse()">Browse Comics →</button>
+      <button class="btn-dismiss" (click)="close()">Dismiss</button>
+    </div>
+
+  </div>
+</div>

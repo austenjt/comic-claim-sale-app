@@ -3,6 +3,8 @@ import { Router } from '@angular/router';
 import { MsalService } from '@azure/msal-angular';
 import { AuthService } from './auth.service';
 import { LogService } from './log.service';
+import { DiscountService } from './discount.service';
+import { SalesModalService } from './sales-modal.service';
 
 @Component({
     selector: 'app-root',
@@ -27,6 +29,8 @@ export class AppComponent implements OnInit {
     public logService: LogService,
     private msal: MsalService,
     private router: Router,
+    private discountService: DiscountService,
+    private salesModal: SalesModalService,
   ) {}
 
   ngOnInit(): void {
@@ -65,9 +69,27 @@ export class AppComponent implements OnInit {
                 }
               }
             });
+          } else {
+            // No MSAL accounts — user is not logged in. Show the sales modal
+            // once per browser session if there are active promotions.
+            this.maybeSalesModal();
           }
         },
       });
+    });
+  }
+
+  private maybeSalesModal(): void {
+    const KEY = 'lcr-sales-modal-shown';
+    if (sessionStorage.getItem(KEY)) return;
+    this.discountService.getAll().subscribe({
+      next: discounts => {
+        if (discounts.some(d => d.isActive)) {
+          sessionStorage.setItem(KEY, '1');
+          this.salesModal.show();
+        }
+      },
+      error: () => {} // silently ignore — discount API failure shouldn't break the page
     });
   }
 

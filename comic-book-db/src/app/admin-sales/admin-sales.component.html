@@ -4,7 +4,10 @@
   <div *ngIf="error" class="error-message">{{ error }}</div>
   <div *ngIf="loading">Loading…</div>
 
-  <button class="btn-create" (click)="openCreate()" *ngIf="!showForm && auth.isAdmin()">+ New Rule</button>
+  <div class="sales-toolbar" *ngIf="!showForm">
+    <button class="btn-create" (click)="openCreate()" *ngIf="auth.isAdmin()">+ New Rule</button>
+    <button class="btn-preview" (click)="previewModal()">⚡ Preview Sales Banner</button>
+  </div>
 
   <!-- Create / Edit Form (admin only) -->
   <div *ngIf="showForm && auth.isAdmin()" class="discount-form">
