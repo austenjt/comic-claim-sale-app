@@ -74,6 +74,26 @@ public class HttpHelper {
             .build();
     }
 
+    /** 401 Unauthorized with a generic plain-text body. */
+    public static HttpResponseMessage unauthorized(HttpRequestMessage<?> request) {
+        return cors(request.createResponseBuilder(HttpStatus.UNAUTHORIZED))
+            .header("Content-Type", "text/plain")
+            .body("Unauthorized")
+            .build();
+    }
+
+    /**
+     * 500 Internal Server Error with a generic message. The exception is intentionally not
+     * included in the response body so internals don't leak — callers should log the
+     * exception with full stack trace before invoking this helper.
+     */
+    public static HttpResponseMessage serverError(HttpRequestMessage<?> request, Throwable e) {
+        return cors(request.createResponseBuilder(HttpStatus.INTERNAL_SERVER_ERROR))
+            .header("Content-Type", "text/plain")
+            .body("An internal error occurred.")
+            .build();
+    }
+
     /**
      * Map a service-layer exception to a sensible HTTP response. This replaces the
      * bag of {@code I_AM_A_TEAPOT} responses scattered through triggers.

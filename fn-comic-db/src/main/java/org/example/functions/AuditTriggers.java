@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.functions.model.ComicAuditLog;
 import org.example.functions.model.User;
 import org.example.functions.service.AuditService;
+import org.example.functions.util.HttpHelper;
 import org.example.functions.util.AuthHelper;
 import org.example.functions.util.Mappers;
 
@@ -36,24 +37,19 @@ public class AuditTriggers {
     {
         User admin = AuthHelper.requireAdmin(request);
         if (admin == null) {
-            return request.createResponseBuilder(HttpStatus.UNAUTHORIZED)
-                .header("Access-Control-Allow-Origin", "*")
-                .body("Admin access required.")
-                .build();
+            return HttpHelper.cors(request.createResponseBuilder(HttpStatus.UNAUTHORIZED))
+                .body("Admin access required.")                .build();
         }
         try {
             List<ComicAuditLog> logs = AuditService.getServiceInstance().getAuditLogsForComic(comicId);
-            return request.createResponseBuilder(HttpStatus.OK)
-                .header("Access-Control-Allow-Origin", "*")
+            return HttpHelper.cors(request.createResponseBuilder(HttpStatus.OK))
                 .header("Content-Type", "application/json")
                 .body(OBJECT_MAPPER.writeValueAsString(logs))
                 .build();
         } catch (Exception e) {
             log.error("Error fetching audit log for comic {}", comicId, e);
-            return request.createResponseBuilder(HttpStatus.INTERNAL_SERVER_ERROR)
-                .header("Access-Control-Allow-Origin", "*")
-                .body("Failed to load audit log.")
-                .build();
+            return HttpHelper.cors(request.createResponseBuilder(HttpStatus.INTERNAL_SERVER_ERROR))
+                .body("Failed to load audit log.")                .build();
         }
     }
 }

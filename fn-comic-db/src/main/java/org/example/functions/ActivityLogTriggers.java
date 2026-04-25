@@ -11,6 +11,7 @@ import com.microsoft.azure.functions.annotation.HttpTrigger;
 import lombok.extern.slf4j.Slf4j;
 import org.example.functions.model.ActivityLog;
 import org.example.functions.service.ActivityLogService;
+import org.example.functions.util.HttpHelper;
 import org.example.functions.util.Mappers;
 
 import java.util.List;
@@ -35,27 +36,22 @@ public class ActivityLogTriggers {
         try {
             String body = request.getBody().orElse(null);
             if (body == null || body.isBlank()) {
-                return request.createResponseBuilder(HttpStatus.BAD_REQUEST)
-                    .header("Access-Control-Allow-Origin", "*")
-                    .body("Request body required.")
-                    .build();
+                return HttpHelper.cors(request.createResponseBuilder(HttpStatus.BAD_REQUEST))
+                    .body("Request body required.")                    .build();
             }
             @SuppressWarnings("unchecked")
             Map<String, Object> payload = OBJECT_MAPPER.readValue(body, Map.class);
             String message = (String) payload.getOrDefault("message", "");
             boolean isError = Boolean.TRUE.equals(payload.get("isError"));
             ActivityLog entry = ActivityLogService.getServiceInstance().writeLog(message, isError);
-            return request.createResponseBuilder(HttpStatus.OK)
-                .header("Access-Control-Allow-Origin", "*")
+            return HttpHelper.cors(request.createResponseBuilder(HttpStatus.OK))
                 .header("Content-Type", "application/json")
                 .body(OBJECT_MAPPER.writeValueAsString(entry))
                 .build();
         } catch (Exception e) {
             log.error("Error writing activity log", e);
-            return request.createResponseBuilder(HttpStatus.INTERNAL_SERVER_ERROR)
-                .header("Access-Control-Allow-Origin", "*")
-                .body("Failed to write log.")
-                .build();
+            return HttpHelper.cors(request.createResponseBuilder(HttpStatus.INTERNAL_SERVER_ERROR))
+                .body("Failed to write log.")                .build();
         }
     }
 
@@ -71,17 +67,14 @@ public class ActivityLogTriggers {
         log.info("Processing getActivityLogs.");
         try {
             List<ActivityLog> logs = ActivityLogService.getServiceInstance().getRecentLogs(100);
-            return request.createResponseBuilder(HttpStatus.OK)
-                .header("Access-Control-Allow-Origin", "*")
+            return HttpHelper.cors(request.createResponseBuilder(HttpStatus.OK))
                 .header("Content-Type", "application/json")
                 .body(OBJECT_MAPPER.writeValueAsString(logs))
                 .build();
         } catch (Exception e) {
             log.error("Error fetching activity logs", e);
-            return request.createResponseBuilder(HttpStatus.INTERNAL_SERVER_ERROR)
-                .header("Access-Control-Allow-Origin", "*")
-                .body("Failed to load logs.")
-                .build();
+            return HttpHelper.cors(request.createResponseBuilder(HttpStatus.INTERNAL_SERVER_ERROR))
+                .body("Failed to load logs.")                .build();
         }
     }
 }

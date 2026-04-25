@@ -24,13 +24,13 @@ public class AuditService {
 
     private final CosmosContainer auditLogsContainer;
 
-    private static AuditService SERVICE_INSTANCE;
+    /** Thread-safe lazy singleton via the initialization-on-demand holder idiom. */
+    private static class Holder {
+        private static final AuditService INSTANCE = new AuditService();
+    }
 
     public static AuditService getServiceInstance() {
-        if (Objects.isNull(SERVICE_INSTANCE)) {
-            SERVICE_INSTANCE = new AuditService();
-        }
-        return SERVICE_INSTANCE;
+        return Holder.INSTANCE;
     }
 
     public AuditService() {

@@ -14,13 +14,13 @@ import java.util.Objects;
 @Slf4j
 public class ImageResizeService {
 
-    private static ImageResizeService SERVICE_INSTANCE;
+    /** Thread-safe lazy singleton via the initialization-on-demand holder idiom. */
+    private static class Holder {
+        private static final ImageResizeService INSTANCE = new ImageResizeService();
+    }
 
     public static ImageResizeService getServiceInstance() {
-        if (Objects.isNull(SERVICE_INSTANCE)) {
-            SERVICE_INSTANCE = new ImageResizeService();
-        }
-        return SERVICE_INSTANCE;
+        return Holder.INSTANCE;
     }
 
     /** Resizes only if the image exceeds maxHeight. Returns original bytes unchanged if already small enough. */

@@ -29,13 +29,13 @@ public class UserService {
 
     private static final ObjectMapper OBJECT_MAPPER = Mappers.STANDARD;
     private final CosmosContainer usersContainer;
-    private static UserService SERVICE_INSTANCE;
+    /** Thread-safe lazy singleton via the initialization-on-demand holder idiom. */
+    private static class Holder {
+        private static final UserService INSTANCE = new UserService();
+    }
 
     public static UserService getServiceInstance() {
-        if (Objects.isNull(SERVICE_INSTANCE)) {
-            SERVICE_INSTANCE = new UserService();
-        }
-        return SERVICE_INSTANCE;
+        return Holder.INSTANCE;
     }
 
     public UserService() {

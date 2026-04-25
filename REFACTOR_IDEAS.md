@@ -4,7 +4,7 @@ Code-smell punch list from a read-only audit of the `fn-comic-db/` Java Azure Fu
 
 ## 1. Duplication / boilerplate
 
-- **CORS + error response repetition** — every trigger manually sets `Access-Control-Allow-Origin`, `Content-Type`, etc. Helpers like `cors()`, `unauthorized()`, `badRequest()` exist but aren't used consistently. A central `ResponseBuilder` would collapse a lot of code.
+- ~~**CORS + error response repetition** — every trigger manually sets `Access-Control-Allow-Origin`, `Content-Type`, etc. Helpers like `cors()`, `unauthorized()`, `badRequest()` exist but aren't used consistently. A central `ResponseBuilder` would collapse a lot of code.~~ ✅ **DONE** — `HttpHelper` extended with `cors()`, `unauthorized()`, `serverError()`, `badRequest()`, `notFound()`, `conflict()`. All 9 trigger-local `cors()`/`unauthorized()`/`serverError()` helpers now delegate to `HttpHelper`. ~46 hand-rolled CORS chains in `Comic/Image/ActivityLog/Audit/Validation/SearchTriggers` replaced with `HttpHelper.cors(...)`. Per-file `CORS_ORIGIN`/`CORS_HEADERS` constants removed.
 - **JSON field extraction repeats** without null checks — e.g. `AdminTriggers.java:157-159`, `CartTriggers.java:79-80`. A `HttpHelper.requireString(payload, "comicId")` helper would standardize this.
 - **Cosmos query → parse → list pattern** is copy-pasted in `CartService.java:57-65, 369-378, 386-394` and `ComicService`. A generic `<T> List<T> queryAndMap(SqlQuerySpec, Class<T>)` would consolidate it.
 - **try/catch shapes are nearly identical** across triggers (`CartTriggers` alone has ~10 copies). A functional wrapper like `safeHandle(() -> ...)` could centralize the catch ladder.
@@ -18,7 +18,7 @@ Code-smell punch list from a read-only audit of the `fn-comic-db/` Java Azure Fu
 ## 3. Singleton / DI coupling
 
 - `getServiceInstance()` is called in 50+ spots. A thin constructor-injection seam (no framework needed — just pass services into constructors) would make this testable.
-- `static SERVICE_INSTANCE` lazy init is **not thread-safe** in any service (e.g. `CartService.java:38`). Two cold-start threads could race. Use enum singleton or eager init.
+- ~~`static SERVICE_INSTANCE` lazy init is **not thread-safe** in any service (e.g. `CartService.java:38`). Two cold-start threads could race. Use enum singleton or eager init.~~ ✅ **DONE** — all 10 services (Cart, Comic, Bid, Discount, Archive, Email, Audit, Image, ImageResize, ActivityLog, User) now use the initialization-on-demand holder idiom. Thread-safe by JLS class-init guarantees, no synchronization overhead, still lazy.
 - Services pull in many other services (`CartService` → `Comic/Bid/Discount/Archive/Email/Audit/Image/ActivityLog/User`). The graph is invisible unless you read every method.
 
 ## 4. Error handling
@@ -38,7 +38,7 @@ Code-smell punch list from a read-only audit of the `fn-comic-db/` Java Azure Fu
 
 - ~~Cart status values (`"OPEN"`, `"FINALIZING"`, `"FINALIZED"`, `"FULFILLED"`, `"DELETED"`) and payment status (`"PAID"`, `"UNPAID"`) are bare strings scattered across services and triggers. **A `CartStatus` enum with `@JsonValue` would prevent typos** — but the values would need to match what the frontend reads, so flag this as frontend-coupled.~~ ✅ **DONE** — `CartStatus` and `PaymentStatus` enums added with `@JsonValue`/`@JsonCreator`; field types tightened in `Cart` and `ArchivedOrder`; all string literals replaced. JSON wire format verified byte-identical.
 - Container names in `CosmosDbClient.java` aren't centralized constants.
-- Email subjects/bodies hardcoded inline in `CartService.java:696-813` — pull out to a `MessageTemplates` class or properties file.
+- ~~Email subjects/bodies hardcoded inline in `CartService.java:696-813` — pull out to a `MessageTemplates` class or properties file.~~ ✅ **DONE** — moved into `org.example.functions.email.EmailTemplates` with one method per email returning a `(subject, body)` record. `CartService` shrunk from 838 → 784 lines; `ArchiveService.sendArchivedPaymentReceivedEmail` also delegates. Sets up future migration to a properties file or templating engine.
 - `EnvHelper` defaults (20, 10, 500, 7) lack inline javadoc explaining the units/intent.
 
 ## 7. Validation
@@ -107,3 +107,13 @@ Three that give the most leverage with the least frontend risk:
 ### Verification
 
 Built with `mvn clean package` (Java 17), all 29 existing unit tests pass, and a JSON probe confirmed `Cart`/`ArchivedOrder` serialization is byte-identical to the previous string-based representation (no `etag` field leaks into responses).
+
+---
+
+## Round 2 (Apr 2026)
+
+1. ~~**Thread-safe singleton init across all services**~~ ✅ **DONE** — initialization-on-demand holder idiom in all 10 services.
+2. ~~**Adopt `HttpHelper` response builders across all triggers**~~ ✅ **DONE** — ~46 hand-rolled CORS chains and 9 private helpers collapsed to delegations.
+3. ~~**Extract email templates from `CartService` and `ArchiveService`**~~ ✅ **DONE** — new `email.EmailTemplates` class; `CartService` down to 784 lines.
+
+Verified: `mvn test` passes (29/29), compile clean, no behavior change.

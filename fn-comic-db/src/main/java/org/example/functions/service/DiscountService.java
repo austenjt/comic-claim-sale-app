@@ -29,13 +29,13 @@ public class DiscountService {
 
     private static final ObjectMapper OBJECT_MAPPER = Mappers.STANDARD;
     private final CosmosContainer discountsContainer;
-    private static DiscountService SERVICE_INSTANCE;
+    /** Thread-safe lazy singleton via the initialization-on-demand holder idiom. */
+    private static class Holder {
+        private static final DiscountService INSTANCE = new DiscountService();
+    }
 
     public static DiscountService getServiceInstance() {
-        if (Objects.isNull(SERVICE_INSTANCE)) {
-            SERVICE_INSTANCE = new DiscountService();
-        }
-        return SERVICE_INSTANCE;
+        return Holder.INSTANCE;
     }
 
     public DiscountService() {

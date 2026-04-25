@@ -22,13 +22,13 @@ public class ImageService {
 
     private final CosmosContainer imagesContainer;
 
-    private static ImageService SERVICE_INSTANCE;
+    /** Thread-safe lazy singleton via the initialization-on-demand holder idiom. */
+    private static class Holder {
+        private static final ImageService INSTANCE = new ImageService();
+    }
 
     public static ImageService getServiceInstance() {
-        if (Objects.isNull(SERVICE_INSTANCE)) {
-            SERVICE_INSTANCE = new ImageService();
-        }
-        return SERVICE_INSTANCE;
+        return Holder.INSTANCE;
     }
 
     public ImageService() {

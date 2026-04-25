@@ -44,13 +44,13 @@ public class ComicService {
 
     private final CosmosContainer comicsContainer;
 
-    private static ComicService SERVICE_INSTANCE;
+    /** Thread-safe lazy singleton via the initialization-on-demand holder idiom. */
+    private static class Holder {
+        private static final ComicService INSTANCE = new ComicService();
+    }
 
     public static ComicService getServiceInstance() {
-        if (Objects.isNull(SERVICE_INSTANCE)) {
-            SERVICE_INSTANCE = new ComicService();
-        }
-        return SERVICE_INSTANCE;
+        return Holder.INSTANCE;
     }
 
     public ComicService() {

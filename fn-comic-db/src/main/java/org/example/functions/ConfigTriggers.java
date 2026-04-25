@@ -15,6 +15,7 @@ import org.example.functions.model.enums.CoverVariant;
 import org.example.functions.model.enums.GradingCompany;
 import org.example.functions.model.enums.PageQuality;
 import org.example.functions.util.EnvHelper;
+import org.example.functions.util.HttpHelper;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -26,8 +27,6 @@ import java.util.Optional;
 public class ConfigTriggers {
 
     private static final ObjectMapper OBJECT_MAPPER = Mappers.STANDARD;
-    private static final String CORS_ORIGIN  = "*";
-    private static final String CORS_HEADERS = "Authorization, Content-Type";
 
     @FunctionName("getConfig")
     public HttpResponseMessage getConfig(
@@ -86,9 +85,8 @@ public class ConfigTriggers {
         }
     }
 
+    /** Thin wrapper delegating to {@link HttpHelper#cors}. */
     private HttpResponseMessage.Builder cors(HttpResponseMessage.Builder b) {
-        return b.header("Access-Control-Allow-Origin", CORS_ORIGIN)
-                .header("Access-Control-Allow-Headers", CORS_HEADERS)
-                .header("Access-Control-Allow-Methods", "*");
+        return HttpHelper.cors(b);
     }
 }

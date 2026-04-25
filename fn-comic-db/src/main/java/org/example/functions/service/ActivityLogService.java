@@ -24,13 +24,13 @@ public class ActivityLogService {
 
     private final CosmosContainer container;
 
-    private static ActivityLogService SERVICE_INSTANCE;
+    /** Thread-safe lazy singleton via the initialization-on-demand holder idiom. */
+    private static class Holder {
+        private static final ActivityLogService INSTANCE = new ActivityLogService();
+    }
 
     public static ActivityLogService getServiceInstance() {
-        if (Objects.isNull(SERVICE_INSTANCE)) {
-            SERVICE_INSTANCE = new ActivityLogService();
-        }
-        return SERVICE_INSTANCE;
+        return Holder.INSTANCE;
     }
 
     public ActivityLogService() {

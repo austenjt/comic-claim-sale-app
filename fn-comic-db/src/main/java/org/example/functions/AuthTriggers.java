@@ -15,6 +15,7 @@ import org.example.functions.model.User;
 import org.example.functions.model.UserIdentity;
 import org.example.functions.model.UserStatus;
 import org.example.functions.service.UserService;
+import org.example.functions.util.HttpHelper;
 import org.example.functions.util.Mappers;
 
 import java.util.Optional;
@@ -33,8 +34,6 @@ import java.util.Optional;
 public class AuthTriggers {
 
     private static final ObjectMapper OBJECT_MAPPER = Mappers.STANDARD;
-    private static final String CORS_ORIGIN  = "*";
-    private static final String CORS_HEADERS = "Authorization, Content-Type";
 
     @FunctionName("authMe")
     public HttpResponseMessage authMe(
@@ -137,10 +136,8 @@ public class AuthTriggers {
         return node;
     }
 
+    /** Thin wrapper delegating to {@link HttpHelper#cors}. */
     private HttpResponseMessage.Builder cors(HttpResponseMessage.Builder builder) {
-        return builder
-            .header("Access-Control-Allow-Origin",  CORS_ORIGIN)
-            .header("Access-Control-Allow-Headers", CORS_HEADERS)
-            .header("Access-Control-Allow-Methods", "*");
+        return HttpHelper.cors(builder);
     }
 }

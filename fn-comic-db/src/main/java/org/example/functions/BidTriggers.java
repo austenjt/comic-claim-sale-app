@@ -26,8 +26,6 @@ import java.util.Optional;
 public class BidTriggers {
 
     private static final ObjectMapper OBJECT_MAPPER = Mappers.STANDARD;
-    private static final String CORS_ORIGIN  = "*";
-    private static final String CORS_HEADERS = "Authorization, Content-Type";
 
     // ─── POST /api/bid/cancel ─────────────────────────────────────────────────
     // Admin-only: cancel an opened bid before any user has bid. Resets to pre-opened state.
@@ -219,23 +217,22 @@ public class BidTriggers {
     }
 
     // ─── Helpers ──────────────────────────────────────────────────────────────
+    //
+    // Thin wrappers delegating to HttpHelper so existing call sites don't need to change.
 
     private HttpResponseMessage.Builder cors(HttpResponseMessage.Builder b) {
-        return b.header("Access-Control-Allow-Origin", CORS_ORIGIN)
-                .header("Access-Control-Allow-Headers", CORS_HEADERS)
-                .header("Access-Control-Allow-Methods", "*");
+        return HttpHelper.cors(b);
     }
 
     private HttpResponseMessage unauthorized(HttpRequestMessage<?> request) {
-        return cors(request.createResponseBuilder(HttpStatus.UNAUTHORIZED)).body("Unauthorized").build();
+        return HttpHelper.unauthorized(request);
     }
 
     private HttpResponseMessage badRequest(HttpRequestMessage<?> request, String msg) {
-        return cors(request.createResponseBuilder(HttpStatus.BAD_REQUEST)).body(msg).build();
+        return HttpHelper.badRequest(request, msg);
     }
 
     private HttpResponseMessage serverError(HttpRequestMessage<?> request, Exception e) {
-        return cors(request.createResponseBuilder(HttpStatus.INTERNAL_SERVER_ERROR))
-            .body(e.getMessage()).build();
+        return HttpHelper.serverError(request, e);
     }
 }

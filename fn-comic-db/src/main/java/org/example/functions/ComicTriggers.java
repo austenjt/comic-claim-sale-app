@@ -59,9 +59,7 @@ public class ComicTriggers {
                 String body = admin
                     ? OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(paged)
                     : OBJECT_MAPPER.writerWithView(Views.Public.class).writeValueAsString(paged);
-                return request.createResponseBuilder(HttpStatus.OK)
-                    .header("Access-Control-Allow-Origin", "*")
-                    .header("Access-Control-Allow-Methods", "*")
+                return HttpHelper.cors(request.createResponseBuilder(HttpStatus.OK))
                     .header("Content-Type", "application/json")
                     .body(body)
                     .build();
@@ -71,9 +69,7 @@ public class ComicTriggers {
                 String body = admin
                     ? OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(comicBookData)
                     : OBJECT_MAPPER.writerWithView(Views.Public.class).writeValueAsString(comicBookData);
-                return request.createResponseBuilder(HttpStatus.OK)
-                    .header("Access-Control-Allow-Origin", "*")
-                    .header("Access-Control-Allow-Methods", "*")
+                return HttpHelper.cors(request.createResponseBuilder(HttpStatus.OK))
                     .header("Content-Type", "application/json")
                     .body(body)
                     .build();
@@ -100,8 +96,7 @@ public class ComicTriggers {
         try {
             List<String> series = ComicService.getServiceInstance().getUniqueSeries();
             String body = OBJECT_MAPPER.writeValueAsString(series);
-            return request.createResponseBuilder(HttpStatus.OK)
-                .header("Access-Control-Allow-Origin", "*")
+            return HttpHelper.cors(request.createResponseBuilder(HttpStatus.OK))
                 .header("Content-Type", "application/json")
                 .body(body)
                 .build();
@@ -124,9 +119,7 @@ public class ComicTriggers {
         ComicService comicService = ComicService.getServiceInstance();
         Optional<ComicBook> matchingComic = comicService.getComicById(Integer.parseInt(id));
         if (matchingComic.isEmpty()) {
-            return request.createResponseBuilder(HttpStatus.NOT_FOUND)
-                .header("Access-Control-Allow-Origin", "*")
-                .header("Access-Control-Allow-Methods", "*")
+            return HttpHelper.cors(request.createResponseBuilder(HttpStatus.NOT_FOUND))
                 .header("Content-Type", "text/plain")
                 .body(String.format("Comic with id %s not found.", id))
                 .build();
@@ -143,9 +136,7 @@ public class ComicTriggers {
             String body = admin
                 ? OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(comic)
                 : OBJECT_MAPPER.writerWithView(Views.Public.class).writeValueAsString(comic);
-            return request.createResponseBuilder(HttpStatus.OK)
-                .header("Access-Control-Allow-Origin", "*")
-                .header("Access-Control-Allow-Methods", "*")
+            return HttpHelper.cors(request.createResponseBuilder(HttpStatus.OK))
                 .header("Content-Type", "application/json")
                 .body(body)
                 .build();
@@ -177,9 +168,7 @@ public class ComicTriggers {
         }
         String editedBy = admin != null ? admin.getEmail() : null;
         ComicBook successfulUpdate = comicService.updateComic(updatedComicBook, editedBy);
-        return request.createResponseBuilder(HttpStatus.OK)
-            .header("Access-Control-Allow-Origin", "*")
-            .header("Access-Control-Allow-Methods", "*")
+        return HttpHelper.cors(request.createResponseBuilder(HttpStatus.OK))
             .header("Content-Type", "application/json")
             .body(successfulUpdate)
             .build();
@@ -202,9 +191,7 @@ public class ComicTriggers {
             Optional<String> optionalId = Optional.ofNullable(request.getQueryParameters().get("id"));
             optionalId.ifPresent(s -> newComicBook.setId(Integer.parseInt(s)));
             ComicBook addedComicBook = comicService.createComic(newComicBook);
-            return request.createResponseBuilder(HttpStatus.OK)
-                .header("Access-Control-Allow-Origin", "*")
-                .header("Access-Control-Allow-Methods", "*")
+            return HttpHelper.cors(request.createResponseBuilder(HttpStatus.OK))
                 .header("Content-Type", "application/json")
                 .body(OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(addedComicBook))
                 .build();
@@ -264,10 +251,7 @@ public class ComicTriggers {
                     }
                 }
             } else {
-                return request.createResponseBuilder(HttpStatus.NOT_FOUND)
-                    .header("Access-Control-Allow-Origin", "*")
-                    .header("Access-Control-Allow-Methods", "*")
-                    .header("Access-Control-Allow-Headers", "Content-Type")
+                return HttpHelper.cors(request.createResponseBuilder(HttpStatus.NOT_FOUND))
                     .header("Content-Type", "application/json")
                     .body(String.format("{ \"deleted\": \"%s\", \"id\": %s }", false, targetId))
                     .build();
@@ -276,10 +260,7 @@ public class ComicTriggers {
             log.error("deleteComic error", e);
             return HttpHelper.errorResponse(request, e);
         }
-        return request.createResponseBuilder(HttpStatus.OK)
-            .header("Access-Control-Allow-Origin", "*")
-            .header("Access-Control-Allow-Methods", "*")
-            .header("Access-Control-Allow-Headers", "Content-Type")
+        return HttpHelper.cors(request.createResponseBuilder(HttpStatus.OK))
             .header("Content-Type", "application/json")
             .body(String.format("{ \"deleted\": \"%s\", \"id\": %d }", true, targetId))
             .build();
@@ -296,28 +277,21 @@ public class ComicTriggers {
     {
         log.info("Processing deleteSet function for collectionGroup={}", collectionGroupStr);
         if (!AuthHelper.isAdminRequest(request)) {
-            return request.createResponseBuilder(HttpStatus.FORBIDDEN)
-                .header("Access-Control-Allow-Origin", "*")
-                .body("Admin access required.")
-                .build();
+            return HttpHelper.cors(request.createResponseBuilder(HttpStatus.FORBIDDEN))
+                .body("Admin access required.")                .build();
         }
         try {
             int collectionGroup = Integer.parseInt(collectionGroupStr);
             if (CartService.getServiceInstance().isSetClaimed(collectionGroup)) {
-                return request.createResponseBuilder(HttpStatus.CONFLICT)
-                    .header("Access-Control-Allow-Origin", "*")
-                    .body("This set is currently claimed by a user. Release all items before deleting.")
-                    .build();
+                return HttpHelper.cors(request.createResponseBuilder(HttpStatus.CONFLICT))
+                    .body("This set is currently claimed by a user. Release all items before deleting.")                    .build();
             }
             if (ArchiveService.getServiceInstance().hasArchivedOrderForGroup(collectionGroup)) {
-                return request.createResponseBuilder(HttpStatus.CONFLICT)
-                    .header("Access-Control-Allow-Origin", "*")
-                    .body("This set has a fulfilled archived order. Use 'Full Delete' on the archived order to remove the set.")
-                    .build();
+                return HttpHelper.cors(request.createResponseBuilder(HttpStatus.CONFLICT))
+                    .body("This set has a fulfilled archived order. Use 'Full Delete' on the archived order to remove the set.")                    .build();
             }
             ComicService.getServiceInstance().deleteSet(collectionGroup);
-            return request.createResponseBuilder(HttpStatus.OK)
-                .header("Access-Control-Allow-Origin", "*")
+            return HttpHelper.cors(request.createResponseBuilder(HttpStatus.OK))
                 .header("Content-Type", "application/json")
                 .body(String.format("{ \"deleted\": true, \"collectionGroup\": %d }", collectionGroup))
                 .build();
@@ -338,22 +312,17 @@ public class ComicTriggers {
     {
         log.info("Processing deleteSetFully function for collectionGroup={}", collectionGroupStr);
         if (!AuthHelper.isAdminRequest(request)) {
-            return request.createResponseBuilder(HttpStatus.FORBIDDEN)
-                .header("Access-Control-Allow-Origin", "*")
-                .body("Admin access required.")
-                .build();
+            return HttpHelper.cors(request.createResponseBuilder(HttpStatus.FORBIDDEN))
+                .body("Admin access required.")                .build();
         }
         try {
             int collectionGroup = Integer.parseInt(collectionGroupStr);
             if (CartService.getServiceInstance().isSetClaimed(collectionGroup)) {
-                return request.createResponseBuilder(HttpStatus.CONFLICT)
-                    .header("Access-Control-Allow-Origin", "*")
-                    .body("This set is currently claimed by a user. Release all items before deleting.")
-                    .build();
+                return HttpHelper.cors(request.createResponseBuilder(HttpStatus.CONFLICT))
+                    .body("This set is currently claimed by a user. Release all items before deleting.")                    .build();
             }
             ComicService.getServiceInstance().deleteSetFully(collectionGroup);
-            return request.createResponseBuilder(HttpStatus.OK)
-                .header("Access-Control-Allow-Origin", "*")
+            return HttpHelper.cors(request.createResponseBuilder(HttpStatus.OK))
                 .header("Content-Type", "application/json")
                 .body(String.format("{ \"deleted\": true, \"collectionGroup\": %d }", collectionGroup))
                 .build();
@@ -374,25 +343,20 @@ public class ComicTriggers {
     {
         log.info("Processing getSets function.");
         if (!AuthHelper.isAdminRequest(request)) {
-            return request.createResponseBuilder(HttpStatus.FORBIDDEN)
-                .header("Access-Control-Allow-Origin", "*")
-                .body("Admin access required.")
-                .build();
+            return HttpHelper.cors(request.createResponseBuilder(HttpStatus.FORBIDDEN))
+                .body("Admin access required.")                .build();
         }
         try {
             List<ComicBook> sets = ComicService.getServiceInstance().getSetsList();
             String body = OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(sets);
-            return request.createResponseBuilder(HttpStatus.OK)
-                .header("Access-Control-Allow-Origin", "*")
+            return HttpHelper.cors(request.createResponseBuilder(HttpStatus.OK))
                 .header("Content-Type", "application/json")
                 .body(body)
                 .build();
         } catch (JsonProcessingException e) {
             log.error("Error in getSets.", e);
-            return request.createResponseBuilder(HttpStatus.INTERNAL_SERVER_ERROR)
-                .header("Access-Control-Allow-Origin", "*")
-                .body(e.getMessage())
-                .build();
+            return HttpHelper.cors(request.createResponseBuilder(HttpStatus.INTERNAL_SERVER_ERROR))
+                .body(e.getMessage())                .build();
         }
     }
 
@@ -407,10 +371,8 @@ public class ComicTriggers {
     {
         log.info("Processing getNextSetGroupId function.");
         if (!AuthHelper.isAdminRequest(request)) {
-            return request.createResponseBuilder(HttpStatus.FORBIDDEN)
-                .header("Access-Control-Allow-Origin", "*")
-                .body("Admin access required.")
-                .build();
+            return HttpHelper.cors(request.createResponseBuilder(HttpStatus.FORBIDDEN))
+                .body("Admin access required.")                .build();
         }
         try {
             // Max across currently active sets
@@ -421,17 +383,14 @@ public class ComicTriggers {
             // Max across all archived (fulfilled) orders
             int archivedMax = ArchiveService.getServiceInstance().getMaxCollectionGroup();
             int next = Math.max(activeMax, archivedMax) + 1;
-            return request.createResponseBuilder(HttpStatus.OK)
-                .header("Access-Control-Allow-Origin", "*")
+            return HttpHelper.cors(request.createResponseBuilder(HttpStatus.OK))
                 .header("Content-Type", "application/json")
                 .body("{\"nextGroupId\":" + next + "}")
                 .build();
         } catch (Exception e) {
             log.error("Error in getNextSetGroupId.", e);
-            return request.createResponseBuilder(HttpStatus.INTERNAL_SERVER_ERROR)
-                .header("Access-Control-Allow-Origin", "*")
-                .body(e.getMessage())
-                .build();
+            return HttpHelper.cors(request.createResponseBuilder(HttpStatus.INTERNAL_SERVER_ERROR))
+                .body(e.getMessage())                .build();
         }
     }
 
@@ -446,25 +405,20 @@ public class ComicTriggers {
     {
         log.info("Processing getSingleComics function.");
         if (!AuthHelper.isAdminRequest(request)) {
-            return request.createResponseBuilder(HttpStatus.FORBIDDEN)
-                .header("Access-Control-Allow-Origin", "*")
-                .body("Admin access required.")
-                .build();
+            return HttpHelper.cors(request.createResponseBuilder(HttpStatus.FORBIDDEN))
+                .body("Admin access required.")                .build();
         }
         try {
             List<ComicBook> singles = ComicService.getServiceInstance().getSingleComics();
             String body = OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(singles);
-            return request.createResponseBuilder(HttpStatus.OK)
-                .header("Access-Control-Allow-Origin", "*")
+            return HttpHelper.cors(request.createResponseBuilder(HttpStatus.OK))
                 .header("Content-Type", "application/json")
                 .body(body)
                 .build();
         } catch (JsonProcessingException e) {
             log.error("Error in getSingleComics.", e);
-            return request.createResponseBuilder(HttpStatus.INTERNAL_SERVER_ERROR)
-                .header("Access-Control-Allow-Origin", "*")
-                .body(e.getMessage())
-                .build();
+            return HttpHelper.cors(request.createResponseBuilder(HttpStatus.INTERNAL_SERVER_ERROR))
+                .body(e.getMessage())                .build();
         }
     }
 

@@ -45,9 +45,7 @@ public class ImageTriggers {
             ImageService imageService = ImageService.getServiceInstance();
 
             List<String> imageData = imageService.getImagesList();
-            return request.createResponseBuilder(HttpStatus.OK)
-                .header("Access-Control-Allow-Origin", "*")
-                .header("Access-Control-Allow-Methods", "*")
+            return HttpHelper.cors(request.createResponseBuilder(HttpStatus.OK))
                 .header("Content-Type", "application/json")
                 .body(imageData)
                 .build();
@@ -71,11 +69,8 @@ public class ImageTriggers {
             ImageService imageService = ImageService.getServiceInstance();
             byte[] imageData = imageService.getImageByName(name);
 
-            return request.createResponseBuilder(HttpStatus.OK)
-                .header("Access-Control-Allow-Origin", "*")
-                .header("Access-Control-Allow-Methods", "*")
-                .header("Content-Type", getMimeType(name))
-                .body(imageData)
+            return HttpHelper.cors(request.createResponseBuilder(HttpStatus.OK))
+                .header("Content-Type", getMimeType(name))                .body(imageData)
                 .build();
         } catch (Exception e) {
             log.error("Severe error processing getImageByName.", e);
@@ -122,16 +117,12 @@ public class ImageTriggers {
             byte[] imageData = files.get(0); // Assuming first file is the image
             log.info("Before upload, image size is: " + imageData.length);
             String result = imageService.updateImage(name, imageData, force);
-            return request.createResponseBuilder(HttpStatus.OK)
-                .header("Access-Control-Allow-Origin", "*")
-                .header("Access-Control-Allow-Methods", "*")
+            return HttpHelper.cors(request.createResponseBuilder(HttpStatus.OK))
                 .header("Content-Type", "text/plain")
                 .body(result)
                 .build();
         } catch (Exception e) {
-            return request.createResponseBuilder(HttpStatus.INTERNAL_SERVER_ERROR)
-                .header("Access-Control-Allow-Origin", "*")
-                .header("Access-Control-Allow-Methods", "*")
+            return HttpHelper.cors(request.createResponseBuilder(HttpStatus.INTERNAL_SERVER_ERROR))
                 .header("Content-Type", "text/plain")
                 .body("Error: " + e.getMessage())
                 .build();
@@ -219,17 +210,13 @@ public class ImageTriggers {
             }
             ComicBook updated = comicService.updateComic(comic);
 
-            return request.createResponseBuilder(HttpStatus.OK)
-                .header("Access-Control-Allow-Origin", "*")
-                .header("Access-Control-Allow-Methods", "*")
+            return HttpHelper.cors(request.createResponseBuilder(HttpStatus.OK))
                 .header("Content-Type", "application/json")
                 .body(OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(updated))
                 .build();
         } catch (Exception e) {
             log.error("Error in uploadComicImage.", e);
-            return request.createResponseBuilder(HttpStatus.INTERNAL_SERVER_ERROR)
-                .header("Access-Control-Allow-Origin", "*")
-                .header("Access-Control-Allow-Methods", "*")
+            return HttpHelper.cors(request.createResponseBuilder(HttpStatus.INTERNAL_SERVER_ERROR))
                 .header("Content-Type", "text/plain")
                 .body("Error: " + e.getMessage())
                 .build();
@@ -296,17 +283,13 @@ public class ImageTriggers {
             }
             ComicBook updated = comicService.updateComic(comic);
 
-            return request.createResponseBuilder(HttpStatus.OK)
-                .header("Access-Control-Allow-Origin", "*")
-                .header("Access-Control-Allow-Methods", "*")
+            return HttpHelper.cors(request.createResponseBuilder(HttpStatus.OK))
                 .header("Content-Type", "application/json")
                 .body(OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(updated))
                 .build();
         } catch (Exception e) {
             log.error("Error in uploadComicBackImage.", e);
-            return request.createResponseBuilder(HttpStatus.INTERNAL_SERVER_ERROR)
-                .header("Access-Control-Allow-Origin", "*")
-                .header("Access-Control-Allow-Methods", "*")
+            return HttpHelper.cors(request.createResponseBuilder(HttpStatus.INTERNAL_SERVER_ERROR))
                 .header("Content-Type", "text/plain")
                 .body("Error: " + e.getMessage())
                 .build();
@@ -326,16 +309,12 @@ public class ImageTriggers {
         try {
             ImageService imageService = ImageService.getServiceInstance();
             String result = imageService.deleteImage(name);
-            return request.createResponseBuilder(HttpStatus.OK)
-                .header("Access-Control-Allow-Origin", "*")
-                .header("Access-Control-Allow-Methods", "*")
+            return HttpHelper.cors(request.createResponseBuilder(HttpStatus.OK))
                 .header("Content-Type", "text/plain")
                 .body(result)
                 .build();
         } catch (Exception e) {
-            return request.createResponseBuilder(HttpStatus.INTERNAL_SERVER_ERROR)
-                .header("Access-Control-Allow-Origin", "*")
-                .header("Access-Control-Allow-Methods", "*")
+            return HttpHelper.cors(request.createResponseBuilder(HttpStatus.INTERNAL_SERVER_ERROR))
                 .header("Content-Type", "text/plain")
                 .body("Error: " + e.getMessage())
                 .build();

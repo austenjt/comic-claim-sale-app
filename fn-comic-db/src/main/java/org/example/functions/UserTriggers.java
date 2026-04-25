@@ -26,8 +26,6 @@ public class UserTriggers {
 
     private static final ObjectMapper OBJECT_MAPPER = Mappers.STANDARD;
 
-    private static final String CORS_ORIGIN  = "*";
-    private static final String CORS_HEADERS = "Authorization, Content-Type";
 
     // ─── GET /api/users/me ───────────────────────────────────────────────────
 
@@ -293,10 +291,8 @@ public class UserTriggers {
         return node;
     }
 
+    /** Thin wrapper delegating to {@link HttpHelper#cors}. */
     private HttpResponseMessage.Builder cors(HttpResponseMessage.Builder builder) {
-        return builder
-            .header("Access-Control-Allow-Origin",  CORS_ORIGIN)
-            .header("Access-Control-Allow-Headers", CORS_HEADERS)
-            .header("Access-Control-Allow-Methods", "*");
+        return HttpHelper.cors(builder);
     }
 }

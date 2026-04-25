@@ -22,8 +22,6 @@ import java.util.Optional;
 public class ContactTriggers {
 
     private static final ObjectMapper OBJECT_MAPPER = Mappers.STANDARD;
-    private static final String CORS_ORIGIN = "*";
-    private static final String CORS_HEADERS = "Authorization, Content-Type";
 
     // ─── POST /api/contact ────────────────────────────────────────────────────
 
@@ -79,9 +77,8 @@ public class ContactTriggers {
         }
     }
 
+    /** Thin wrapper delegating to {@link HttpHelper#cors}. */
     private HttpResponseMessage.Builder cors(HttpResponseMessage.Builder b) {
-        return b.header("Access-Control-Allow-Origin", CORS_ORIGIN)
-                .header("Access-Control-Allow-Headers", CORS_HEADERS)
-                .header("Access-Control-Allow-Methods", "*");
+        return HttpHelper.cors(b);
     }
 }

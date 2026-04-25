@@ -18,13 +18,13 @@ import java.util.Objects;
 @Slf4j
 public class BidService {
 
-    private static BidService SERVICE_INSTANCE;
+    /** Thread-safe lazy singleton via the initialization-on-demand holder idiom. */
+    private static class Holder {
+        private static final BidService INSTANCE = new BidService();
+    }
 
     public static BidService getServiceInstance() {
-        if (Objects.isNull(SERVICE_INSTANCE)) {
-            SERVICE_INSTANCE = new BidService();
-        }
-        return SERVICE_INSTANCE;
+        return Holder.INSTANCE;
     }
 
     /**

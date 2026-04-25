@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.functions.model.Discount;
 import org.example.functions.service.DiscountService;
 import org.example.functions.util.AuthHelper;
+import org.example.functions.util.HttpHelper;
 import org.example.functions.util.Mappers;
 
 import java.util.List;
@@ -22,8 +23,6 @@ import java.util.Optional;
 public class DiscountTriggers {
 
     private static final ObjectMapper OBJECT_MAPPER = Mappers.STANDARD;
-    private static final String CORS_ORIGIN = "*";
-    private static final String CORS_HEADERS = "Authorization, Content-Type";
 
     // ─── GET /api/discounts ───────────────────────────────────────────────────
 
@@ -110,20 +109,19 @@ public class DiscountTriggers {
     }
 
     // ─── Helpers ──────────────────────────────────────────────────────────────
+    //
+    // These thin wrappers delegate to HttpHelper so call sites in this trigger keep their
+    // current shape. New triggers should call HttpHelper directly.
 
     private HttpResponseMessage.Builder cors(HttpResponseMessage.Builder b) {
-        return b.header("Access-Control-Allow-Origin", CORS_ORIGIN)
-                .header("Access-Control-Allow-Headers", CORS_HEADERS)
-                .header("Access-Control-Allow-Methods", "*");
+        return HttpHelper.cors(b);
     }
 
     private HttpResponseMessage unauthorized(HttpRequestMessage<?> request) {
-        return cors(request.createResponseBuilder(HttpStatus.UNAUTHORIZED))
-            .body("Unauthorized").build();
+        return HttpHelper.unauthorized(request);
     }
 
     private HttpResponseMessage serverError(HttpRequestMessage<?> request, Exception e) {
-        return cors(request.createResponseBuilder(HttpStatus.INTERNAL_SERVER_ERROR))
-            .body(e.getMessage()).build();
+        return HttpHelper.serverError(request, e);
     }
 }

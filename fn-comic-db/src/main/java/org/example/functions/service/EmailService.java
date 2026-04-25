@@ -16,13 +16,13 @@ import java.util.Properties;
 @Slf4j
 public class EmailService {
 
-    private static EmailService SERVICE_INSTANCE;
+    /** Thread-safe lazy singleton via the initialization-on-demand holder idiom. */
+    private static class Holder {
+        private static final EmailService INSTANCE = new EmailService();
+    }
 
     public static EmailService getServiceInstance() {
-        if (SERVICE_INSTANCE == null) {
-            SERVICE_INSTANCE = new EmailService();
-        }
-        return SERVICE_INSTANCE;
+        return Holder.INSTANCE;
     }
 
     /**

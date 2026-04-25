@@ -10,6 +10,7 @@ import com.microsoft.azure.functions.annotation.FunctionName;
 import com.microsoft.azure.functions.annotation.HttpTrigger;
 import lombok.extern.slf4j.Slf4j;
 import org.example.functions.model.enums.NumberSentinel;
+import org.example.functions.util.HttpHelper;
 import org.example.functions.util.Mappers;
 
 import java.util.Arrays;
@@ -113,18 +114,14 @@ public class ValidationTriggers {
 
     private HttpResponseMessage buildResponse(HttpRequestMessage<?> request, Map<String, Object> body) {
         try {
-            return request.createResponseBuilder(HttpStatus.OK)
-                .header("Access-Control-Allow-Origin", "*")
-                .header("Access-Control-Allow-Methods", "*")
+            return HttpHelper.cors(request.createResponseBuilder(HttpStatus.OK))
                 .header("Content-Type", "application/json")
                 .body(OBJECT_MAPPER.writeValueAsString(body))
                 .build();
         } catch (Exception e) {
             log.error("Error serializing validateComicNumber response", e);
-            return request.createResponseBuilder(HttpStatus.INTERNAL_SERVER_ERROR)
-                .header("Access-Control-Allow-Origin", "*")
-                .body("Serialization error")
-                .build();
+            return HttpHelper.cors(request.createResponseBuilder(HttpStatus.INTERNAL_SERVER_ERROR))
+                .body("Serialization error")                .build();
         }
     }
 }

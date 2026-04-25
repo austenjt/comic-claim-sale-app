@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.extern.slf4j.Slf4j;
 import org.example.functions.client.CosmosDbClient;
+import org.example.functions.email.EmailTemplates;
 import org.example.functions.model.ArchivedOrder;
 import org.example.functions.util.Mappers;
 import org.example.functions.model.ArchivedOrderItem;
@@ -26,13 +27,13 @@ public class ArchiveService {
 
     private static final ObjectMapper OBJECT_MAPPER = Mappers.STANDARD;
     private final CosmosContainer archivedOrdersContainer;
-    private static ArchiveService SERVICE_INSTANCE;
+    /** Thread-safe lazy singleton via the initialization-on-demand holder idiom. */
+    private static class Holder {
+        private static final ArchiveService INSTANCE = new ArchiveService();
+    }
 
     public static ArchiveService getServiceInstance() {
-        if (Objects.isNull(SERVICE_INSTANCE)) {
-            SERVICE_INSTANCE = new ArchiveService();
-        }
-        return SERVICE_INSTANCE;
+        return Holder.INSTANCE;
     }
 
     public ArchiveService() {
@@ -98,35 +99,10 @@ public class ArchiveService {
     private void sendArchivedPaymentReceivedEmail(ArchivedOrder order) {
         if (order.getUserEmail() == null) return;
         try {
-            StringBuilder sb = new StringBuilder();
-            double subtotal = 0;
-            for (ArchivedOrderItem item : order.getItems()) {
-                if (item.getPrice() == 0) continue;
-                String num = item.getComicNumber() != null ? " " + item.getComicNumber() : "";
-                sb.append(String.format("  %s%s — $%.2f%n", item.getComicTitle(), num, item.getPrice()));
-                subtotal += item.getPrice();
-            }
-            sb.append(String.format("%nSubtotal: $%.2f%n", subtotal));
-            if (order.getShippingCost() > 0) {
-                sb.append(String.format("Shipping: $%.2f%n", order.getShippingCost()));
-            }
-            if (order.getDiscountAmount() > 0) {
-                String desc = order.getDiscountDescription() != null ? " (" + order.getDiscountDescription() + ")" : "";
-                sb.append(String.format("Discount%s: -$%.2f%n", desc, order.getDiscountAmount()));
-            }
-            double total = subtotal + order.getShippingCost() - order.getDiscountAmount();
-            sb.append(String.format("Total: $%.2f%n", total));
-
-            String body = "Hi " + order.getUserName() + ",\n\n"
-                + "Great news! We've received your payment for your recent order.\n\n"
-                + "ORDER RECEIPT\n"
-                + "=============\n"
-                + sb + "\n"
-                + "Thank you for your payment!\n\n"
-                + "Lightning Comics\n";
+            EmailTemplates.Email msg = EmailTemplates.archivedPaymentReceived(order);
             EmailService.getServiceInstance().send(
                 java.util.List.of(order.getUserEmail()), null, null,
-                "Payment Received", body);
+                msg.subject(), msg.body());
         } catch (Exception e) {
             log.warn("Failed to send payment received email to {}: {}", order.getUserEmail(), e.getMessage());
         }

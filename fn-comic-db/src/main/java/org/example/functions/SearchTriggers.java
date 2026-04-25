@@ -37,9 +37,7 @@ public class SearchTriggers {
         ComicService comicService = ComicService.getServiceInstance();
         List<ComicBook> comicBookData = comicService.getComicsSearch(titleSearch);
         try {
-            return request.createResponseBuilder(HttpStatus.OK)
-                .header("Access-Control-Allow-Origin", "*")
-                .header("Access-Control-Allow-Methods", "*")
+            return HttpHelper.cors(request.createResponseBuilder(HttpStatus.OK))
                 .header("Content-Type", "application/json")
                 .body(OBJECT_MAPPER.writerWithDefaultPrettyPrinter()
                     .writeValueAsString(comicBookData))
