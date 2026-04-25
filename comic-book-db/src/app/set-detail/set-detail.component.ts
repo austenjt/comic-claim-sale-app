@@ -158,12 +158,32 @@ export class SetDetailComponent implements OnInit, OnDestroy {
     );
   }
 
-  canClaimSet(): boolean {
+  /**
+   * Whether the Claim Set button should be rendered at all.
+   * Mirrors the dashboard pattern: visible whenever the set is claimable in
+   * principle (has priced members, not already in someone's cart). The
+   * button is shown even when the user's cart is not OPEN — in that case
+   * {@link canClaimSet} returns false and the button renders disabled.
+   */
+  showClaimSetButton(): boolean {
     return this.setMembers.length > 0 &&
            this.totalPrice > 0 &&
            !this.isSetInMyCart() &&
-           !this.isSetClaimedByOther() &&
+           !this.isSetClaimedByOther();
+  }
+
+  /** Whether clicking the Claim Set button right now would actually succeed. */
+  canClaimSet(): boolean {
+    return this.showClaimSetButton() &&
            (this.myCart?.status === 'OPEN' || !this.myCart);
+  }
+
+  /** Tooltip explaining why the Claim button is disabled when the user has a non-OPEN cart. */
+  cartLockedTitle(): string {
+    const status = this.myCart?.status;
+    if (status === 'FINALIZING') return 'Your order has been submitted and is in the review window.';
+    if (status === 'FINALIZED') return 'Your order is finalized — wait for fulfillment before claiming again.';
+    return '';
   }
 
   claimSet(): void {

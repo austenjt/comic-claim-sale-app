@@ -165,13 +165,16 @@
             <span class="detail-label"></span>
             <span class="detail-value">
               <div *ngIf="claimError" class="claim-error">{{ claimError }}</div>
-              <button *ngIf="canClaimSet()" class="btn-claim-detail" (click)="claimSet()" [disabled]="actionLoading">
+              <button *ngIf="showClaimSetButton()" class="btn-claim-detail"
+                      (click)="claimSet()"
+                      [disabled]="!canClaimSet() || actionLoading"
+                      [title]="canClaimSet() ? '' : cartLockedTitle()">
                 {{ actionLoading ? 'Claiming…' : 'Claim Set' }}
               </button>
               <span *ngIf="totalPrice === 0" class="claim-blocked">
                 This set can't be claimed until all books are priced.
               </span>
-              <span *ngIf="totalPrice > 0 && !canClaimSet() && !isSetInMyCart() && !isSetClaimedByOther()" class="claim-blocked">
+              <span *ngIf="showClaimSetButton() && !canClaimSet()" class="claim-blocked">
                 Your cart must be open to claim new items.
               </span>
             </span>
