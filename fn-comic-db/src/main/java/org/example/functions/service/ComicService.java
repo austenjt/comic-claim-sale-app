@@ -1,7 +1,9 @@
 package org.example.functions.service;
 
 import com.azure.cosmos.CosmosContainer;
+import com.azure.cosmos.CosmosException;
 import com.azure.cosmos.models.CosmosItemRequestOptions;
+import com.azure.cosmos.models.CosmosItemResponse;
 import com.azure.cosmos.models.CosmosQueryRequestOptions;
 import com.azure.cosmos.models.PartitionKey;
 import com.azure.cosmos.models.SqlParameter;
@@ -367,11 +369,33 @@ public class ComicService {
         }
     }
 
+    /**
+     * Bundles a comic with its Cosmos {@code _etag} so callers can pass the eTag back to
+     * {@link #updateComic(ComicBook, String, String)} for optimistic concurrency control.
+     */
+    public record ComicWithETag(ComicBook comic, String eTag) {}
+
+    /**
+     * Reads a comic and returns it together with the Cosmos {@code _etag} captured from the
+     * read response. Use this when you need to perform an optimistic-locked update (e.g. bid
+     * placement) so that a concurrent writer can be detected.
+     */
+    public Optional<ComicWithETag> getComicByIdWithETag(int id) {
+        String idStr = String.valueOf(id);
+        try {
+            CosmosItemResponse<ObjectNode> response =
+                comicsContainer.readItem(idStr, new PartitionKey(idStr), ObjectNode.class);
+            ComicBook comic = nodeToComicBook(response.getItem());
+            if (comic == null) return Optional.empty();
+            return Optional.of(new ComicWithETag(comic, response.getETag()));
+        } catch (Exception e) {
+            log.warn("getComicByIdWithETag({}) not found: {}", id, e.getMessage());
+            return Optional.empty();
+        }
+    }
+
     public ComicBook updateComic(ComicBook updatedComicBook) {
-        String idStr = String.valueOf(updatedComicBook.getId());
-        ObjectNode node = comicBookToNode(updatedComicBook);
-        comicsContainer.replaceItem(node, idStr, new PartitionKey(idStr), new CosmosItemRequestOptions());
-        return updatedComicBook;
+        return replaceComic(updatedComicBook, null);
     }
 
     /**
@@ -380,8 +404,22 @@ public class ComicService {
      * @param editedBy         email of the admin, or a system label like "system:fulfill"
      */
     public ComicBook updateComic(ComicBook updatedComicBook, String editedBy) {
+        return updateComic(updatedComicBook, editedBy, null);
+    }
+
+    /**
+     * Updates a comic with optional optimistic-concurrency protection. When {@code ifMatchETag}
+     * is non-null and the stored document has been modified since it was read, Cosmos returns
+     * 412 Precondition Failed; that is translated into an {@link IllegalStateException} so the
+     * trigger layer maps it to a 409 Conflict response.
+     *
+     * @param updatedComicBook the new state of the comic
+     * @param editedBy         email of the admin, or a system label like "system:fulfill"
+     * @param ifMatchETag      the {@code _etag} captured at read time, or {@code null} to skip the check
+     */
+    public ComicBook updateComic(ComicBook updatedComicBook, String editedBy, String ifMatchETag) {
         ComicBook oldComic = getComicById(updatedComicBook.getId()).orElse(null);
-        updateComic(updatedComicBook);
+        replaceComic(updatedComicBook, ifMatchETag);
         if (oldComic != null && editedBy != null) {
             List<FieldChange> changes = diffComics(oldComic, updatedComicBook);
             if (!changes.isEmpty()) {
@@ -479,6 +517,30 @@ public class ComicService {
         for (ComicBook comic : all) {
             deleteComic(comic.getId());
         }
+    }
+
+    /**
+     * Performs the actual {@code replaceItem} call against Cosmos, optionally with an
+     * If-Match eTag. A 412 Precondition Failed is mapped to {@link IllegalStateException}
+     * so callers and the trigger layer can treat concurrency conflicts uniformly.
+     */
+    private ComicBook replaceComic(ComicBook comic, String ifMatchETag) {
+        String idStr = String.valueOf(comic.getId());
+        ObjectNode node = comicBookToNode(comic);
+        CosmosItemRequestOptions options = new CosmosItemRequestOptions();
+        if (ifMatchETag != null) {
+            options.setIfMatchETag(ifMatchETag);
+        }
+        try {
+            comicsContainer.replaceItem(node, idStr, new PartitionKey(idStr), options);
+        } catch (CosmosException e) {
+            if (e.getStatusCode() == 412) {
+                throw new IllegalStateException(
+                    "Comic " + idStr + " was modified by another request. Please refresh and try again.", e);
+            }
+            throw e;
+        }
+        return comic;
     }
 
     private ObjectNode comicBookToNode(ComicBook comic) {

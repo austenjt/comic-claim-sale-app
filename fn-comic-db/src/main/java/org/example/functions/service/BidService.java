@@ -6,6 +6,7 @@ import org.example.functions.model.BiddingState;
 import org.example.functions.model.Cart;
 import org.example.functions.model.ComicBook;
 import org.example.functions.model.User;
+import org.example.functions.model.enums.CartStatus;
 import org.example.functions.util.EnvHelper;
 
 import java.math.BigDecimal;
@@ -83,20 +84,25 @@ public class BidService {
      * at the comic's existing highBid (or $0 if none). Requires admin to have opened
      * bidding first (bidOpenedAt must be set). If bidding is already in progress,
      * returns the current comic state without modification.
+     *
+     * <p>Uses optimistic concurrency on the comic document so two users racing to be
+     * the first bidder cannot both succeed — the loser sees a 409 Conflict.</p>
      */
     public ComicBook startBidding(User user, String comicId) {
         if (!EnvHelper.isBiddingModeEnabled()) {
             throw new IllegalStateException("Bidding mode is not enabled.");
         }
-        ComicBook comic = ComicService.getServiceInstance().getComicById(Integer.parseInt(comicId))
+        ComicService.ComicWithETag read = ComicService.getServiceInstance()
+            .getComicByIdWithETag(Integer.parseInt(comicId))
             .orElseThrow(() -> new IllegalArgumentException("Comic not found: " + comicId));
+        ComicBook comic = read.comic();
 
         if (!Boolean.TRUE.equals(comic.getEnableBid())) {
             throw new IllegalArgumentException("Comic " + comicId + " does not have bidding enabled.");
         }
 
         Cart activeCart = CartService.getServiceInstance().getActiveCart(user.getId()).orElse(null);
-        if (activeCart != null && ("FINALIZING".equals(activeCart.getStatus()) || "FINALIZED".equals(activeCart.getStatus()))) {
+        if (activeCart != null && (activeCart.is(CartStatus.FINALIZING) || activeCart.is(CartStatus.FINALIZED))) {
             throw new IllegalStateException("Your order has been submitted — you cannot bid until it is fulfilled.");
         }
 
@@ -136,7 +142,7 @@ public class BidService {
             .placedAt(now)
             .build());
 
-        ComicService.getServiceInstance().updateComic(comic, "system:bid-start");
+        ComicService.getServiceInstance().updateComic(comic, "system:bid-start", read.eTag());
         log.info("Bidding started on comic {} by user {} at ${}", comicId, user.getId(), startingBid);
         return comic;
     }
@@ -144,20 +150,27 @@ public class BidService {
     /**
      * Place a bid. Amount must strictly exceed the current highBid.
      * Throws if bidding has not started or has already expired.
+     *
+     * <p>The comic read+write is protected by an If-Match eTag so that two users bidding
+     * simultaneously cannot both win — the second writer sees a 412 Precondition Failed,
+     * which is surfaced as an {@link IllegalStateException} (mapped to HTTP 409 by the
+     * trigger layer) and the user can simply retry.</p>
      */
     public ComicBook placeBid(User user, String comicId, BigDecimal amount) {
         if (!EnvHelper.isBiddingModeEnabled()) {
             throw new IllegalStateException("Bidding mode is not enabled.");
         }
-        ComicBook comic = ComicService.getServiceInstance().getComicById(Integer.parseInt(comicId))
+        ComicService.ComicWithETag read = ComicService.getServiceInstance()
+            .getComicByIdWithETag(Integer.parseInt(comicId))
             .orElseThrow(() -> new IllegalArgumentException("Comic not found: " + comicId));
+        ComicBook comic = read.comic();
 
         if (!Boolean.TRUE.equals(comic.getEnableBid())) {
             throw new IllegalArgumentException("Comic " + comicId + " does not have bidding enabled.");
         }
 
         Cart activeCart = CartService.getServiceInstance().getActiveCart(user.getId()).orElse(null);
-        if (activeCart != null && ("FINALIZING".equals(activeCart.getStatus()) || "FINALIZED".equals(activeCart.getStatus()))) {
+        if (activeCart != null && (activeCart.is(CartStatus.FINALIZING) || activeCart.is(CartStatus.FINALIZED))) {
             throw new IllegalStateException("Your order has been submitted — you cannot bid until it is fulfilled.");
         }
 
@@ -213,7 +226,7 @@ public class BidService {
             .placedAt(now)
             .build());
 
-        ComicService.getServiceInstance().updateComic(comic, "system:bid");
+        ComicService.getServiceInstance().updateComic(comic, "system:bid", read.eTag());
         log.info("Bid of ${} placed on comic {} by user {}", amount, comicId, user.getId());
         return comic;
     }

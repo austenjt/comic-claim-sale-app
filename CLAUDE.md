@@ -70,7 +70,7 @@ npm run deploy # deploys via @azure/static-web-apps-cli to production
 
 **Service classes** (`org.example.functions.service.*`) contain all business logic. Services are singletons accessed via `getServiceInstance()` — no dependency injection framework is used.
 
-**Data layer**: `CosmosDbClient` is a manual singleton that holds references to all six Cosmos DB containers: `comics`, `images`, `users`, `sessions`, `carts`, `discounts`. The database is `comic-db` in Azure.
+**Data layer**: `CosmosDbClient` is a manual singleton that holds references to all ten Cosmos DB containers: `comics`, `images`, `users`, `sessions`, `carts`, `discounts`, `archived-orders`, `return-events`, `audit-logs`, `activity-logs`. The database is `comic-db` in Azure.
 
 **Important Azure constraint**: The `admin/` route prefix is reserved by Azure Functions for its internal host management API. Any HTTP trigger routed under `admin/` will 404 in production. Use a different prefix (e.g. `orders/`).
 

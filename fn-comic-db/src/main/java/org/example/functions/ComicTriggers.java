@@ -11,7 +11,6 @@ import com.microsoft.azure.functions.annotation.BindingName;
 import com.microsoft.azure.functions.annotation.FunctionName;
 import com.microsoft.azure.functions.annotation.HttpTrigger;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.example.functions.model.ComicBook;
 import org.example.functions.model.PagedResponse;
 import org.example.functions.model.User;
@@ -22,6 +21,7 @@ import org.example.functions.service.ImageService;
 import org.example.functions.util.AuthHelper;
 import org.example.functions.util.EnvHelper;
 import org.example.functions.util.CsvToJsonConverter;
+import org.example.functions.util.HttpHelper;
 import org.example.functions.util.Mappers;
 import org.example.functions.util.Views;
 
@@ -80,17 +80,10 @@ public class ComicTriggers {
             }
         } catch (NumberFormatException e) {
             log.error("Invalid pagination parameters.", e);
-            return request.createResponseBuilder(HttpStatus.BAD_REQUEST)
-                .body("Invalid pagination parameters")
-                .build();
+            return HttpHelper.badRequest(request, "Invalid pagination parameters");
         } catch (JsonProcessingException e) {
             log.error("Severe error processing listAllComics.", e);
-            return request.createResponseBuilder(HttpStatus.I_AM_A_TEAPOT)
-                .header("Access-Control-Allow-Origin", "*")
-                .header("Access-Control-Allow-Methods", "*")
-                .header("Content-Type", "text/plain")
-                .body(ExceptionUtils.getMessage(e))
-                .build();
+            return HttpHelper.getErrorResponse(request, "Failed to serialize comic list.");
         }
     }
 
@@ -158,12 +151,7 @@ public class ComicTriggers {
                 .build();
         } catch (JsonProcessingException e) {
             log.error("Severe error processing getComicById.", e);
-            return request.createResponseBuilder(HttpStatus.INTERNAL_SERVER_ERROR)
-                .header("Access-Control-Allow-Origin", "*")
-                .header("Access-Control-Allow-Methods", "*")
-                .header("Content-Type", "text/plain")
-                .body(ExceptionUtils.getMessage(e))
-                .build();
+            return HttpHelper.getErrorResponse(request, "Failed to serialize comic.");
         }
     }
 
@@ -184,12 +172,8 @@ public class ComicTriggers {
         try {
             updatedComicBook = OBJECT_MAPPER.readValue(requestBody, ComicBook.class);
         } catch (JsonProcessingException e) {
-            return request.createResponseBuilder(HttpStatus.I_AM_A_TEAPOT)
-                .header("Access-Control-Allow-Origin", "*")
-                .header("Access-Control-Allow-Methods", "*")
-                .header("Content-Type", "text/plain")
-                .body("Failed update: " + e.getMessage())
-                .build();
+            log.warn("updateComic: malformed request body", e);
+            return HttpHelper.badRequest(request, "Malformed comic JSON in request body.");
         }
         String editedBy = admin != null ? admin.getEmail() : null;
         ComicBook successfulUpdate = comicService.updateComic(updatedComicBook, editedBy);
@@ -226,12 +210,7 @@ public class ComicTriggers {
                 .build();
         } catch (Exception e) {
             log.error("There was a create comic error.", e);
-            return request.createResponseBuilder(HttpStatus.INTERNAL_SERVER_ERROR)
-                .header("Access-Control-Allow-Origin", "*")
-                .header("Access-Control-Allow-Methods", "*")
-                .header("Content-Type", "text/plain")
-                .body(ExceptionUtils.getMessage(e))
-                .build();
+            return HttpHelper.errorResponse(request, e);
         }
     }
 
@@ -294,13 +273,8 @@ public class ComicTriggers {
                     .build();
             }
         } catch (Exception e) {
-            return request.createResponseBuilder(HttpStatus.I_AM_A_TEAPOT)
-                .header("Access-Control-Allow-Origin", "*")
-                .header("Access-Control-Allow-Methods", "*")
-                .header("Access-Control-Allow-Headers", "Content-Type")
-                .header("Content-Type", "text/plain")
-                .body(ExceptionUtils.getMessage(e))
-                .build();
+            log.error("deleteComic error", e);
+            return HttpHelper.errorResponse(request, e);
         }
         return request.createResponseBuilder(HttpStatus.OK)
             .header("Access-Control-Allow-Origin", "*")
@@ -348,10 +322,8 @@ public class ComicTriggers {
                 .body(String.format("{ \"deleted\": true, \"collectionGroup\": %d }", collectionGroup))
                 .build();
         } catch (Exception e) {
-            return request.createResponseBuilder(HttpStatus.I_AM_A_TEAPOT)
-                .header("Access-Control-Allow-Origin", "*")
-                .body(ExceptionUtils.getMessage(e))
-                .build();
+            log.error("deleteSet error", e);
+            return HttpHelper.errorResponse(request, e);
         }
     }
 
@@ -386,10 +358,8 @@ public class ComicTriggers {
                 .body(String.format("{ \"deleted\": true, \"collectionGroup\": %d }", collectionGroup))
                 .build();
         } catch (Exception e) {
-            return request.createResponseBuilder(HttpStatus.I_AM_A_TEAPOT)
-                .header("Access-Control-Allow-Origin", "*")
-                .body(ExceptionUtils.getMessage(e))
-                .build();
+            log.error("deleteSetFully error", e);
+            return HttpHelper.errorResponse(request, e);
         }
     }
 

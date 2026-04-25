@@ -10,9 +10,9 @@ import com.microsoft.azure.functions.annotation.AuthorizationLevel;
 import com.microsoft.azure.functions.annotation.FunctionName;
 import com.microsoft.azure.functions.annotation.HttpTrigger;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.example.functions.model.ComicBook;
 import org.example.functions.service.ComicService;
+import org.example.functions.util.HttpHelper;
 import org.example.functions.util.Mappers;
 
 import java.util.List;
@@ -46,12 +46,7 @@ public class SearchTriggers {
                 .build();
         } catch (JsonProcessingException e) {
             log.error("Severe error processing getComics().", e);
-            return request.createResponseBuilder(HttpStatus.I_AM_A_TEAPOT)
-                .header("Access-Control-Allow-Origin", "*")
-                .header("Access-Control-Allow-Methods", "*")
-                .header("Content-Type", "text/plain")
-                .body(ExceptionUtils.getMessage(e))
-                .build();
+            return HttpHelper.getErrorResponse(request, "Failed to serialize search results.");
         }
     }
 

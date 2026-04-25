@@ -1,6 +1,7 @@
 package org.example.functions.service;
 
 import com.azure.cosmos.CosmosContainer;
+import com.azure.cosmos.CosmosException;
 import com.azure.cosmos.models.CosmosItemRequestOptions;
 import com.azure.cosmos.models.CosmosQueryRequestOptions;
 import com.azure.cosmos.models.PartitionKey;
@@ -20,6 +21,8 @@ import org.example.functions.model.ClaimNotification;
 import org.example.functions.model.ComicBook;
 import org.example.functions.model.ComicNumber;
 import org.example.functions.model.User;
+import org.example.functions.model.enums.CartStatus;
+import org.example.functions.model.enums.PaymentStatus;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -56,13 +59,25 @@ public class CartService {
             List.of(new SqlParameter("@userId", userId)));
         for (ObjectNode node : cartsContainer.queryItems(query, new CosmosQueryRequestOptions(), ObjectNode.class)) {
             try {
-                Cart cart = OBJECT_MAPPER.treeToValue(node, Cart.class);
+                Cart cart = parseCartWithETag(node);
                 return Optional.of(checkAndFinalize(cart));
             } catch (Exception e) {
                 log.error("Error parsing cart", e);
             }
         }
         return Optional.empty();
+    }
+
+    /**
+     * Deserialize a Cosmos document into a {@link Cart} and stash the {@code _etag} on the
+     * cart so subsequent {@link #save(Cart)} calls can use optimistic-concurrency protection.
+     */
+    private Cart parseCartWithETag(ObjectNode node) throws com.fasterxml.jackson.core.JsonProcessingException {
+        Cart cart = OBJECT_MAPPER.treeToValue(node, Cart.class);
+        if (node.has("_etag") && !node.get("_etag").isNull()) {
+            cart.setEtag(node.get("_etag").asText());
+        }
+        return cart;
     }
 
     /** Get or create an OPEN cart for the user. */
@@ -75,7 +90,7 @@ public class CartService {
         cart.setUserId(user.getId());
         cart.setUserName(user.getName());
         cart.setUserEmail(user.getEmail());
-        cart.setStatus("OPEN");
+        cart.setStatus(CartStatus.OPEN);
         cart.setCreatedAt(Instant.now().toString());
         save(cart);
         log.info("Created new cart {} for user {}", cart.getId(), user.getId());
@@ -98,7 +113,7 @@ public class CartService {
             throw new IllegalStateException("Comic " + comicId + " is already claimed.");
         }
         Cart cart = getOrCreateCart(user);
-        if (!"OPEN".equals(cart.getStatus())) {
+        if (!cart.is(CartStatus.OPEN)) {
             throw new IllegalStateException("Cart is not open for new claims (status: " + cart.getStatus() + ").");
         }
         ComicBook comic = ComicService.getServiceInstance().getComicById(Integer.parseInt(comicId))
@@ -151,7 +166,7 @@ public class CartService {
         }
 
         Cart cart = getOrCreateCart(user);
-        if (!"OPEN".equals(cart.getStatus())) {
+        if (!cart.is(CartStatus.OPEN)) {
             throw new IllegalStateException("Cart is not open for new claims (status: " + cart.getStatus() + ").");
         }
 
@@ -185,7 +200,7 @@ public class CartService {
     public Cart removeItem(String userId, String comicId) {
         Cart cart = getActiveCart(userId)
             .orElseThrow(() -> new IllegalStateException("No active cart found."));
-        if ("FINALIZED".equals(cart.getStatus()) || "FULFILLED".equals(cart.getStatus())) {
+        if (cart.is(CartStatus.FINALIZED) || cart.is(CartStatus.FULFILLED)) {
             throw new IllegalStateException("Cannot remove items from a " + cart.getStatus() + " cart.");
         }
 
@@ -215,7 +230,7 @@ public class CartService {
         cart.getItems().removeIf(i -> idsToRemove.contains(i.getComicId()));
 
         if (cart.getItems().isEmpty()) {
-            cart.setStatus("DELETED");
+            cart.setStatus(CartStatus.DELETED);
             cart.setFinalizeAfter(null);
             cart.setFinalizedAt(null);
             log.info("Cart {} is now empty after user removal, marked as DELETED", cart.getId());
@@ -234,7 +249,7 @@ public class CartService {
             throw new IllegalStateException("Comic " + comicId + " is already claimed by another user.");
         }
         Cart cart = getOrCreateCart(user);
-        if (!"OPEN".equals(cart.getStatus()) && !"FINALIZING".equals(cart.getStatus()) && !"FINALIZED".equals(cart.getStatus())) {
+        if (!cart.is(CartStatus.OPEN) && !cart.is(CartStatus.FINALIZING) && !cart.is(CartStatus.FINALIZED)) {
             throw new IllegalStateException("Cannot award to a cart with status: " + cart.getStatus());
         }
         ComicBook comic = ComicService.getServiceInstance().getComicById(Integer.parseInt(comicId))
@@ -258,7 +273,7 @@ public class CartService {
     public Cart submitOrder(String userId, String customerNotes) {
         Cart cart = getActiveCart(userId)
             .orElseThrow(() -> new IllegalStateException("No active cart found."));
-        if (!"OPEN".equals(cart.getStatus())) {
+        if (!cart.is(CartStatus.OPEN)) {
             throw new IllegalStateException("Order can only be submitted from an OPEN cart.");
         }
         if (cart.getItems().isEmpty()) {
@@ -271,8 +286,8 @@ public class CartService {
         cart.setDiscountBreakdown(discountResult.getBreakdown());
         int bookCount = (int) cart.getItems().stream().filter(i -> !i.isSetContainer()).count();
         cart.setShippingCost(ShippingCalculator.estimate(bookCount).getEstimatedCost());
-        cart.setStatus("FINALIZING");
-        cart.setPaymentStatus("UNPAID");
+        cart.setStatus(CartStatus.FINALIZING);
+        cart.setPaymentStatus(PaymentStatus.UNPAID);
         if (customerNotes != null && !customerNotes.isBlank()) {
             cart.setCustomerNotes(customerNotes.trim());
         }
@@ -292,12 +307,12 @@ public class CartService {
     }
 
     /** Admin: update the payment status of an active cart. Valid values: UNPAID, PARTIAL, PAID. */
-    public Cart updatePaymentStatus(String cartId, String status) {
+    public Cart updatePaymentStatus(String cartId, PaymentStatus status) {
         Cart cart = findCartById(cartId);
         cart.setPaymentStatus(status);
         save(cart);
         log.info("Payment status for cart {} set to {}", cartId, status);
-        if ("PAID".equals(status)) {
+        if (status == PaymentStatus.PAID) {
             sendPaymentReceivedEmail(cart);
         }
         return cart;
@@ -316,10 +331,10 @@ public class CartService {
     /** Admin: revert a submitted cart back to OPEN so the user can add more items. */
     public Cart unsubmitOrder(String cartId) {
         Cart cart = findCartById(cartId);
-        if (!"FINALIZING".equals(cart.getStatus()) && !"FINALIZED".equals(cart.getStatus())) {
+        if (!cart.is(CartStatus.FINALIZING) && !cart.is(CartStatus.FINALIZED)) {
             throw new IllegalStateException("Can only unsubmit a FINALIZING or FINALIZED cart (current: " + cart.getStatus() + ").");
         }
-        cart.setStatus("OPEN");
+        cart.setStatus(CartStatus.OPEN);
         cart.setFinalizeAfter(null);
         cart.setFinalizedAt(null);
         cart.setDiscountAmount(0.0);
@@ -337,7 +352,7 @@ public class CartService {
     /** Admin: mark a cart as FULFILLED and stamp soldTo/dateSold on each comic. */
     public Cart fulfillCart(String cartId) {
         Cart cart = findCartById(cartId);
-        cart.setStatus("FULFILLED");
+        cart.setStatus(CartStatus.FULFILLED);
         cart.setFulfilledAt(Instant.now().toString());
         save(cart);
         log.info("Cart {} marked as FULFILLED", cartId);
@@ -367,7 +382,7 @@ public class CartService {
         List<Cart> result = new ArrayList<>();
         for (ObjectNode node : cartsContainer.queryItems(query, new CosmosQueryRequestOptions(), ObjectNode.class)) {
             try {
-                Cart cart = OBJECT_MAPPER.treeToValue(node, Cart.class);
+                Cart cart = parseCartWithETag(node);
                 if (!cart.getItems().isEmpty()) {
                     result.add(cart);
                 }
@@ -385,7 +400,7 @@ public class CartService {
         List<Cart> result = new ArrayList<>();
         for (ObjectNode node : cartsContainer.queryItems(query, new CosmosQueryRequestOptions(), ObjectNode.class)) {
             try {
-                Cart cart = OBJECT_MAPPER.treeToValue(node, Cart.class);
+                Cart cart = parseCartWithETag(node);
                 result.add(checkAndFinalize(cart));
             } catch (Exception e) {
                 log.error("Error parsing cart in getAllActiveCarts", e);
@@ -457,10 +472,10 @@ public class CartService {
         int count = 0;
         for (ObjectNode node : cartsContainer.queryItems(query, new CosmosQueryRequestOptions(), ObjectNode.class)) {
             try {
-                Cart cart = OBJECT_MAPPER.treeToValue(node, Cart.class);
-                String before = cart.getStatus();
+                Cart cart = parseCartWithETag(node);
+                CartStatus before = cart.getStatus();
                 checkAndFinalize(cart);
-                if ("FINALIZED".equals(cart.getStatus()) && !"FINALIZED".equals(before)) {
+                if (cart.is(CartStatus.FINALIZED) && before != CartStatus.FINALIZED) {
                     count++;
                 }
             } catch (Exception e) {
@@ -481,16 +496,16 @@ public class CartService {
         int expired = 0;
         for (ObjectNode node : cartsContainer.queryItems(query, new CosmosQueryRequestOptions(), ObjectNode.class)) {
             try {
-                Cart cart = OBJECT_MAPPER.treeToValue(node, Cart.class);
+                Cart cart = parseCartWithETag(node);
                 if (cart.getItems().isEmpty()) {
-                    cart.setStatus("DELETED");
+                    cart.setStatus(CartStatus.DELETED);
                     save(cart);
                     continue;
                 }
                 for (CartItem item : cart.getItems()) {
                     writeReturnEvent(item);
                 }
-                cart.setStatus("DELETED");
+                cart.setStatus(CartStatus.DELETED);
                 save(cart);
                 log.info("Expired abandoned cart {} for user {} ({} items returned)",
                     cart.getId(), cart.getUserId(), cart.getItems().size());
@@ -558,7 +573,7 @@ public class CartService {
                     .collect(java.util.stream.Collectors.toSet());
                 cart.getItems().removeIf(i -> idsToRemove.contains(i.getComicId()));
                 if (cart.getItems().isEmpty()) {
-                    cart.setStatus("DELETED");
+                    cart.setStatus(CartStatus.DELETED);
                     cart.setFinalizeAfter(null);
                     cart.setFinalizedAt(null);
                     log.info("Cart {} is now empty after admin release, marked as DELETED", cart.getId());
@@ -818,7 +833,7 @@ public class CartService {
             List.of(new SqlParameter("@cartId", cartId)));
         for (ObjectNode node : cartsContainer.queryItems(query, new CosmosQueryRequestOptions(), ObjectNode.class)) {
             try {
-                return OBJECT_MAPPER.treeToValue(node, Cart.class);
+                return parseCartWithETag(node);
             } catch (Exception e) {
                 throw new RuntimeException("Failed to parse cart: " + cartId, e);
             }
@@ -826,13 +841,44 @@ public class CartService {
         throw new IllegalArgumentException("Cart not found: " + cartId);
     }
 
+    /**
+     * Persists a cart. If the cart has an {@code etag} captured from a previous read, the
+     * write is performed with an If-Match precondition so a concurrent modification will
+     * fail fast (412 → {@link IllegalStateException} → 409 Conflict to the client). New
+     * carts (no etag yet) are inserted via {@code createItem}. The fresh {@code _etag}
+     * returned by Cosmos is stored back on the cart so any subsequent save in the same
+     * request also benefits from concurrency protection.
+     */
     private void save(Cart cart) {
         ObjectNode node = OBJECT_MAPPER.valueToTree(cart);
+        String ifMatch = cart.getEtag();
+        if (ifMatch == null) {
+            // Brand-new (or as-yet unread) cart — try create, fall back to replace if it already exists
+            try {
+                var resp = cartsContainer.createItem(node,
+                    new PartitionKey(cart.getId()), new CosmosItemRequestOptions());
+                cart.setEtag(resp.getETag());
+            } catch (CosmosException e) {
+                if (e.getStatusCode() == 409) {
+                    var resp = cartsContainer.replaceItem(node, cart.getId(),
+                        new PartitionKey(cart.getId()), new CosmosItemRequestOptions());
+                    cart.setEtag(resp.getETag());
+                } else {
+                    throw e;
+                }
+            }
+            return;
+        }
+        CosmosItemRequestOptions options = new CosmosItemRequestOptions().setIfMatchETag(ifMatch);
         try {
-            cartsContainer.readItem(cart.getId(), new PartitionKey(cart.getId()), ObjectNode.class);
-            cartsContainer.replaceItem(node, cart.getId(), new PartitionKey(cart.getId()), new CosmosItemRequestOptions());
-        } catch (Exception e) {
-            cartsContainer.createItem(node, new PartitionKey(cart.getId()), new CosmosItemRequestOptions());
+            var resp = cartsContainer.replaceItem(node, cart.getId(), new PartitionKey(cart.getId()), options);
+            cart.setEtag(resp.getETag());
+        } catch (CosmosException e) {
+            if (e.getStatusCode() == 412) {
+                throw new IllegalStateException(
+                    "Cart " + cart.getId() + " was modified concurrently. Please refresh and try again.", e);
+            }
+            throw e;
         }
     }
 }

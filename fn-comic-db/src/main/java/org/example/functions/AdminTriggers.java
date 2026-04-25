@@ -15,6 +15,7 @@ import org.example.functions.model.ArchivedOrder;
 import org.example.functions.model.ArchivedOrderItem;
 import org.example.functions.model.Cart;
 import org.example.functions.model.User;
+import org.example.functions.model.enums.PaymentStatus;
 import org.example.functions.service.ArchiveService;
 import org.example.functions.service.CartService;
 import org.example.functions.service.ComicService;
@@ -200,8 +201,9 @@ public class AdminTriggers {
 
     // ─── POST /api/orders/{cartId}/payment ───────────────────────────────────
 
-    private static final java.util.Set<String> VALID_PAYMENT_STATUSES =
-        java.util.Set.of("UNPAID", "PAID");
+    /** Statuses an admin is currently allowed to assign via the public payment endpoint. */
+    private static final java.util.Set<PaymentStatus> ASSIGNABLE_PAYMENT_STATUSES =
+        java.util.Set.of(PaymentStatus.UNPAID, PaymentStatus.PAID);
 
     @FunctionName("updatePaymentStatus")
     public HttpResponseMessage updatePaymentStatus(
@@ -214,12 +216,18 @@ public class AdminTriggers {
         try {
             String body = request.getBody().orElse("{}");
             ObjectNode payload = OBJECT_MAPPER.readValue(body, ObjectNode.class);
-            String status = payload.has("status") ? payload.get("status").asText() : null;
-            if (status == null || !VALID_PAYMENT_STATUSES.contains(status)) {
+            String raw = payload.has("status") ? payload.get("status").asText() : null;
+            PaymentStatus parsed;
+            try {
+                parsed = PaymentStatus.fromJson(raw);
+            } catch (IllegalArgumentException e) {
+                parsed = null;
+            }
+            if (parsed == null || !ASSIGNABLE_PAYMENT_STATUSES.contains(parsed)) {
                 return cors(request.createResponseBuilder(HttpStatus.BAD_REQUEST))
                     .body("status must be one of: UNPAID, PAID").build();
             }
-            Cart cart = CartService.getServiceInstance().updatePaymentStatus(cartId, status);
+            Cart cart = CartService.getServiceInstance().updatePaymentStatus(cartId, parsed);
             return cors(request.createResponseBuilder(HttpStatus.OK))
                 .header("Content-Type", "application/json")
                 .body(OBJECT_MAPPER.writeValueAsString(cart)).build();
@@ -272,12 +280,18 @@ public class AdminTriggers {
         try {
             String body = request.getBody().orElse("{}");
             ObjectNode payload = OBJECT_MAPPER.readValue(body, ObjectNode.class);
-            String status = payload.has("status") ? payload.get("status").asText() : null;
-            if (status == null || !VALID_PAYMENT_STATUSES.contains(status)) {
+            String raw = payload.has("status") ? payload.get("status").asText() : null;
+            PaymentStatus parsed;
+            try {
+                parsed = PaymentStatus.fromJson(raw);
+            } catch (IllegalArgumentException e) {
+                parsed = null;
+            }
+            if (parsed == null || !ASSIGNABLE_PAYMENT_STATUSES.contains(parsed)) {
                 return cors(request.createResponseBuilder(HttpStatus.BAD_REQUEST))
                     .body("status must be one of: UNPAID, PAID").build();
             }
-            ArchivedOrder order = ArchiveService.getServiceInstance().updatePaymentStatus(orderId, status);
+            ArchivedOrder order = ArchiveService.getServiceInstance().updatePaymentStatus(orderId, parsed);
             return cors(request.createResponseBuilder(HttpStatus.OK))
                 .header("Content-Type", "application/json")
                 .body(OBJECT_MAPPER.writeValueAsString(order)).build();

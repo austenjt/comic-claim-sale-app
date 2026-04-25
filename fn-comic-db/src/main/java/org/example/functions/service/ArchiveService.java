@@ -14,6 +14,7 @@ import org.example.functions.model.ArchivedOrder;
 import org.example.functions.util.Mappers;
 import org.example.functions.model.ArchivedOrderItem;
 import org.example.functions.model.Cart;
+import org.example.functions.model.enums.PaymentStatus;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -81,14 +82,14 @@ public class ArchiveService {
     }
 
     /** Admin: update the payment status on an archived order. Valid values: UNPAID, PARTIAL, PAID. */
-    public ArchivedOrder updatePaymentStatus(String orderId, String status) {
+    public ArchivedOrder updatePaymentStatus(String orderId, PaymentStatus status) {
         ArchivedOrder order = getArchivedOrderById(orderId)
             .orElseThrow(() -> new IllegalArgumentException("Archived order not found: " + orderId));
         order.setPaymentStatus(status);
         ObjectNode node = OBJECT_MAPPER.valueToTree(order);
         archivedOrdersContainer.replaceItem(node, orderId, new PartitionKey(orderId), new CosmosItemRequestOptions());
         log.info("Payment status for archived order {} set to {}", orderId, status);
-        if ("PAID".equals(status)) {
+        if (status == PaymentStatus.PAID) {
             sendArchivedPaymentReceivedEmail(order);
         }
         return order;

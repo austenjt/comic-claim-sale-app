@@ -11,12 +11,12 @@ import com.microsoft.azure.functions.annotation.FunctionName;
 import com.microsoft.azure.functions.annotation.HttpTrigger;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.fileupload.MultipartStream;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.example.functions.model.ComicBook;
 import org.example.functions.model.ComicNumber;
 import org.example.functions.service.ComicService;
 import org.example.functions.service.ImageResizeService;
 import org.example.functions.service.ImageService;
+import org.example.functions.util.HttpHelper;
 import org.example.functions.util.Mappers;
 
 import java.io.ByteArrayInputStream;
@@ -53,12 +53,7 @@ public class ImageTriggers {
                 .build();
         } catch (Exception e) {
             log.error("Severe error processing getAllImageNames.", e);
-            return request.createResponseBuilder(HttpStatus.I_AM_A_TEAPOT)
-                .header("Access-Control-Allow-Origin", "*")
-                .header("Access-Control-Allow-Methods", "*")
-                .header("Content-Type", "text/plain")
-                .body(ExceptionUtils.getMessage(e))
-                .build();
+            return HttpHelper.errorResponse(request, e);
         }
     }
 
@@ -83,13 +78,8 @@ public class ImageTriggers {
                 .body(imageData)
                 .build();
         } catch (Exception e) {
-            log.error("Severe error processing geSmallImageById.", e);
-            return request.createResponseBuilder(HttpStatus.I_AM_A_TEAPOT)
-                .header("Access-Control-Allow-Origin", "*")
-                .header("Access-Control-Allow-Methods", "*")
-                .header("Content-Type", "text/plain")
-                .body(ExceptionUtils.getMessage(e))
-                .build();
+            log.error("Severe error processing getImageByName.", e);
+            return HttpHelper.errorResponse(request, e);
         }
     }
 

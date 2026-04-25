@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.example.functions.model.enums.PaymentStatus;
 
 import java.util.List;
 
@@ -26,7 +27,7 @@ public class ArchivedOrder {
     private double shippingCost;
     private String createdAt;
     private String fulfilledAt;
-    private String paymentStatus; // UNPAID | PARTIAL | PAID
+    private PaymentStatus paymentStatus;
     private Boolean shipped;
     private String trackingNumber;
     private String customerNotes;

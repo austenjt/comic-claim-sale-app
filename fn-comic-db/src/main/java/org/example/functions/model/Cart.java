@@ -1,6 +1,9 @@
 package org.example.functions.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.example.functions.model.enums.CartStatus;
+import org.example.functions.model.enums.PaymentStatus;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,8 +15,7 @@ public class Cart {
     private String userName;
     private String userEmail;
     private List<CartItem> items = new ArrayList<>();
-    // OPEN | FINALIZING | FINALIZED | FULFILLED
-    private String status;
+    private CartStatus status;
     private String createdAt;
     private String finalizeAfter;  // ISO-8601, set when user submits order (now + 20h)
     private String finalizedAt;
@@ -23,11 +25,19 @@ public class Cart {
     private Boolean discountExcludesSets; // true when any active discount rule excluded set items
     private List<CartDiscount> discountBreakdown = new ArrayList<>(); // per-rule breakdown for frontend per-item display
     private double shippingCost;         // snapshotted at submit time
-    private String paymentStatus;        // UNPAID | PARTIAL | PAID — set by admin
+    private PaymentStatus paymentStatus; // set by admin
     private Boolean shipped;             // true once admin marks order as shipped
     private String trackingNumber;       // optional shipping tracking number
     private String customerNotes;        // optional message from user, captured at submit time
     private String adminNotes;           // internal notes from admin
+
+    /**
+     * Cosmos {@code _etag} captured at read time, used for optimistic-concurrency
+     * protected writes. Marked {@link JsonIgnore} so it never appears in API responses or
+     * persisted documents — Cosmos manages the real {@code _etag} system property itself.
+     */
+    @JsonIgnore
+    private String etag;
 
     public Cart() {}
 
@@ -46,8 +56,11 @@ public class Cart {
     public List<CartItem> getItems() { return items; }
     public void setItems(List<CartItem> items) { this.items = items; }
 
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
+    public CartStatus getStatus() { return status; }
+    public void setStatus(CartStatus status) { this.status = status; }
+
+    /** Convenience for {@code status == target}. Null-safe. */
+    public boolean is(CartStatus target) { return this.status == target; }
 
     public String getCreatedAt() { return createdAt; }
     public void setCreatedAt(String createdAt) { this.createdAt = createdAt; }
@@ -70,8 +83,8 @@ public class Cart {
     public double getShippingCost() { return shippingCost; }
     public void setShippingCost(double shippingCost) { this.shippingCost = shippingCost; }
 
-    public String getPaymentStatus() { return paymentStatus; }
-    public void setPaymentStatus(String paymentStatus) { this.paymentStatus = paymentStatus; }
+    public PaymentStatus getPaymentStatus() { return paymentStatus; }
+    public void setPaymentStatus(PaymentStatus paymentStatus) { this.paymentStatus = paymentStatus; }
 
     public Boolean getShipped() { return shipped; }
     public void setShipped(Boolean shipped) { this.shipped = shipped; }
@@ -92,4 +105,10 @@ public class Cart {
     public void setDiscountBreakdown(List<CartDiscount> discountBreakdown) {
         this.discountBreakdown = discountBreakdown != null ? discountBreakdown : new ArrayList<>();
     }
+
+    /** Cosmos {@code _etag} captured at read time. Excluded from JSON serialization. */
+    @JsonIgnore
+    public String getEtag() { return etag; }
+    @JsonIgnore
+    public void setEtag(String etag) { this.etag = etag; }
 }
