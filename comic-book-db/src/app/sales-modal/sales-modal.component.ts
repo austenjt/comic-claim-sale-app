@@ -64,7 +64,7 @@ export class SalesModalComponent implements OnInit, OnDestroy {
       case 'RAW_PERCENTAGE':
         return `${d.percentageOff}% off items in your order${note}`;
       case 'BUY_X_GET_ONE_FREE':
-        return `Buy ${d.xBooks} books — get the cheapest one free${note}`;
+        return `Buy ${d.xBooks} books — get another book free${note}`;
       case 'PERCENT_OFF_OVER_X_BOOKS':
         return `${d.percentageOff}% off when you claim more than ${d.xBooks} book${d.xBooks === 1 ? '' : 's'}${note}`;
     }

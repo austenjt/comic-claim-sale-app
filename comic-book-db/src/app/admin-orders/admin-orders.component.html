@@ -193,6 +193,13 @@
         </label>
       </div>
       <button
+        class="btn-refresh-discounts"
+        [disabled]="refreshingDiscountsId === order.id"
+        (click)="refreshDiscounts(order)"
+        title="Recompute discounts on this order with the current rules and re-send the order email">
+        {{ refreshingDiscountsId === order.id ? 'Refreshing…' : 'Refresh Discounts' }}
+      </button>
+      <button
         class="btn-unsubmit"
         (click)="unsubmit(order)"
         title="Revert this order to Open so the user can add more items">

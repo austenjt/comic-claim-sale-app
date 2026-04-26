@@ -97,6 +97,36 @@ public class AdminTriggers {
         }
     }
 
+    // ─── POST /api/orders/{cartId}/refresh-discounts ─────────────────────────
+
+    /**
+     * Admin: re-runs discount calculation on a FINALIZING cart and re-sends the
+     * order-submitted email. Used to recover a cart whose discount snapshot was
+     * computed before a discount-logic change shipped.
+     */
+    @FunctionName("refreshOrderDiscounts")
+    public HttpResponseMessage refreshOrderDiscounts(
+        @HttpTrigger(name = "refreshOrderDiscounts", route = "orders/{cartId}/refresh-discounts",
+            methods = {HttpMethod.POST}, authLevel = AuthorizationLevel.ANONYMOUS)
+        HttpRequestMessage<Optional<String>> request,
+        @BindingName("cartId") String cartId)
+    {
+        if (AuthHelper.requireAdmin(request) == null) return unauthorized(request);
+        try {
+            Cart cart = CartService.getServiceInstance().refreshSubmittedDiscounts(cartId);
+            return cors(request.createResponseBuilder(HttpStatus.OK))
+                .header("Content-Type", "application/json")
+                .body(OBJECT_MAPPER.writeValueAsString(cart)).build();
+        } catch (IllegalStateException e) {
+            return cors(request.createResponseBuilder(HttpStatus.BAD_REQUEST)).body(e.getMessage()).build();
+        } catch (IllegalArgumentException e) {
+            return cors(request.createResponseBuilder(HttpStatus.NOT_FOUND)).body(e.getMessage()).build();
+        } catch (Exception e) {
+            log.error("refreshOrderDiscounts error", e);
+            return serverError(request, e);
+        }
+    }
+
     // ─── POST /api/orders/{cartId}/unsubmit ──────────────────────────────────
 
     @FunctionName("unsubmitOrder")

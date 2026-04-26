@@ -81,6 +81,8 @@ export class AdminOrdersComponent implements OnInit {
   }
 
   pendingFulfillId: string | null = null;
+  /** Id of the order whose discounts are currently being refreshed (for button busy state). */
+  refreshingDiscountsId: string | null = null;
   pendingDeleteId: string | null = null;
   pendingFullDeleteId: string | null = null;
 
@@ -173,6 +175,27 @@ export class AdminOrdersComponent implements OnInit {
     this.cartService.unsubmitOrder(cart.id).subscribe({
       next: () => { this.loadOrders(); this.loadOpenCarts(); },
       error: () => this.error = 'Failed to unsubmit order.'
+    });
+  }
+
+  /**
+   * Recompute discounts on a FINALIZING cart with the current rules and re-send the order
+   * email. Used to refresh a cart whose stored discount snapshot was computed before a
+   * discount-logic change shipped.
+   */
+  refreshDiscounts(cart: Cart) {
+    this.refreshingDiscountsId = cart.id;
+    this.cartService.refreshOrderDiscounts(cart.id).subscribe({
+      next: updated => {
+        this.refreshingDiscountsId = null;
+        // Replace the order in-place so the table updates without a full reload.
+        const idx = this.orders.findIndex(o => o.id === cart.id);
+        if (idx >= 0) this.orders[idx] = updated;
+      },
+      error: err => {
+        this.refreshingDiscountsId = null;
+        this.error = err?.error || 'Failed to refresh discounts.';
+      }
     });
   }
 

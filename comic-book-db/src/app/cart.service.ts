@@ -81,6 +81,15 @@ export class CartService {
     return this.http.post<Cart>(`${this.apiBase}/orders/${cartId}/unsubmit`, {});
   }
 
+  /**
+   * Admin: re-run discount calculation on a FINALIZING cart and re-send the order-submitted
+   * email. Use when a cart's stored discount snapshot is out of date relative to the current
+   * discount logic (e.g. after deploying a fix to discount math).
+   */
+  refreshOrderDiscounts(cartId: string): Observable<Cart> {
+    return this.http.post<Cart>(`${this.apiBase}/orders/${cartId}/refresh-discounts`, {});
+  }
+
   updateAdminNotes(cartId: string, adminNotes: string | null): Observable<Cart> {
     return this.http.post<Cart>(`${this.apiBase}/orders/${cartId}/notes`, { adminNotes });
   }

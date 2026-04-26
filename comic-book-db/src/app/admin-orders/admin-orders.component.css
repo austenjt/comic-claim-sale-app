@@ -219,6 +219,22 @@ tfoot td { font-weight: bold; background: #adc178; }
 }
 .btn-unsubmit:hover { background: rgba(147, 197, 253, 0.14); }
 
+/* Refresh-discounts: same outline style as Unsubmit, in a distinct hue (warm amber) so the
+   admin can pick it out. Used to recompute discount math on a submitted order. */
+.btn-refresh-discounts {
+  padding: var(--space-2) var(--space-6);
+  background: transparent;
+  color: #FCD34D;
+  border: 1px solid #FCD34D;
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-14);
+  cursor: pointer;
+  font-weight: var(--fw-semibold);
+  transition: background-color var(--duration-base) var(--ease-standard);
+}
+.btn-refresh-discounts:hover:not(:disabled) { background: rgba(252, 211, 77, 0.14); }
+.btn-refresh-discounts:disabled { opacity: 0.55; cursor: default; }
+
 .btn-fulfill {
   padding: var(--space-2) var(--space-6);
   background: transparent;
@@ -438,7 +454,7 @@ tfoot td { font-weight: bold; background: #adc178; }
   /* Hide the "Claimed" date column at the smallest widths — still shown
      in the order header (Opened / Finalized timestamps). */
   th:nth-child(3), td:nth-child(3) { display: none; }
-  .btn-unsubmit, .btn-fulfill, .btn-full-delete, .btn-delete {
+  .btn-unsubmit, .btn-fulfill, .btn-full-delete, .btn-delete, .btn-refresh-discounts {
     flex: 1;
     padding: var(--space-2) var(--space-3);
   }

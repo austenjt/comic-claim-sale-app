@@ -338,6 +338,40 @@ public class CartService {
         return cart;
     }
 
+    /**
+     * Admin: re-run {@code applyDiscounts} on an already-submitted cart, refresh the
+     * stored discount snapshot ({@code discountAmount}, {@code discountDescription},
+     * {@code discountBreakdown}, the three {@code discountExcludes*} flags), persist it,
+     * and re-send the order-submitted email so the customer sees the corrected totals.
+     *
+     * <p>This is the recovery path when discount logic changes after a cart was already
+     * submitted — the stored snapshot would otherwise stay frozen at the old calculation
+     * for the life of the cart. Status, payment status, and shipping fields are left
+     * untouched; only the discount snapshot is updated.</p>
+     *
+     * <p>Restricted to {@code FINALIZING} carts. {@code FULFILLED} carts have already
+     * been archived and should be edited via the archived-orders flow if at all;
+     * {@code OPEN} carts haven't run discount calculation yet (it runs on submit).</p>
+     */
+    public Cart refreshSubmittedDiscounts(String cartId) {
+        Cart cart = findCartById(cartId);
+        if (!cart.is(CartStatus.FINALIZING)) {
+            throw new IllegalStateException(
+                "Can only refresh discounts on a FINALIZING cart (current: " + cart.getStatus() + ").");
+        }
+        DiscountService.DiscountResult result = DiscountService.getServiceInstance().applyDiscounts(cart);
+        cart.setDiscountAmount(result.getAmount());
+        cart.setDiscountDescription(result.getDescription());
+        cart.setDiscountExcludesSets(result.isExcludedSets() ? Boolean.TRUE : null);
+        cart.setDiscountExcludesAuctions(result.isExcludedAuctions() ? Boolean.TRUE : null);
+        cart.setDiscountExcludesGraded(result.isExcludedGraded() ? Boolean.TRUE : null);
+        cart.setDiscountBreakdown(result.getBreakdown());
+        save(cart);
+        log.info("Discount snapshot refreshed on cart {} — new total savings ${}", cartId, result.getAmount());
+        sendOrderSubmittedEmail(cart);
+        return cart;
+    }
+
     /** Admin: revert a submitted cart back to OPEN so the user can add more items. */
     public Cart unsubmitOrder(String cartId) {
         Cart cart = findCartById(cartId);
