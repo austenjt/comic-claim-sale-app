@@ -395,22 +395,40 @@ export class AdminOrdersComponent implements OnInit {
     return rule.description.startsWith('Buy ');
   }
 
-  private getFreeItemIds(rule: CartDiscount, cart: Cart): Set<string> {
-    const eligible = this.visibleCartItems(cart)
-      .filter(i => !i.wonViaBid && !this.isItemExcluded(i, rule))
-      .slice()
-      .sort((a, b) => a.price - b.price);
+  /**
+   * Cross-rule deduped free-item map for an active cart's BUY_X_GET_ONE_FREE rules.
+   * See {@code DiscountService.computeBuyXFreePicks} on the backend; this is its frontend
+   * mirror so per-row FREE badges align with the backend's authoritative amounts.
+   */
+  private computeBuyXFreeIds(cart: Cart): Map<string, Set<string>> {
+    const result = new Map<string, Set<string>>();
+    const breakdown = cart.discountBreakdown;
+    if (!breakdown || breakdown.length === 0) return result;
 
-    const freeIds = new Set<string>();
-    let remaining = Math.round(rule.amount * 100) / 100;
-    for (const item of eligible) {
-      if (remaining < 0.005) break;
-      if (item.price <= remaining + 0.005) {
-        freeIds.add(item.comicId);
-        remaining = Math.round((remaining - item.price) * 100) / 100;
+    const alreadyFreed = new Set<string>();
+    for (const rule of breakdown) {
+      if (!this.isBuyXFreeRule(rule)) continue;
+
+      const eligible = this.visibleCartItems(cart)
+        .filter(i => !i.wonViaBid
+          && !this.isItemExcluded(i, rule)
+          && !alreadyFreed.has(i.comicId))
+        .slice()
+        .sort((a, b) => a.price - b.price);
+
+      const freeIds = new Set<string>();
+      let remaining = Math.round(rule.amount * 100) / 100;
+      for (const item of eligible) {
+        if (remaining < 0.005) break;
+        if (item.price <= remaining + 0.005) {
+          freeIds.add(item.comicId);
+          alreadyFreed.add(item.comicId);
+          remaining = Math.round((remaining - item.price) * 100) / 100;
+        }
       }
+      result.set(rule.description, freeIds);
     }
-    return freeIds;
+    return result;
   }
 
   discountedItemPrice(item: CartItem, cart: Cart): number {
@@ -418,11 +436,12 @@ export class AdminOrdersComponent implements OnInit {
 
     const breakdown = cart.discountBreakdown;
     if (breakdown && breakdown.length > 0) {
+      const buyXFreeMap = this.computeBuyXFreeIds(cart);
       let totalItemDiscount = 0;
       for (const rule of breakdown) {
         if (this.isItemExcluded(item, rule)) continue;
         if (this.isBuyXFreeRule(rule)) {
-          if (this.getFreeItemIds(rule, cart).has(item.comicId)) {
+          if (buyXFreeMap.get(rule.description)?.has(item.comicId)) {
             totalItemDiscount += item.price;
           }
           continue;
@@ -491,28 +510,42 @@ export class AdminOrdersComponent implements OnInit {
     return false;
   }
 
-  private getArchivedFreeItemIds(rule: {
-    amount: number; excludesSets: boolean; excludesAuctions: boolean; excludesGraded: boolean;
-  }, order: ArchivedOrder): Set<string> {
-    const eligible = order.items
-      .filter(i => i.comicNumber !== '#SET' &&   // exclude set containers
-        !i.wonViaBid &&                           // exclude bid-won items
-        i.price > 0 &&                            // exclude $0 items (containers, awarded)
-        !!i.comicId &&
-        !this.isArchivedItemExcluded(i, rule))
-      .slice()
-      .sort((a, b) => a.price - b.price);
+  /**
+   * Builds the deduped per-rule free-item map for an archived order. Keyed by the rule's
+   * index in the rules array — that lets us also handle legacy orders where rules were
+   * reconstructed from the description string and don't have a stable id/description field.
+   * Same algorithm as {@code DiscountService.computeBuyXFreePicks} on the backend.
+   */
+  private computeArchivedBuyXFreeIds(rules: Array<{
+    amount: number; excludesSets: boolean; excludesAuctions: boolean; excludesGraded: boolean; isBuyXFree: boolean;
+  }>, order: ArchivedOrder): Map<number, Set<string>> {
+    const result = new Map<number, Set<string>>();
+    const alreadyFreed = new Set<string>();
+    rules.forEach((rule, idx) => {
+      if (!rule.isBuyXFree) return;
+      const eligible = order.items
+        .filter(i => i.comicNumber !== '#SET'   // exclude set containers
+          && !i.wonViaBid                        // exclude bid-won items
+          && i.price > 0                         // exclude $0 items
+          && !!i.comicId
+          && !this.isArchivedItemExcluded(i, rule)
+          && !alreadyFreed.has(i.comicId!))
+        .slice()
+        .sort((a, b) => a.price - b.price);
 
-    const freeIds = new Set<string>();
-    let remaining = Math.round(rule.amount * 100) / 100;
-    for (const item of eligible) {
-      if (remaining < 0.005) break;
-      if (item.price <= remaining + 0.005) {
-        freeIds.add(item.comicId!);
-        remaining = Math.round((remaining - item.price) * 100) / 100;
+      const freeIds = new Set<string>();
+      let remaining = Math.round(rule.amount * 100) / 100;
+      for (const item of eligible) {
+        if (remaining < 0.005) break;
+        if (item.price <= remaining + 0.005) {
+          freeIds.add(item.comicId!);
+          alreadyFreed.add(item.comicId!);
+          remaining = Math.round((remaining - item.price) * 100) / 100;
+        }
       }
-    }
-    return freeIds;
+      result.set(idx, freeIds);
+    });
+    return result;
   }
 
   discountedArchivedItemPrice(item: ArchivedOrderItem, order: ArchivedOrder): number {
@@ -532,23 +565,24 @@ export class AdminOrdersComponent implements OnInit {
       : (order.discountDescription ? this.parseArchivedBreakdown(order.discountDescription) : []);
 
     if (rules.length > 0) {
+      const buyXFreeMap = this.computeArchivedBuyXFreeIds(rules, order);
       let totalItemDiscount = 0;
-      for (const rule of rules) {
-        if (this.isArchivedItemExcluded(item, rule)) continue;
+      rules.forEach((rule, idx) => {
+        if (this.isArchivedItemExcluded(item, rule)) return;
         if (rule.isBuyXFree) {
-          if (item.comicId && this.getArchivedFreeItemIds(rule, order).has(item.comicId)) {
+          if (item.comicId && buyXFreeMap.get(idx)?.has(item.comicId)) {
             totalItemDiscount += item.price;
           }
-          continue;
+          return;
         }
         const base = order.items
           .filter(i => i.comicNumber !== '#SET' &&
             !i.wonViaBid &&
             !this.isArchivedItemExcluded(i, rule))
           .reduce((sum, i) => sum + i.price, 0);
-        if (base <= 0) continue;
+        if (base <= 0) return;
         totalItemDiscount += (item.price / base) * rule.amount;
-      }
+      });
       return Math.max(0, Math.round((item.price - totalItemDiscount) * 100) / 100);
     }
 

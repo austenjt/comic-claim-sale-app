@@ -61,9 +61,16 @@ class DiscountServiceTest {
     }
 
     private static Discount buyXGetOneFree(int x, boolean excludeSets, boolean excludeAuctions, boolean excludeGraded) {
+        // Include xBooks in the id so a test using two BUY_X rules with different X gets distinct ids.
+        // Tests that need two rules with the SAME X should call buyXGetOneFreeWithId() instead.
+        return buyXGetOneFreeWithId("d-bxgo-" + x, x, excludeSets, excludeAuctions, excludeGraded);
+    }
+
+    private static Discount buyXGetOneFreeWithId(String id, int x, boolean excludeSets,
+                                                 boolean excludeAuctions, boolean excludeGraded) {
         return Discount.builder()
-            .id("d-bxgo")
-            .name("BXGO")
+            .id(id)
+            .name("BXGO-" + id)
             .type(DiscountType.BUY_X_GET_ONE_FREE)
             .isActive(true)
             .xBooks(x)
@@ -416,6 +423,82 @@ class DiscountServiceTest {
     }
 
     // ─── Multi-rule stacking ─────────────────────────────────────────────────
+
+    @Test
+    void twoBuyXGetOneFreeRules_dedupePicksAcrossRules() {
+        // Regression for the bug a user reported: two BUY_X_GET_ONE_FREE rules in one cart
+        // both picked the SAME cheapest book, so the per-row math zeroed out one $0.50 book
+        // for both rules and silently lost the second rule's promised savings.
+        //
+        // Cart shape (mirrors the user's reported scenario, scaled down):
+        //   - 22 eligible items: two $0.50 books, one $0.75 book, nineteen $1.00 books
+        //   - Rule A: "Buy 10 get 1 free" → freeCount = 22 / 11 = 2
+        //   - Rule B: "Buy 20 get 1 free" → freeCount = 22 / 21 = 1
+        //
+        // Expected after the fix:
+        //   - Rule A picks the two $0.50 books → savings $1.00
+        //   - Rule B picks the next-cheapest $0.75 book (not the same $0.50!) → savings $0.75
+        //   - Total: $1.75 (NOT $1.50, which was the buggy answer)
+        List<CartItem> items = new java.util.ArrayList<>();
+        items.add(book("a", 0.50));
+        items.add(book("b", 0.50));
+        items.add(book("c", 0.75));
+        for (int i = 0; i < 19; i++) items.add(book("d" + i, 1.00));
+        var cart = cartOf(items.toArray(new CartItem[0]));
+
+        var result = DiscountService.computeDiscounts(cart, List.of(
+            buyXGetOneFree(10, false, false, false),
+            buyXGetOneFree(20, false, false, false)));
+
+        assertEquals(1.75, result.getAmount(), 0.001,
+            "Two BUY_X rules must free three DISTINCT cheapest items, not free the same book twice");
+        assertEquals(2, result.getBreakdown().size());
+
+        // Buy 10 should claim the two $0.50 books (savings $1.00).
+        var buy10 = result.getBreakdown().stream()
+            .filter(b -> b.getDescription().startsWith("Buy 10"))
+            .findFirst().orElseThrow();
+        assertEquals(1.00, buy10.getAmount(), 0.001);
+        assertTrue(buy10.getDescription().contains("(2 free, $-1.00)"),
+            "Buy 10's description should show 2 free books at $1.00 — got: " + buy10.getDescription());
+
+        // Buy 20 should claim the $0.75 book (savings $0.75, NOT $0.50).
+        var buy20 = result.getBreakdown().stream()
+            .filter(b -> b.getDescription().startsWith("Buy 20"))
+            .findFirst().orElseThrow();
+        assertEquals(0.75, buy20.getAmount(), 0.001,
+            "Buy 20 must pick the $0.75 book — picking another $0.50 would double-count savings");
+        assertTrue(buy20.getDescription().contains("(1 free, $-0.75)"),
+            "Buy 20's description should reflect the $0.75 pick — got: " + buy20.getDescription());
+    }
+
+    @Test
+    void twoBuyXGetOneFreeRules_smallerXAlwaysPicksFirst_regardlessOfRuleOrder() {
+        // Confirms that the deterministic xBooks-ascending sort means rule order in the
+        // input list doesn't change which rule claims which books. Same scenario as above
+        // but with the rules passed in reversed order.
+        List<CartItem> items = new java.util.ArrayList<>();
+        items.add(book("a", 0.50));
+        items.add(book("b", 0.50));
+        items.add(book("c", 0.75));
+        for (int i = 0; i < 19; i++) items.add(book("d" + i, 1.00));
+        var cart = cartOf(items.toArray(new CartItem[0]));
+
+        var result = DiscountService.computeDiscounts(cart, List.of(
+            buyXGetOneFree(20, false, false, false),  // larger X passed FIRST
+            buyXGetOneFree(10, false, false, false)));
+
+        // Total must still be $1.75 — sort is by xBooks, not by input order.
+        assertEquals(1.75, result.getAmount(), 0.001);
+        var buy10 = result.getBreakdown().stream()
+            .filter(b -> b.getDescription().startsWith("Buy 10"))
+            .findFirst().orElseThrow();
+        var buy20 = result.getBreakdown().stream()
+            .filter(b -> b.getDescription().startsWith("Buy 20"))
+            .findFirst().orElseThrow();
+        assertEquals(1.00, buy10.getAmount(), 0.001, "Buy 10 should still claim the cheapest two");
+        assertEquals(0.75, buy20.getAmount(), 0.001, "Buy 20 should still pick the leftover $0.75");
+    }
 
     @Test
     void twoPercentOverRules_stackIndependently_neitherAffectsTheOther() {

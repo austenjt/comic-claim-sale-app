@@ -250,26 +250,46 @@ export class CartComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Identifies which item IDs are free under a BUY_X_GET_ONE_FREE rule.
-   * Mirrors the backend logic: sort eligible items by price ascending, then greedily pick the
-   * cheapest until their cumulative price equals rule.amount.
+   * Computes the free-item set for every BUY_X_GET_ONE_FREE rule in the cart's breakdown
+   * with cross-rule dedupe — mirrors {@code DiscountService.computeBuyXFreePicks} on the
+   * backend so the per-row FREE badges line up with the backend's authoritative discount
+   * amounts. Without dedupe, two rules whose backend-computed amounts both consume the
+   * same $0.50 book would show only one FREE badge instead of two distinct ones.
+   *
+   * <p>Rules are processed in the breakdown's order; the backend produces the breakdown in
+   * xBooks-ascending order so smaller-X rules already claim the cheapest items first, and
+   * each later rule's {@code amount} reflects the leftover cheapest sum. We greedily
+   * consume {@code rule.amount} from the cheapest items not yet freed.</p>
    */
-  private getFreeItemIds(rule: CartDiscount): Set<string> {
-    const eligible = this.visibleItems
-      .filter(i => !i.wonViaBid && !this.isItemExcluded(i, rule))
-      .slice()
-      .sort((a, b) => a.price - b.price);
+  private computeBuyXFreeIds(): Map<string, Set<string>> {
+    const result = new Map<string, Set<string>>();
+    const breakdown = this.cart?.discountBreakdown;
+    if (!breakdown || breakdown.length === 0) return result;
 
-    const freeIds = new Set<string>();
-    let remaining = Math.round(rule.amount * 100) / 100;
-    for (const item of eligible) {
-      if (remaining < 0.005) break;
-      if (item.price <= remaining + 0.005) {
-        freeIds.add(item.comicId);
-        remaining = Math.round((remaining - item.price) * 100) / 100;
+    const alreadyFreed = new Set<string>();
+    for (const rule of breakdown) {
+      if (!this.isBuyXFreeRule(rule)) continue;
+
+      const eligible = this.visibleItems
+        .filter(i => !i.wonViaBid
+          && !this.isItemExcluded(i, rule)
+          && !alreadyFreed.has(i.comicId))
+        .slice()
+        .sort((a, b) => a.price - b.price);
+
+      const freeIds = new Set<string>();
+      let remaining = Math.round(rule.amount * 100) / 100;
+      for (const item of eligible) {
+        if (remaining < 0.005) break;
+        if (item.price <= remaining + 0.005) {
+          freeIds.add(item.comicId);
+          alreadyFreed.add(item.comicId);
+          remaining = Math.round((remaining - item.price) * 100) / 100;
+        }
       }
+      result.set(rule.description, freeIds);
     }
-    return freeIds;
+    return result;
   }
 
   /**
@@ -290,12 +310,13 @@ export class CartComponent implements OnInit, OnDestroy {
 
     const breakdown = this.cart?.discountBreakdown;
     if (breakdown && breakdown.length > 0) {
+      const buyXFreeMap = this.computeBuyXFreeIds();
       let totalItemDiscount = 0;
       for (const rule of breakdown) {
         if (this.isItemExcluded(item, rule)) continue;
         if (this.isBuyXFreeRule(rule)) {
           // Free items absorb their full price from this rule; all others absorb nothing.
-          if (this.getFreeItemIds(rule).has(item.comicId)) {
+          if (buyXFreeMap.get(rule.description)?.has(item.comicId)) {
             totalItemDiscount += item.price;
           }
           continue;

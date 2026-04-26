@@ -19,8 +19,12 @@ import org.example.functions.model.enums.DiscountType;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -124,6 +128,13 @@ public class DiscountService {
             .filter(i -> !i.isAwarded() && i.getPrice() > 0)
             .collect(Collectors.toList());
 
+        // Pre-compute free-item picks for all BUY_X_GET_ONE_FREE rules. Rules with smaller
+        // xBooks are processed first so they claim the cheapest items, then larger-X rules
+        // dedupe against those picks. Without this, two rules can both pick the same cheap
+        // book — the per-row math caps the second "free" assignment at zero, silently losing
+        // discount value the customer was promised.
+        Map<String, List<CartItem>> buyXFreePicks = computeBuyXFreePicks(baseItems, active);
+
         double totalSavings = 0.0;
         boolean anySetsExcluded = false;
         boolean anyAuctionsExcluded = false;
@@ -174,17 +185,14 @@ public class DiscountService {
                     break;
                 }
                 case BUY_X_GET_ONE_FREE: {
-                    int freeCount = itemCount / (d.getXBooks() + 1);
-                    if (freeCount > 0) {
-                        List<Double> prices = discountableItems.stream()
-                            .map(CartItem::getPrice)
-                            .sorted(Comparator.naturalOrder())
-                            .collect(Collectors.toList());
-                        double savings = prices.subList(0, Math.min(freeCount, prices.size()))
-                            .stream().mapToDouble(Double::doubleValue).sum();
+                    // Picks were pre-computed with cross-rule dedupe; just look up this rule's items.
+                    List<CartItem> picked = buyXFreePicks.getOrDefault(d.getId(), java.util.Collections.emptyList());
+                    if (!picked.isEmpty()) {
+                        double savings = picked.stream().mapToDouble(CartItem::getPrice).sum();
                         if (savings > 0) {
                             totalSavings += savings;
-                            String desc = String.format("Buy %d get 1 free (%d free, $-%.2f)%s", d.getXBooks(), freeCount, savings, excludeNote);
+                            String desc = String.format("Buy %d get 1 free (%d free, $-%.2f)%s",
+                                d.getXBooks(), picked.size(), savings, excludeNote);
                             descriptions.add(desc);
                             breakdown.add(new CartDiscount(savings, desc, excludeSets, excludeAuctions, excludeGraded));
                         }
@@ -220,6 +228,74 @@ public class DiscountService {
         if (auctions) parts.add("auctions");
         if (graded) parts.add("graded");
         return " (" + String.join(", ", parts) + " excluded)";
+    }
+
+    /**
+     * Determines which items each {@code BUY_X_GET_ONE_FREE} rule will mark as free, with
+     * cross-rule deduping so the same physical book is never counted as free under more
+     * than one rule.
+     *
+     * <p>Algorithm:</p>
+     * <ol>
+     *   <li>Filter {@code active} to BUY_X rules and sort by {@code xBooks} ascending
+     *       (with discount id as a stable tiebreaker). Smaller-X rules trigger more often
+     *       and on more carts, so they claim the cheapest books first; larger-X rules
+     *       pick from what's left.</li>
+     *   <li>For each rule in that order, count free books from its <em>full</em> eligible
+     *       pool ({@code freeCount = pool.size() / (xBooks + 1)}) — this matches the
+     *       customer's mental model: "you have N books, this rule frees floor(N/(X+1))".</li>
+     *   <li>Pick that many items from the rule's eligible pool, sorted by price ascending,
+     *       skipping any item already freed by a prior rule. Add the picks to the global
+     *       already-freed set and record them in the result map keyed by discount id.</li>
+     * </ol>
+     *
+     * <p>Without this step, two rules can both pick the same $0.50 book; the customer
+     * sees only that book go to zero, and the second rule's promised savings vanish.</p>
+     */
+    private static Map<String, List<CartItem>> computeBuyXFreePicks(
+            List<CartItem> baseItems, List<Discount> active) {
+        List<Discount> buyXRules = active.stream()
+            .filter(d -> d.getType() == DiscountType.BUY_X_GET_ONE_FREE)
+            .sorted(Comparator
+                .<Discount>comparingInt(d -> d.getXBooks())
+                .thenComparing(Discount::getId, Comparator.nullsLast(Comparator.naturalOrder())))
+            .collect(Collectors.toList());
+
+        Map<String, List<CartItem>> picks = new HashMap<>();
+        Set<String> alreadyFreedIds = new HashSet<>();
+
+        for (Discount d : buyXRules) {
+            boolean excludeSets = Boolean.TRUE.equals(d.getExcludeSets());
+            boolean excludeAuctions = Boolean.TRUE.equals(d.getExcludeAuctions());
+            boolean excludeGraded = Boolean.TRUE.equals(d.getExcludeGraded());
+
+            // The rule's eligible pool — same filters used in the main computeDiscounts loop.
+            List<CartItem> ruleEligible = baseItems.stream()
+                .filter(i -> !(excludeSets && i.getCollectionGroup() != null && i.getCollectionGroup() > 0))
+                .filter(i -> !(excludeAuctions && i.isWonViaBid()))
+                .filter(i -> !(excludeGraded && i.isGraded()))
+                .collect(Collectors.toList());
+
+            // freeCount uses the rule's full eligible pool, independent of other rules' picks.
+            int freeCount = ruleEligible.size() / (d.getXBooks() + 1);
+            if (freeCount == 0) continue;
+
+            // Pick from items not bid-won and not already freed by a prior BUY_X rule.
+            List<CartItem> pickPool = ruleEligible.stream()
+                .filter(i -> !i.isWonViaBid())
+                .filter(i -> !alreadyFreedIds.contains(i.getComicId()))
+                .sorted(Comparator.comparingDouble(CartItem::getPrice))
+                .collect(Collectors.toList());
+
+            int actualPick = Math.min(freeCount, pickPool.size());
+            if (actualPick == 0) continue;
+
+            List<CartItem> picked = new ArrayList<>(pickPool.subList(0, actualPick));
+            for (CartItem item : picked) alreadyFreedIds.add(item.getComicId());
+            picks.put(d.getId(), picked);
+        }
+
+        return picks;
     }
 
     public static class DiscountResult {
