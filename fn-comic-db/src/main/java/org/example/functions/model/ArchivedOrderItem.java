@@ -20,4 +20,8 @@ public class ArchivedOrderItem {
     private double price;
     private String claimedAt;
     private Integer collectionGroup;
+    /** Mirrors {@code CartItem.wonViaBid} so the frontend can apply auction-exclusion math after archive. */
+    private boolean wonViaBid;
+    /** Mirrors {@code CartItem.isGraded} so the frontend can apply graded-exclusion math after archive. */
+    private boolean isGraded;
 }

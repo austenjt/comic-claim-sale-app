@@ -138,6 +138,7 @@ public class CartService {
                 : comic.getTargetPrice() != null ? comic.getTargetPrice().doubleValue() : 0.0);
         item.setClaimedAt(Instant.now().toString());
         item.setWonViaBid(wonViaBid);
+        item.setGraded(isComicGraded(comic));
 
         cart.getItems().add(item);
         save(cart);
@@ -193,6 +194,7 @@ public class CartService {
                         : member.getTargetPrice() != null ? member.getTargetPrice().doubleValue() : 0.0);
                 memberCount++;
             }
+            item.setGraded(isComicGraded(member));
             cart.getItems().add(item);
         }
         save(cart);
@@ -267,6 +269,7 @@ public class CartService {
         item.setPrice(0.0);
         item.setClaimedAt(Instant.now().toString());
         item.setAwarded(true);
+        item.setGraded(isComicGraded(comic));
 
         cart.getItems().add(item);
         save(cart);
@@ -288,6 +291,8 @@ public class CartService {
         cart.setDiscountAmount(discountResult.getAmount());
         cart.setDiscountDescription(discountResult.getDescription());
         cart.setDiscountExcludesSets(discountResult.isExcludedSets() ? Boolean.TRUE : null);
+        cart.setDiscountExcludesAuctions(discountResult.isExcludedAuctions() ? Boolean.TRUE : null);
+        cart.setDiscountExcludesGraded(discountResult.isExcludedGraded() ? Boolean.TRUE : null);
         cart.setDiscountBreakdown(discountResult.getBreakdown());
         int bookCount = (int) cart.getItems().stream().filter(i -> !i.isSetContainer()).count();
         cart.setShippingCost(ShippingCalculator.estimate(bookCount).getEstimatedCost());
@@ -344,6 +349,9 @@ public class CartService {
         cart.setFinalizedAt(null);
         cart.setDiscountAmount(0.0);
         cart.setDiscountDescription(null);
+        cart.setDiscountExcludesSets(null);
+        cart.setDiscountExcludesAuctions(null);
+        cart.setDiscountExcludesGraded(null);
         cart.setShippingCost(0.0);
         cart.setAdminNotes(null);
         cart.setTrackingNumber(null);
@@ -657,6 +665,13 @@ public class CartService {
         } catch (Exception e) {
             log.warn("Failed to write return event for comic {}: {}", item.getComicId(), e.getMessage());
         }
+    }
+
+    /** Returns true if the comic is CGC/CBCS-graded — used to snapshot {@code CartItem.isGraded}. */
+    private static boolean isComicGraded(ComicBook comic) {
+        return comic != null
+            && comic.getComicCondition() != null
+            && Boolean.TRUE.equals(comic.getComicCondition().getIsGraded());
     }
 
     private static String formatComicNumber(ComicNumber n) {

@@ -16,6 +16,8 @@ interface CartRow {
   claimedAt: string;
   removeId: string;
   wonViaBid: boolean;
+  /** True for single rows when the item is graded; for set rows, true if ANY member is graded. */
+  isGraded: boolean;
   containerTitle?: string;
   containerId?: string;
 }
@@ -182,6 +184,7 @@ export class CartComponent implements OnInit, OnDestroy {
           claimedAt: setItems[0].claimedAt,
           removeId: setItems[0].comicId,
           wonViaBid: setItems.some(i => !!i.wonViaBid),
+          isGraded: setItems.some(i => !!i.isGraded),
           containerTitle: container?.comicTitle,
           containerId: container?.comicId
         });
@@ -193,7 +196,8 @@ export class CartComponent implements OnInit, OnDestroy {
           totalPrice: item.price,
           claimedAt: item.claimedAt,
           removeId: item.comicId,
-          wonViaBid: !!item.wonViaBid
+          wonViaBid: !!item.wonViaBid,
+          isGraded: !!item.isGraded
         });
       }
     }
@@ -222,14 +226,21 @@ export class CartComponent implements OnInit, OnDestroy {
     return this.cart?.status !== 'OPEN' && (this.cart?.discountAmount ?? 0) > 0;
   }
 
+  /** Apply rule-level exclusions to a cart item. Mirrors backend DiscountService logic. */
+  private isItemExcluded(item: CartItem, rule: CartDiscount): boolean {
+    if (rule.excludesSets && item.collectionGroup != null && item.collectionGroup > 0) return true;
+    if (rule.excludesAuctions && item.wonViaBid) return true;
+    if (rule.excludesGraded && item.isGraded) return true;
+    return false;
+  }
+
   /**
    * Returns the eligible base price total for a given discount rule — i.e. the sum of prices
-   * for all non-bid items that this rule applies to.
+   * for all non-bid items that this rule applies to (after honoring its exclude flags).
    */
   private eligibleBaseForRule(rule: CartDiscount): number {
     return this.visibleItems
-      .filter(i => !i.wonViaBid &&
-        !(rule.excludesSets && i.collectionGroup != null && i.collectionGroup > 0))
+      .filter(i => !i.wonViaBid && !this.isItemExcluded(i, rule))
       .reduce((sum, i) => sum + i.price, 0);
   }
 
@@ -240,13 +251,12 @@ export class CartComponent implements OnInit, OnDestroy {
 
   /**
    * Identifies which item IDs are free under a BUY_X_GET_ONE_FREE rule.
-   * Mirrors the backend logic: sort eligible (non-bid, non-set-if-excluded) items by price
-   * ascending, then greedily pick the cheapest until their cumulative price equals rule.amount.
+   * Mirrors the backend logic: sort eligible items by price ascending, then greedily pick the
+   * cheapest until their cumulative price equals rule.amount.
    */
   private getFreeItemIds(rule: CartDiscount): Set<string> {
     const eligible = this.visibleItems
-      .filter(i => !i.wonViaBid &&
-        !(rule.excludesSets && i.collectionGroup != null && i.collectionGroup > 0))
+      .filter(i => !i.wonViaBid && !this.isItemExcluded(i, rule))
       .slice()
       .sort((a, b) => a.price - b.price);
 
@@ -280,10 +290,9 @@ export class CartComponent implements OnInit, OnDestroy {
 
     const breakdown = this.cart?.discountBreakdown;
     if (breakdown && breakdown.length > 0) {
-      const isSetMember = item.collectionGroup != null && item.collectionGroup > 0;
       let totalItemDiscount = 0;
       for (const rule of breakdown) {
-        if (rule.excludesSets && isSetMember) continue;
+        if (this.isItemExcluded(item, rule)) continue;
         if (this.isBuyXFreeRule(rule)) {
           // Free items absorb their full price from this rule; all others absorb nothing.
           if (this.getFreeItemIds(rule).has(item.comicId)) {

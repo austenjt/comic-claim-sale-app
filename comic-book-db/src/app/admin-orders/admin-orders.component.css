@@ -261,7 +261,13 @@ tfoot td { font-weight: bold; background: #adc178; }
   border-color: var(--color-danger-hover);
 }
 
-/* Bid-won rows: amber left border + faint warm tint on the first cell */
+/* Graded-comic rows: blue left border + faint cool tint, same visual weight as bid-won.
+   Declared BEFORE .won-via-bid-row so that auction highlighting wins when a row is both. */
+.graded-row td { background: rgba(50, 110, 200, 0.06); }
+.graded-row td:first-child { border-left: 3px solid #3a7ec9; }
+
+/* Bid-won rows: amber left border + faint warm tint on the first cell. Takes precedence
+   over .graded-row by virtue of being declared later (same specificity, later wins). */
 .won-via-bid-row td { background: rgba(200, 145, 50, 0.06); }
 .won-via-bid-row td:first-child { border-left: 3px solid #c9893a; }
 

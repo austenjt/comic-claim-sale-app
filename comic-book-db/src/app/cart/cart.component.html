@@ -54,7 +54,9 @@
       <tbody>
         <ng-container *ngFor="let row of groupedRows">
           <!-- Single comic: one row -->
-          <tr *ngIf="row.type === 'single'" [class.won-via-bid-row]="row.wonViaBid">
+          <tr *ngIf="row.type === 'single'"
+              [class.won-via-bid-row]="row.wonViaBid"
+              [class.graded-row]="row.isGraded">
             <td>
               <a [routerLink]="['/detail', row.items[0].comicId]">
                 {{ row.items[0].comicTitle }}{{ row.items[0].comicNumber ? ' ' + row.items[0].comicNumber : '' }}
@@ -75,7 +77,9 @@
           </tr>
           <!-- Set: header row (title + date + release) then one row per member comic -->
           <ng-container *ngIf="row.type === 'set'">
-            <tr class="set-header-row" [class.won-via-bid-row]="row.wonViaBid">
+            <tr class="set-header-row"
+                [class.won-via-bid-row]="row.wonViaBid"
+                [class.graded-row]="row.isGraded">
               <td>
                 <a class="set-header-link" [routerLink]="['/set', row.containerId ?? row.items[0].comicId]">
                   {{ row.containerTitle ?? row.items[0].comicTitle }}
@@ -94,7 +98,10 @@
                 <button *ngIf="!row.wonViaBid" class="btn-release" (click)="removeItem(row.removeId)">Release</button>
               </td>
             </tr>
-            <tr *ngFor="let comic of row.items" class="set-member-row" [class.won-via-bid-row]="row.wonViaBid">
+            <tr *ngFor="let comic of row.items"
+                class="set-member-row"
+                [class.won-via-bid-row]="row.wonViaBid"
+                [class.graded-row]="comic.isGraded">
               <td class="set-member-comic">
                 <a [routerLink]="['/detail', comic.comicId]">
                   {{ comic.comicTitle }}{{ comic.comicNumber ? ' ' + comic.comicNumber : '' }}

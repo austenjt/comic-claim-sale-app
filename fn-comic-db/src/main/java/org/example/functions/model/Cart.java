@@ -23,6 +23,8 @@ public class Cart {
     private double discountAmount;       // snapshotted at submit time
     private String discountDescription;  // human-readable summary of applied discounts
     private Boolean discountExcludesSets; // true when any active discount rule excluded set items
+    private Boolean discountExcludesAuctions; // true when any active discount rule excluded auction (bid-won) items
+    private Boolean discountExcludesGraded; // true when any active discount rule excluded graded comics
     private List<CartDiscount> discountBreakdown = new ArrayList<>(); // per-rule breakdown for frontend per-item display
     private double shippingCost;         // snapshotted at submit time
     private PaymentStatus paymentStatus; // set by admin
@@ -100,6 +102,12 @@ public class Cart {
 
     public Boolean getDiscountExcludesSets() { return discountExcludesSets; }
     public void setDiscountExcludesSets(Boolean discountExcludesSets) { this.discountExcludesSets = discountExcludesSets; }
+
+    public Boolean getDiscountExcludesAuctions() { return discountExcludesAuctions; }
+    public void setDiscountExcludesAuctions(Boolean discountExcludesAuctions) { this.discountExcludesAuctions = discountExcludesAuctions; }
+
+    public Boolean getDiscountExcludesGraded() { return discountExcludesGraded; }
+    public void setDiscountExcludesGraded(Boolean discountExcludesGraded) { this.discountExcludesGraded = discountExcludesGraded; }
 
     public List<CartDiscount> getDiscountBreakdown() { return discountBreakdown; }
     public void setDiscountBreakdown(List<CartDiscount> discountBreakdown) {

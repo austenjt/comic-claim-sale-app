@@ -2,6 +2,8 @@ export interface CartDiscount {
   amount: number;
   description: string;
   excludesSets: boolean;
+  excludesAuctions?: boolean;
+  excludesGraded?: boolean;
 }
 
 export interface ShippingEstimate {
@@ -22,6 +24,8 @@ export interface CartItem {
   isSetContainer?: boolean;
   /** True when this item was won through a bidding cycle — cannot be returned. */
   wonViaBid?: boolean;
+  /** True when the source comic is graded (CGC/CBCS). Snapshotted at cart-add time. */
+  isGraded?: boolean;
 }
 
 export interface Cart {
@@ -38,6 +42,8 @@ export interface Cart {
   discountAmount?: number;
   discountDescription?: string | null;
   discountExcludesSets?: boolean | null;
+  discountExcludesAuctions?: boolean | null;
+  discountExcludesGraded?: boolean | null;
   discountBreakdown?: CartDiscount[] | null;
   shippingCost?: number;
   paymentStatus?: 'UNPAID' | 'PARTIAL' | 'PAID' | null;

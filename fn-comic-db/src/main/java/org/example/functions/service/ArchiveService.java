@@ -184,7 +184,12 @@ public class ArchiveService {
         return result;
     }
 
-    private ArchivedOrder toArchivedOrder(Cart cart) {
+    /**
+     * Maps a fulfilled {@link Cart} to its persistent {@link ArchivedOrder} representation.
+     * Package-private and static so unit tests can verify the field-by-field copy without
+     * needing to mock Cosmos.
+     */
+    static ArchivedOrder toArchivedOrder(Cart cart) {
         List<ArchivedOrderItem> items = cart.getItems().stream()
             .map(i -> ArchivedOrderItem.builder()
                 .comicId(i.getComicId())
@@ -193,6 +198,8 @@ public class ArchiveService {
                 .price(i.getPrice())
                 .claimedAt(i.getClaimedAt())
                 .collectionGroup(i.getCollectionGroup())
+                .wonViaBid(i.isWonViaBid())
+                .isGraded(i.isGraded())
                 .build())
             .collect(Collectors.toList());
 
@@ -204,6 +211,10 @@ public class ArchiveService {
             .items(items)
             .discountAmount(cart.getDiscountAmount())
             .discountDescription(cart.getDiscountDescription())
+            .discountExcludesSets(cart.getDiscountExcludesSets())
+            .discountExcludesAuctions(cart.getDiscountExcludesAuctions())
+            .discountExcludesGraded(cart.getDiscountExcludesGraded())
+            .discountBreakdown(cart.getDiscountBreakdown())
             .shippingCost(cart.getShippingCost())
             .createdAt(cart.getCreatedAt())
             .fulfilledAt(cart.getFulfilledAt())

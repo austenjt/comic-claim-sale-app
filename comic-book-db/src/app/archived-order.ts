@@ -1,3 +1,5 @@
+import { CartDiscount } from './cart';
+
 export interface ArchivedOrderItem {
   comicId?: string | null;
   comicTitle: string;
@@ -6,6 +8,7 @@ export interface ArchivedOrderItem {
   claimedAt: string;
   collectionGroup?: number | null;
   wonViaBid?: boolean;
+  isGraded?: boolean;
 }
 
 export interface ArchivedOrder {
@@ -16,6 +19,10 @@ export interface ArchivedOrder {
   items: ArchivedOrderItem[];
   discountAmount: number;
   discountDescription?: string;
+  discountExcludesSets?: boolean | null;
+  discountExcludesAuctions?: boolean | null;
+  discountExcludesGraded?: boolean | null;
+  discountBreakdown?: CartDiscount[] | null;
   shippingCost?: number;
   createdAt: string;
   fulfilledAt: string;

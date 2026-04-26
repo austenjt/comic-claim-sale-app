@@ -8,5 +8,9 @@ export interface Discount {
   percentageOff: number;
   xBooks: number;
   excludeSets: boolean;
+  /** When true, items won via auction (bid) are excluded from this rule's count and discount. */
+  excludeAuctions?: boolean;
+  /** When true, graded comics (CGC/CBCS) are excluded from this rule's count and discount. */
+  excludeGraded?: boolean;
   createdAt: string;
 }

@@ -106,9 +106,16 @@ public class DiscountService {
      * All rules stack; total savings are capped at the cart subtotal.
      */
     public DiscountResult applyDiscounts(Cart cart) {
-        List<Discount> active = getActiveDiscounts();
-        if (active.isEmpty()) {
-            return new DiscountResult(0.0, null, false, new ArrayList<>());
+        return computeDiscounts(cart, getActiveDiscounts());
+    }
+
+    /**
+     * Pure-functional discount calculation, separated from the Cosmos read so unit tests can
+     * exercise the math in isolation. Package-private on purpose.
+     */
+    static DiscountResult computeDiscounts(Cart cart, List<Discount> active) {
+        if (active == null || active.isEmpty()) {
+            return new DiscountResult(0.0, null, false, false, false, new ArrayList<>());
         }
 
         // Bid-won items count toward tier thresholds but never receive a discount themselves.
@@ -119,6 +126,8 @@ public class DiscountService {
 
         double totalSavings = 0.0;
         boolean anySetsExcluded = false;
+        boolean anyAuctionsExcluded = false;
+        boolean anyGradedExcluded = false;
         List<String> descriptions = new ArrayList<>();
         List<CartDiscount> breakdown = new ArrayList<>();
         double baseSubtotal = baseItems.stream()
@@ -128,13 +137,18 @@ public class DiscountService {
 
         for (Discount d : active) {
             boolean excludeSets = Boolean.TRUE.equals(d.getExcludeSets());
-            if (excludeSets) {
-                anySetsExcluded = true;
-            }
-            // When excludeSets is true, set member items (collectionGroup > 0) are excluded from
-            // both the threshold count and discount eligibility for this rule.
+            boolean excludeAuctions = Boolean.TRUE.equals(d.getExcludeAuctions());
+            boolean excludeGraded = Boolean.TRUE.equals(d.getExcludeGraded());
+            if (excludeSets) anySetsExcluded = true;
+            if (excludeAuctions) anyAuctionsExcluded = true;
+            if (excludeGraded) anyGradedExcluded = true;
+
+            // Each enabled exclude flag drops the matching items from BOTH the threshold count
+            // and the discount-eligible pool for this rule.
             List<CartItem> countableItems = baseItems.stream()
                 .filter(i -> !(excludeSets && i.getCollectionGroup() != null && i.getCollectionGroup() > 0))
+                .filter(i -> !(excludeAuctions && i.isWonViaBid()))
+                .filter(i -> !(excludeGraded && i.isGraded()))
                 .collect(Collectors.toList());
 
             List<CartItem> discountableItems = countableItems.stream()
@@ -146,7 +160,7 @@ public class DiscountService {
                 .sum();
             int itemCount = countableItems.size();
 
-            String excludeNote = excludeSets ? " (sets excluded)" : "";
+            String excludeNote = buildExcludeNote(excludeSets, excludeAuctions, excludeGraded);
 
             switch (d.getType()) {
                 case RAW_PERCENTAGE: {
@@ -155,7 +169,7 @@ public class DiscountService {
                         totalSavings += savings;
                         String desc = String.format("%.0f%% off ($-%.2f)%s", d.getPercentageOff(), savings, excludeNote);
                         descriptions.add(desc);
-                        breakdown.add(new CartDiscount(savings, desc, excludeSets));
+                        breakdown.add(new CartDiscount(savings, desc, excludeSets, excludeAuctions, excludeGraded));
                     }
                     break;
                 }
@@ -172,7 +186,7 @@ public class DiscountService {
                             totalSavings += savings;
                             String desc = String.format("Buy %d get 1 free (%d free, $-%.2f)%s", d.getXBooks(), freeCount, savings, excludeNote);
                             descriptions.add(desc);
-                            breakdown.add(new CartDiscount(savings, desc, excludeSets));
+                            breakdown.add(new CartDiscount(savings, desc, excludeSets, excludeAuctions, excludeGraded));
                         }
                     }
                     break;
@@ -184,7 +198,7 @@ public class DiscountService {
                             totalSavings += savings;
                             String desc = String.format("%.0f%% off (over %d books, $-%.2f)%s", d.getPercentageOff(), d.getXBooks(), savings, excludeNote);
                             descriptions.add(desc);
-                            breakdown.add(new CartDiscount(savings, desc, excludeSets));
+                            breakdown.add(new CartDiscount(savings, desc, excludeSets, excludeAuctions, excludeGraded));
                         }
                     }
                     break;
@@ -194,25 +208,44 @@ public class DiscountService {
 
         totalSavings = Math.min(totalSavings, baseSubtotal);
         String description = descriptions.isEmpty() ? null : String.join("; ", descriptions);
-        return new DiscountResult(totalSavings, description, anySetsExcluded, breakdown);
+        return new DiscountResult(totalSavings, description,
+            anySetsExcluded, anyAuctionsExcluded, anyGradedExcluded, breakdown);
+    }
+
+    /** Builds the human-readable parenthetical for which categories were excluded by a rule. */
+    private static String buildExcludeNote(boolean sets, boolean auctions, boolean graded) {
+        if (!sets && !auctions && !graded) return "";
+        List<String> parts = new ArrayList<>();
+        if (sets) parts.add("sets");
+        if (auctions) parts.add("auctions");
+        if (graded) parts.add("graded");
+        return " (" + String.join(", ", parts) + " excluded)";
     }
 
     public static class DiscountResult {
         private final double amount;
         private final String description;
         private final boolean excludedSets;
+        private final boolean excludedAuctions;
+        private final boolean excludedGraded;
         private final List<CartDiscount> breakdown;
 
-        public DiscountResult(double amount, String description, boolean excludedSets, List<CartDiscount> breakdown) {
+        public DiscountResult(double amount, String description,
+                              boolean excludedSets, boolean excludedAuctions, boolean excludedGraded,
+                              List<CartDiscount> breakdown) {
             this.amount = amount;
             this.description = description;
             this.excludedSets = excludedSets;
+            this.excludedAuctions = excludedAuctions;
+            this.excludedGraded = excludedGraded;
             this.breakdown = breakdown;
         }
 
         public double getAmount() { return amount; }
         public String getDescription() { return description; }
         public boolean isExcludedSets() { return excludedSets; }
+        public boolean isExcludedAuctions() { return excludedAuctions; }
+        public boolean isExcludedGraded() { return excludedGraded; }
         public List<CartDiscount> getBreakdown() { return breakdown; }
     }
 }

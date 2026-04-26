@@ -59,14 +59,38 @@ export class SalesModalComponent implements OnInit, OnDestroy {
   }
 
   describeDiscount(d: Discount): string {
-    const setsNote = d.excludeSets ? ' (sets not included)' : '';
+    const note = this.exclusionPhrase(d);
     switch (d.type) {
       case 'RAW_PERCENTAGE':
-        return `${d.percentageOff}% off your entire order${setsNote}`;
+        return `${d.percentageOff}% off items in your order${note}`;
       case 'BUY_X_GET_ONE_FREE':
-        return `Buy ${d.xBooks} books — get the cheapest one free${setsNote}`;
+        return `Buy ${d.xBooks} books — get the cheapest one free${note}`;
       case 'PERCENT_OFF_OVER_X_BOOKS':
-        return `${d.percentageOff}% off when you claim more than ${d.xBooks} book${d.xBooks === 1 ? '' : 's'}${setsNote}`;
+        return `${d.percentageOff}% off when you claim more than ${d.xBooks} book${d.xBooks === 1 ? '' : 's'}${note}`;
     }
+  }
+
+  /**
+   * Builds the customer-facing parenthetical that lists which categories the rule excludes.
+   * Reads naturally — "(sets not included)", "(sets and auction items not included)",
+   * "(sets, auction items, and graded comics not included)" — depending on which flags are set.
+   * Returns an empty string when no exclusions apply.
+   */
+  private exclusionPhrase(d: Discount): string {
+    const parts: string[] = [];
+    if (d.excludeSets) parts.push('sets');
+    if (d.excludeAuctions) parts.push('auction items');
+    if (d.excludeGraded) parts.push('graded comics');
+    if (parts.length === 0) return '';
+    let joined: string;
+    if (parts.length === 1) {
+      joined = parts[0];
+    } else if (parts.length === 2) {
+      joined = `${parts[0]} and ${parts[1]}`;
+    } else {
+      // Oxford comma for three or more.
+      joined = `${parts.slice(0, -1).join(', ')}, and ${parts[parts.length - 1]}`;
+    }
+    return ` (${joined} not included)`;
   }
 }

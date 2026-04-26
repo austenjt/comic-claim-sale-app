@@ -22,6 +22,15 @@ public class CartItem {
     @JsonProperty("isAwarded")
     private boolean isAwarded;
 
+    /**
+     * True when the source comic is graded (CGC/CBCS). Snapshotted at cart-add time so
+     * discount rules with {@code excludeGraded=true} don't have to round-trip Cosmos per item.
+     * Defaults to false for legacy cart items, which means they'll be treated as ungraded —
+     * acceptable since legacy carts predate the excludeGraded feature.
+     */
+    @JsonProperty("isGraded")
+    private boolean isGraded;
+
     public CartItem() {}
 
     public String getComicId() { return comicId; }
@@ -50,4 +59,7 @@ public class CartItem {
 
     public boolean isAwarded() { return isAwarded; }
     public void setAwarded(boolean awarded) { isAwarded = awarded; }
+
+    public boolean isGraded() { return isGraded; }
+    public void setGraded(boolean graded) { isGraded = graded; }
 }
