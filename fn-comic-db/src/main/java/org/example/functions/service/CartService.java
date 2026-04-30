@@ -301,8 +301,9 @@ public class CartService {
         if (customerNotes != null && !customerNotes.isBlank()) {
             cart.setCustomerNotes(customerNotes.trim());
         }
+        cart.setInvoiceNumber(generateInvoiceNumber());
         save(cart);
-        log.info("Cart {} submitted", cart.getId());
+        log.info("Cart {} submitted as {}", cart.getId(), cart.getInvoiceNumber());
         sendOrderSubmittedEmail(cart);
         return cart;
     }
@@ -774,6 +775,34 @@ public class CartService {
         } catch (Exception e) {
             log.warn("Failed to send fulfillment email to {}: {}", cart.getUserEmail(), e.getMessage());
         }
+    }
+
+    /**
+     * Atomically allocates the next invoice number by incrementing a counter document
+     * stored in the carts container under the fixed ID {@code _invoice_counter}.
+     * Returns a formatted string like {@code "LCR-0042"}.
+     */
+    private String generateInvoiceNumber() {
+        final String COUNTER_ID = "_invoice_counter";
+        final PartitionKey pk = new PartitionKey(COUNTER_ID);
+        int nextValue;
+        try {
+            ObjectNode node = cartsContainer.readItem(COUNTER_ID, pk, ObjectNode.class).getItem();
+            nextValue = node.get("value").asInt(0) + 1;
+            node.put("value", nextValue);
+            cartsContainer.replaceItem(node, COUNTER_ID, pk, new CosmosItemRequestOptions());
+        } catch (CosmosException e) {
+            if (e.getStatusCode() == 404) {
+                nextValue = 1;
+                ObjectNode node = OBJECT_MAPPER.createObjectNode();
+                node.put("id", COUNTER_ID);
+                node.put("value", nextValue);
+                cartsContainer.createItem(node, pk, new CosmosItemRequestOptions());
+            } else {
+                throw e;
+            }
+        }
+        return String.format("LCR-%04d", nextValue);
     }
 
     private Cart findCartById(String cartId) {

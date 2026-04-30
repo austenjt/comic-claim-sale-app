@@ -51,5 +51,6 @@ export interface Cart {
   trackingNumber?: string | null;
   customerNotes?: string | null;
   adminNotes?: string | null;
+  invoiceNumber?: string | null;
   shippingEstimate?: ShippingEstimate | null;
 }

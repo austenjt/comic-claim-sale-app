@@ -32,6 +32,7 @@ public class Cart {
     private String trackingNumber;       // optional shipping tracking number
     private String customerNotes;        // optional message from user, captured at submit time
     private String adminNotes;           // internal notes from admin
+    private String invoiceNumber;        // human-readable order number, e.g. "LCR-0042", set on submission
 
     /**
      * Cosmos {@code _etag} captured at read time, used for optimistic-concurrency
@@ -99,6 +100,9 @@ public class Cart {
 
     public String getAdminNotes() { return adminNotes; }
     public void setAdminNotes(String adminNotes) { this.adminNotes = adminNotes; }
+
+    public String getInvoiceNumber() { return invoiceNumber; }
+    public void setInvoiceNumber(String invoiceNumber) { this.invoiceNumber = invoiceNumber; }
 
     public Boolean getDiscountExcludesSets() { return discountExcludesSets; }
     public void setDiscountExcludesSets(Boolean discountExcludesSets) { this.discountExcludesSets = discountExcludesSets; }

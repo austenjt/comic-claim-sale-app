@@ -31,4 +31,5 @@ export interface ArchivedOrder {
   trackingNumber?: string | null;
   customerNotes?: string | null;
   adminNotes?: string | null;
+  invoiceNumber?: string | null;
 }

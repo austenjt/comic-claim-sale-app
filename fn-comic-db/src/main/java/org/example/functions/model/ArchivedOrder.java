@@ -40,4 +40,5 @@ public class ArchivedOrder {
     private String trackingNumber;
     private String customerNotes;
     private String adminNotes;
+    private String invoiceNumber;
 }

@@ -223,6 +223,7 @@ public class ArchiveService {
             .trackingNumber(cart.getTrackingNumber())
             .customerNotes(cart.getCustomerNotes())
             .adminNotes(cart.getAdminNotes())
+            .invoiceNumber(cart.getInvoiceNumber())
             .build();
     }
 }

@@ -16,6 +16,7 @@
         <span class="order-status" [ngClass]="'status-' + order.status.toLowerCase()">
           {{ statusLabel(order.status) }}
         </span>
+        <span *ngIf="order.invoiceNumber" class="order-invoice">Order #{{ order.invoiceNumber }}</span>
         <span class="order-date">Opened: {{ order.createdAt | date:'short' }}</span>
         <span *ngIf="order.finalizedAt" class="order-date">Finalized: {{ order.finalizedAt | date:'short' }}</span>
       </div>
@@ -348,6 +349,7 @@
       </div>
       <div class="order-meta">
         <span class="order-status status-fulfilled">Fulfilled</span>
+        <span *ngIf="order.invoiceNumber" class="order-invoice">Order #{{ order.invoiceNumber }}</span>
         <span class="order-date">Ordered: {{ order.createdAt | date:'short' }}</span>
         <span *ngIf="order.fulfilledAt" class="order-date">Fulfilled: {{ order.fulfilledAt | date:'short' }}</span>
       </div>

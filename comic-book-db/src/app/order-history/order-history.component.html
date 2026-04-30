@@ -11,6 +11,7 @@
     <div class="order-header">
       <div class="order-meta">
         <span class="order-status">Fulfilled</span>
+        <span *ngIf="order.invoiceNumber" class="order-invoice">Order #{{ order.invoiceNumber }}</span>
         <span class="order-date">Ordered: {{ order.createdAt | date:'mediumDate' }}</span>
         <span *ngIf="order.fulfilledAt" class="order-date">Shipped: {{ order.fulfilledAt | date:'mediumDate' }}</span>
       </div>

@@ -41,6 +41,7 @@
     <div class="cart-status" [ngClass]="'status-' + cart.status.toLowerCase()">
       {{ statusLabel }}
     </div>
+    <div *ngIf="cart.invoiceNumber" class="invoice-number">Order #{{ cart.invoiceNumber }}</div>
 
     <table *ngIf="visibleItems.length > 0">
       <thead>
