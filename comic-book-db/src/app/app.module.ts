@@ -41,6 +41,7 @@ import { SetDetailComponent } from './set-detail/set-detail.component';
 import { DashboardHeaderComponent } from './dashboard-header/dashboard-header.component';
 import { PaginationBarComponent } from './pagination-bar/pagination-bar.component';
 import { SalesModalComponent } from './sales-modal/sales-modal.component';
+import { SquarePaymentModalComponent } from './square-payment-modal/square-payment-modal.component';
 
 @NgModule({
     declarations: [
@@ -66,6 +67,7 @@ import { SalesModalComponent } from './sales-modal/sales-modal.component';
         DashboardHeaderComponent,
         PaginationBarComponent,
         SalesModalComponent,
+        SquarePaymentModalComponent,
     ],
     bootstrap: [AppComponent],
     imports: [

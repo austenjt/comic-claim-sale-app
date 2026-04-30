@@ -126,6 +126,37 @@ tfoot td { font-weight: bold; background: #adc178; }
   white-space: pre-wrap;
 }
 
+.payment-success-banner {
+  background: var(--color-success-bg);
+  color: var(--color-success);
+  border-left: 4px solid var(--color-success);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3) var(--space-4);
+  font-weight: var(--fw-medium);
+}
+
+/* Square Pay Now button — matches Square's brand blue */
+.btn-square-pay {
+  display: inline-block;
+  height: 48px;
+  line-height: 48px;
+  min-width: 212px;
+  padding: 0 var(--space-6);
+  background-color: #006aff;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  font-size: var(--fs-16);
+  font-weight: var(--fw-semibold);
+  font-family: inherit;
+  text-align: center;
+  cursor: pointer;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1) inset;
+  transition: background-color var(--duration-base) var(--ease-standard);
+  margin-right: var(--space-3);
+}
+.btn-square-pay:hover { background-color: #0058d6; }
+
 /* Unsubmit: outline-info (blue) — visually says "this is reversible" */
 .btn-unsubmit {
   margin-top: var(--space-3);

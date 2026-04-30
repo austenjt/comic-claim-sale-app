@@ -1,0 +1,26 @@
+<div class="modal-overlay" (click)="close()">
+  <div class="modal modal--sm sq-modal" role="dialog" aria-modal="true"
+       aria-labelledby="sq-modal-title"
+       (click)="$event.stopPropagation()">
+
+    <h3 id="sq-modal-title" class="modal__title">Complete Payment</h3>
+
+    <p class="sq-amount">
+      Total due: <strong>{{ amountDollars | currency }}</strong>
+    </p>
+
+    <div *ngIf="sdkError" class="sq-error">{{ sdkError }}</div>
+
+    <div id="sq-card-container" class="sq-card-container"></div>
+
+    <div *ngIf="payError" class="sq-error">{{ payError }}</div>
+
+    <div class="modal__actions sq-actions">
+      <button class="sq-btn-cancel" (click)="close()" [disabled]="paying">Cancel</button>
+      <button class="sq-btn-pay" (click)="pay()" [disabled]="paying || !!sdkError">
+        {{ paying ? 'Processing…' : 'Pay ' + (amountDollars | currency) }}
+      </button>
+    </div>
+
+  </div>
+</div>

@@ -34,6 +34,8 @@ export class CartComponent implements OnInit, OnDestroy {
   error = '';
   submitting = false;
   customerNotes = '';
+  showPaymentModal = false;
+  paymentSuccess = false;
 
   confirmModal: {
     comicId: string;
@@ -365,6 +367,11 @@ export class CartComponent implements OnInit, OnDestroy {
 
   canUnsubmit(): boolean {
     return this.cart?.status === 'FINALIZING' || this.cart?.status === 'FINALIZED';
+  }
+
+  onPaymentComplete() {
+    this.showPaymentModal = false;
+    this.paymentSuccess = true;
   }
 
   unsubmit() {

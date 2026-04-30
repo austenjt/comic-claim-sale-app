@@ -163,6 +163,9 @@
         Your order has been submitted. You can still remove items if needed.
         Once fulfilled, you can start a new claim cart.
       </p>
+      <button class="btn-square-pay" (click)="showPaymentModal = true" [disabled]="paymentSuccess">
+        {{ paymentSuccess ? 'Paid ✓' : 'Pay Now' }}
+      </button>
       <button class="btn-unsubmit" (click)="unsubmit()">UnSubmit Order</button>
     </div>
 
@@ -203,9 +206,26 @@
       <p class="finalized-note">
         Your order is finalized and with the seller. Payment details will be arranged directly.
       </p>
+      <button class="btn-square-pay" (click)="showPaymentModal = true" [disabled]="paymentSuccess">
+        {{ paymentSuccess ? 'Paid ✓' : 'Pay Now' }}
+      </button>
       <button class="btn-unsubmit" (click)="unsubmit()">UnSubmit Order</button>
     </div>
   </ng-container>
+
+  <!-- Payment success banner -->
+  <div class="cart-actions payment-success-banner" *ngIf="paymentSuccess">
+    Payment received — thank you! The seller has been notified.
+  </div>
+
+  <!-- Square payment modal -->
+  <app-square-payment-modal
+    *ngIf="showPaymentModal"
+    [amountDollars]="discountedTotal"
+    [cartId]="cart?.id ?? ''"
+    (paid)="onPaymentComplete()"
+    (closed)="showPaymentModal = false">
+  </app-square-payment-modal>
 
   <!-- Release confirmation modal -->
   <div class="modal-backdrop modal-overlay" *ngIf="confirmModal" (click)="cancelRelease()">
