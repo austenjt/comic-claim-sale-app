@@ -166,7 +166,8 @@ export class SetDetailComponent implements OnInit, OnDestroy {
    * {@link canClaimSet} returns false and the button renders disabled.
    */
   showClaimSetButton(): boolean {
-    return this.setMembers.length > 0 &&
+    return this.container?.isForSale === true &&
+           this.setMembers.length > 0 &&
            this.totalPrice > 0 &&
            !this.isSetInMyCart() &&
            !this.isSetClaimedByOther();

@@ -190,7 +190,8 @@ h2 {
 .btn-bid-start,
 .btn-start-bid,
 .btn-cancel-bid,
-.btn-award {
+.btn-award,
+.btn-sell {
   padding: var(--space-1) var(--space-4);
   border-radius: var(--radius-sm);
   font-size: var(--fs-14);
@@ -356,6 +357,17 @@ h2 {
 .btn-award:hover:not(:disabled) {
   background: #6F523F;
   border-color: #6F523F;
+}
+
+/* Sell — admin action to mark an item as for sale */
+.btn-sell {
+  background: #2d6a4f;
+  color: var(--color-text-inverse);
+  border-color: #2d6a4f;
+}
+.btn-sell:hover:not(:disabled) {
+  background: #1b4332;
+  border-color: #1b4332;
 }
 
 /* Delete-card — outline danger, smaller geometry */

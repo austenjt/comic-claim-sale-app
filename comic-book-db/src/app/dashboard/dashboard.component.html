@@ -193,6 +193,8 @@
                 {{ claimingSetId === comic.id ? 'Adding…' : 'Claim Set' }}
               </button>
             </ng-container>
+            <button *ngIf="auth.isAdmin() && !comic.isForSale" class="btn-sell"
+              (click)="$event.preventDefault(); $event.stopPropagation(); markForSale(comic)">Sell</button>
           </div>
         </div>
       </a>
@@ -302,6 +304,8 @@
               <button *ngIf="auth.isAdmin() && configService.awardModeEnabled && !claimedDate(comic.id) && !comic.comicCondition?.cgcCondition?.grade && !comic.comicCondition?.cbcsCondition?.grade && !isBiddingActive(comic)"
                 class="btn-award"
                 (click)="$event.preventDefault(); $event.stopPropagation(); openAwardModal(comic)">Award</button>
+              <button *ngIf="auth.isAdmin() && !comic.isForSale" class="btn-sell"
+                (click)="$event.preventDefault(); $event.stopPropagation(); markForSale(comic)">Sell</button>
             </ng-template>
           </div>
         </div>

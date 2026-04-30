@@ -91,6 +91,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   get displayComics(): Comic[] {
     let result = this.pageItems;
+    // Non-admins never see items not marked for sale (backend also enforces this)
+    if (!this.auth.isAdmin()) {
+      result = result.filter(c => c.isForSale === true);
+    }
     if (this.excludeClaimed) {
       result = result.filter(c => {
         if (this.recentlyActedIds.has(String(c.id))) return true;
@@ -693,6 +697,17 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
     if (anyActive) this.startBidTimer();
     if (this.pageItems.some(c => c.enableBid && !c.sold)) this.startBidPolling();
+  }
+
+  markForSale(comic: Comic): void {
+    const updated: Comic = { ...comic, isForSale: true };
+    this.comicService.updateComic(updated).subscribe({
+      next: () => {
+        const idx = this.pageItems.findIndex(c => c.id === comic.id);
+        if (idx >= 0) this.pageItems[idx] = { ...this.pageItems[idx], isForSale: true };
+      },
+      error: () => {}
+    });
   }
 
   trackById(_index: number, comic: Comic): number { return comic.id; }
