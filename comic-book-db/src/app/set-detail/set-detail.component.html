@@ -118,6 +118,10 @@
           <span *ngIf="!auth.isAdmin()" class="detail-value">{{ container.publicNotes }}</span>
           <textarea *ngIf="auth.isAdmin()" class="detail-edit-textarea" rows="7" [(ngModel)]="editContainer!.publicNotes"></textarea>
         </div>
+        <div class="detail-item" *ngIf="container.ebayListingUrl">
+          <span class="detail-label">eBay Listing</span>
+          <span class="detail-value"><a [href]="container.ebayListingUrl" target="_blank" rel="noopener noreferrer">View on eBay</a></span>
+        </div>
       </div>
 
       <!-- Admin-only sale / collection fields -->
@@ -127,6 +131,10 @@
           <div class="detail-item">
             <span class="detail-label">For Sale</span>
             <input class="detail-edit-checkbox" type="checkbox" [(ngModel)]="editContainer!.isForSale">
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">eBay Listing URL</span>
+            <input class="detail-edit-input" type="url" [(ngModel)]="editContainer!.ebayListingUrl" placeholder="https://www.ebay.com/itm/...">
           </div>
           <div class="detail-item">
             <span class="detail-label">Storage Location</span>

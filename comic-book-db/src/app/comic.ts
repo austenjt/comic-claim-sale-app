@@ -88,6 +88,7 @@ export interface Comic {
   dateAcquired: string | null;
   purchasedFrom: string | null;
   purchaseReferenceURL: string | null;
+  ebayListingUrl?: string | null;
   salePrice: number | null;
   dateSold: string | null;
   soldTo: string | null;

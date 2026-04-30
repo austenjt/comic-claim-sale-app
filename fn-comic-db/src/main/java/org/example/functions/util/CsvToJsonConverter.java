@@ -248,7 +248,10 @@ public class CsvToJsonConverter {
           comicBook.setTitle(reconcileTitleWithNumber(title, comicNumber));
           comicBook.setNumber(comicNumber);
 
-          // Series
+          // Series — fall back to the reconciled title (bracketed) when the CSV column is blank
+          if (isBlank(series)) {
+              series = "[" + comicBook.getTitle() + "]";
+          }
           comicBook.setSeries(series);
 
           // GoCollect info

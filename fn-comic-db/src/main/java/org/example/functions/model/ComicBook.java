@@ -65,6 +65,7 @@ public class ComicBook {
     private String purchaseReferenceURL;
 
     // Sale info
+    private String ebayListingUrl;
     @JsonSerialize(using = MoneySerializer.class)
     private BigDecimal salePrice;
     private String dateSold;

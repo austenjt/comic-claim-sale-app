@@ -138,15 +138,12 @@ tfoot td { font-weight: bold; background: #adc178; }
 /* Square Pay Now button — matches Square's brand blue */
 .btn-square-pay {
   display: inline-block;
-  height: 48px;
-  line-height: 48px;
-  min-width: 212px;
-  padding: 0 var(--space-6);
+  padding: var(--space-2) var(--space-6);
   background-color: #006aff;
   color: #ffffff;
   border: none;
-  border-radius: 6px;
-  font-size: var(--fs-16);
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-14);
   font-weight: var(--fw-semibold);
   font-family: inherit;
   text-align: center;
