@@ -43,6 +43,8 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
   backImageUploadErrorSummary = '';
   backImageUploadErrorDetail = '';
   backImageUploadErrorExpanded = false;
+  captureModalOpen = false;
+  captureModalTarget: 'front' | 'back' | null = null;
   readonly Math = Math;
   linkCopied = false;
   pendingDelete = false;
@@ -137,6 +139,8 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
     this.backImageUploadErrorSummary = '';
     this.backImageUploadErrorDetail = '';
     this.backImageUploadErrorExpanded = false;
+    this.captureModalOpen = false;
+    this.captureModalTarget = null;
     if (this.bidTimerInterval) { clearInterval(this.bidTimerInterval); this.bidTimerInterval = null; }
     if (this.bidPollInterval) { clearInterval(this.bidPollInterval); this.bidPollInterval = null; }
     if (this.claimEventSub) { this.claimEventSub.unsubscribe(); this.claimEventSub = null; }
@@ -515,10 +519,28 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
     this.zoomOpen = !this.zoomOpen;
   }
 
-  onImageFileSelected(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    if (!input.files?.length || !this.comic) return;
-    const file = input.files[0];
+  openCaptureModal(target: 'front' | 'back'): void {
+    this.captureModalTarget = target;
+    this.captureModalOpen = true;
+  }
+
+  onCaptureFile(file: File): void {
+    if (this.captureModalTarget === 'front') {
+      this.uploadFrontImage(file);
+    } else if (this.captureModalTarget === 'back') {
+      this.uploadBackImage(file);
+    }
+    this.captureModalOpen = false;
+    this.captureModalTarget = null;
+  }
+
+  closeCaptureModal(): void {
+    this.captureModalOpen = false;
+    this.captureModalTarget = null;
+  }
+
+  private uploadFrontImage(file: File): void {
+    if (!this.comic) return;
     this.imageUploading = true;
     this.imageUploadErrorSummary = '';
     this.imageUploadErrorDetail = '';
@@ -530,22 +552,18 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
           this.comic.largeCachedImageId = updatedComic.largeCachedImageId;
           this.comic.smallCachedImageId = updatedComic.smallCachedImageId;
         }
-        input.value = '';
       },
       error: (err: any) => {
         this.imageUploading = false;
         const sizeMB = (file.size / 1024 / 1024).toFixed(1);
         this.imageUploadErrorSummary = `Upload failed (${sizeMB} MB).`;
         this.imageUploadErrorDetail = err?.error || err?.message || 'Image may be too large or an invalid format.';
-        input.value = '';
       }
     });
   }
 
-  onBackImageFileSelected(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    if (!input.files?.length || !this.comic) return;
-    const file = input.files[0];
+  private uploadBackImage(file: File): void {
+    if (!this.comic) return;
     this.backImageUploading = true;
     this.backImageUploadErrorSummary = '';
     this.backImageUploadErrorDetail = '';
@@ -557,14 +575,12 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
           this.comic.largeBackImageId = updatedComic.largeBackImageId;
           this.comic.smallBackImageId = updatedComic.smallBackImageId;
         }
-        input.value = '';
       },
       error: (err: any) => {
         this.backImageUploading = false;
         const sizeMB = (file.size / 1024 / 1024).toFixed(1);
         this.backImageUploadErrorSummary = `Upload failed (${sizeMB} MB).`;
         this.backImageUploadErrorDetail = err?.error || err?.message || 'Image may be too large or an invalid format.';
-        input.value = '';
       }
     });
   }

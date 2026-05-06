@@ -1,0 +1,52 @@
+<div class="modal-overlay" (click)="close()">
+  <div class="capture-modal modal" role="dialog" aria-modal="true"
+       [attr.aria-label]="title"
+       (click)="$event.stopPropagation()">
+
+    <div class="modal__title">{{ title }}</div>
+
+    <!-- Stage: picker -->
+    <ng-container *ngIf="stage === 'picker'">
+      <div class="picker-options">
+        <button class="picker-btn" type="button" (click)="openFileInput()">
+          <span class="picker-icon">&#128193;</span>
+          <span>Upload from File</span>
+        </button>
+        <button class="picker-btn" type="button" (click)="openCamera()">
+          <span class="picker-icon">&#128247;</span>
+          <span>Use Camera</span>
+        </button>
+      </div>
+      <div *ngIf="cameraError" class="capture-error" role="alert">{{ cameraError }}</div>
+      <div class="capture-modal-footer">
+        <button class="capture-cancel-btn" type="button" (click)="close()">Cancel</button>
+      </div>
+      <input #fileInput type="file" accept="image/png,image/jpeg" style="display:none"
+             (change)="onFileSelected($event)">
+    </ng-container>
+
+    <!-- Stage: camera -->
+    <ng-container *ngIf="stage === 'camera'">
+      <div class="camera-viewport">
+        <video #videoEl class="camera-video" autoplay playsinline muted></video>
+      </div>
+      <canvas #canvasEl style="display:none"></canvas>
+      <div class="capture-modal-footer">
+        <button class="picker-btn capture-action-btn" type="button" (click)="capture()">&#128247; Take Photo</button>
+        <button class="capture-cancel-btn" type="button" (click)="close()">Cancel</button>
+      </div>
+    </ng-container>
+
+    <!-- Stage: preview -->
+    <ng-container *ngIf="stage === 'preview'">
+      <div class="preview-viewport">
+        <img [src]="previewDataUrl" alt="Captured image preview" class="preview-img">
+      </div>
+      <div class="capture-modal-footer">
+        <button class="picker-btn capture-action-btn" type="button" (click)="confirm()">Use This Photo</button>
+        <button class="capture-cancel-btn" type="button" (click)="retake()">Retake</button>
+      </div>
+    </ng-container>
+
+  </div>
+</div>

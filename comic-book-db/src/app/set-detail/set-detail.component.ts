@@ -34,6 +34,8 @@ export class SetDetailComponent implements OnInit, OnDestroy {
   backImageUploading = false;
   backImageUploadError = '';
   linkCopied = false;
+  captureModalOpen = false;
+  captureModalTarget: 'front' | 'back' | null = null;
 
   removingId: number | null = null;
   editContainer: Comic | null = null;
@@ -211,10 +213,28 @@ export class SetDetailComponent implements OnInit, OnDestroy {
     });
   }
 
-  onImageFileSelected(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    if (!input.files?.length || !this.container) return;
-    const file = input.files[0];
+  openCaptureModal(target: 'front' | 'back'): void {
+    this.captureModalTarget = target;
+    this.captureModalOpen = true;
+  }
+
+  onCaptureFile(file: File): void {
+    if (this.captureModalTarget === 'front') {
+      this.uploadFrontImage(file);
+    } else if (this.captureModalTarget === 'back') {
+      this.uploadBackImage(file);
+    }
+    this.captureModalOpen = false;
+    this.captureModalTarget = null;
+  }
+
+  closeCaptureModal(): void {
+    this.captureModalOpen = false;
+    this.captureModalTarget = null;
+  }
+
+  private uploadFrontImage(file: File): void {
+    if (!this.container) return;
     this.imageUploading = true;
     this.imageUploadError = '';
     this.imageService.uploadComicImage(this.container.id, file).subscribe({
@@ -224,20 +244,16 @@ export class SetDetailComponent implements OnInit, OnDestroy {
           this.container.largeCachedImageId = updatedComic.largeCachedImageId;
           this.container.smallCachedImageId = updatedComic.smallCachedImageId;
         }
-        input.value = '';
       },
       error: () => {
         this.imageUploading = false;
         this.imageUploadError = 'Upload failed. Image may be too large or an invalid format.';
-        input.value = '';
       }
     });
   }
 
-  onBackImageFileSelected(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    if (!input.files?.length || !this.container) return;
-    const file = input.files[0];
+  private uploadBackImage(file: File): void {
+    if (!this.container) return;
     this.backImageUploading = true;
     this.backImageUploadError = '';
     this.imageService.uploadComicBackImage(this.container.id, file).subscribe({
@@ -247,12 +263,10 @@ export class SetDetailComponent implements OnInit, OnDestroy {
           this.container.largeBackImageId = updatedComic.largeBackImageId;
           this.container.smallBackImageId = updatedComic.smallBackImageId;
         }
-        input.value = '';
       },
       error: () => {
         this.backImageUploading = false;
         this.backImageUploadError = 'Upload failed. Image may be too large or an invalid format.';
-        input.value = '';
       }
     });
   }

@@ -93,7 +93,7 @@
 
         <div *ngIf="auth.isAdmin()" class="img-update-bar">
           <ng-container *ngIf="activeImage === 'front'">
-            <button class="img-update-btn" (click)="imageFileInput.click()" [disabled]="imageUploading">
+            <button class="img-update-btn" (click)="openCaptureModal('front')" [disabled]="imageUploading">
               {{ imageUploading ? 'Uploading...' : 'Update Front Cover' }}
             </button>
             <div *ngIf="imageUploadErrorSummary" class="img-upload-error">
@@ -105,7 +105,7 @@
             </div>
           </ng-container>
           <ng-container *ngIf="activeImage === 'back'">
-            <button class="img-update-btn" (click)="backImageFileInput.click()" [disabled]="backImageUploading">
+            <button class="img-update-btn" (click)="openCaptureModal('back')" [disabled]="backImageUploading">
               {{ backImageUploading ? 'Uploading...' : 'Update Back Cover' }}
             </button>
             <div *ngIf="backImageUploadErrorSummary" class="img-upload-error">
@@ -133,11 +133,6 @@
           <span class="thumb-label">Back</span>
         </div>
       </div>
-
-      <input #imageFileInput type="file" accept="image/png,image/jpeg" style="display:none"
-             (change)="onImageFileSelected($event)">
-      <input #backImageFileInput type="file" accept="image/png,image/jpeg" style="display:none"
-             (change)="onBackImageFileSelected($event)">
 
     </div>
 
@@ -755,3 +750,10 @@
     </div>
   </div>
 </div>
+
+<app-image-capture-modal
+  *ngIf="captureModalOpen"
+  [title]="captureModalTarget === 'front' ? 'Update Front Cover' : 'Update Back Cover'"
+  (fileSelected)="onCaptureFile($event)"
+  (closed)="closeCaptureModal()">
+</app-image-capture-modal>
