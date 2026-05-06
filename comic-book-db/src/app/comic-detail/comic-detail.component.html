@@ -475,7 +475,7 @@
         <div class="detail-item" *ngIf="auth.isAdmin() || comic.defects">
           <span class="detail-label">Defects</span>
           <span *ngIf="!auth.isAdmin()" class="detail-value">{{comic.defects}}</span>
-          <input *ngIf="auth.isAdmin()" class="detail-edit-input" type="text" [(ngModel)]="editComic!.defects">
+          <textarea *ngIf="auth.isAdmin()" class="detail-edit-textarea" rows="3" [(ngModel)]="editComic!.defects"></textarea>
         </div>
       </div>
 
