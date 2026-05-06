@@ -53,6 +53,15 @@
   letter-spacing: 0.02em;
 }
 
+.header-title-since {
+  display: block;
+  font-size: 0.6rem;
+  font-weight: 400;
+  font-style: italic;
+  color: rgba(173, 193, 120, 0.65);
+  letter-spacing: 0.02em;
+}
+
 /* Right section: avatar + dropdown */
 .header-user {
   position: relative;
