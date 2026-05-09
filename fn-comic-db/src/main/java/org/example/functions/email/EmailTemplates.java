@@ -4,6 +4,7 @@ import org.example.functions.model.ArchivedOrder;
 import org.example.functions.model.ArchivedOrderItem;
 import org.example.functions.model.Cart;
 import org.example.functions.model.CartItem;
+import org.example.functions.model.ShippingAddress;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -42,6 +43,7 @@ public final class EmailTemplates {
             + buildOrderItemsText(cart) + "\n"
             + (cart.getCustomerNotes() != null && !cart.getCustomerNotes().isBlank()
                 ? "Your notes: " + cart.getCustomerNotes() + "\n\n" : "")
+            + buildShippingAddressText(cart.getUserName(), cart.getShippingAddress())
             + "Thank you for shopping with Lightning Comics!\n";
         return new Email("Your Order is Being Processed", body);
     }
@@ -53,6 +55,7 @@ public final class EmailTemplates {
             + "ORDER RECEIPT\n"
             + "=============\n"
             + buildOrderItemsText(cart) + "\n"
+            + buildShippingAddressText(cart.getUserName(), cart.getShippingAddress())
             + "Thank you for your payment!\n\n"
             + "Lightning Comics\n";
         return new Email("Payment Received", body);
@@ -125,6 +128,7 @@ public final class EmailTemplates {
             + itemsText
             + "\n"
             + summary
+            + buildShippingAddressText(cart.getUserName(), cart.getShippingAddress())
             + trackingLine
             + sellerNotesLine
             + "\nThank you for your business. We hope you enjoy your comics!\n\n"
@@ -168,6 +172,23 @@ public final class EmailTemplates {
     }
 
     // ─── Shared helpers ───────────────────────────────────────────────────────
+
+    /** Formats a shipping address block for inclusion in emails. Returns empty string if no address. */
+    private static String buildShippingAddressText(String recipientName, ShippingAddress address) {
+        if (address == null) return "";
+        StringBuilder sb = new StringBuilder("\nSHIP TO\n-------\n");
+        sb.append(recipientName).append("\n");
+        sb.append(address.getStreet1()).append("\n");
+        if (address.getStreet2() != null && !address.getStreet2().isBlank()) {
+            sb.append(address.getStreet2()).append("\n");
+        }
+        sb.append(address.getCity()).append(", ").append(address.getState()).append(" ").append(address.getZip()).append("\n");
+        if (address.getPhone() != null && !address.getPhone().isBlank()) {
+            sb.append(address.getPhone()).append("\n");
+        }
+        sb.append("\n");
+        return sb.toString();
+    }
 
     /** Itemized list + subtotal/shipping/discount/total block used by Cart-based emails. */
     private static String buildOrderItemsText(Cart cart) {

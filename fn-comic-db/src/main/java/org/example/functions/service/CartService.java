@@ -18,6 +18,7 @@ import org.example.functions.util.Mappers;
 import org.example.functions.util.ShippingCalculator;
 import org.example.functions.model.Cart;
 import org.example.functions.model.CartItem;
+import org.example.functions.model.ShippingAddress;
 import org.example.functions.model.ClaimNotification;
 import org.example.functions.model.ComicBook;
 import org.example.functions.model.ComicNumber;
@@ -370,6 +371,19 @@ public class CartService {
         save(cart);
         log.info("Discount snapshot refreshed on cart {} — new total savings ${}", cartId, result.getAmount());
         sendOrderSubmittedEmail(cart);
+        return cart;
+    }
+
+    /** Save a shipping address on an active FINALIZING or FINALIZED cart. */
+    public Cart saveShippingAddress(String userId, ShippingAddress address) {
+        Cart cart = getActiveCart(userId)
+            .orElseThrow(() -> new IllegalStateException("No active cart found."));
+        if (!cart.is(CartStatus.FINALIZING) && !cart.is(CartStatus.FINALIZED)) {
+            throw new IllegalStateException("Cart must be submitted before adding a shipping address.");
+        }
+        cart.setShippingAddress(address);
+        save(cart);
+        log.info("Saved shipping address for cart {}", cart.getId());
         return cart;
     }
 

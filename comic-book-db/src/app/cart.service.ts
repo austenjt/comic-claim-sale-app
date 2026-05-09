@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { Cart } from './cart';
 import { Comic } from './comic';
 import { ArchivedOrder } from './archived-order';
+import { ShippingAddress } from './user';
 
 export interface ClaimNotification {
   eventType: string;
@@ -39,6 +40,10 @@ export class CartService {
 
   submitOrder(customerNotes?: string): Observable<Cart> {
     return this.http.post<Cart>(`${this.apiBase}/cart/submit`, { customerNotes: customerNotes || null });
+  }
+
+  saveShippingAddress(address: ShippingAddress): Observable<Cart> {
+    return this.http.put<Cart>(`${this.apiBase}/cart/address`, { shippingAddress: address });
   }
 
   unsubmitMyOrder(): Observable<Cart> {

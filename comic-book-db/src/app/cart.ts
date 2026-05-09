@@ -1,3 +1,5 @@
+import { ShippingAddress } from './user';
+
 export interface CartDiscount {
   amount: number;
   description: string;
@@ -53,4 +55,5 @@ export interface Cart {
   adminNotes?: string | null;
   invoiceNumber?: string | null;
   shippingEstimate?: ShippingEstimate | null;
+  shippingAddress?: ShippingAddress | null;
 }

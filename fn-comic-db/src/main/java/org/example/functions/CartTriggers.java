@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.functions.model.ArchivedOrder;
 import org.example.functions.model.Cart;
 import org.example.functions.model.ClaimNotification;
+import org.example.functions.model.ShippingAddress;
 import org.example.functions.model.ShippingEstimate;
 import org.example.functions.model.User;
 import org.example.functions.service.ActivityLogService;
@@ -173,6 +174,34 @@ public class CartTriggers {
             return badRequest(request, e.getMessage());
         } catch (Exception e) {
             log.error("submitOrder error", e);
+            return serverError(request, e);
+        }
+    }
+
+    // ─── PUT /api/cart/address ────────────────────────────────────────────────
+
+    @FunctionName("saveCartAddress")
+    public HttpResponseMessage saveCartAddress(
+        @HttpTrigger(name = "saveCartAddress", route = "cart/address",
+            methods = {HttpMethod.PUT}, authLevel = AuthorizationLevel.ANONYMOUS)
+        HttpRequestMessage<Optional<String>> request)
+    {
+        User user = AuthHelper.requireApproved(request);
+        if (user == null) return unauthorized(request);
+        try {
+            JsonNode body = OBJECT_MAPPER.readTree(request.getBody().orElse("{}"));
+            if (!body.has("shippingAddress") || body.get("shippingAddress").isNull()) {
+                return badRequest(request, "shippingAddress is required");
+            }
+            ShippingAddress address = OBJECT_MAPPER.treeToValue(body.get("shippingAddress"), ShippingAddress.class);
+            Cart cart = CartService.getServiceInstance().saveShippingAddress(user.getId(), address);
+            return cors(request.createResponseBuilder(HttpStatus.OK))
+                .header("Content-Type", "application/json")
+                .body(OBJECT_MAPPER.writeValueAsString(cart)).build();
+        } catch (IllegalStateException e) {
+            return badRequest(request, e.getMessage());
+        } catch (Exception e) {
+            log.error("saveCartAddress error", e);
             return serverError(request, e);
         }
     }

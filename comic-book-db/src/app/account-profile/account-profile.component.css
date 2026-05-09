@@ -84,6 +84,15 @@
   opacity: 0.75;
 }
 
+.form-group-row {
+  display: flex;
+  gap: 10px;
+}
+
+.form-group--city { flex: 2; }
+.form-group--state { flex: 1; }
+.form-group--zip { flex: 1.25; }
+
 .form-group-inline {
   flex-direction: row;
   align-items: center;

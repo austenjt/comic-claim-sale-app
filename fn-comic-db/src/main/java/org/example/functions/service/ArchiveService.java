@@ -224,6 +224,7 @@ public class ArchiveService {
             .customerNotes(cart.getCustomerNotes())
             .adminNotes(cart.getAdminNotes())
             .invoiceNumber(cart.getInvoiceNumber())
+            .shippingAddress(cart.getShippingAddress())
             .build();
     }
 }

@@ -152,7 +152,64 @@ tfoot td { font-weight: bold; background: #adc178; }
   transition: background-color var(--duration-base) var(--ease-standard);
   margin-right: var(--space-3);
 }
-.btn-square-pay:hover { background-color: #0058d6; }
+.btn-square-pay:hover:not(:disabled) { background-color: #0058d6; }
+.btn-square-pay:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* Checkout button row: Shipping / Pay Now / Pay Later */
+.checkout-button-row {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: var(--space-2);
+}
+
+/* Shipping: green when active, muted when done */
+.btn-shipping {
+  padding: var(--space-3) var(--space-6);
+  background: #2e7d32;
+  color: #fff;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-14);
+  font-weight: var(--fw-semibold);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.btn-shipping:hover:not(:disabled) { background: #1b5e20; }
+.btn-shipping:disabled,
+.btn-shipping--done:disabled {
+  background: #9e9e9e;
+  color: #fff;
+  cursor: default;
+  opacity: 0.8;
+}
+
+/* Pay Later: secondary outline button */
+.btn-pay-later {
+  padding: var(--space-3) var(--space-6);
+  background: transparent;
+  color: var(--color-text);
+  border: 1px solid #bbb;
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-14);
+  font-weight: var(--fw-semibold);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.btn-pay-later:hover:not(:disabled) { background: #f0f0f0; }
+.btn-pay-later:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.pay-later-note {
+  font-size: var(--fs-13);
+  color: #555;
+  margin: 0 0 var(--space-2);
+}
+
+/* Shipping address display in cart */
+.shipping-address-display .notes-value {
+  line-height: 1.6;
+}
 
 /* Unsubmit: outline-info (blue) — visually says "this is reversible" */
 .btn-unsubmit {

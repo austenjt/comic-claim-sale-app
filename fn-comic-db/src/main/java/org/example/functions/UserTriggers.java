@@ -12,6 +12,7 @@ import com.microsoft.azure.functions.annotation.BindingName;
 import com.microsoft.azure.functions.annotation.FunctionName;
 import com.microsoft.azure.functions.annotation.HttpTrigger;
 import lombok.extern.slf4j.Slf4j;
+import org.example.functions.model.ShippingAddress;
 import org.example.functions.model.User;
 import org.example.functions.service.UserService;
 import org.example.functions.util.AuthHelper;
@@ -80,7 +81,6 @@ public class UserTriggers {
             String body = request.getBody().orElse("{}");
             JsonNode json = OBJECT_MAPPER.readTree(body);
             String name          = HttpHelper.getString(json, "name");
-            String address       = HttpHelper.getString(json, "address");
             String phone         = HttpHelper.getString(json, "phone");
             String notes         = HttpHelper.getString(json, "notes");
             String preferences   = HttpHelper.getString(json, "preferences");
@@ -88,8 +88,11 @@ public class UserTriggers {
             String paypalHandle  = HttpHelper.getString(json, "paypalHandle");
             String ebayUsername  = HttpHelper.getString(json, "ebayUsername");
             String cashAppHandle = HttpHelper.getString(json, "cashAppHandle");
+            ShippingAddress shippingAddress = json.has("shippingAddress") && !json.get("shippingAddress").isNull()
+                ? OBJECT_MAPPER.treeToValue(json.get("shippingAddress"), ShippingAddress.class)
+                : null;
             User updated = UserService.getServiceInstance()
-                .updateContactDetails(caller.getId(), name, address, phone, notes, preferences,
+                .updateContactDetails(caller.getId(), name, shippingAddress, phone, notes, preferences,
                     venmoHandle, paypalHandle, ebayUsername, cashAppHandle);
             return cors(request.createResponseBuilder(HttpStatus.OK))
                 .header("Content-Type", "application/json")
@@ -276,7 +279,7 @@ public class UserTriggers {
         node.put("id",            user.getId());
         node.put("name",          user.getName());
         node.put("email",         user.getEmail());
-        node.put("address",       user.getAddress());
+        node.set("shippingAddress", OBJECT_MAPPER.valueToTree(user.getShippingAddress()));
         node.put("phone",         user.getPhone());
         node.put("notes",         user.getNotes());
         node.put("preferences",   user.getPreferences());

@@ -1,4 +1,5 @@
 import { CartDiscount } from './cart';
+import { ShippingAddress } from './user';
 
 export interface ArchivedOrderItem {
   comicId?: string | null;
@@ -32,4 +33,5 @@ export interface ArchivedOrder {
   customerNotes?: string | null;
   adminNotes?: string | null;
   invoiceNumber?: string | null;
+  shippingAddress?: ShippingAddress | null;
 }

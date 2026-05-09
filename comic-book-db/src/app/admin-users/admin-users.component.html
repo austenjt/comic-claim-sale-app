@@ -62,7 +62,13 @@
         </div>
         <div class="user-prop">
           <span class="prop-label">Address</span>
-          <span class="prop-value">{{ user.address || '—' }}</span>
+          <span class="prop-value">
+            <ng-container *ngIf="user.shippingAddress">
+              {{ user.shippingAddress.street1 }}{{ user.shippingAddress.street2 ? ', ' + user.shippingAddress.street2 : '' }},
+              {{ user.shippingAddress.city }}, {{ user.shippingAddress.state }} {{ user.shippingAddress.zip }}
+            </ng-container>
+            <ng-container *ngIf="!user.shippingAddress">—</ng-container>
+          </span>
         </div>
         <div class="user-prop">
           <span class="prop-label">Approved</span>

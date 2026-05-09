@@ -121,7 +121,7 @@ public class AuthTriggers {
         node.put("id",            user.getId());
         node.put("name",          user.getName());
         node.put("email",         user.getEmail());
-        node.put("address",       user.getAddress());
+        node.set("shippingAddress", OBJECT_MAPPER.valueToTree(user.getShippingAddress()));
         node.put("phone",         user.getPhone());
         node.put("notes",         user.getNotes());
         node.put("preferences",   user.getPreferences());

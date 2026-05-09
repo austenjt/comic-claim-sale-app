@@ -33,6 +33,7 @@ public class Cart {
     private String customerNotes;        // optional message from user, captured at submit time
     private String adminNotes;           // internal notes from admin
     private String invoiceNumber;        // human-readable order number, e.g. "LCR-0042", set on submission
+    private ShippingAddress shippingAddress; // collected during checkout after order submission
 
     /**
      * Cosmos {@code _etag} captured at read time, used for optimistic-concurrency
@@ -103,6 +104,9 @@ public class Cart {
 
     public String getInvoiceNumber() { return invoiceNumber; }
     public void setInvoiceNumber(String invoiceNumber) { this.invoiceNumber = invoiceNumber; }
+
+    public ShippingAddress getShippingAddress() { return shippingAddress; }
+    public void setShippingAddress(ShippingAddress shippingAddress) { this.shippingAddress = shippingAddress; }
 
     public Boolean getDiscountExcludesSets() { return discountExcludesSets; }
     public void setDiscountExcludesSets(Boolean discountExcludesSets) { this.discountExcludesSets = discountExcludesSets; }

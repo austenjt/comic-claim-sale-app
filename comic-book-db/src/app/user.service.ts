@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { User } from './user';
+import { User, ShippingAddress } from './user';
 import { apiBase } from './auth.config';
 
 @Injectable({ providedIn: 'root' })
@@ -28,12 +28,16 @@ export class UserService {
     return this.http.post(`${apiBase}/users/${id}/reactivate`, {}, { responseType: 'text' });
   }
 
-  updateProfile(name: string, address: string, phone: string, notes: string, preferences: string,
-                venmoHandle: string, paypalHandle: string, ebayUsername: string,
+  updateProfile(name: string, shippingAddress: ShippingAddress | null, phone: string, notes: string,
+                preferences: string, venmoHandle: string, paypalHandle: string, ebayUsername: string,
                 cashAppHandle: string): Observable<User> {
     return this.http.put<User>(`${apiBase}/users/me`, {
-      name, address, phone, notes, preferences,
+      name, shippingAddress, phone, notes, preferences,
       venmoHandle, paypalHandle, ebayUsername, cashAppHandle
     });
+  }
+
+  updateProfileAddress(shippingAddress: ShippingAddress): Observable<User> {
+    return this.http.put<User>(`${apiBase}/users/me`, { shippingAddress });
   }
 }

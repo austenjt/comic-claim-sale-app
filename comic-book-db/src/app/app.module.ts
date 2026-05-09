@@ -43,6 +43,7 @@ import { PaginationBarComponent } from './pagination-bar/pagination-bar.componen
 import { SalesModalComponent } from './sales-modal/sales-modal.component';
 import { SquarePaymentModalComponent } from './square-payment-modal/square-payment-modal.component';
 import { ImageCaptureModalComponent } from './image-capture-modal/image-capture-modal.component';
+import { ShippingModalComponent } from './shipping-modal/shipping-modal.component';
 
 @NgModule({
     declarations: [
@@ -70,6 +71,7 @@ import { ImageCaptureModalComponent } from './image-capture-modal/image-capture-
         SalesModalComponent,
         SquarePaymentModalComponent,
         ImageCaptureModalComponent,
+        ShippingModalComponent,
     ],
     bootstrap: [AppComponent],
     imports: [

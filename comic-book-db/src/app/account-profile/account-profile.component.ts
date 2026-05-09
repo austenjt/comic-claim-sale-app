@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../auth.service';
 import { UserService } from '../user.service';
-import { User } from '../user';
+import { User, ShippingAddress } from '../user';
 
 @Component({
     selector: 'app-account-profile',
@@ -11,7 +11,11 @@ import { User } from '../user';
 })
 export class AccountProfileComponent implements OnInit {
   name = '';
-  address = '';
+  street1 = '';
+  street2 = '';
+  city = '';
+  state = '';
+  zip = '';
   phone = '';
   notes = '';
   preferences = '';
@@ -30,7 +34,11 @@ export class AccountProfileComponent implements OnInit {
     const user = this.auth.currentUser$.value;
     if (user) {
       this.name = user.name ?? '';
-      this.address = user.address ?? '';
+      this.street1 = user.shippingAddress?.street1 ?? '';
+      this.street2 = user.shippingAddress?.street2 ?? '';
+      this.city = user.shippingAddress?.city ?? '';
+      this.state = user.shippingAddress?.state ?? '';
+      this.zip = user.shippingAddress?.zip ?? '';
       this.phone = user.phone ?? '';
       this.notes = user.notes ?? '';
       this.preferences = user.preferences ?? '';
@@ -45,8 +53,11 @@ export class AccountProfileComponent implements OnInit {
     this.saving = true;
     this.saveSuccess = false;
     this.saveError = '';
+    const shippingAddress: ShippingAddress | null = (this.street1 || this.city || this.state || this.zip)
+      ? { street1: this.street1, street2: this.street2 || undefined, city: this.city, state: this.state, zip: this.zip, phone: this.phone || undefined }
+      : null;
     this.userService.updateProfile(
-      this.name, this.address, this.phone, this.notes, this.preferences,
+      this.name, shippingAddress, this.phone, this.notes, this.preferences,
       this.venmoHandle, this.paypalHandle, this.ebayUsername, this.cashAppHandle
     ).subscribe({
       next: (updated: User) => {

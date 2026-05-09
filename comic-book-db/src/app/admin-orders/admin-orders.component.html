@@ -151,6 +151,16 @@
       <span class="notes-heading">Customer notes:</span> {{ order.customerNotes }}
     </div>
 
+    <div *ngIf="order.shippingAddress" class="order-notes shipping-address-note">
+      <span class="notes-heading">Ship to:</span>
+      <span class="saved-note-text">
+        {{ order.userName }},
+        {{ order.shippingAddress.street1 }}{{ order.shippingAddress.street2 ? ', ' + order.shippingAddress.street2 : '' }},
+        {{ order.shippingAddress.city }}, {{ order.shippingAddress.state }} {{ order.shippingAddress.zip }}
+        <ng-container *ngIf="order.shippingAddress.phone"> · {{ order.shippingAddress.phone }}</ng-container>
+      </span>
+    </div>
+
     <div class="order-notes admin-notes-row">
       <span class="notes-heading">Seller notes:</span>
       <ng-container *ngIf="!isNotesEditing(order.id, order.adminNotes)">
@@ -449,6 +459,16 @@
 
     <div *ngIf="order.customerNotes" class="order-notes customer-notes">
       <span class="notes-heading">Customer notes:</span> {{ order.customerNotes }}
+    </div>
+
+    <div *ngIf="order.shippingAddress" class="order-notes shipping-address-note">
+      <span class="notes-heading">Ship to:</span>
+      <span class="saved-note-text">
+        {{ order.userName }},
+        {{ order.shippingAddress.street1 }}{{ order.shippingAddress.street2 ? ', ' + order.shippingAddress.street2 : '' }},
+        {{ order.shippingAddress.city }}, {{ order.shippingAddress.state }} {{ order.shippingAddress.zip }}
+        <ng-container *ngIf="order.shippingAddress.phone"> · {{ order.shippingAddress.phone }}</ng-container>
+      </span>
     </div>
 
     <div class="order-notes admin-notes-row">

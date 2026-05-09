@@ -12,7 +12,7 @@ public class User {
     private String name;
     private String email;
     private String entraOid;
-    private String address;
+    private ShippingAddress shippingAddress;
     private String phone;
     private String notes;
     private String preferences;

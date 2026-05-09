@@ -1,0 +1,62 @@
+<div class="modal-overlay" (click)="close()" role="dialog" aria-modal="true" aria-labelledby="shipping-modal-title">
+  <div class="modal modal--lg shipping-modal" (click)="$event.stopPropagation()">
+
+    <div class="modal__header">
+      <h3 id="shipping-modal-title" class="modal__title">Shipping Address</h3>
+      <button class="modal__close" (click)="close()" aria-label="Close">&#x2715;</button>
+    </div>
+
+    <div class="modal__body shipping-modal__body">
+      <p *ngIf="hasExistingProfileAddress" class="prefill-notice">
+        We've pre-filled your saved address. Update it below if needed.
+      </p>
+
+      <div *ngIf="error" class="shipping-error">{{ error }}</div>
+
+      <div class="form-group">
+        <label for="sh-street1">Street Address <span class="required">*</span></label>
+        <input id="sh-street1" type="text" [(ngModel)]="street1" placeholder="123 Main St" />
+      </div>
+
+      <div class="form-group">
+        <label for="sh-street2">Apt / Suite <span class="optional">(optional)</span></label>
+        <input id="sh-street2" type="text" [(ngModel)]="street2" placeholder="Apt 4B" />
+      </div>
+
+      <div class="form-row">
+        <div class="form-group form-group--city">
+          <label for="sh-city">City <span class="required">*</span></label>
+          <input id="sh-city" type="text" [(ngModel)]="city" />
+        </div>
+        <div class="form-group form-group--state">
+          <label for="sh-state">State <span class="required">*</span></label>
+          <input id="sh-state" type="text" [(ngModel)]="state" maxlength="2" placeholder="TX" />
+        </div>
+        <div class="form-group form-group--zip">
+          <label for="sh-zip">ZIP <span class="required">*</span></label>
+          <input id="sh-zip" type="text" [(ngModel)]="zip" maxlength="10" placeholder="78701" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="sh-phone">Phone <span class="optional">(optional)</span></label>
+        <input id="sh-phone" type="tel" [(ngModel)]="phone" placeholder="(555) 555-5555" />
+      </div>
+
+      <label class="save-profile-check">
+        <input type="checkbox" [(ngModel)]="saveToProfile" />
+        Save this address to my profile for future orders
+      </label>
+    </div>
+
+    <div class="modal__actions shipping-modal__actions">
+      <button class="btn-pay-later-modal" [disabled]="saving || !isValid()" (click)="saveAndPayLater()">
+        Pay Later
+      </button>
+      <button class="btn-pay-now-modal" [disabled]="saving || !isValid()" (click)="saveAndPayNow()">
+        {{ saving ? 'Saving…' : 'Pay Now' }}
+      </button>
+    </div>
+
+  </div>
+</div>

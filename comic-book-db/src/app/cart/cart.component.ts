@@ -35,7 +35,9 @@ export class CartComponent implements OnInit, OnDestroy {
   submitting = false;
   customerNotes = '';
   showPaymentModal = false;
+  showShippingModal = false;
   paymentSuccess = false;
+  payLaterAcknowledged = false;
 
   confirmModal: {
     comicId: string;
@@ -369,9 +371,28 @@ export class CartComponent implements OnInit, OnDestroy {
     return this.cart?.status === 'FINALIZING' || this.cart?.status === 'FINALIZED';
   }
 
+  get isPaid(): boolean {
+    return this.paymentSuccess || this.cart?.paymentStatus === 'PAID';
+  }
+
   onPaymentComplete() {
     this.showPaymentModal = false;
     this.paymentSuccess = true;
+    this.loadCart();
+  }
+
+  onShippingAddressSaved(updatedCart: Cart) {
+    this.cart = updatedCart;
+  }
+
+  onShippingPayNow(updatedCart: Cart) {
+    this.cart = updatedCart;
+    this.showShippingModal = false;
+    this.showPaymentModal = true;
+  }
+
+  onPayLater() {
+    this.payLaterAcknowledged = true;
   }
 
   unsubmit() {

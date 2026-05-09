@@ -161,12 +161,30 @@
 
     <div class="cart-actions finalizing-note" *ngIf="cart.status === 'FINALIZING'">
       <p>
-        Your order has been submitted. You can still remove items if needed.
-        Once fulfilled, you can start a new claim cart.
+        Your order has been submitted. Complete checkout below.
+        You can still remove items if needed.
       </p>
-      <button class="btn-square-pay" (click)="showPaymentModal = true" [disabled]="paymentSuccess">
-        {{ paymentSuccess ? 'Paid ✓' : 'Pay Now' }}
-      </button>
+      <div class="checkout-button-row">
+        <button class="btn-shipping"
+                [class.btn-shipping--done]="!!cart.shippingAddress"
+                [disabled]="!!cart.shippingAddress"
+                (click)="showShippingModal = true">
+          {{ cart.shippingAddress ? '✓ Shipping' : 'Shipping' }}
+        </button>
+        <button class="btn-square-pay"
+                [disabled]="!cart.shippingAddress || isPaid"
+                (click)="showPaymentModal = true">
+          {{ isPaid ? 'Paid ✓' : 'Pay Now' }}
+        </button>
+        <button class="btn-pay-later"
+                [disabled]="!cart.shippingAddress || isPaid"
+                (click)="onPayLater()">
+          Pay Later
+        </button>
+      </div>
+      <p *ngIf="payLaterAcknowledged && cart.shippingAddress" class="pay-later-note">
+        Your order is saved. We'll be in touch about payment arrangements.
+      </p>
       <button class="btn-unsubmit" (click)="unsubmit()">UnSubmit Order</button>
     </div>
 
@@ -198,6 +216,17 @@
       <p class="notes-value">{{ cart.customerNotes }}</p>
     </div>
 
+    <div class="cart-actions shipping-address-display" *ngIf="cart.shippingAddress && cart.status !== 'OPEN'">
+      <p class="notes-label">Ship to:</p>
+      <p class="notes-value">
+        {{ cart.userName }}<br>
+        {{ cart.shippingAddress.street1 }}<br>
+        <ng-container *ngIf="cart.shippingAddress.street2">{{ cart.shippingAddress.street2 }}<br></ng-container>
+        {{ cart.shippingAddress.city }}, {{ cart.shippingAddress.state }} {{ cart.shippingAddress.zip }}
+        <ng-container *ngIf="cart.shippingAddress.phone"><br>{{ cart.shippingAddress.phone }}</ng-container>
+      </p>
+    </div>
+
     <div class="cart-actions seller-notes-display" *ngIf="cart.adminNotes">
       <p class="notes-label">Seller notes:</p>
       <p class="notes-value">{{ cart.adminNotes }}</p>
@@ -207,17 +236,44 @@
       <p class="finalized-note">
         Your order is finalized and with the seller. Payment details will be arranged directly.
       </p>
-      <button class="btn-square-pay" (click)="showPaymentModal = true" [disabled]="paymentSuccess">
-        {{ paymentSuccess ? 'Paid ✓' : 'Pay Now' }}
-      </button>
+      <div class="checkout-button-row">
+        <button class="btn-shipping"
+                [class.btn-shipping--done]="!!cart.shippingAddress"
+                [disabled]="!!cart.shippingAddress"
+                (click)="showShippingModal = true">
+          {{ cart.shippingAddress ? '✓ Shipping' : 'Shipping' }}
+        </button>
+        <button class="btn-square-pay"
+                [disabled]="!cart.shippingAddress || isPaid"
+                (click)="showPaymentModal = true">
+          {{ isPaid ? 'Paid ✓' : 'Pay Now' }}
+        </button>
+        <button class="btn-pay-later"
+                [disabled]="!cart.shippingAddress || isPaid"
+                (click)="onPayLater()">
+          Pay Later
+        </button>
+      </div>
+      <p *ngIf="payLaterAcknowledged && cart.shippingAddress" class="pay-later-note">
+        Your order is saved. We'll be in touch about payment arrangements.
+      </p>
       <button class="btn-unsubmit" (click)="unsubmit()">UnSubmit Order</button>
     </div>
   </ng-container>
 
   <!-- Payment success banner -->
-  <div class="cart-actions payment-success-banner" *ngIf="paymentSuccess">
+  <div class="cart-actions payment-success-banner" *ngIf="isPaid">
     Payment received — thank you! The seller has been notified.
   </div>
+
+  <!-- Shipping address modal -->
+  <app-shipping-modal
+    *ngIf="showShippingModal && cart"
+    [cart]="cart"
+    (saved)="onShippingAddressSaved($event)"
+    (payNowRequested)="onShippingPayNow($event)"
+    (closed)="showShippingModal = false">
+  </app-shipping-modal>
 
   <!-- Square payment modal -->
   <app-square-payment-modal

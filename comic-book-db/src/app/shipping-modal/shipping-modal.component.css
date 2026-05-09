@@ -1,0 +1,132 @@
+.shipping-modal__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.prefill-notice {
+  background: #e8f4fd;
+  border-left: 3px solid #2196f3;
+  padding: 0.5rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  color: #1565c0;
+  margin: 0;
+}
+
+.shipping-error {
+  background: #fdecea;
+  border-left: 3px solid #c62828;
+  padding: 0.5rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  color: #c62828;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.form-group label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #444;
+}
+
+.form-group input {
+  padding: 0.5rem 0.625rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 0.9375rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #1976d2;
+  box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.15);
+}
+
+.form-row {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.form-group--city { flex: 2; }
+.form-group--state { flex: 1; }
+.form-group--zip { flex: 1.25; }
+
+.required {
+  color: #c62828;
+  font-weight: normal;
+}
+
+.optional {
+  color: #888;
+  font-weight: normal;
+  font-size: 0.8rem;
+}
+
+.save-profile-check {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: #555;
+  cursor: pointer;
+  margin-top: 0.25rem;
+}
+
+.save-profile-check input {
+  cursor: pointer;
+}
+
+.shipping-modal__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+.btn-pay-later-modal {
+  padding: 0.55rem 1.25rem;
+  border: 1px solid #bbb;
+  border-radius: 6px;
+  background: #f5f5f5;
+  color: #444;
+  font-size: 0.9375rem;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btn-pay-later-modal:hover:not(:disabled) {
+  background: #e0e0e0;
+}
+
+.btn-pay-later-modal:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-pay-now-modal {
+  padding: 0.55rem 1.5rem;
+  border: none;
+  border-radius: 6px;
+  background: #1976d2;
+  color: #fff;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btn-pay-now-modal:hover:not(:disabled) {
+  background: #1565c0;
+}
+
+.btn-pay-now-modal:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

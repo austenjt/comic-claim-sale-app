@@ -17,9 +17,31 @@
       <input id="name" type="text" [(ngModel)]="name" name="name" required />
     </div>
 
+    <div class="form-section-heading">Shipping Address</div>
+
     <div class="form-group">
-      <label for="address">Address</label>
-      <textarea id="address" [(ngModel)]="address" name="address" rows="3"></textarea>
+      <label for="street1">Street Address</label>
+      <input id="street1" type="text" [(ngModel)]="street1" name="street1" placeholder="123 Main St" />
+    </div>
+
+    <div class="form-group">
+      <label for="street2">Apt / Suite <span class="section-note">* optional</span></label>
+      <input id="street2" type="text" [(ngModel)]="street2" name="street2" placeholder="Apt 4B" />
+    </div>
+
+    <div class="form-group-row">
+      <div class="form-group form-group--city">
+        <label for="city">City</label>
+        <input id="city" type="text" [(ngModel)]="city" name="city" />
+      </div>
+      <div class="form-group form-group--state">
+        <label for="state">State</label>
+        <input id="state" type="text" [(ngModel)]="state" name="state" maxlength="2" placeholder="TX" />
+      </div>
+      <div class="form-group form-group--zip">
+        <label for="zip">ZIP</label>
+        <input id="zip" type="text" [(ngModel)]="zip" name="zip" maxlength="10" placeholder="78701" />
+      </div>
     </div>
 
     <div class="form-group">

@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.extern.slf4j.Slf4j;
 import org.example.functions.client.CosmosDbClient;
+import org.example.functions.model.ShippingAddress;
 import org.example.functions.model.User;
 import org.example.functions.model.UserIdentity;
 import org.example.functions.model.UserStatus;
@@ -156,17 +157,17 @@ public class UserService {
         }
     }
 
-    public User updateContactDetails(String userId, String name, String address, String phone, String notes,
-                                      String preferences, String venmoHandle, String paypalHandle,
+    public User updateContactDetails(String userId, String name, ShippingAddress shippingAddress, String phone,
+                                      String notes, String preferences, String venmoHandle, String paypalHandle,
                                       String ebayUsername, String cashAppHandle) {
         Optional<User> optUser = findById(userId);
         if (optUser.isEmpty()) {
             throw new IllegalArgumentException("User not found: " + userId);
         }
         User user = optUser.get();
-        if (name != null)          user.setName(name);
-        if (address != null)       user.setAddress(address);
-        if (phone != null)         user.setPhone(phone);
+        if (name != null)            user.setName(name);
+        if (shippingAddress != null) user.setShippingAddress(shippingAddress);
+        if (phone != null)           user.setPhone(phone);
         if (notes != null)         user.setNotes(notes);
         if (preferences != null)   user.setPreferences(preferences);
         if (venmoHandle != null)   user.setVenmoHandle(venmoHandle);

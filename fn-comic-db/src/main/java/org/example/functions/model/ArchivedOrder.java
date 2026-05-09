@@ -41,4 +41,5 @@ public class ArchivedOrder {
     private String customerNotes;
     private String adminNotes;
     private String invoiceNumber;
+    private ShippingAddress shippingAddress;
 }
