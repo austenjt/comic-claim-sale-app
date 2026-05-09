@@ -181,8 +181,16 @@
         Submit button is locked until that auction ends or you are outbid.
       </li>
       <li>
+        <strong>Checkout</strong> — after submitting, three buttons appear: <em>Shipping</em>,
+        <em>Pay Now</em>, and <em>Pay Later</em>. Start by clicking <strong>Shipping</strong> to
+        enter your mailing address. Once your address is saved, the Shipping button turns grey and
+        Pay Now / Pay Later become enabled. Click <strong>Pay Now</strong> to pay immediately with a
+        credit or debit card via Square, or <strong>Pay Later</strong> to let the seller contact you
+        about payment arrangements (Venmo, PayPal, etc.).
+      </li>
+      <li>
         <strong>Finalized</strong> — once the review window expires, your cart locks automatically.
-        The seller will reach out to arrange payment and shipping.
+        The checkout buttons remain available until payment is complete.
       </li>
       <li>
         <strong>Fulfilled</strong> — once the seller marks your order as fulfilled, the cart closes.
@@ -231,18 +239,34 @@
     <h2>Your Profile</h2>
     <p>
       Your <a routerLink="/profile">Profile page</a> lets you update your contact details at any
-      time — name, shipping address, phone number, and payment notes. Keeping these current
-      ensures the seller can reach you and knows how you want to pay when your order is finalized.
+      time — name, phone number, and payment handles (Venmo, PayPal, Cash App, eBay). You can also
+      save a shipping address with structured fields: street address, optional apartment/suite,
+      city, state, and ZIP. Keeping this current saves time at checkout — the Shipping modal
+      pre-fills from your saved address so you only need to confirm it.
     </p>
   </section>
 
   <section class="hiw-section">
     <h2>Payment</h2>
     <p>
-      Payment is handled directly between you and the seller — there's no payment processor built
-      into this site. Include your preferred payment method in the <em>Payment Notes</em> field
-      of your profile (PayPal, Venmo, cash at pickup, etc.). The seller will contact you after
-      your order is finalized to confirm the total and shipping details.
+      Two payment options are available after you save your shipping address:
+    </p>
+    <ul>
+      <li>
+        <strong>Pay Now</strong> — pay immediately with a credit or debit card using the
+        Square-powered checkout. Your card is processed securely and the seller is notified
+        automatically once payment is confirmed.
+      </li>
+      <li>
+        <strong>Pay Later</strong> — choose this if you prefer to pay via Venmo, PayPal,
+        Cash App, or another arrangement. The seller will reach out to confirm the total and
+        coordinate payment directly. Add your preferred handles to your profile so the seller
+        knows how to contact you.
+      </li>
+    </ul>
+    <p>
+      Once payment is received, the Pay Now button changes to <em>Paid ✓</em> and both payment
+      buttons are disabled for the remainder of the order.
     </p>
   </section>
 
@@ -330,6 +354,11 @@
         <strong>Release</strong> — removes a standalone comic from a buyer's cart and returns it to
         sale. A <em>"Returned to sale"</em> log entry is recorded in real time.
         Set items do not have a Release button; contact the buyer if a set needs to be released.
+      </li>
+      <li>
+        <strong>Shipping address</strong> — if the buyer entered a shipping address during checkout,
+        it appears on the order card as a <em>Ship to:</em> block so you can prepare the shipment
+        without contacting the buyer separately.
       </li>
       <li>
         <strong>Payment status</strong> — a dropdown on each order lets you mark it as
