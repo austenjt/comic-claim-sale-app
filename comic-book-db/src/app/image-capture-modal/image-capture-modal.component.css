@@ -108,3 +108,39 @@
   margin-top: var(--space-2);
   text-align: center;
 }
+
+/* ── Crop button (secondary outline) ───────────────────────────── */
+.btn-crop {
+  padding: var(--space-2) var(--space-4);
+  background: transparent;
+  color: var(--color-text);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: var(--fs-14);
+  font-weight: var(--fw-semibold);
+  transition: background-color var(--duration-base) var(--ease-standard);
+}
+.btn-crop:hover { background: var(--color-surface-alt); }
+
+/* ── Crop stage ─────────────────────────────────────────────────── */
+.crop-viewport {
+  width: 100%;
+  margin-top: var(--space-3);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  line-height: 0; /* removes gap below inline canvas */
+}
+
+.crop-canvas {
+  width: 100%;
+  display: block;
+  cursor: crosshair;
+}
+
+.crop-hint {
+  font-size: var(--fs-13);
+  color: var(--color-text-muted);
+  text-align: center;
+  margin: var(--space-2) 0 0;
+}

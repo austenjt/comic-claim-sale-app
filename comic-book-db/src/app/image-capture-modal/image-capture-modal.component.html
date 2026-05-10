@@ -44,7 +44,25 @@
       </div>
       <div class="capture-modal-footer">
         <button class="picker-btn capture-action-btn" type="button" (click)="confirm()">Use This Photo</button>
+        <button class="btn-crop" type="button" (click)="enterCrop()">&#9986; Crop</button>
         <button class="capture-cancel-btn" type="button" (click)="retake()">Retake</button>
+      </div>
+    </ng-container>
+
+    <!-- Stage: crop -->
+    <ng-container *ngIf="stage === 'crop'">
+      <div class="crop-viewport">
+        <canvas #cropCanvas class="crop-canvas"
+          (mousedown)="onCropMouseDown($event)"
+          (mousemove)="onCropMouseMove($event)"
+          (mouseup)="onCropMouseUp()"
+          (mouseleave)="onCropMouseUp()"></canvas>
+      </div>
+      <p class="crop-hint">Click and drag to select the area to keep</p>
+      <div class="capture-modal-footer">
+        <button class="picker-btn capture-action-btn" type="button"
+                [disabled]="!cropReady" (click)="applyCrop()">Apply Crop</button>
+        <button class="capture-cancel-btn" type="button" (click)="cancelCrop()">Cancel</button>
       </div>
     </ng-container>
 
