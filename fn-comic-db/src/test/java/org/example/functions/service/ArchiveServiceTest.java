@@ -23,13 +23,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * dependency, so this exercises field propagation directly.
  *
  * <p>The motivation for these tests is that the discount-exclusion fields
- * ({@code wonViaBid}, {@code isGraded}, {@code discountExcludesSets/Auctions/Graded},
+ * ({@code isGraded}, {@code discountExcludesSets/Graded},
  * {@code discountBreakdown}) all need to survive archiving so that the admin orders UI can
  * still recompute exact per-row discounted prices for fulfilled orders.</p>
  */
 class ArchiveServiceTest {
 
-    private static CartItem item(String id, double price, boolean wonViaBid, boolean isGraded, Integer collectionGroup) {
+    private static CartItem item(String id, double price, boolean isGraded, Integer collectionGroup) {
         CartItem ci = new CartItem();
         ci.setComicId(id);
         ci.setComicTitle("Title " + id);
@@ -37,7 +37,6 @@ class ArchiveServiceTest {
         ci.setPrice(price);
         ci.setClaimedAt("2026-04-25T00:00:00Z");
         ci.setCollectionGroup(collectionGroup);
-        ci.setWonViaBid(wonViaBid);
         ci.setGraded(isGraded);
         return ci;
     }
@@ -60,17 +59,16 @@ class ArchiveServiceTest {
         c.setDiscountAmount(15.00);
         c.setDiscountDescription("10% off ($-15.00) (sets, graded excluded)");
         c.setDiscountExcludesSets(Boolean.TRUE);
-        c.setDiscountExcludesAuctions(Boolean.TRUE);
         c.setDiscountExcludesGraded(Boolean.TRUE);
         List<CartDiscount> breakdown = new ArrayList<>();
         breakdown.add(new CartDiscount(15.00, "10% off ($-15.00) (sets, graded excluded)",
-            true, true, true));
+            true, true));
         c.setDiscountBreakdown(breakdown);
 
         c.setItems(new ArrayList<>(List.of(
-            item("1", 50.00, false, false, null),    // standalone, raw
-            item("2", 25.00, true,  false, null),    // bid-won
-            item("3", 75.00, false, true,  null))));  // graded
+            item("1", 50.00, false, null),    // standalone, raw
+            item("2", 25.00, false, null),    // regular item
+            item("3", 75.00, true,  null))));  // graded
         return c;
     }
 
@@ -98,7 +96,6 @@ class ArchiveServiceTest {
     void toArchivedOrder_copiesDiscountExclusionFlags() {
         ArchivedOrder order = ArchiveService.toArchivedOrder(sampleCart());
         assertEquals(Boolean.TRUE, order.getDiscountExcludesSets());
-        assertEquals(Boolean.TRUE, order.getDiscountExcludesAuctions());
         assertEquals(Boolean.TRUE, order.getDiscountExcludesGraded());
     }
 
@@ -111,28 +108,24 @@ class ArchiveServiceTest {
         assertEquals(15.00, entry.getAmount(), 0.001);
         assertEquals("10% off ($-15.00) (sets, graded excluded)", entry.getDescription());
         assertTrue(entry.isExcludesSets());
-        assertTrue(entry.isExcludesAuctions());
         assertTrue(entry.isExcludesGraded());
     }
 
     @Test
-    void toArchivedOrder_copiesItemLevelWonViaBidAndIsGradedFlags() {
+    void toArchivedOrder_copiesItemLevelIsGradedFlag() {
         ArchivedOrder order = ArchiveService.toArchivedOrder(sampleCart());
         assertEquals(3, order.getItems().size());
 
         ArchivedOrderItem standalone = order.getItems().get(0);
         assertEquals("1", standalone.getComicId());
-        assertFalse(standalone.isWonViaBid());
         assertFalse(standalone.isGraded());
 
-        ArchivedOrderItem bidWon = order.getItems().get(1);
-        assertEquals("2", bidWon.getComicId());
-        assertTrue(bidWon.isWonViaBid(), "wonViaBid must propagate to archive so admin UI can compute auction-exclusion math");
-        assertFalse(bidWon.isGraded());
+        ArchivedOrderItem regular = order.getItems().get(1);
+        assertEquals("2", regular.getComicId());
+        assertFalse(regular.isGraded());
 
         ArchivedOrderItem graded = order.getItems().get(2);
         assertEquals("3", graded.getComicId());
-        assertFalse(graded.isWonViaBid());
         assertTrue(graded.isGraded(), "isGraded must propagate to archive so admin UI can compute graded-exclusion math");
     }
 
@@ -143,7 +136,6 @@ class ArchiveServiceTest {
         c.setDiscountAmount(0.0);
         c.setDiscountDescription(null);
         c.setDiscountExcludesSets(null);
-        c.setDiscountExcludesAuctions(null);
         c.setDiscountExcludesGraded(null);
         c.setDiscountBreakdown(new ArrayList<>());
 
@@ -151,7 +143,6 @@ class ArchiveServiceTest {
         assertEquals(0.0, order.getDiscountAmount(), 0.001);
         assertEquals(null, order.getDiscountDescription());
         assertEquals(null, order.getDiscountExcludesSets());
-        assertEquals(null, order.getDiscountExcludesAuctions());
         assertEquals(null, order.getDiscountExcludesGraded());
         assertNotNull(order.getDiscountBreakdown());
         assertTrue(order.getDiscountBreakdown().isEmpty());

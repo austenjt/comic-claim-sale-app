@@ -103,18 +103,8 @@ public class CartService {
         return cart;
     }
 
-    /** Add a comic to the user's cart via a normal claim. Throws if comic is already claimed or cart is not OPEN. */
+    /** Add a comic to the user's cart. Throws if comic is already claimed or cart is not OPEN. */
     public Cart addItem(User user, String comicId) {
-        return addItemInternal(user, comicId, false, null);
-    }
-
-    /** Add a comic to the user's cart as the winner of a completed bid cycle.
-     *  The item will be marked {@code wonViaBid=true} and cannot be returned by the user. */
-    public Cart addBidWonItem(User user, String comicId, java.math.BigDecimal winningBid) {
-        return addItemInternal(user, comicId, true, winningBid);
-    }
-
-    private Cart addItemInternal(User user, String comicId, boolean wonViaBid, java.math.BigDecimal overridePrice) {
         if (isComicClaimed(comicId)) {
             throw new IllegalStateException("Comic " + comicId + " is already claimed.");
         }
@@ -125,8 +115,7 @@ public class CartService {
         ComicBook comic = ComicService.getServiceInstance().getComicById(Integer.parseInt(comicId))
             .orElseThrow(() -> new IllegalArgumentException("Comic not found: " + comicId));
 
-        // Standalone claims require a sale price; bid-won items use the override price so they are exempt
-        if (!wonViaBid && comic.getSalePrice() == null) {
+        if (comic.getSalePrice() == null) {
             throw new IllegalStateException("Comic " + comicId + " does not have a sale price and cannot be claimed.");
         }
 
@@ -134,11 +123,8 @@ public class CartService {
         item.setComicId(comicId);
         item.setComicTitle(comic.getTitle());
         item.setComicNumber(formatComicNumber(comic.getNumber()));
-        item.setPrice(overridePrice != null ? overridePrice.doubleValue()
-                : comic.getSalePrice() != null ? comic.getSalePrice().doubleValue()
-                : comic.getTargetPrice() != null ? comic.getTargetPrice().doubleValue() : 0.0);
+        item.setPrice(comic.getSalePrice().doubleValue());
         item.setClaimedAt(Instant.now().toString());
-        item.setWonViaBid(wonViaBid);
         item.setGraded(isComicGraded(comic));
 
         cart.getItems().add(item);
@@ -215,11 +201,6 @@ public class CartService {
         CartItem target = cart.getItems().stream()
             .filter(i -> comicId.equals(i.getComicId())).findFirst().orElse(null);
 
-        // Bid-won items cannot be returned by the user
-        if (target != null && target.isWonViaBid()) {
-            throw new IllegalStateException("Items won via bidding cannot be returned.");
-        }
-
         // Collect all items to remove (cascade for set members, single for standalone)
         List<CartItem> toRemove;
         if (target != null && target.getCollectionGroup() != null && target.getCollectionGroup() > 0) {
@@ -292,7 +273,6 @@ public class CartService {
         cart.setDiscountAmount(discountResult.getAmount());
         cart.setDiscountDescription(discountResult.getDescription());
         cart.setDiscountExcludesSets(discountResult.isExcludedSets() ? Boolean.TRUE : null);
-        cart.setDiscountExcludesAuctions(discountResult.isExcludedAuctions() ? Boolean.TRUE : null);
         cart.setDiscountExcludesGraded(discountResult.isExcludedGraded() ? Boolean.TRUE : null);
         cart.setDiscountBreakdown(discountResult.getBreakdown());
         int bookCount = (int) cart.getItems().stream().filter(i -> !i.isSetContainer()).count();
@@ -343,7 +323,7 @@ public class CartService {
     /**
      * Admin: re-run {@code applyDiscounts} on an already-submitted cart, refresh the
      * stored discount snapshot ({@code discountAmount}, {@code discountDescription},
-     * {@code discountBreakdown}, the three {@code discountExcludes*} flags), persist it,
+     * {@code discountBreakdown}, the two {@code discountExcludes*} flags), persist it,
      * and re-send the order-submitted email so the customer sees the corrected totals.
      *
      * <p>This is the recovery path when discount logic changes after a cart was already
@@ -365,7 +345,6 @@ public class CartService {
         cart.setDiscountAmount(result.getAmount());
         cart.setDiscountDescription(result.getDescription());
         cart.setDiscountExcludesSets(result.isExcludedSets() ? Boolean.TRUE : null);
-        cart.setDiscountExcludesAuctions(result.isExcludedAuctions() ? Boolean.TRUE : null);
         cart.setDiscountExcludesGraded(result.isExcludedGraded() ? Boolean.TRUE : null);
         cart.setDiscountBreakdown(result.getBreakdown());
         save(cart);
@@ -399,7 +378,6 @@ public class CartService {
         cart.setDiscountAmount(0.0);
         cart.setDiscountDescription(null);
         cart.setDiscountExcludesSets(null);
-        cart.setDiscountExcludesAuctions(null);
         cart.setDiscountExcludesGraded(null);
         cart.setShippingCost(0.0);
         cart.setAdminNotes(null);

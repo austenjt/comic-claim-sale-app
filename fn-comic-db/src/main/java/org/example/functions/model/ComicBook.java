@@ -3,11 +3,9 @@ package org.example.functions.model;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.example.functions.util.Views;
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import org.example.functions.util.MoneySerializer;
 import lombok.Builder;
@@ -100,19 +98,6 @@ public class ComicBook {
     // Notes
     private String personalNotes;
     private String publicNotes;
-
-    // Bidding
-    @JsonProperty("enableBid")
-    private Boolean enableBid;
-
-    @JsonUnwrapped
-    @Getter(AccessLevel.NONE)
-    private BiddingState biddingState;
-
-    public BiddingState getBiddingState() {
-        if (this.biddingState == null) this.biddingState = new BiddingState();
-        return this.biddingState;
-    }
 
     /**
      * Used to prevent duplicate data being added.

@@ -28,9 +28,6 @@ public class Discount {
     private int xBooks;
     @JsonProperty("excludeSets")
     private Boolean excludeSets;
-    /** When true, items won via bidding (auction wins) are excluded from this rule's count and discount. */
-    @JsonProperty("excludeAuctions")
-    private Boolean excludeAuctions;
     /** When true, graded comics (CGC/CBCS) are excluded from this rule's count and discount. */
     @JsonProperty("excludeGraded")
     private Boolean excludeGraded;

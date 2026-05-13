@@ -54,8 +54,7 @@ public class ComicTriggers {
                 int pageSize = EnvHelper.getDashboardPageSize();
                 String sort = request.getQueryParameters().getOrDefault("sort", "oldest-first");
                 boolean onlyPriced = "true".equalsIgnoreCase(request.getQueryParameters().get("onlyPriced"));
-                boolean onlyBiddable = "true".equalsIgnoreCase(request.getQueryParameters().get("onlyBiddable"));
-                PagedResponse<ComicBook> paged = comicService.getTopLevelComicsPaged(pageNumber, pageSize, sort, onlyPriced, onlyBiddable, admin);
+                PagedResponse<ComicBook> paged = comicService.getTopLevelComicsPaged(pageNumber, pageSize, sort, onlyPriced, admin);
                 String body = admin
                     ? OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(paged)
                     : OBJECT_MAPPER.writerWithView(Views.Public.class).writeValueAsString(paged);
@@ -220,13 +219,6 @@ public class ComicTriggers {
             .findFirst();
         try {
             if (existingComic.isPresent()) {
-                // Block deletion of bid-sold items
-                if (existingComic.get().getBiddingState().isSold()) {
-                    return request.createResponseBuilder(HttpStatus.CONFLICT)
-                        .header("Content-Type", "text/plain")
-                        .body("Cannot delete a comic that was sold via bidding.")
-                        .build();
-                }
                 comicService.deleteComic(existingComic.get().getId());
 
                 // Remove comic from any active carts (best-effort)
