@@ -17,7 +17,6 @@ import org.example.functions.model.ClaimNotification;
 import org.example.functions.model.ShippingAddress;
 import org.example.functions.model.ShippingEstimate;
 import org.example.functions.model.User;
-import org.example.functions.service.ActivityLogService;
 import org.example.functions.service.ArchiveService;
 import org.example.functions.service.CartService;
 import org.example.functions.util.AuthHelper;
@@ -160,13 +159,6 @@ public class CartTriggers {
             JsonNode body = OBJECT_MAPPER.readTree(request.getBody().orElse("{}"));
             String customerNotes = HttpHelper.getString(body, "customerNotes");
             Cart cart = CartService.getServiceInstance().submitOrder(user.getId(), customerNotes);
-            double itemsTotal = cart.getItems().stream()
-                .filter(i -> !i.isSetContainer())
-                .mapToDouble(org.example.functions.model.CartItem::getPrice)
-                .sum();
-            double total = itemsTotal - cart.getDiscountAmount() + cart.getShippingCost();
-            String logMessage = String.format("User %s submitted shopping cart: $%.2f", user.getName(), total);
-            ActivityLogService.getServiceInstance().writeLog(logMessage, false);
             return cors(request.createResponseBuilder(HttpStatus.OK))
                 .header("Content-Type", "application/json")
                 .body(OBJECT_MAPPER.writeValueAsString(cart)).build();
