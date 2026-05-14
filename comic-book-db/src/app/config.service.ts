@@ -18,15 +18,11 @@ export interface ComicEnums {
 export interface AppConfig extends ComicEnums {
   emailEnabled: boolean;
   awardModeEnabled: boolean;
-  biddingMode: boolean;
-  biddingCycleMins: number;
 }
 
 const DEFAULT_CONFIG: AppConfig = {
   emailEnabled: true,
   awardModeEnabled: true,
-  biddingMode: false,
-  biddingCycleMins: 10,
   coverVariants: [],
   gradingCompanies: [],
   grades: [],
@@ -57,14 +53,6 @@ export class ConfigService {
 
   get awardModeEnabled(): boolean {
     return this._config.awardModeEnabled;
-  }
-
-  get biddingMode(): boolean {
-    return this._config.biddingMode ?? false;
-  }
-
-  get biddingCycleMins(): number {
-    return this._config.biddingCycleMins ?? 10;
   }
 
   getEnums(): ComicEnums {

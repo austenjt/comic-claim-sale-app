@@ -2,7 +2,6 @@ import { Component, OnInit, HostListener } from '@angular/core';
 import { Router } from '@angular/router';
 import { MsalService } from '@azure/msal-angular';
 import { AuthService } from './auth.service';
-import { LogService } from './log.service';
 import { DiscountService } from './discount.service';
 import { SalesModalService } from './sales-modal.service';
 
@@ -26,7 +25,6 @@ export class AppComponent implements OnInit {
 
   constructor(
     public auth: AuthService,
-    public logService: LogService,
     private msal: MsalService,
     private router: Router,
     private discountService: DiscountService,

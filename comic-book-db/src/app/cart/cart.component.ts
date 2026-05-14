@@ -1,12 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Subscription } from 'rxjs';
 import { CartService } from '../cart.service';
-import { LogService } from '../log.service';
-import { ConfigService } from '../config.service';
-import { ComicService } from '../comic.service';
 import { AuthService } from '../auth.service';
 import { Cart, CartDiscount, CartItem } from '../cart';
-import { Comic } from '../comic';
 
 interface CartRow {
   type: 'single' | 'set';
@@ -15,7 +10,6 @@ interface CartRow {
   totalPrice: number;
   claimedAt: string;
   removeId: string;
-  wonViaBid: boolean;
   /** True for single rows when the item is graded; for set rows, true if ANY member is graded. */
   isGraded: boolean;
   containerTitle?: string;
@@ -38,7 +32,6 @@ export class CartComponent implements OnInit, OnDestroy {
   showShippingModal = false;
   paymentSuccess = false;
   payLaterAcknowledged = false;
-
   confirmModal: {
     comicId: string;
     setTitle: string;
@@ -46,49 +39,16 @@ export class CartComponent implements OnInit, OnDestroy {
     isFinalizing: boolean;
   } | null = null;
 
-  private activeBidComics: Comic[] = [];
-  private claimSub!: Subscription;
-
   constructor(
     private cartService: CartService,
-    private logService: LogService,
-    public configService: ConfigService,
-    private comicService: ComicService,
     public auth: AuthService
   ) {}
 
   ngOnInit() {
     this.loadCart();
-    this.refreshActiveBids();
-    this.claimSub = this.logService.newClaimEvent$.subscribe(() => this.refreshActiveBids());
   }
 
-  ngOnDestroy() {
-    this.claimSub?.unsubscribe();
-  }
-
-  private refreshActiveBids(): void {
-    if (!this.configService.biddingMode) return;
-    this.comicService.getDashboardPage(1, 'bidding-first', false, true).subscribe({
-      next: resp => { this.activeBidComics = resp.items; },
-      error: () => {}
-    });
-  }
-
-  private bidSecondsRemaining(comic: Comic): number {
-    if (!comic.bidStartedAt) return 0;
-    const endsAt = new Date(comic.bidStartedAt).getTime() +
-                   this.configService.biddingCycleMins * 60000;
-    return Math.max(0, Math.floor((endsAt - Date.now()) / 1000));
-  }
-
-  get myActiveBidLeads(): Comic[] {
-    const myName = this.auth.currentUser$.value?.name;
-    if (!myName) return [];
-    return this.activeBidComics.filter(c =>
-      c.currentBidderName === myName && this.bidSecondsRemaining(c) > 0
-    );
-  }
+  ngOnDestroy() {}
 
   loadCart() {
     this.loading = true;
@@ -141,12 +101,6 @@ export class CartComponent implements OnInit, OnDestroy {
     this.cartService.removeItem(comicId).subscribe({
       next: cart => {
         this.cart = cart;
-        if (item) {
-          const msg = isSetItem
-            ? `"${item.comicTitle}" set (${setCount} books) returned to available.`
-            : `"${item.comicTitle}${item.comicNumber ? ' ' + item.comicNumber : ''}" Returned to sale`;
-          this.logService.log(msg);
-        }
       },
       error: () => this.error = 'Failed to remove item.'
     });
@@ -187,7 +141,6 @@ export class CartComponent implements OnInit, OnDestroy {
           totalPrice: setItems.reduce((sum, i) => sum + i.price, 0),
           claimedAt: setItems[0].claimedAt,
           removeId: setItems[0].comicId,
-          wonViaBid: setItems.some(i => !!i.wonViaBid),
           isGraded: setItems.some(i => !!i.isGraded),
           containerTitle: container?.comicTitle,
           containerId: container?.comicId
@@ -200,7 +153,6 @@ export class CartComponent implements OnInit, OnDestroy {
           totalPrice: item.price,
           claimedAt: item.claimedAt,
           removeId: item.comicId,
-          wonViaBid: !!item.wonViaBid,
           isGraded: !!item.isGraded
         });
       }
@@ -233,7 +185,6 @@ export class CartComponent implements OnInit, OnDestroy {
   /** Apply rule-level exclusions to a cart item. Mirrors backend DiscountService logic. */
   private isItemExcluded(item: CartItem, rule: CartDiscount): boolean {
     if (rule.excludesSets && item.collectionGroup != null && item.collectionGroup > 0) return true;
-    if (rule.excludesAuctions && item.wonViaBid) return true;
     if (rule.excludesGraded && item.isGraded) return true;
     return false;
   }
@@ -244,7 +195,7 @@ export class CartComponent implements OnInit, OnDestroy {
    */
   private eligibleBaseForRule(rule: CartDiscount): number {
     return this.visibleItems
-      .filter(i => !i.wonViaBid && !this.isItemExcluded(i, rule))
+      .filter(i => !this.isItemExcluded(i, rule))
       .reduce((sum, i) => sum + i.price, 0);
   }
 
@@ -275,8 +226,7 @@ export class CartComponent implements OnInit, OnDestroy {
       if (!this.isBuyXFreeRule(rule)) continue;
 
       const eligible = this.visibleItems
-        .filter(i => !i.wonViaBid
-          && !this.isItemExcluded(i, rule)
+        .filter(i => !this.isItemExcluded(i, rule)
           && !alreadyFreed.has(i.comicId))
         .slice()
         .sort((a, b) => a.price - b.price);
@@ -310,8 +260,6 @@ export class CartComponent implements OnInit, OnDestroy {
    * were submitted before the breakdown field existed.
    */
   discountedItemPrice(item: CartItem): number {
-    if (item.wonViaBid) return item.price;
-
     const breakdown = this.cart?.discountBreakdown;
     if (breakdown && breakdown.length > 0) {
       const buyXFreeMap = this.computeBuyXFreeIds();
@@ -334,7 +282,7 @@ export class CartComponent implements OnInit, OnDestroy {
 
     // Fallback for orders without breakdown: spread total discount proportionally.
     const discount = this.cart?.discountAmount ?? 0;
-    const base = this.visibleItems.filter(i => !i.wonViaBid).reduce((sum, i) => sum + i.price, 0);
+    const base = this.visibleItems.reduce((sum, i) => sum + i.price, 0);
     if (discount <= 0 || base <= 0) return item.price;
     const factor = (base - discount) / base;
     if (factor <= 0) return 0;
@@ -356,15 +304,12 @@ export class CartComponent implements OnInit, OnDestroy {
   }
 
   canRemoveItem(comicId: string): boolean {
-    if (!this.canRemove()) return false;
-    const item = this.cart?.items.find(i => i.comicId === comicId);
-    return !item?.wonViaBid;
+    return this.canRemove();
   }
 
   canSubmit(): boolean {
     return this.cart?.status === 'OPEN' &&
-           this.visibleItems.length > 0 &&
-           this.myActiveBidLeads.length === 0;
+           this.visibleItems.length > 0;
   }
 
   canUnsubmit(): boolean {

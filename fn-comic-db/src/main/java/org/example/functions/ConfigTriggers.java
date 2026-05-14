@@ -43,8 +43,6 @@ public class ConfigTriggers {
             Map<String, Object> response = new LinkedHashMap<>();
             response.put("emailEnabled", EnvHelper.isEmailEnabled());
             response.put("awardModeEnabled", EnvHelper.isAwardModeEnabled());
-            response.put("biddingMode", EnvHelper.isBiddingModeEnabled());
-            response.put("biddingCycleMins", EnvHelper.getBiddingCycleMins());
 
             List<String> coverVariants = new ArrayList<>();
             for (CoverVariant cv : CoverVariant.values()) {

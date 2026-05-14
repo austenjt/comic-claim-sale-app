@@ -29,17 +29,6 @@ public class EnvHelper {
         return val == null || Boolean.parseBoolean(val); // defaults to true if not set
     }
 
-    public static boolean isBiddingModeEnabled() {
-        String val = getProp("BIDDING_MODE");
-        return Boolean.parseBoolean(val != null ? val : "false");
-    }
-
-    public static int getBiddingCycleMins() {
-        String val = getProp("BIDDING_CYCLE");
-        if (val == null || val.isBlank()) return 10;
-        try { return Integer.parseInt(val.trim()); } catch (NumberFormatException e) { return 10; }
-    }
-
     public static int getDashboardPageSize() {
         String val = getProp("DASHBOARD_PAGE_SIZE");
         if (val == null || val.isBlank()) return 500; // default: 500 items per page

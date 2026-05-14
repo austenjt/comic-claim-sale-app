@@ -26,8 +26,6 @@ public class ArchivedOrder {
     private String discountDescription;
     /** Snapshotted from {@code Cart.discountExcludesSets} at fulfillment time. */
     private Boolean discountExcludesSets;
-    /** Snapshotted from {@code Cart.discountExcludesAuctions} at fulfillment time. */
-    private Boolean discountExcludesAuctions;
     /** Snapshotted from {@code Cart.discountExcludesGraded} at fulfillment time. */
     private Boolean discountExcludesGraded;
     /** Snapshotted from {@code Cart.discountBreakdown} so per-rule math survives archive. */

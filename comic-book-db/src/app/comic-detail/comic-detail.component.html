@@ -1,53 +1,3 @@
-<!-- Bid modal -->
-<div *ngIf="bidModalOpen" class="bid-modal-overlay modal-overlay" (click)="closeBidModal()">
-  <div class="bid-modal modal" role="dialog" aria-modal="true"
-       aria-labelledby="comic-detail-bid-modal-title"
-       (click)="$event.stopPropagation()">
-    <div id="comic-detail-bid-modal-title" class="bid-modal-title">Place Bid</div>
-    <div class="bid-modal-comic-name">"{{ comic?.title }}"</div>
-    <div class="bid-modal-info">
-      <div class="bid-modal-info-row">
-        <span>Current High Bid</span>
-        <strong>${{ (comic?.highBid ?? 0).toFixed(2) }}</strong>
-      </div>
-      <div class="bid-modal-info-row" *ngIf="comic?.currentBidderName">
-        <span>Leader</span>
-        <strong>{{ comic?.currentBidderName }}</strong>
-      </div>
-      <div class="bid-modal-info-row">
-        <span>Time Remaining</span>
-        <strong class="bid-modal-timer">⏱ {{ bidCountdownLabel }}</strong>
-      </div>
-    </div>
-    <div class="bid-modal-input-group">
-      <label for="comic-detail-bid-amount" class="bid-modal-label">Your Bid — min ${{ minNextBid(comic?.highBid ?? 0).toFixed(2) }}, in $0.25 increments</label>
-      <div class="bid-modal-input-row">
-        <span class="bid-modal-dollar">$</span>
-        <input type="number"
-               id="comic-detail-bid-amount"
-               class="bid-modal-input"
-               [(ngModel)]="bidModalAmount"
-               [min]="minNextBid(comic?.highBid ?? 0)"
-               step="0.25"
-               placeholder="0.00"
-               (keyup.enter)="submitBid()"
-               [disabled]="bidModalSubmitting"
-               aria-describedby="comic-detail-bid-warning comic-detail-bid-error"
-               [attr.aria-invalid]="bidModalError ? 'true' : null"
-               autofocus>
-      </div>
-    </div>
-    <div *ngIf="bidModalWarning" id="comic-detail-bid-warning" role="status" aria-live="polite" class="bid-modal-warning">⚠ {{ bidModalWarning }}</div>
-    <div *ngIf="bidModalError" id="comic-detail-bid-error" role="alert" class="bid-modal-error">{{ bidModalError }}</div>
-    <div class="bid-modal-actions">
-      <button class="bid-modal-submit-btn" (click)="submitBid()" [disabled]="bidModalSubmitting || !bidModalAmount">
-        {{ bidModalSubmitting ? 'Placing…' : 'Place Bid' }}
-      </button>
-      <button class="bid-modal-cancel-btn" (click)="closeBidModal()" [disabled]="bidModalSubmitting">Cancel</button>
-    </div>
-  </div>
-</div>
-
 <div *ngIf="loading" class="warming-up">
   <div class="warming-up-spinner"></div>
   <span>Please wait while things warm up. This site is not always on, and turns on when visited.</span>
@@ -502,10 +452,6 @@
       <div class="detail-section">
         <div class="detail-section-title">Sale Info</div>
         <div class="detail-item">
-          <span class="detail-label">Bidding Enabled</span>
-          <input class="detail-edit-checkbox" type="checkbox" [(ngModel)]="editComic!.enableBid">
-        </div>
-        <div class="detail-item">
           <span class="detail-label">For Sale</span>
           <input class="detail-edit-checkbox" type="checkbox" [(ngModel)]="editComic!.isForSale">
         </div>
@@ -590,15 +536,6 @@
         </div>
       </div>
 
-      <!-- Sale Info (non-admin) -->
-      <div class="detail-section" *ngIf="!auth.isAdmin()">
-        <div class="detail-section-title">Sale Info</div>
-        <div class="detail-item">
-          <span class="detail-label">Bidding Enabled</span>
-          <span class="detail-value">{{ (comic.enableBid && !comic.sold) ? 'Yes' : 'No' }}</span>
-        </div>
-      </div>
-
       <!-- Claim Status -->
       <div class="detail-section">
         <div class="detail-section-title">Claim Status</div>
@@ -608,14 +545,6 @@
           <div class="detail-item">
             <span class="detail-label">Status</span>
             <span class="detail-value claim-status-sold">Sold</span>
-          </div>
-        </ng-container>
-
-        <!-- Won via bid (finalized but not yet fulfilled) -->
-        <ng-container *ngIf="!comic.soldTo && comic.sold">
-          <div class="detail-item">
-            <span class="detail-label">Status</span>
-            <span class="detail-value claim-status-claimed">Won via Bid</span>
           </div>
         </ng-container>
 
@@ -629,7 +558,7 @@
             <span class="detail-label">Date Claimed</span>
             <span class="detail-value">{{ claimedDate(comic.id) | date:'medium' }}</span>
           </div>
-          <div class="detail-item" *ngIf="auth.isApproved() && !auth.isAdmin() && myCart?.status === 'OPEN' && !isWonViaBid(comic.id)">
+          <div class="detail-item" *ngIf="auth.isApproved() && !auth.isAdmin() && myCart?.status === 'OPEN'">
             <span class="detail-label"></span>
             <span class="detail-value">
               <div *ngIf="claimError" class="claim-error">{{ claimError }}</div>
@@ -656,47 +585,16 @@
         <ng-container *ngIf="!comic.soldTo && !comic.sold && !claimedDate(comic.id) && !isInMyCart(comic.id)">
           <div class="detail-item">
             <span class="detail-label">Status</span>
-            <span class="detail-value" [class.claim-status-available]="!isBiddingActive()" [class.claim-status-bidding]="isBiddingActive()">
-              {{ isBiddingActive() ? 'Bidding' : 'Available' }}
-            </span>
+            <span class="detail-value claim-status-available">Available</span>
           </div>
 
-          <!-- Active bidding state -->
-          <ng-container *ngIf="configService.biddingMode && comic.enableBid && isBiddingActive()">
-            <div class="detail-item">
-              <span class="detail-label">Time Left</span>
-              <span class="detail-value bid-timer-value">⏱ {{ bidCountdownLabel }}</span>
-            </div>
-            <div class="detail-item">
-              <span class="detail-label">High Bid</span>
-              <span class="detail-value">${{ (comic.highBid ?? 0).toFixed(2) }} by {{ comic.currentBidderName ?? '—' }}</span>
-            </div>
-            <div class="detail-item" *ngIf="auth.isApproved() && !auth.isAdmin()">
-              <span class="detail-label"></span>
-              <span class="detail-value">
-                <div *ngIf="claimError" class="claim-error">{{ claimError }}</div>
-                <button class="btn-bid-detail" (click)="placeBid()" [disabled]="actionLoading">
-                  {{ actionLoading ? 'Placing…' : 'Place Bid' }}
-                </button>
-              </span>
-            </div>
-          </ng-container>
-
-          <!-- Normal claim or bid start -->
-          <div class="detail-item" *ngIf="auth.isApproved() && !auth.isAdmin() && !isBiddingActive()">
+          <div class="detail-item" *ngIf="auth.isApproved() && !auth.isAdmin()">
             <span class="detail-label"></span>
             <span class="detail-value">
               <div *ngIf="claimError" class="claim-error">{{ claimError }}</div>
-              <ng-container *ngIf="configService.biddingMode && comic.enableBid; else normalClaim">
-                <button *ngIf="canClaim(comic.id)" class="btn-claim-detail" (click)="startBidding()" [disabled]="actionLoading">
-                  {{ actionLoading ? 'Starting…' : 'Bid' }}
-                </button>
-              </ng-container>
-              <ng-template #normalClaim>
-                <button *ngIf="canClaim(comic.id)" class="btn-claim-detail" (click)="claim()" [disabled]="actionLoading">
-                  {{ actionLoading ? 'Claiming…' : 'Claim' }}
-                </button>
-              </ng-template>
+              <button *ngIf="canClaim(comic.id)" class="btn-claim-detail" (click)="claim()" [disabled]="actionLoading">
+                {{ actionLoading ? 'Claiming…' : 'Claim' }}
+              </button>
               <span *ngIf="!comic.salePrice" class="claim-blocked">
                 This item can't be claimed until it is priced.
               </span>
@@ -710,7 +608,7 @@
       </div>
 
       <!-- Admin Actions -->
-      <div class="detail-section" *ngIf="auth.isAdmin() && !isBiddingActive() && !comic.sold && !claimedDate(comic.id)">
+      <div class="detail-section" *ngIf="auth.isAdmin() && !comic.sold && !claimedDate(comic.id)">
         <div class="detail-section-title">Admin Actions</div>
         <div class="detail-item">
           <span class="detail-label">Delete Comic</span>
@@ -724,27 +622,6 @@
             <span *ngIf="pendingDelete" class="admin-delete-warning">This will permanently remove the comic.</span>
           </span>
         </div>
-      </div>
-
-      <!-- Bid History -->
-      <div class="detail-section" *ngIf="comic.bidHistory && comic.bidHistory.length > 0">
-        <div class="detail-section-title">Bid History</div>
-        <table class="bid-history-table">
-          <thead>
-            <tr>
-              <th>Bidder</th>
-              <th>Amount</th>
-              <th>Time</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let bid of bidHistoryDesc" [class.bid-row-winner]="bid.userId === comic.currentBidderId">
-              <td>{{ bid.userName }}</td>
-              <td>${{ bid.amount.toFixed(2) }}</td>
-              <td>{{ bid.placedAt | date:'h:mm:ss a' }}</td>
-            </tr>
-          </tbody>
-        </table>
       </div>
 
     </div>

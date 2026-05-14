@@ -5,7 +5,6 @@
   [totalPages]="totalPages"
   [(excludeClaimed)]="excludeClaimed"
   [(showPricedOnly)]="showPricedOnly"
-  [(biddableOnly)]="biddableOnly"
   [(sortOrder)]="sortOrder"
   (goToPage)="goToPage($event)">
 </app-dashboard-header>
@@ -33,120 +32,6 @@
     <div class="award-modal-actions">
       <button class="award-confirm-btn" (click)="confirmAward()" [disabled]="!selectedUserId || awardLoading">Award</button>
       <button class="award-cancel-btn" (click)="closeAwardModal()">Cancel</button>
-    </div>
-  </div>
-</div>
-
-<!-- Start Bid modal -->
-<div *ngIf="startBidModalComic" class="bid-modal-overlay modal-overlay" (click)="cancelOpenBid()">
-  <div class="bid-modal modal" role="dialog" aria-modal="true"
-       aria-labelledby="start-bid-modal-title"
-       (click)="$event.stopPropagation()">
-    <div id="start-bid-modal-title" class="bid-modal-title">Start Bid</div>
-    <div class="bid-modal-comic-name">"{{ startBidModalComic.title }}"</div>
-    <div class="bid-modal-input-group">
-      <label for="start-bid-amount" class="bid-modal-label">Starting Bid — in $0.25 increments</label>
-      <div class="bid-modal-input-row">
-        <span class="bid-modal-dollar">$</span>
-        <input type="number"
-               id="start-bid-amount"
-               class="bid-modal-input"
-               [(ngModel)]="startBidModalPrice"
-               [min]="0"
-               step="0.25"
-               placeholder="0.00"
-               (keyup.enter)="confirmOpenBid()"
-               [disabled]="startBidModalSubmitting"
-               aria-describedby="start-bid-error"
-               [attr.aria-invalid]="startBidModalError ? 'true' : null"
-               autofocus>
-      </div>
-    </div>
-    <div *ngIf="startBidModalError" id="start-bid-error" role="alert" class="bid-modal-error">{{ startBidModalError }}</div>
-    <div class="bid-modal-actions">
-      <button class="bid-modal-submit-btn" (click)="confirmOpenBid()" [disabled]="startBidModalSubmitting || startBidModalPrice == null">
-        {{ startBidModalSubmitting ? 'Opening…' : 'Open Bidding' }}
-      </button>
-      <button class="bid-modal-cancel-btn" (click)="cancelOpenBid()" [disabled]="startBidModalSubmitting">Cancel</button>
-    </div>
-  </div>
-</div>
-
-<!-- First-bid price confirmation modal -->
-<div *ngIf="firstBidConfirmComic" class="bid-modal-overlay modal-overlay" (click)="cancelFirstBidConfirm()">
-  <div class="bid-modal modal" role="dialog" aria-modal="true"
-       aria-labelledby="first-bid-confirm-modal-title"
-       (click)="$event.stopPropagation()">
-    <div id="first-bid-confirm-modal-title" class="bid-modal-title">Starting Bid Notice</div>
-    <div class="bid-modal-comic-name">"{{ firstBidConfirmComic.title }}"</div>
-    <div class="bid-modal-info">
-      <div class="bid-modal-info-row">
-        <span>Listed Price</span>
-        <strong>${{ (firstBidConfirmComic.salePrice ?? 0).toFixed(2) }}</strong>
-      </div>
-      <div class="bid-modal-info-row">
-        <span>Starting Bid</span>
-        <strong>${{ (firstBidConfirmComic.highBid ?? 0).toFixed(2) }}</strong>
-      </div>
-    </div>
-    <p class="bid-modal-label" style="margin-top:12px">
-      The starting bid for this book has been set higher than its listed price.
-      You will be bidding at <strong>${{ (firstBidConfirmComic.highBid ?? 0).toFixed(2) }}</strong> to start.
-      Do you want to continue?
-    </p>
-    <div class="bid-modal-actions">
-      <button class="bid-modal-submit-btn" (click)="confirmFirstBid()">Yes, Place Bid</button>
-      <button class="bid-modal-cancel-btn" (click)="cancelFirstBidConfirm()">Cancel</button>
-    </div>
-  </div>
-</div>
-
-<!-- Bid modal -->
-<div *ngIf="bidModalComic" class="bid-modal-overlay modal-overlay" (click)="closeBidModal()">
-  <div class="bid-modal modal" role="dialog" aria-modal="true"
-       aria-labelledby="dashboard-bid-modal-title"
-       (click)="$event.stopPropagation()">
-    <div id="dashboard-bid-modal-title" class="bid-modal-title">Place Bid</div>
-    <div class="bid-modal-comic-name">"{{ bidModalComic.title }}"</div>
-    <div class="bid-modal-info">
-      <div class="bid-modal-info-row">
-        <span>Current High Bid</span>
-        <strong>${{ (bidModalComic.highBid ?? 0).toFixed(2) }}</strong>
-      </div>
-      <div class="bid-modal-info-row" *ngIf="bidModalComic.currentBidderName">
-        <span>Leader</span>
-        <strong>{{ bidModalComic.currentBidderName }}</strong>
-      </div>
-      <div class="bid-modal-info-row">
-        <span>Time Remaining</span>
-        <strong class="bid-modal-timer">⏱ {{ bidCountdownLabel(bidModalComic.id) }}</strong>
-      </div>
-    </div>
-    <div class="bid-modal-input-group">
-      <label for="dashboard-bid-amount" class="bid-modal-label">Your Bid — min ${{ minNextBid(bidModalComic.highBid ?? 0).toFixed(2) }}, in $0.25 increments</label>
-      <div class="bid-modal-input-row">
-        <span class="bid-modal-dollar">$</span>
-        <input type="number"
-               id="dashboard-bid-amount"
-               class="bid-modal-input"
-               [(ngModel)]="bidModalAmount"
-               [min]="minNextBid(bidModalComic.highBid ?? 0)"
-               step="0.25"
-               placeholder="0.00"
-               (keyup.enter)="submitBid()"
-               [disabled]="bidModalSubmitting"
-               aria-describedby="dashboard-bid-warning dashboard-bid-error"
-               [attr.aria-invalid]="bidModalError ? 'true' : null"
-               autofocus>
-      </div>
-    </div>
-    <div *ngIf="bidModalWarning" id="dashboard-bid-warning" role="status" aria-live="polite" class="bid-modal-warning">⚠ {{ bidModalWarning }}</div>
-    <div *ngIf="bidModalError" id="dashboard-bid-error" role="alert" class="bid-modal-error">{{ bidModalError }}</div>
-    <div class="bid-modal-actions">
-      <button class="bid-modal-submit-btn" (click)="submitBid()" [disabled]="bidModalSubmitting || !bidModalAmount">
-        {{ bidModalSubmitting ? 'Placing…' : 'Place Bid' }}
-      </button>
-      <button class="bid-modal-cancel-btn" (click)="closeBidModal()" [disabled]="bidModalSubmitting">Cancel</button>
     </div>
   </div>
 </div>
@@ -241,68 +126,14 @@
               <ng-container *ngIf="auth.isApproved() && !auth.isAdmin()">
                 <button *ngIf="isInMyCart(comic.id)" class="btn-in-cart" disabled>In Your Cart</button>
 
-                <!-- Bidding: active cycle -->
-                <ng-container *ngIf="configService.biddingMode && comic.enableBid && isBiddingActive(comic)">
-                  <div class="bid-countdown">⏱ {{ bidCountdownLabel(comic.id) }}</div>
-                  <div class="bid-leader" *ngIf="comic.currentBidderName">
-                    by {{ comic.currentBidderName }}
-                  </div>
-                  <div class="bid-leader">${{ (comic.highBid ?? 0).toFixed(2) }}</div>
-                  <button class="btn-bid"
-                    [disabled]="!canBid()"
-                    [title]="canBid() ? '' : cartLockedTitle()"
-                    (click)="$event.preventDefault(); $event.stopPropagation(); placeBid(comic)">
-                    BID
-                  </button>
-                </ng-container>
-
-                <!-- Bidding: start (Bid button — only visible after admin has opened it) -->
-                <ng-container *ngIf="configService.biddingMode && comic.enableBid && !comic.sold && comic.bidOpenedAt && !isBiddingActive(comic)">
-                  <button class="btn-bid-start"
-                    [disabled]="!canBid()"
-                    [title]="canBid() ? '' : cartLockedTitle()"
-                    (click)="$event.preventDefault(); $event.stopPropagation(); startBidding(comic)">Bid</button>
-                </ng-container>
-
-                <!-- Bidding: not yet opened — placeholder so users know bidding is coming -->
-                <ng-container *ngIf="configService.biddingMode && comic.enableBid && !comic.sold && !comic.bidOpenedAt && !isBiddingActive(comic)">
-                  <button class="btn-bid-start btn-bid-pending" disabled title="Bidding not yet open">Bid</button>
-                </ng-container>
-
-                <!-- Normal claim (no bidding) -->
-                <ng-container *ngIf="!(configService.biddingMode && comic.enableBid)">
-                  <button *ngIf="showClaimButton(comic)" class="btn-claim"
-                    [disabled]="!canClaim(comic)"
-                    [title]="canClaim(comic) ? '' : cartLockedTitle()"
-                    (click)="$event.preventDefault(); $event.stopPropagation(); claim(comic)">Claim</button>
-                </ng-container>
+                <!-- Normal claim -->
+                <button *ngIf="showClaimButton(comic)" class="btn-claim"
+                  [disabled]="!canClaim(comic)"
+                  [title]="canClaim(comic) ? '' : cartLockedTitle()"
+                  (click)="$event.preventDefault(); $event.stopPropagation(); claim(comic)">Claim</button>
               </ng-container>
 
-              <!-- Admin bid controls -->
-              <ng-container *ngIf="auth.isAdmin() && configService.biddingMode && comic.enableBid && !comic.sold && !claimedDate(comic.id)">
-                <!-- Not yet opened: show Start Bid button -->
-                <ng-container *ngIf="!comic.bidOpenedAt && !isBiddingActive(comic)">
-                  <button class="btn-start-bid"
-                    (click)="$event.preventDefault(); $event.stopPropagation(); openBidModal(comic)">
-                    Start Bid
-                  </button>
-                </ng-container>
-                <!-- Opened, waiting for first bid -->
-                <ng-container *ngIf="comic.bidOpenedAt && !isBiddingActive(comic)">
-                  <button class="btn-cancel-bid"
-                    (click)="$event.preventDefault(); $event.stopPropagation(); cancelBid(comic)">
-                    Cancel
-                  </button>
-                </ng-container>
-                <!-- Active: show countdown + high bid (same info users see) -->
-                <ng-container *ngIf="isBiddingActive(comic)">
-                  <div class="bid-countdown">⏱ {{ bidCountdownLabel(comic.id) }}</div>
-                  <div class="bid-leader" *ngIf="comic.currentBidderName">by {{ comic.currentBidderName }}</div>
-                  <div class="bid-leader">${{ (comic.highBid ?? 0).toFixed(2) }}</div>
-                </ng-container>
-              </ng-container>
-
-              <button *ngIf="auth.isAdmin() && configService.awardModeEnabled && !claimedDate(comic.id) && !comic.comicCondition?.cgcCondition?.grade && !comic.comicCondition?.cbcsCondition?.grade && !isBiddingActive(comic)"
+              <button *ngIf="auth.isAdmin() && configService.awardModeEnabled && !claimedDate(comic.id) && !comic.comicCondition?.cgcCondition?.grade && !comic.comicCondition?.cbcsCondition?.grade"
                 class="btn-award"
                 (click)="$event.preventDefault(); $event.stopPropagation(); openAwardModal(comic)">Award</button>
               <button *ngIf="auth.isAdmin() && !comic.isForSale" class="btn-sell"
@@ -325,18 +156,5 @@
 <footer class="dashboard-footer">
   <div class="footer-main-row">
     <span class="footer-address">Oregon City, Oregon 97045 USA</span>
-    <button class="footer-logs-toggle" (click)="logsExpanded = !logsExpanded">
-      {{ logsExpanded ? '&#9650; Hide Logs' : '&#9660; Logs' }}
-      <span class="footer-logs-count">{{ logService.logEntries.length }}</span>
-    </button>
-  </div>
-  <div *ngIf="logsExpanded" class="footer-logs-panel">
-    <div *ngIf="logService.logEntries.length === 0" class="footer-log-empty">No logs yet.</div>
-    <div *ngFor="let entry of logService.logEntries"
-         class="footer-log-entry"
-         [class.footer-log-error]="entry.isError">
-      <span class="footer-log-time">{{ entry.timestamp | date:'HH:mm:ss' }}</span>
-      <span class="footer-log-msg">{{ entry.message }}</span>
-    </div>
   </div>
 </footer>

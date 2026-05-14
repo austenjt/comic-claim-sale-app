@@ -57,11 +57,10 @@
         <ng-container *ngFor="let row of groupedRows(order)">
           <!-- Single comic: one row -->
           <tr *ngIf="row.type === 'single'"
-              [class.won-via-bid-row]="row.wonViaBid"
               [class.graded-row]="row.isGraded">
             <td><a [routerLink]="['/detail', row.items[0].comicId]">{{ row.items[0].comicTitle }}{{ row.items[0].comicNumber ? ' ' + row.items[0].comicNumber : '' }}</a></td>
             <td>
-              <ng-container *ngIf="showItemDiscounts(order) && !row.wonViaBid; else plainOrderPrice">
+              <ng-container *ngIf="showItemDiscounts(order); else plainOrderPrice">
                 <span class="price-original">{{ row.items[0].price | currency }}</span>
                 <span *ngIf="discountedItemPrice(row.items[0], order) === 0" class="price-free-badge">FREE</span>
                 <span *ngIf="discountedItemPrice(row.items[0], order) !== 0" class="price-discounted">{{ discountedItemPrice(row.items[0], order) | currency }}</span>
@@ -70,25 +69,24 @@
             </td>
             <td>{{ row.claimedAt | date:'short' }}</td>
             <td>
-              <button *ngIf="!row.wonViaBid" class="btn-release" (click)="unclaim(row.removeId)"
+              <button class="btn-release" (click)="unclaim(row.removeId)"
                 title="Release this comic back to available">Release</button>
             </td>
           </tr>
           <!-- Set: header row then one row per member comic -->
           <ng-container *ngIf="row.type === 'set'">
             <tr class="set-header-row"
-                [class.won-via-bid-row]="row.wonViaBid"
                 [class.graded-row]="row.isGraded">
               <td>
                 <a class="set-header-link" [routerLink]="['/set', row.containerId ?? row.items[0].comicId]">{{ row.containerTitle ?? row.items[0].comicTitle }}</a>
                 <span class="set-tag">Set {{ row.collectionGroup }}</span>
               </td>
               <td class="set-total-price">
-                <ng-container *ngIf="showItemDiscounts(order) && !row.wonViaBid">
+                <ng-container *ngIf="showItemDiscounts(order)">
                   <span class="price-original">{{ row.totalPrice | currency }}</span>
                   <span class="price-discounted">{{ discountedSetTotal(row, order) | currency }}</span>
                 </ng-container>
-                <span *ngIf="!showItemDiscounts(order) || row.wonViaBid">{{ row.totalPrice | currency }}</span>
+                <span *ngIf="!showItemDiscounts(order)">{{ row.totalPrice | currency }}</span>
               </td>
               <td>{{ row.claimedAt | date:'short' }}</td>
               <td>
@@ -98,13 +96,12 @@
             </tr>
             <tr *ngFor="let comic of row.items"
                 class="set-member-row"
-                [class.won-via-bid-row]="row.wonViaBid"
                 [class.graded-row]="comic.isGraded">
               <td class="set-member-comic">
                 <a [routerLink]="['/detail', comic.comicId]">{{ comic.comicTitle }}{{ comic.comicNumber ? ' ' + comic.comicNumber : '' }}</a>
               </td>
               <td class="set-member-price">
-                <ng-container *ngIf="showItemDiscounts(order) && !comic.wonViaBid; else plainSetMemberPrice">
+                <ng-container *ngIf="showItemDiscounts(order); else plainSetMemberPrice">
                   <span class="price-original">{{ comic.price | currency }}</span>
                   <span *ngIf="discountedItemPrice(comic, order) === 0" class="price-free-badge">FREE</span>
                   <span *ngIf="discountedItemPrice(comic, order) !== 0" class="price-discounted">{{ discountedItemPrice(comic, order) | currency }}</span>
@@ -272,20 +269,18 @@
         <ng-container *ngFor="let row of groupedRows(cart)">
           <!-- Single comic: one row -->
           <tr *ngIf="row.type === 'single'"
-              [class.won-via-bid-row]="row.wonViaBid"
               [class.graded-row]="row.isGraded">
             <td><a [routerLink]="['/detail', row.items[0].comicId]">{{ row.items[0].comicTitle }}{{ row.items[0].comicNumber ? ' ' + row.items[0].comicNumber : '' }}</a></td>
             <td>{{ row.items[0].price | currency }}</td>
             <td>{{ row.claimedAt | date:'short' }}</td>
             <td>
-              <button *ngIf="!row.wonViaBid" class="btn-release" (click)="unclaim(row.removeId)"
+              <button class="btn-release" (click)="unclaim(row.removeId)"
                 title="Release this comic back to available">Release</button>
             </td>
           </tr>
           <!-- Set: header row then one row per member comic -->
           <ng-container *ngIf="row.type === 'set'">
             <tr class="set-header-row"
-                [class.won-via-bid-row]="row.wonViaBid"
                 [class.graded-row]="row.isGraded">
               <td>
                 <a class="set-header-link" [routerLink]="['/set', row.containerId ?? row.items[0].comicId]">{{ row.containerTitle ?? row.items[0].comicTitle }}</a>
@@ -300,7 +295,6 @@
             </tr>
             <tr *ngFor="let comic of row.items"
                 class="set-member-row"
-                [class.won-via-bid-row]="row.wonViaBid"
                 [class.graded-row]="comic.isGraded">
               <td class="set-member-comic">
                 <a [routerLink]="['/detail', comic.comicId]">{{ comic.comicTitle }}{{ comic.comicNumber ? ' ' + comic.comicNumber : '' }}</a>

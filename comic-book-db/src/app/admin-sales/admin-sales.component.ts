@@ -24,7 +24,6 @@ export class AdminSalesComponent implements OnInit {
   formPercentageOff = 0;
   formXBooks = 1;
   formExcludeSets = false;
-  formExcludeAuctions = false;
   formExcludeGraded = false;
 
   readonly typeOptions: { value: DiscountType; label: string }[] = [
@@ -61,7 +60,6 @@ export class AdminSalesComponent implements OnInit {
     this.formPercentageOff = 0;
     this.formXBooks = 1;
     this.formExcludeSets = false;
-    this.formExcludeAuctions = false;
     this.formExcludeGraded = false;
     this.showForm = true;
   }
@@ -74,7 +72,6 @@ export class AdminSalesComponent implements OnInit {
     this.formPercentageOff = d.percentageOff;
     this.formXBooks = d.xBooks || 1;
     this.formExcludeSets = d.excludeSets ?? false;
-    this.formExcludeAuctions = d.excludeAuctions ?? false;
     this.formExcludeGraded = d.excludeGraded ?? false;
     this.showForm = true;
   }
@@ -92,7 +89,6 @@ export class AdminSalesComponent implements OnInit {
       percentageOff: this.formPercentageOff,
       xBooks: Number(this.formXBooks) || 1,
       excludeSets: this.formExcludeSets,
-      excludeAuctions: this.formExcludeAuctions,
       excludeGraded: this.formExcludeGraded
     };
 
@@ -152,7 +148,6 @@ export class AdminSalesComponent implements OnInit {
   private exclusionNote(d: Discount): string {
     const parts: string[] = [];
     if (d.excludeSets) parts.push('sets');
-    if (d.excludeAuctions) parts.push('auctions');
     if (d.excludeGraded) parts.push('graded');
     return parts.length ? ` (${parts.join(', ')} excluded)` : '';
   }

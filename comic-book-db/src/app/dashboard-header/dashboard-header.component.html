@@ -17,17 +17,11 @@
                 (click)="showPricedOnlyChange.emit(!showPricedOnly)">
           {{ showPricedOnly ? 'Show Unpriced' : 'Exclude Unpriced' }}
         </button>
-        <button class="btn-exclude-claimed"
-                [class.btn-exclude-claimed-active]="biddableOnly"
-                (click)="biddableOnlyChange.emit(!biddableOnly)">
-          {{ biddableOnly ? 'Show All' : 'Only Bidding' }}
-        </button>
         <select class="sort-select"
                 [value]="sortOrder"
                 (change)="sortOrderChange.emit($any($event.target).value)">
           <option value="oldest-first">Oldest First</option>
           <option value="newest-first">Newest First</option>
-          <option value="bidding-first">Bidding First</option>
           <option value="claimed-first">Claimed First</option>
           <option value="a-z">A–Z Sort</option>
           <option value="z-a">Z–A Sort</option>

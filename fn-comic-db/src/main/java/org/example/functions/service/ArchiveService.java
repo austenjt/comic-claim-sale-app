@@ -198,7 +198,6 @@ public class ArchiveService {
                 .price(i.getPrice())
                 .claimedAt(i.getClaimedAt())
                 .collectionGroup(i.getCollectionGroup())
-                .wonViaBid(i.isWonViaBid())
                 .isGraded(i.isGraded())
                 .build())
             .collect(Collectors.toList());
@@ -212,7 +211,6 @@ public class ArchiveService {
             .discountAmount(cart.getDiscountAmount())
             .discountDescription(cart.getDiscountDescription())
             .discountExcludesSets(cart.getDiscountExcludesSets())
-            .discountExcludesAuctions(cart.getDiscountExcludesAuctions())
             .discountExcludesGraded(cart.getDiscountExcludesGraded())
             .discountBreakdown(cart.getDiscountBreakdown())
             .shippingCost(cart.getShippingCost())

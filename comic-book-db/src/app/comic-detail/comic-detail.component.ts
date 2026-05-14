@@ -8,7 +8,6 @@ import { Cart } from '../cart';
 import { ComicService } from '../comic.service';
 import { ImageService } from '../image.service';
 import { CartService } from '../cart.service';
-import { LogService } from '../log.service';
 import { AuthService } from '../auth.service';
 import { ConfigService, ComicEnums } from '../config.service';
 import { DashboardNavService, NavItem } from '../dashboard-nav.service';
@@ -30,10 +29,6 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
   claimError = '';
   loading = true;
   actionLoading = false;
-  bidSecondsRemaining = 0;
-  private bidTimerInterval: any = null;
-  private bidPollInterval: any = null;
-  private claimEventSub: Subscription | null = null;
   private routeParamSub: Subscription | null = null;
   imageUploading = false;
   imageUploadErrorSummary = '';
@@ -57,10 +52,6 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
   saveError = '';
   saveDone = false;
   enums: ComicEnums = { coverVariants: [], gradingCompanies: [], grades: [], pageQualities: [] };
-  bidModalOpen = false;
-  bidModalAmount: number | null = null;
-  bidModalError = '';
-  bidModalSubmitting = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -68,7 +59,6 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
     private comicService: ComicService,
     private imageService: ImageService,
     private cartService: CartService,
-    private logService: LogService,
     public auth: AuthService,
     public configService: ConfigService,
     private navService: DashboardNavService,
@@ -116,7 +106,6 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
     this.zoomOpen = false;
     this.claimError = '';
     this.actionLoading = false;
-    this.bidSecondsRemaining = 0;
     this.linkCopied = false;
     this.pendingDelete = false;
     this.deleting = false;
@@ -127,10 +116,6 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
     this.saving = false;
     this.saveError = '';
     this.saveDone = false;
-    this.bidModalOpen = false;
-    this.bidModalAmount = null;
-    this.bidModalError = '';
-    this.bidModalSubmitting = false;
     this.imageUploading = false;
     this.imageUploadErrorSummary = '';
     this.imageUploadErrorDetail = '';
@@ -141,9 +126,6 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
     this.backImageUploadErrorExpanded = false;
     this.captureModalOpen = false;
     this.captureModalTarget = null;
-    if (this.bidTimerInterval) { clearInterval(this.bidTimerInterval); this.bidTimerInterval = null; }
-    if (this.bidPollInterval) { clearInterval(this.bidPollInterval); this.bidPollInterval = null; }
-    if (this.claimEventSub) { this.claimEventSub.unsubscribe(); this.claimEventSub = null; }
   }
 
   claimedDate(comicId: number): string | null {
@@ -152,10 +134,6 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
 
   isInMyCart(comicId: number): boolean {
     return this.myCart?.items.some(i => i.comicId === String(comicId)) ?? false;
-  }
-
-  isWonViaBid(comicId: number): boolean {
-    return this.myCart?.items.some(i => i.comicId === String(comicId) && i.wonViaBid) ?? false;
   }
 
   canClaim(comicId: number): boolean {
@@ -186,13 +164,11 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
     if (!this.comic) return;
     this.claimError = '';
     this.actionLoading = true;
-    const heading = this.comicHeading;
     this.cartService.removeItem(String(this.comic.id)).subscribe({
       next: cart => {
         this.myCart = cart;
         delete this.claimedMap[String(this.comic!.id)];
         this.actionLoading = false;
-        this.logService.log(`"${heading}" Returned to sale`);
       },
       error: err => {
         this.claimError = err?.error || 'Failed to release comic.';
@@ -201,167 +177,12 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
     });
   }
 
-  get bidHistoryDesc() {
-    return [...(this.comic?.bidHistory ?? [])].reverse();
-  }
-
   ngOnDestroy(): void {
-    if (this.bidTimerInterval) clearInterval(this.bidTimerInterval);
-    if (this.bidPollInterval) clearInterval(this.bidPollInterval);
-    if (this.claimEventSub) this.claimEventSub.unsubscribe();
     if (this.routeParamSub) this.routeParamSub.unsubscribe();
-  }
-
-  isBiddingActive(): boolean {
-    if (!this.comic?.bidStartedAt) return false;
-    return this.bidSecondsRemaining > 0;
-  }
-
-  get bidCountdownLabel(): string {
-    const m = Math.floor(this.bidSecondsRemaining / 60);
-    const s = this.bidSecondsRemaining % 60;
-    return `${m}:${s.toString().padStart(2, '0')}`;
-  }
-
-  private startBidTimer(): void {
-    if (this.bidTimerInterval) return;
-    this.bidTimerInterval = setInterval(() => {
-      if (!this.comic?.bidStartedAt) {
-        clearInterval(this.bidTimerInterval);
-        this.bidTimerInterval = null;
-        return;
-      }
-      const endsAt = new Date(this.comic.bidStartedAt).getTime() +
-                     this.configService.biddingCycleMins * 60000;
-      this.bidSecondsRemaining = Math.max(0, Math.floor((endsAt - Date.now()) / 1000));
-      if (this.bidSecondsRemaining === 0) {
-        clearInterval(this.bidTimerInterval);
-        this.bidTimerInterval = null;
-        this.onBidExpired();
-      }
-    }, 1000);
-  }
-
-  private onBidExpired(): void {
-    if (!this.comic) return;
-    const comicId = String(this.comic.id);
-    this.comic.bidStartedAt = null;
-
-    // Immediately mark as sold so the bid/delete UI doesn't re-appear while the
-    // finalizeBid HTTP round-trip is in flight. Admin also calls finalizeBid so
-    // the comic is finalized even when no regular user has the page open.
-    this.comic.sold = true;
-
-    this.cartService.finalizeBid(comicId).subscribe({
-      next: () => {
-        this.logService.log('Bidding ended — comic added to winner\'s cart.');
-        this.loadClaimedMap();
-        if (!this.auth.isAdmin()) {
-          this.cartService.getMyCart().subscribe({ next: c => this.myCart = c, error: () => {} });
-        }
-      },
-      error: () => {
-        // Another client already finalized — refresh claimed map and (for non-admin) cart
-        this.loadClaimedMap();
-        if (!this.auth.isAdmin()) {
-          this.cartService.getMyCart().subscribe({ next: c => this.myCart = c, error: () => {} });
-        }
-      }
-    });
   }
 
   private loadClaimedMap(): void {
     this.cartService.getClaimedMap().subscribe({ next: m => this.claimedMap = m, error: () => {} });
-  }
-
-  startBidding(): void {
-    if (!this.comic) return;
-    this.actionLoading = true;
-    this.cartService.startBid(String(this.comic.id)).subscribe({
-      next: updatedComic => {
-        this.comic = { ...this.comic!, ...updatedComic };
-        const endsAt = new Date(this.comic.bidStartedAt!).getTime() +
-                       this.configService.biddingCycleMins * 60000;
-        this.bidSecondsRemaining = Math.max(0, Math.floor((endsAt - Date.now()) / 1000));
-        this.startBidTimer();
-        this.actionLoading = false;
-        this.logService.logBid(`Bidding started — ${this.configService.biddingCycleMins} min window open!`);
-        // Ensure all viewers start getting live updates from this point on
-        this.setupBidRefresh();
-      },
-      error: err => {
-        this.claimError = err?.error || 'Failed to start bidding.';
-        this.actionLoading = false;
-      }
-    });
-  }
-
-  placeBid(): void {
-    if (!this.comic) return;
-    this.bidModalAmount = null;
-    this.bidModalError = '';
-    this.bidModalOpen = true;
-  }
-
-  closeBidModal(): void {
-    if (this.bidModalSubmitting) return;
-    this.bidModalOpen = false;
-    this.bidModalAmount = null;
-    this.bidModalError = '';
-  }
-
-  minNextBid(highBid: number): number {
-    const nextQuarter = Math.ceil((highBid + 0.001) / 0.25) * 0.25;
-    return Math.max(nextQuarter, 1.00);
-  }
-
-  get bidModalWarning(): string {
-    if (!this.comic || this.bidModalAmount === null) return '';
-    const currentHigh = this.comic.highBid ?? 0;
-    if (this.bidModalAmount >= currentHigh + 10) {
-      return `Your bid is $${(this.bidModalAmount - currentHigh).toFixed(2)} over the current high bid — double-check before submitting.`;
-    }
-    return '';
-  }
-
-  submitBid(): void {
-    if (!this.comic || this.bidModalSubmitting) return;
-    const currentHigh = this.comic.highBid ?? 0;
-    const amount = this.bidModalAmount;
-    if (amount === null || isNaN(amount) || amount <= currentHigh) {
-      this.bidModalError = `Bid must be greater than $${currentHigh.toFixed(2)}.`;
-      return;
-    }
-    if (amount < 1.00) {
-      this.bidModalError = 'Bid must be at least $1.00.';
-      return;
-    }
-    if (Math.abs(Math.round(amount * 4) - amount * 4) > 0.001) {
-      this.bidModalError = 'Bid must be in whole dollar or $0.25 increments (e.g. $1.00, $1.25, $1.50).';
-      return;
-    }
-    this.bidModalSubmitting = true;
-    this.bidModalError = '';
-    this.cartService.placeBid(String(this.comic.id), amount).subscribe({
-      next: updatedComic => {
-        this.comic = { ...this.comic!, ...updatedComic };
-        // bidStartedAt was reset on the server — restart the timer if it had stopped
-        if (this.comic.bidStartedAt && !this.bidTimerInterval) {
-          const endsAt = new Date(this.comic.bidStartedAt).getTime() +
-                         this.configService.biddingCycleMins * 60000;
-          this.bidSecondsRemaining = Math.max(0, Math.floor((endsAt - Date.now()) / 1000));
-          if (this.bidSecondsRemaining > 0) this.startBidTimer();
-        }
-        this.bidModalSubmitting = false;
-        this.bidModalOpen = false;
-        this.claimError = '';
-        this.logService.logBid(`Bid of $${amount.toFixed(2)} placed!`);
-      },
-      error: err => {
-        this.bidModalError = err?.error || 'Bid failed.';
-        this.bidModalSubmitting = false;
-      }
-    });
   }
 
   private buildPageMeta(comic: Comic): void {
@@ -452,67 +273,7 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
         this.loading = false;
         if (comic) this.buildPageMeta(comic);
         if (comic && this.auth.isAdmin()) this.initEditComic(comic);
-        if (comic?.bidStartedAt) {
-          const endsAt = new Date(comic.bidStartedAt).getTime() +
-                         this.configService.biddingCycleMins * 60000;
-          this.bidSecondsRemaining = Math.max(0, Math.floor((endsAt - Date.now()) / 1000));
-          if (this.bidSecondsRemaining > 0) this.startBidTimer();
-        }
-        // Start polling/event subscription so other users' bids push updates here
-        if (comic?.enableBid && !comic.sold) {
-          this.setupBidRefresh();
-        }
       });
-  }
-
-  /** Subscribe to claim events and poll so bid state stays current for all viewers. */
-  private setupBidRefresh(): void {
-    // Event-driven: react immediately when a bid notification arrives for this comic
-    if (!this.claimEventSub) {
-      this.claimEventSub = this.logService.newClaimEvent$.subscribe(n => {
-        if (this.comic && n.comicId === String(this.comic.id)) {
-          this.refreshBidState();
-        }
-      });
-    }
-    // Polling fallback: catch anything the notification stream may have missed
-    if (!this.bidPollInterval) {
-      this.bidPollInterval = setInterval(() => this.refreshBidState(), 5000);
-    }
-  }
-
-  /** Re-fetch the comic and update bid state without disrupting an already-running timer. */
-  private refreshBidState(): void {
-    if (!this.comic || this.actionLoading) return;
-    const wasActive = this.isBiddingActive();
-    const wasSold = !!this.comic.sold;
-    this.comicService.getComic(this.comic.id).subscribe({
-      next: latestComic => {
-        if (!latestComic) return;
-        this.comic = { ...this.comic!, ...latestComic };
-        // If bidding just became visible (another user started it), kick off the timer
-        if (!wasActive && this.comic.bidStartedAt) {
-          const endsAt = new Date(this.comic.bidStartedAt).getTime() +
-                         this.configService.biddingCycleMins * 60000;
-          this.bidSecondsRemaining = Math.max(0, Math.floor((endsAt - Date.now()) / 1000));
-          if (this.bidSecondsRemaining > 0) this.startBidTimer();
-        }
-        // sold=true is set only when finalization is fully committed to the DB.
-        // Use that as a reliable signal to refresh claim state for all viewers.
-        if (!wasSold && this.comic.sold) {
-          this.loadClaimedMap();
-          if (!this.auth.isAdmin()) {
-            this.cartService.getMyCart().subscribe({ next: c => this.myCart = c, error: () => {} });
-          }
-          // Stop polling — bidding is permanently over for this item
-          if (this.bidPollInterval) {
-            clearInterval(this.bidPollInterval);
-            this.bidPollInterval = null;
-          }
-        }
-      },
-      error: () => {}
-    });
   }
 
   toggleZoom(): void {
