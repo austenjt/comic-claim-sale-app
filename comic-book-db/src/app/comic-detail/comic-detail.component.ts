@@ -271,7 +271,12 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
       .subscribe(comic => {
         this.comic = comic;
         this.loading = false;
-        if (comic) this.buildPageMeta(comic);
+        if (comic) {
+          this.buildPageMeta(comic);
+          this.comicService.recordView(id).subscribe(r => {
+            if (this.comic) this.comic.viewCount = r.viewCount;
+          });
+        }
         if (comic && this.auth.isAdmin()) this.initEditComic(comic);
       });
   }

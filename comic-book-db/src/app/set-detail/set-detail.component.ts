@@ -93,6 +93,9 @@ export class SetDetailComponent implements OnInit, OnDestroy {
           const count = (comic.items ?? []).length;
           this.titleService.setTitle(`${comic.title} Set — Lightning Comics PDX`);
           this.meta.updateTag({ name: 'description', content: `${comic.title} — set of ${count} comic${count !== 1 ? 's' : ''} available for claim at Lightning Comics PDX in Oregon City, OR.` });
+          this.comicService.recordView(id).subscribe(r => {
+            if (this.container) this.container.viewCount = r.viewCount;
+          });
         }
       });
 

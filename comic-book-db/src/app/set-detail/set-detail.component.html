@@ -103,6 +103,11 @@
           <span class="detail-value">{{ setMembers.length }}</span>
         </div>
 
+        <div class="detail-item" *ngIf="container.viewCount != null">
+          <span class="detail-label">Views</span>
+          <span class="detail-value">{{ container.viewCount | number }}</span>
+        </div>
+
         <div class="detail-item" *ngIf="totalPrice > 0">
           <span class="detail-label">Total Price</span>
           <span class="detail-value">{{ totalPrice | currency:'USD':'symbol':'1.2-2' }}</span>

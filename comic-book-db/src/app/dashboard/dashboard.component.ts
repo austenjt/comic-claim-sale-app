@@ -60,10 +60,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
   get sortOrder() { return this._sortOrder; }
   set sortOrder(v: string) { this._sortOrder = v; this.currentPage = 1; this.loadPage(); this.savePrefs(); }
 
-  private _biddableOnly = false;
-  get biddableOnly() { return this._biddableOnly; }
-  set biddableOnly(v: boolean) { this._biddableOnly = v; this.currentPage = 1; this.loadPage(); this.savePrefs(); }
-
   private loadSub: Subscription | null = null;
   private loadRetryTimer: any = null;
 
@@ -110,8 +106,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       sortOrder: this._sortOrder,
       currentPage: this.currentPage,
       excludeClaimed: this._excludeClaimed,
-      showPricedOnly: this._showPricedOnly,
-      biddableOnly: this._biddableOnly
+      showPricedOnly: this._showPricedOnly
     }));
   }
 
@@ -124,7 +119,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
       if (prefs.currentPage) this.currentPage = prefs.currentPage;
       if (prefs.excludeClaimed != null) this._excludeClaimed = prefs.excludeClaimed;
       if (prefs.showPricedOnly != null) this._showPricedOnly = prefs.showPricedOnly;
-      if (prefs.biddableOnly != null) this._biddableOnly = prefs.biddableOnly;
     } catch { /* ignore corrupt data */ }
   }
 

@@ -99,6 +99,7 @@ export interface Comic {
   largeBackImageId: string | null;
   personalNotes: string | null;
   publicNotes: string | null;
+  viewCount?: number | null;
   sold?: boolean | null;
   items?: Comic[];
 }

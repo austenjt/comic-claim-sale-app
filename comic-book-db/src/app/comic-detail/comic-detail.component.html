@@ -102,6 +102,11 @@
           <span class="detail-value">{{comic.id}}</span>
         </div>
 
+        <div class="detail-item" *ngIf="comic.viewCount != null">
+          <span class="detail-label">Views</span>
+          <span class="detail-value">{{comic.viewCount | number}}</span>
+        </div>
+
         <div class="detail-item" *ngIf="auth.isAdmin() || (comic.series && comic.series !== '')">
           <span class="detail-label">Series</span>
           <span *ngIf="!auth.isAdmin()" class="detail-value">{{comic.series}}</span>

@@ -99,6 +99,9 @@ public class ComicBook {
     private String personalNotes;
     private String publicNotes;
 
+    // Analytics
+    private Integer viewCount;
+
     /**
      * Used to prevent duplicate data being added.
      * Does a comparison but ignores 'id' field.

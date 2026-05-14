@@ -187,6 +187,13 @@ export class ComicService {
     );
   }
 
+  /** POST: increment the view count for a comic. Best-effort — errors are swallowed. */
+  recordView(id: number): Observable<{ viewCount: number }> {
+    return this.http.post<{ viewCount: number }>(`${this.comicsUrl}/${id}/view`, null).pipe(
+      catchError(this.handleError<{ viewCount: number }>('recordView', { viewCount: 0 }))
+    );
+  }
+
   /** PUT: update the comic on the server */
   updateComic(comic: Comic): Observable<any> {
     this.log(`received update for comic id=${comic.id} and title=${comic.title}`);

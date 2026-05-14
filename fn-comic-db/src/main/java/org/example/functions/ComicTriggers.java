@@ -82,6 +82,31 @@ public class ComicTriggers {
         }
     }
 
+    @FunctionName("recordView")
+    public HttpResponseMessage recordView(
+        @HttpTrigger(
+            name = "recordView",
+            route = "comics/{id}/view",
+            methods = {HttpMethod.POST},
+            authLevel = AuthorizationLevel.ANONYMOUS)
+        HttpRequestMessage<Optional<String>> request, @BindingName("id") String id)
+    {
+        log.info("Processing recordView for comic id {}.", id);
+        try {
+            int newCount = ComicService.getServiceInstance().incrementViewCount(Integer.parseInt(id));
+            return HttpHelper.cors(request.createResponseBuilder(HttpStatus.OK))
+                .header("Content-Type", "application/json")
+                .body("{\"viewCount\":" + newCount + "}")
+                .build();
+        } catch (Exception e) {
+            log.warn("recordView failed for comic id {}.", id, e);
+            return HttpHelper.cors(request.createResponseBuilder(HttpStatus.OK))
+                .header("Content-Type", "application/json")
+                .body("{\"viewCount\":0}")
+                .build();
+        }
+    }
+
     @FunctionName("getSeriesList")
     public HttpResponseMessage getSeriesList(
         @HttpTrigger(

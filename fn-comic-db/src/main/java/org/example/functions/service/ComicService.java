@@ -25,8 +25,10 @@ import org.example.functions.model.ComicBook;
 import org.example.functions.model.FieldChange;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -116,6 +118,37 @@ public class ComicService {
         }
         String whereClause = where.toString();
 
+        // Price sorts: a SET's effective price is the sum of its members' prices, which isn't a stored field.
+        // Cosmos can only sort by c.salePrice on the container document (null for SETs), so we must fetch
+        // everything, enrich all SETs, sort by computed price in Java, then paginate.
+        boolean isPriceSort = "highest-price".equals(sort) || "lowest-price".equals(sort);
+        if (isPriceSort) {
+            List<ComicBook> all = new ArrayList<>();
+            String sql = "SELECT * FROM c WHERE " + whereClause;
+            for (ObjectNode node : comicsContainer.queryItems(sql, new CosmosQueryRequestOptions(), ObjectNode.class)) {
+                ComicBook cb = nodeToComicBook(node);
+                if (cb != null) all.add(cb);
+            }
+            enrichSets(all);
+
+            Comparator<ComicBook> cmp = Comparator.comparing(ComicService::effectivePrice);
+            if ("highest-price".equals(sort)) cmp = cmp.reversed();
+            all.sort(cmp);
+
+            int totalCount = all.size();
+            int totalPages = (int) Math.ceil((double) totalCount / pageSize);
+            List<ComicBook> pageItems = new ArrayList<>(
+                    all.subList(Math.min(offset, totalCount), Math.min(offset + pageSize, totalCount)));
+            log.info("getTopLevelComicsPaged (price sort): page={}, size={}, total={}, sort={}", pageNumber, pageSize, totalCount, sort);
+            return PagedResponse.<ComicBook>builder()
+                    .items(pageItems)
+                    .totalCount(totalCount)
+                    .pageNumber(pageNumber)
+                    .pageSize(pageSize)
+                    .totalPages(totalPages)
+                    .build();
+        }
+
         // Count query
         String countSql = "SELECT VALUE COUNT(1) FROM c WHERE " + whereClause;
         int totalCount = 0;
@@ -138,31 +171,7 @@ public class ComicService {
             if (cb != null) pageItems.add(cb);
         }
 
-        // Enrich SET containers with their member comics (one batch query for all sets on this page)
-        List<Integer> setGroups = pageItems.stream()
-                .filter(c -> "SET".equals(c.getDocType())
-                        && c.getCollectionGroup() != null
-                        && c.getCollectionGroup() > 0)
-                .map(ComicBook::getCollectionGroup)
-                .collect(Collectors.toList());
-
-        if (!setGroups.isEmpty()) {
-            String inClause = setGroups.stream().map(String::valueOf).collect(Collectors.joining(", "));
-            // NOT (c.docType = 'SET') correctly handles undefined docType (unlike != which returns false for undefined)
-            String membersSql = "SELECT * FROM c WHERE c.collectionGroup IN (" + inClause + ") AND NOT (c.docType = 'SET')";
-            List<ComicBook> allMembers = new ArrayList<>();
-            for (ObjectNode node : comicsContainer.queryItems(membersSql, new CosmosQueryRequestOptions(), ObjectNode.class)) {
-                ComicBook m = nodeToComicBook(node);
-                if (m != null) allMembers.add(m);
-            }
-            Map<Integer, List<ComicBook>> membersByGroup = allMembers.stream()
-                    .collect(Collectors.groupingBy(ComicBook::getCollectionGroup));
-            for (ComicBook comic : pageItems) {
-                if ("SET".equals(comic.getDocType()) && comic.getCollectionGroup() != null) {
-                    comic.setItems(membersByGroup.getOrDefault(comic.getCollectionGroup(), new ArrayList<>()));
-                }
-            }
-        }
+        enrichSets(pageItems);
 
         int totalPages = (int) Math.ceil((double) totalCount / pageSize);
         log.info("getTopLevelComicsPaged: page={}, size={}, total={}, sort={}", pageNumber, pageSize, totalCount, sort);
@@ -175,15 +184,55 @@ public class ComicService {
                 .build();
     }
 
+    /**
+     * Fetches member comics for all SET containers in the list and attaches them to items[].
+     */
+    private void enrichSets(List<ComicBook> topLevel) {
+        List<Integer> setGroups = topLevel.stream()
+                .filter(c -> "SET".equals(c.getDocType())
+                        && c.getCollectionGroup() != null
+                        && c.getCollectionGroup() > 0)
+                .map(ComicBook::getCollectionGroup)
+                .collect(Collectors.toList());
+        if (setGroups.isEmpty()) return;
+
+        String inClause = setGroups.stream().map(String::valueOf).collect(Collectors.joining(", "));
+        // NOT (c.docType = 'SET') correctly handles undefined docType (unlike != which returns false for undefined)
+        String membersSql = "SELECT * FROM c WHERE c.collectionGroup IN (" + inClause + ") AND NOT (c.docType = 'SET')";
+        List<ComicBook> allMembers = new ArrayList<>();
+        for (ObjectNode node : comicsContainer.queryItems(membersSql, new CosmosQueryRequestOptions(), ObjectNode.class)) {
+            ComicBook m = nodeToComicBook(node);
+            if (m != null) allMembers.add(m);
+        }
+        Map<Integer, List<ComicBook>> membersByGroup = allMembers.stream()
+                .collect(Collectors.groupingBy(ComicBook::getCollectionGroup));
+        for (ComicBook comic : topLevel) {
+            if ("SET".equals(comic.getDocType()) && comic.getCollectionGroup() != null) {
+                comic.setItems(membersByGroup.getOrDefault(comic.getCollectionGroup(), new ArrayList<>()));
+            }
+        }
+    }
+
+    /**
+     * Effective price for sorting: sum of member prices for SETs, own salePrice for individual comics.
+     * Null prices are treated as zero.
+     */
+    private static BigDecimal effectivePrice(ComicBook c) {
+        if ("SET".equals(c.getDocType()) && c.getItems() != null) {
+            return c.getItems().stream()
+                    .map(ComicBook::getSalePrice)
+                    .filter(Objects::nonNull)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+        }
+        return c.getSalePrice() != null ? c.getSalePrice() : BigDecimal.ZERO;
+    }
+
     private String sortToOrderBy(String sort) {
         if (sort == null) return "c._ts ASC";
         return switch (sort) {
             case "newest-first"  -> "c._ts DESC";
-            case "bidding-first" -> "c._ts DESC"; // client-side floats bid items; fall back to newest-first
             case "a-z"           -> "c.title ASC";
             case "z-a"           -> "c.title DESC";
-            case "highest-price" -> "c.salePrice DESC";
-            case "lowest-price"  -> "c.salePrice ASC";
             default              -> "c._ts ASC"; // oldest-first, claimed-first
         };
     }
@@ -414,6 +463,10 @@ public class ComicService {
      */
     public ComicBook updateComic(ComicBook updatedComicBook, String editedBy, String ifMatchETag) {
         ComicBook oldComic = getComicById(updatedComicBook.getId()).orElse(null);
+        // Preserve viewCount — it is system-maintained and must not be overwritten by admin saves
+        if (oldComic != null && oldComic.getViewCount() != null) {
+            updatedComicBook.setViewCount(oldComic.getViewCount());
+        }
         replaceComic(updatedComicBook, ifMatchETag);
         if (oldComic != null && editedBy != null) {
             List<FieldChange> changes = diffComics(oldComic, updatedComicBook);
@@ -439,7 +492,7 @@ public class ComicService {
         Iterator<String> fields = newNode.fieldNames();
         while (fields.hasNext()) {
             String field = fields.next();
-            if (field.startsWith("_") || field.equals("id") || field.equals("items")) continue;
+            if (field.startsWith("_") || field.equals("id") || field.equals("items") || field.equals("viewCount")) continue;
             JsonNode oldVal = oldNode.get(field);
             JsonNode newVal = newNode.get(field);
             String oldStr = (oldVal != null && !oldVal.isNull()) ? oldVal.toString() : null;
@@ -449,6 +502,21 @@ public class ComicService {
             }
         }
         return changes;
+    }
+
+    /**
+     * Atomically increments the viewCount for a comic and persists it.
+     * Does not write an audit log entry — view tracking is a system operation.
+     * @return the new viewCount, or 0 if the comic was not found
+     */
+    public int incrementViewCount(int id) {
+        Optional<ComicBook> existing = getComicById(id);
+        if (existing.isEmpty()) return 0;
+        ComicBook comic = existing.get();
+        int newCount = (comic.getViewCount() == null ? 0 : comic.getViewCount()) + 1;
+        comic.setViewCount(newCount);
+        updateComic(comic);
+        return newCount;
     }
 
     public ComicBook createComic(ComicBook newComicBookObj) throws IOException {
