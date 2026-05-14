@@ -105,11 +105,8 @@ public class ComicService {
              .append(" OR NOT IS_DEFINED(c.collectionGroup)")
              .append(" OR c.collectionGroup = null")
              .append(" OR c.collectionGroup <= 0)");
-        if (admin) {
-            // Admins see all comics regardless of isForSale — isForSale=false is a "hidden from buyers" flag only
-        } else {
-            // Non-admins only see comics explicitly marked for sale
-            where.append(" AND c.isForSale = true");
+        if (!admin) {
+            // Non-admins still see comics not marked for sale, but cannot claim them (enforced in CartService)
         }
         where.append(" AND (NOT IS_DEFINED(c.dateSold) OR c.dateSold = null OR c.dateSold = '')");
         if (onlyPriced) {

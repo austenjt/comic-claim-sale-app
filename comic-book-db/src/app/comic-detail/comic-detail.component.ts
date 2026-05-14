@@ -224,6 +224,10 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
     this.salePriceStr = this.editComic.salePrice != null
       ? Number(this.editComic.salePrice).toFixed(2)
       : '';
+    // Set members are always for sale — isForSale is controlled by the set container
+    if (this.parentSetId !== null) {
+      this.editComic.isForSale = true;
+    }
   }
 
   saveComic(): void {

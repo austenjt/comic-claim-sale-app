@@ -115,6 +115,9 @@ public class CartService {
         ComicBook comic = ComicService.getServiceInstance().getComicById(Integer.parseInt(comicId))
             .orElseThrow(() -> new IllegalArgumentException("Comic not found: " + comicId));
 
+        if (!Boolean.TRUE.equals(comic.getIsForSale())) {
+            throw new IllegalStateException("Comic " + comicId + " is not currently for sale.");
+        }
         if (comic.getSalePrice() == null) {
             throw new IllegalStateException("Comic " + comicId + " does not have a sale price and cannot be claimed.");
         }
@@ -138,6 +141,9 @@ public class CartService {
             .orElseThrow(() -> new IllegalArgumentException("Container comic not found: " + containerId));
         if (!"SET".equals(container.getDocType())) {
             throw new IllegalArgumentException("Comic " + containerId + " is not a set container.");
+        }
+        if (!Boolean.TRUE.equals(container.getIsForSale())) {
+            throw new IllegalStateException("Set " + containerId + " is not currently for sale.");
         }
         Integer collectionGroup = container.getCollectionGroup();
         if (collectionGroup == null) {

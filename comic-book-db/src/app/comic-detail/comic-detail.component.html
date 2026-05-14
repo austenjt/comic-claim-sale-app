@@ -458,7 +458,9 @@
         <div class="detail-section-title">Sale Info</div>
         <div class="detail-item">
           <span class="detail-label">For Sale</span>
-          <input class="detail-edit-checkbox" type="checkbox" [(ngModel)]="editComic!.isForSale">
+          <input class="detail-edit-checkbox" type="checkbox" [(ngModel)]="editComic!.isForSale"
+            [disabled]="parentSetId !== null"
+            [title]="parentSetId !== null ? 'Set members are always for sale — toggle this on the set page' : ''">
         </div>
         <div class="detail-item">
           <span class="detail-label">Sale Price</span>

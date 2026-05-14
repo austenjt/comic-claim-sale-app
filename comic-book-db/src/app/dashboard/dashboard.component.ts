@@ -65,10 +65,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   get displayComics(): Comic[] {
     let result = this.pageItems;
-    // Non-admins never see items not marked for sale (backend also enforces this)
-    if (!this.auth.isAdmin()) {
-      result = result.filter(c => c.isForSale === true);
-    }
     if (this.excludeClaimed) {
       result = result.filter(c => {
         if (this.recentlyActedIds.has(String(c.id))) return true;
@@ -266,7 +262,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   showClaimButton(comic: Comic): boolean {
-    return !!comic.salePrice &&
+    return !!comic.isForSale &&
+           !!comic.salePrice &&
            !this.isInMyCart(comic.id) &&
            !this.isClaimedByOther(comic.id);
   }
@@ -317,7 +314,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   showClaimSetButton(container: Comic): boolean {
     const members = container.items ?? [];
-    return members.length > 0 &&
+    return !!container.isForSale &&
+           members.length > 0 &&
            !this.isSetInMyCart(container) &&
            !this.isSetClaimedByOther(container);
   }
