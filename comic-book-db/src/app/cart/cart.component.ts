@@ -1,6 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CartService } from '../cart.service';
-import { LogService } from '../log.service';
 import { AuthService } from '../auth.service';
 import { Cart, CartDiscount, CartItem } from '../cart';
 
@@ -42,7 +41,6 @@ export class CartComponent implements OnInit, OnDestroy {
 
   constructor(
     private cartService: CartService,
-    private logService: LogService,
     public auth: AuthService
   ) {}
 
@@ -103,12 +101,6 @@ export class CartComponent implements OnInit, OnDestroy {
     this.cartService.removeItem(comicId).subscribe({
       next: cart => {
         this.cart = cart;
-        if (item) {
-          const msg = isSetItem
-            ? `"${item.comicTitle}" set (${setCount} books) returned to available.`
-            : `"${item.comicTitle}${item.comicNumber ? ' ' + item.comicNumber : ''}" Returned to sale`;
-          this.logService.log(msg);
-        }
       },
       error: () => this.error = 'Failed to remove item.'
     });

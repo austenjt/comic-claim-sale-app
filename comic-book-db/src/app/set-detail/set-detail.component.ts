@@ -9,7 +9,6 @@ import { Cart } from '../cart';
 import { ComicService } from '../comic.service';
 import { ImageService } from '../image.service';
 import { CartService } from '../cart.service';
-import { LogService } from '../log.service';
 import { AuthService } from '../auth.service';
 import { DashboardNavService, NavItem } from '../dashboard-nav.service';
 
@@ -60,7 +59,6 @@ export class SetDetailComponent implements OnInit, OnDestroy {
     private comicService: ComicService,
     private imageService: ImageService,
     private cartService: CartService,
-    private logService: LogService,
     public auth: AuthService,
     private navService: DashboardNavService,
     private location: Location,
@@ -203,8 +201,6 @@ export class SetDetailComponent implements OnInit, OnDestroy {
           this.claimedMap[String(m.id)] = new Date().toISOString();
         }
         this.actionLoading = false;
-        const claimName = this.auth.currentUser$.value?.name ?? 'User';
-        this.logService.log(`"${this.container!.title}" set (${this.setMembers.length} books) added to ${claimName}'s cart.`);
       },
       error: err => {
         this.claimError = err?.error || 'Failed to claim set.';

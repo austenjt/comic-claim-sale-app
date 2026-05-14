@@ -156,18 +156,5 @@
 <footer class="dashboard-footer">
   <div class="footer-main-row">
     <span class="footer-address">Oregon City, Oregon 97045 USA</span>
-    <button class="footer-logs-toggle" (click)="logsExpanded = !logsExpanded">
-      {{ logsExpanded ? '&#9650; Hide Logs' : '&#9660; Logs' }}
-      <span class="footer-logs-count">{{ logService.logEntries.length }}</span>
-    </button>
-  </div>
-  <div *ngIf="logsExpanded" class="footer-logs-panel">
-    <div *ngIf="logService.logEntries.length === 0" class="footer-log-empty">No logs yet.</div>
-    <div *ngFor="let entry of logService.logEntries"
-         class="footer-log-entry"
-         [class.footer-log-error]="entry.isError">
-      <span class="footer-log-time">{{ entry.timestamp | date:'HH:mm:ss' }}</span>
-      <span class="footer-log-msg">{{ entry.message }}</span>
-    </div>
   </div>
 </footer>

@@ -44,7 +44,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
   // IDs acted on (claimed/awarded) this session — kept in list even when excludeClaimed is on
   private recentlyActedIds = new Set<string>();
 
-  logsExpanded = false;
 
   readonly Math = Math;
   private static readonly PREFS_KEY = 'dashboard_prefs';
@@ -98,7 +97,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     private imageService: ImageService,
     public auth: AuthService,
     private cartService: CartService,
-    public logService: LogService,
+    private logService: LogService,
     private userService: UserService,
     public configService: ConfigService,
     private navService: DashboardNavService,
@@ -206,12 +205,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   private handleClaimError(err: any): void {
     this.refreshMyCart();
-    const msg: string = typeof err?.error === 'string' ? err.error : '';
-    if (msg.toLowerCase().includes('not open') || msg.toLowerCase().includes('status:')) {
-      this.logService.log('Your order has already been submitted — new claims are not allowed.');
-    } else {
-      this.loadClaimedMap();
-    }
+    this.loadClaimedMap();
   }
 
   comicNumberLabel(comic: Comic): string {
@@ -233,11 +227,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
         this.myCart = cart;
         this.claimedMap[String(comic.id)] = new Date().toISOString();
         this.recentlyActedIds.add(String(comic.id));
-        this.logService.markActed(String(comic.id));
-        const num = this.comicNumberLabel(comic);
-        const price = comic.salePrice != null ? ` — $${comic.salePrice.toFixed(2)}` : '';
-        const claimName = this.auth.currentUser$.value?.name ?? 'User';
-        this.logService.log(`"${comic.title}${num}" added to ${claimName}'s cart.${price}`);
       },
       error: (err) => { this.handleClaimError(err); }
     });
@@ -251,15 +240,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
         const members = container.items ?? [];
         this.claimedMap[String(container.id)] = new Date().toISOString();
         this.recentlyActedIds.add(String(container.id));
-        this.logService.markActed(String(container.id));
         for (const m of members) {
           this.claimedMap[String(m.id)] = new Date().toISOString();
           this.recentlyActedIds.add(String(m.id));
-          this.logService.markActed(String(m.id));
         }
         this.claimingSetId = null;
-        const setClaimName = this.auth.currentUser$.value?.name ?? 'User';
-        this.logService.log(`"${container.title}" set (${members.length} books) added to ${setClaimName}'s cart.`);
         this.loadPage();
       },
       error: (err) => {
@@ -355,16 +340,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.awardLoading = true;
     this.awardError = '';
     const comic = this.awardingComic;
-    const label = `"${comic.title}${this.comicNumberLabel(comic)}"`;
     this.cartService.awardComic(String(comic.id), user.id).subscribe({
       next: () => {
         this.claimedMap[String(comic.id)] = new Date().toISOString();
         this.recentlyActedIds.add(String(comic.id));
-        this.logService.markActed(String(comic.id));
         this.awardLoading = false;
         this.awardingComic = null;
         this.selectedUserId = null;
-        this.logService.log(`${label} awarded to ${user.name} — FREE!`);
       },
       error: (err) => {
         this.awardError = err?.error || 'Award failed.';
