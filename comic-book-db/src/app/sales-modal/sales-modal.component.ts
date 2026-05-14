@@ -79,7 +79,6 @@ export class SalesModalComponent implements OnInit, OnDestroy {
   private exclusionPhrase(d: Discount): string {
     const parts: string[] = [];
     if (d.excludeSets) parts.push('sets');
-    if (d.excludeAuctions) parts.push('auction items');
     if (d.excludeGraded) parts.push('graded comics');
     if (parts.length === 0) return '';
     let joined: string;

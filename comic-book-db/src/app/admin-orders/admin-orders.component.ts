@@ -11,7 +11,6 @@ interface AdminCartRow {
   totalPrice: number;
   claimedAt: string;
   removeId: string;
-  wonViaBid: boolean;
   /** True for single rows when the item is graded; for set rows, true if ANY member is graded. */
   isGraded: boolean;
   containerTitle?: string;
@@ -112,7 +111,6 @@ export class AdminOrdersComponent implements OnInit {
           totalPrice: setItems.reduce((sum, i) => sum + i.price, 0),
           claimedAt: setItems[0].claimedAt,
           removeId: setItems[0].comicId,
-          wonViaBid: setItems.some(i => !!i.wonViaBid),
           isGraded: setItems.some(i => !!i.isGraded),
           containerTitle: container?.comicTitle,
           containerId: container?.comicId
@@ -125,7 +123,6 @@ export class AdminOrdersComponent implements OnInit {
           totalPrice: item.price,
           claimedAt: item.claimedAt,
           removeId: item.comicId,
-          wonViaBid: !!item.wonViaBid,
           isGraded: !!item.isGraded
         });
       }
@@ -403,14 +400,13 @@ export class AdminOrdersComponent implements OnInit {
   /** True when this item is excluded from the given rule based on the rule's exclude flags. */
   private isItemExcluded(item: CartItem, rule: CartDiscount): boolean {
     if (rule.excludesSets && item.collectionGroup != null && item.collectionGroup > 0) return true;
-    if (rule.excludesAuctions && item.wonViaBid) return true;
     if (rule.excludesGraded && item.isGraded) return true;
     return false;
   }
 
   private eligibleBaseForRule(rule: CartDiscount, cart: Cart): number {
     return this.visibleCartItems(cart)
-      .filter(i => !i.wonViaBid && !this.isItemExcluded(i, rule))
+      .filter(i => !this.isItemExcluded(i, rule))
       .reduce((sum, i) => sum + i.price, 0);
   }
 
@@ -433,8 +429,7 @@ export class AdminOrdersComponent implements OnInit {
       if (!this.isBuyXFreeRule(rule)) continue;
 
       const eligible = this.visibleCartItems(cart)
-        .filter(i => !i.wonViaBid
-          && !this.isItemExcluded(i, rule)
+        .filter(i => !this.isItemExcluded(i, rule)
           && !alreadyFreed.has(i.comicId))
         .slice()
         .sort((a, b) => a.price - b.price);
@@ -455,8 +450,6 @@ export class AdminOrdersComponent implements OnInit {
   }
 
   discountedItemPrice(item: CartItem, cart: Cart): number {
-    if (item.wonViaBid) return item.price;
-
     const breakdown = cart.discountBreakdown;
     if (breakdown && breakdown.length > 0) {
       const buyXFreeMap = this.computeBuyXFreeIds(cart);
@@ -479,11 +472,9 @@ export class AdminOrdersComponent implements OnInit {
     // Legacy fallback for carts without a breakdown — apply the cart-level exclude flags.
     const discount = cart.discountAmount ?? 0;
     const excludeSets = cart.discountExcludesSets === true;
-    const excludeAuctions = cart.discountExcludesAuctions === true;
     const excludeGraded = cart.discountExcludesGraded === true;
-    const visibleNonBid = this.visibleCartItems(cart).filter(i => !i.wonViaBid
-      && !(excludeSets && i.collectionGroup != null && i.collectionGroup > 0)
-      && !(excludeAuctions && i.wonViaBid)
+    const visibleNonBid = this.visibleCartItems(cart).filter(i =>
+      !(excludeSets && i.collectionGroup != null && i.collectionGroup > 0)
       && !(excludeGraded && i.isGraded));
     const base = visibleNonBid.reduce((sum, i) => sum + i.price, 0);
     if (discount <= 0 || base <= 0) return item.price;
@@ -507,7 +498,7 @@ export class AdminOrdersComponent implements OnInit {
    * Used as a fallback for orders archived before discountBreakdown was persisted.
    */
   private parseArchivedBreakdown(description: string): Array<{
-    amount: number; excludesSets: boolean; excludesAuctions: boolean; excludesGraded: boolean; isBuyXFree: boolean;
+    amount: number; excludesSets: boolean; excludesGraded: boolean; isBuyXFree: boolean;
   }> {
     return description.split('; ').map(seg => {
       const amountMatch = seg.match(/\$-([\d.]+)/);
@@ -516,7 +507,6 @@ export class AdminOrdersComponent implements OnInit {
       return {
         amount: amountMatch ? parseFloat(amountMatch[1]) : 0,
         excludesSets: /\bsets\b/.test(list),
-        excludesAuctions: /\bauctions\b/.test(list),
         excludesGraded: /\bgraded\b/.test(list),
         isBuyXFree: seg.startsWith('Buy ')
       };
@@ -525,10 +515,9 @@ export class AdminOrdersComponent implements OnInit {
 
   /** Apply rule-level exclusions to an archived item. */
   private isArchivedItemExcluded(item: ArchivedOrderItem, rule: {
-    excludesSets: boolean; excludesAuctions: boolean; excludesGraded: boolean;
+    excludesSets: boolean; excludesGraded: boolean;
   }): boolean {
     if (rule.excludesSets && item.collectionGroup != null && item.collectionGroup > 0) return true;
-    if (rule.excludesAuctions && item.wonViaBid) return true;
     if (rule.excludesGraded && item.isGraded) return true;
     return false;
   }
@@ -540,7 +529,7 @@ export class AdminOrdersComponent implements OnInit {
    * Same algorithm as {@code DiscountService.computeBuyXFreePicks} on the backend.
    */
   private computeArchivedBuyXFreeIds(rules: Array<{
-    amount: number; excludesSets: boolean; excludesAuctions: boolean; excludesGraded: boolean; isBuyXFree: boolean;
+    amount: number; excludesSets: boolean; excludesGraded: boolean; isBuyXFree: boolean;
   }>, order: ArchivedOrder): Map<number, Set<string>> {
     const result = new Map<number, Set<string>>();
     const alreadyFreed = new Set<string>();
@@ -548,7 +537,6 @@ export class AdminOrdersComponent implements OnInit {
       if (!rule.isBuyXFree) return;
       const eligible = order.items
         .filter(i => i.comicNumber !== '#SET'   // exclude set containers
-          && !i.wonViaBid                        // exclude bid-won items
           && i.price > 0                         // exclude $0 items
           && !!i.comicId
           && !this.isArchivedItemExcluded(i, rule)
@@ -572,16 +560,13 @@ export class AdminOrdersComponent implements OnInit {
   }
 
   discountedArchivedItemPrice(item: ArchivedOrderItem, order: ArchivedOrder): number {
-    if (item.wonViaBid) return item.price;
-
     // Prefer the persisted breakdown (newer orders); fall back to parsing the description for legacy orders.
     const rules: Array<{
-      amount: number; excludesSets: boolean; excludesAuctions: boolean; excludesGraded: boolean; isBuyXFree: boolean;
+      amount: number; excludesSets: boolean; excludesGraded: boolean; isBuyXFree: boolean;
     }> = order.discountBreakdown?.length
       ? order.discountBreakdown.map(b => ({
           amount: b.amount,
           excludesSets: !!b.excludesSets,
-          excludesAuctions: !!b.excludesAuctions,
           excludesGraded: !!b.excludesGraded,
           isBuyXFree: b.description?.startsWith('Buy ') ?? false,
         }))
@@ -600,7 +585,6 @@ export class AdminOrdersComponent implements OnInit {
         }
         const base = order.items
           .filter(i => i.comicNumber !== '#SET' &&
-            !i.wonViaBid &&
             !this.isArchivedItemExcluded(i, rule))
           .reduce((sum, i) => sum + i.price, 0);
         if (base <= 0) return;
@@ -611,7 +595,7 @@ export class AdminOrdersComponent implements OnInit {
 
     // Fallback for orders with no description and no breakdown: spread total proportionally.
     const discount = order.discountAmount ?? 0;
-    const base = order.items.filter(i => !i.wonViaBid).reduce((sum, i) => sum + i.price, 0);
+    const base = order.items.reduce((sum, i) => sum + i.price, 0);
     if (discount <= 0 || base <= 0) return item.price;
     const factor = Math.max(0, base - discount) / base;
     return Math.round(item.price * factor * 100) / 100;

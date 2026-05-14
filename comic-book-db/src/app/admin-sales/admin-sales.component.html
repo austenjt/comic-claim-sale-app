@@ -47,12 +47,6 @@
     </div>
 
     <div class="form-row">
-      <label for="formExcludeAuctions">Exclude Auctions</label>
-      <input type="checkbox" id="formExcludeAuctions" [(ngModel)]="formExcludeAuctions" name="formExcludeAuctions" />
-      <span class="field-hint">When checked, items won via auction (bidding) will not receive this discount and won't count toward thresholds.</span>
-    </div>
-
-    <div class="form-row">
       <label for="formExcludeGraded">Exclude Graded</label>
       <input type="checkbox" id="formExcludeGraded" [(ngModel)]="formExcludeGraded" name="formExcludeGraded" />
       <span class="field-hint">When checked, graded comics (CGC/CBCS) will not receive this discount and won't count toward thresholds.</span>
@@ -77,7 +71,6 @@
         <th>Parameters</th>
         <th>Active</th>
         <th>Excl. Sets</th>
-        <th>Excl. Auctions</th>
         <th>Excl. Graded</th>
         <th *ngIf="auth.isAdmin()"></th>
       </tr>
@@ -95,11 +88,6 @@
         <td>
           <span class="badge" [class.badge-excl-sets]="d.excludeSets" [class.badge-inactive]="!d.excludeSets">
             {{ d.excludeSets ? 'Yes' : 'No' }}
-          </span>
-        </td>
-        <td>
-          <span class="badge" [class.badge-excl-sets]="d.excludeAuctions" [class.badge-inactive]="!d.excludeAuctions">
-            {{ d.excludeAuctions ? 'Yes' : 'No' }}
           </span>
         </td>
         <td>

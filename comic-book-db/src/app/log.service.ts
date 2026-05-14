@@ -86,10 +86,6 @@ export class LogService {
     this.persistToLog(message, isError);
   }
 
-  logBid(message: string, isError = false): void {
-    this.persistToLog(message, isError);
-  }
-
   private persistToLog(message: string, isError: boolean): void {
     const entry: LogEntry = { message, timestamp: new Date(), isError };
     this.logEntries.unshift(entry);

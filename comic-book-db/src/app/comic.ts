@@ -7,13 +7,6 @@ export interface PagedResponse<T> {
   totalPages: number;
 }
 
-export interface BidEntry {
-  userId: string;
-  userName: string;
-  amount: number;
-  placedAt: string;
-}
-
 export interface ComicNumber {
   volume: number | null;
   number: number | null;
@@ -106,13 +99,6 @@ export interface Comic {
   largeBackImageId: string | null;
   personalNotes: string | null;
   publicNotes: string | null;
-  enableBid?: boolean | null;
   sold?: boolean | null;
-  bidOpenedAt?: string | null;
-  highBid?: number | null;
-  bidStartedAt?: string | null;
-  currentBidderId?: string | null;
-  currentBidderName?: string | null;
-  bidHistory?: BidEntry[];
   items?: Comic[];
 }

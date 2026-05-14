@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Cart } from './cart';
-import { Comic } from './comic';
 import { ArchivedOrder } from './archived-order';
 import { ShippingAddress } from './user';
 
@@ -133,27 +132,5 @@ export class CartService {
 
   awardComic(comicId: string, userId: string): Observable<Cart> {
     return this.http.post<Cart>(`${this.apiBase}/awards`, { comicId, userId });
-  }
-
-  openBid(comicId: string, startingBid?: number): Observable<Comic> {
-    const body: any = { comicId };
-    if (startingBid != null) body.startingBid = startingBid;
-    return this.http.post<Comic>(`${this.apiBase}/bid/open`, body);
-  }
-
-  cancelBid(comicId: string): Observable<Comic> {
-    return this.http.post<Comic>(`${this.apiBase}/bid/cancel`, { comicId });
-  }
-
-  startBid(comicId: string): Observable<Comic> {
-    return this.http.post<Comic>(`${this.apiBase}/bid/start`, { comicId });
-  }
-
-  placeBid(comicId: string, amount: number): Observable<Comic> {
-    return this.http.post<Comic>(`${this.apiBase}/bid`, { comicId, amount });
-  }
-
-  finalizeBid(comicId: string): Observable<Cart> {
-    return this.http.post<Cart>(`${this.apiBase}/bid/finalize`, { comicId });
   }
 }

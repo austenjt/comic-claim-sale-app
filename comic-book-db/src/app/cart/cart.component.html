@@ -56,7 +56,6 @@
         <ng-container *ngFor="let row of groupedRows">
           <!-- Single comic: one row -->
           <tr *ngIf="row.type === 'single'"
-              [class.won-via-bid-row]="row.wonViaBid"
               [class.graded-row]="row.isGraded">
             <td>
               <a [routerLink]="['/detail', row.items[0].comicId]">
@@ -64,7 +63,7 @@
               </a>
             </td>
             <td>
-              <ng-container *ngIf="showItemDiscounts && !row.wonViaBid; else plainPrice">
+              <ng-container *ngIf="showItemDiscounts; else plainPrice">
                 <span class="price-original">{{ row.items[0].price | currency }}</span>
                 <span *ngIf="discountedItemPrice(row.items[0]) === 0" class="price-free-badge">FREE</span>
                 <span *ngIf="discountedItemPrice(row.items[0]) !== 0" class="price-discounted">{{ discountedItemPrice(row.items[0]) | currency }}</span>
@@ -73,13 +72,12 @@
             </td>
             <td>{{ row.claimedAt | date:'short' }}</td>
             <td *ngIf="canRemove()">
-              <button *ngIf="!row.wonViaBid" class="btn-release" (click)="removeItem(row.removeId)">Release</button>
+              <button class="btn-release" (click)="removeItem(row.removeId)">Release</button>
             </td>
           </tr>
           <!-- Set: header row (title + date + release) then one row per member comic -->
           <ng-container *ngIf="row.type === 'set'">
             <tr class="set-header-row"
-                [class.won-via-bid-row]="row.wonViaBid"
                 [class.graded-row]="row.isGraded">
               <td>
                 <a class="set-header-link" [routerLink]="['/set', row.containerId ?? row.items[0].comicId]">
@@ -88,20 +86,19 @@
                 <span class="set-tag">Set {{ row.collectionGroup }}</span>
               </td>
               <td class="set-total-price">
-                <ng-container *ngIf="showItemDiscounts && !row.wonViaBid">
+                <ng-container *ngIf="showItemDiscounts">
                   <span class="price-original">{{ row.totalPrice | currency }}</span>
                   <span class="price-discounted">{{ discountedSetTotal(row) | currency }}</span>
                 </ng-container>
-                <span *ngIf="!showItemDiscounts || row.wonViaBid">{{ row.totalPrice | currency }}</span>
+                <span *ngIf="!showItemDiscounts">{{ row.totalPrice | currency }}</span>
               </td>
               <td>{{ row.claimedAt | date:'short' }}</td>
               <td *ngIf="canRemove()">
-                <button *ngIf="!row.wonViaBid" class="btn-release" (click)="removeItem(row.removeId)">Release</button>
+                <button class="btn-release" (click)="removeItem(row.removeId)">Release</button>
               </td>
             </tr>
             <tr *ngFor="let comic of row.items"
                 class="set-member-row"
-                [class.won-via-bid-row]="row.wonViaBid"
                 [class.graded-row]="comic.isGraded">
               <td class="set-member-comic">
                 <a [routerLink]="['/detail', comic.comicId]">
@@ -109,12 +106,12 @@
                 </a>
               </td>
               <td class="set-member-price">
-                <ng-container *ngIf="showItemDiscounts && !comic.wonViaBid">
+                <ng-container *ngIf="showItemDiscounts">
                   <span class="price-original">{{ comic.price | currency }}</span>
                   <span *ngIf="discountedItemPrice(comic) === 0" class="price-free-badge">FREE</span>
                   <span *ngIf="discountedItemPrice(comic) !== 0" class="price-discounted">{{ discountedItemPrice(comic) | currency }}</span>
                 </ng-container>
-                <span *ngIf="!showItemDiscounts || comic.wonViaBid">{{ comic.price | currency }}</span>
+                <span *ngIf="!showItemDiscounts">{{ comic.price | currency }}</span>
               </td>
               <td></td>
               <td *ngIf="canRemove()"></td>
@@ -186,14 +183,6 @@
         Your order is saved. We'll be in touch about payment arrangements.
       </p>
       <button class="btn-unsubmit" (click)="unsubmit()">UnSubmit Order</button>
-    </div>
-
-    <div class="cart-actions bid-block-notice" *ngIf="cart?.status === 'OPEN' && visibleItems.length > 0 && myActiveBidLeads.length > 0">
-      <p class="bid-block-message">
-        You are currently the highest bidder on
-        <strong>{{ myActiveBidLeads.length === 1 ? myActiveBidLeads[0].title : myActiveBidLeads.length + ' items' }}</strong>.
-        Submission is locked until that auction ends or you are outbid.
-      </p>
     </div>
 
     <div class="cart-actions" *ngIf="canSubmit()">

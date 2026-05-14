@@ -8,7 +8,6 @@ export interface ArchivedOrderItem {
   price: number;
   claimedAt: string;
   collectionGroup?: number | null;
-  wonViaBid?: boolean;
   isGraded?: boolean;
 }
 
@@ -21,7 +20,6 @@ export interface ArchivedOrder {
   discountAmount: number;
   discountDescription?: string;
   discountExcludesSets?: boolean | null;
-  discountExcludesAuctions?: boolean | null;
   discountExcludesGraded?: boolean | null;
   discountBreakdown?: CartDiscount[] | null;
   shippingCost?: number;
