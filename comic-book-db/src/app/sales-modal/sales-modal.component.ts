@@ -72,8 +72,8 @@ export class SalesModalComponent implements OnInit, OnDestroy {
 
   /**
    * Builds the customer-facing parenthetical that lists which categories the rule excludes.
-   * Reads naturally — "(sets not included)", "(sets and auction items not included)",
-   * "(sets, auction items, and graded comics not included)" — depending on which flags are set.
+   * Reads naturally — "(sets not included)", "(graded comics not included)",
+   * "(sets and graded comics not included)" — depending on which flags are set.
    * Returns an empty string when no exclusions apply.
    */
   private exclusionPhrase(d: Discount): string {

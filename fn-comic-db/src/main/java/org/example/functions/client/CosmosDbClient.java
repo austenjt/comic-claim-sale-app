@@ -18,7 +18,6 @@ public class CosmosDbClient {
     private static final String COMICS_CONTAINER = "comics";
     private static final String IMAGES_CONTAINER = "images";
     private static final String USERS_CONTAINER = "users";
-    private static final String SESSIONS_CONTAINER = "sessions";
     private static final String CARTS_CONTAINER = "carts";
     private static final String DISCOUNTS_CONTAINER = "discounts";
     private static final String ARCHIVED_ORDERS_CONTAINER = "archived-orders";
@@ -30,7 +29,6 @@ public class CosmosDbClient {
     private final CosmosContainer comicsContainer;
     private final CosmosContainer imagesContainer;
     private final CosmosContainer usersContainer;
-    private final CosmosContainer sessionsContainer;
     private final CosmosContainer cartsContainer;
     private final CosmosContainer discountsContainer;
     private final CosmosContainer archivedOrdersContainer;
@@ -46,7 +44,6 @@ public class CosmosDbClient {
         this.comicsContainer = database.getContainer(COMICS_CONTAINER);
         this.imagesContainer = database.getContainer(IMAGES_CONTAINER);
         this.usersContainer = database.getContainer(USERS_CONTAINER);
-        this.sessionsContainer = database.getContainer(SESSIONS_CONTAINER);
         this.cartsContainer = database.getContainer(CARTS_CONTAINER);
         this.discountsContainer = database.getContainer(DISCOUNTS_CONTAINER);
         this.archivedOrdersContainer = database.getContainer(ARCHIVED_ORDERS_CONTAINER);
@@ -64,7 +61,6 @@ public class CosmosDbClient {
     public CosmosContainer getComicsContainer() { return comicsContainer; }
     public CosmosContainer getImagesContainer() { return imagesContainer; }
     public CosmosContainer getUsersContainer() { return usersContainer; }
-    public CosmosContainer getSessionsContainer() { return sessionsContainer; }
     public CosmosContainer getCartsContainer() { return cartsContainer; }
     public CosmosContainer getDiscountsContainer() { return discountsContainer; }
     public CosmosContainer getArchivedOrdersContainer() { return archivedOrdersContainer; }

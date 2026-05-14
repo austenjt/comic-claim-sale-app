@@ -62,7 +62,7 @@ app-comic-search {
   color: var(--color-text-muted);
 }
 
-/* Filter buttons (Exclude Claimed, Show Unpriced, Only Bidding):
+/* Filter buttons (Exclude Claimed, Show Unpriced):
    Bark text on near-Parchment fill — same readability pass as the top nav. */
 .btn-exclude-claimed {
   background: rgba(240, 234, 210, 0.65);

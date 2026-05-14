@@ -15,7 +15,7 @@
     <h2>Getting Access</h2>
     <p>
       I am a private seller, selling from my personal collection, and so you'll need an approved account before you can claim anything.
-      Anyone can browse the catalogue, but only approved buyers see the Claim or Bid buttons.
+      Anyone can browse the catalogue, but only approved buyers see the Claim button.
     </p>
     <ol>
       <li>
@@ -44,7 +44,7 @@
     <ul>
       <li>
         <strong>Available comics</strong> show a green <em>Claim</em> button if you're logged in as
-        an approved buyer. For some items, at certain times, you'll see a Bid button to engage in bidding.
+        an approved buyer.
       </li>
       <li>
         <strong>Claimed comics</strong> show a grey <em>Claimed</em> label — they're in someone
@@ -61,9 +61,8 @@
     <p>
       Use the search bar to filter by title or series. Use the sort dropdown to order comics by
       <em>Oldest First</em>, <em>Newest First</em>, <em>A–Z Sort</em>, <em>Z–A Sort</em>,
-      <em>Highest Price</em>, <em>Lowest Price</em>, <em>Claimed First</em>, or <em>Bidding First</em>.
-      The dashboard filter buttons let you hide already-claimed items, hide unpriced items, or narrow to
-      only biddable comics (<em>Only Bidding</em> mode).
+      <em>Highest Price</em>, <em>Lowest Price</em>, or <em>Claimed First</em>.
+      The dashboard filter buttons let you hide already-claimed items or hide unpriced items.
     </p>
   </section>
 
@@ -86,61 +85,6 @@
       the orange <em>Set N</em> badge. You cannot remove individual books from a set; if you need
       to release a claimed set, contact the seller directly.
       All books in a set must be priced before the <em>Claim Set</em> button appears.
-    </p>
-  </section>
-
-  <section class="hiw-section">
-    <h2>Bidding</h2>
-    <p>
-      Some comics are offered through a <strong>bidding format</strong> instead of a fixed-price
-      claim. These are easy to spot — they show a <em>Bid</em> button once the seller opens bidding.
-    </p>
-    <p>
-      The format used here is a <strong>soft-close English auction</strong>:
-    </p>
-    <ul>
-      <li>
-        <strong>Ascending price</strong> — each bid must be higher than the current high bid.
-        The highest bidder when the timer expires wins.
-      </li>
-      <li>
-        <strong>Open bids</strong> — the full bid history (names, amounts, timestamps) is visible
-        to everyone on the comic's detail page.
-      </li>
-      <li>
-        <strong>Inactivity close</strong> — there is no fixed end time. The countdown timer resets
-        every time a new bid is placed. The auction only closes after the full window passes with
-        no new bids — preventing last-second sniping.
-      </li>
-    </ul>
-    <h3>How to participate</h3>
-    <ol>
-      <li>
-        <strong>Watch for the seller to open bidding</strong> — bid-enabled comics show a disabled
-        <em>Bid</em> button as a placeholder even before bidding is open. Once the seller opens it,
-        the button becomes active and you'll see a live notification in the Logs panel.
-      </li>
-      <li>
-        <strong>Start the auction</strong> — click the enabled <em>Bid</em> button to start the
-        countdown timer. No bid amount is required at this step — clicking Bid simply opens the
-        auction window. Once the timer is running, click <em>BID</em> on the card (or use the
-        detail page) to enter your bid amount in a modal.
-      </li>
-      <li>
-        <strong>Stay in the lead</strong> — if you get outbid, the live high bid and bidder name
-        update on both the dashboard card and the detail page. Enter a higher amount and click
-        <em>Place Bid</em> to retake the lead. Each bid resets the timer to the full window.
-      </li>
-      <li>
-        <strong>Winning</strong> — when the timer runs out with no new bids, the comic is
-        automatically added to the winner's cart at the final high-bid price. A notification
-        announces the result to everyone on the dashboard.
-      </li>
-    </ol>
-    <p>
-      Items won via bidding <strong>cannot be removed</strong> from your cart.
-      Contact the seller directly if there is an issue.
-      Bids must be placed in <strong>$0.25 increments</strong> above the current high bid.
     </p>
   </section>
 
@@ -177,8 +121,6 @@
         <strong>Submitted (review window)</strong> — click <em>Submit Order</em> when you're done.
         This starts a short review period set by the seller. During this window you can still remove
         items but cannot add new ones. Any applicable discounts are calculated and shown here.
-        Note: you cannot submit while you are the current high bidder on an active auction — the
-        Submit button is locked until that auction ends or you are outbid.
       </li>
       <li>
         <strong>Checkout</strong> — after submitting, three buttons appear: <em>Shipping</em>,
@@ -227,7 +169,6 @@
       <li>When <strong>someone claims</strong> a comic: <em>"Title #N" added to cart of user UserName — $XX</em></li>
       <li>When the seller <strong>awards</strong> a comic: <em>"Title #N" awarded to UserName — FREE!</em></li>
       <li>When a comic is <strong>returned to sale</strong>: <em>"Title #N" Returned to sale</em> — useful for spotting books you missed coming back available</li>
-      <li>When a <strong>bid auction ends</strong>: a message announces the result to everyone on the dashboard</li>
     </ul>
     <p>
       Log entries are timestamped and persist across page refreshes, so you can review recent
@@ -292,54 +233,10 @@
       <li>
         <strong>Award button</strong> — opens a modal listing all approved users. Selecting a user
         immediately adds the comic to their cart at <strong>$0.00</strong>. If the user has no active
-        cart, one is created. The Award button is hidden when a comic is already claimed, has a CGC or
-        CBCS grade, or has an active bid in progress.
+        cart, one is created. The Award button is hidden when a comic is already claimed or has a CGC or
+        CBCS grade.
       </li>
     </ul>
-  </section>
-
-  <section class="hiw-section hiw-admin">
-    <h2>Bidding (Admin)</h2>
-    <p>
-      Bidding is controlled at two levels: a global on/off switch and a per-comic opt-in.
-    </p>
-    <ul>
-      <li>
-        <strong>Global switch</strong> — set the <code>BIDDING_MODE</code> environment variable
-        to <code>true</code> on the Azure Function App to enable the bidding API. When
-        <code>false</code> (or unset), all bid endpoints are disabled.
-      </li>
-      <li>
-        <strong>Per-comic opt-in</strong> — check the <em>Enable Bid</em> checkbox on a comic
-        row in Comics Management. Only comics with this flag set can enter a bidding cycle.
-      </li>
-      <li>
-        <strong>Window length</strong> — set <code>BIDDING_CYCLE</code> (in minutes, default 10)
-        to control the inactivity window. Each new bid resets the full window.
-      </li>
-    </ul>
-    <h3>Opening and cancelling a cycle</h3>
-    <p>
-      Bid-enabled comics show a <strong>Start Bid</strong> button on the dashboard (admin only).
-      Clicking it opens the item for bidding — buyers will see the <em>Bid</em> button become active
-      and receive a live notification. Bidding does not officially start (the timer does not run) until
-      the first buyer clicks the <em>Bid</em> button to open the auction window.
-    </p>
-    <p>
-      If no buyer has clicked Bid yet, a <strong>Cancel</strong> button appears next to the status label,
-      letting you rescind the open offer. Once a buyer has started the countdown, the cycle cannot be
-      cancelled — it must run to completion.
-    </p>
-    <p>
-      <strong>No manual action is needed to close a cycle.</strong> When the countdown timer hits
-      zero, the browser automatically calls the finalize API, adds the comic to the winner's cart
-      at the high-bid price, and notifies all online users. The comic then shows as claimed and is
-      locked from further bidding.
-    </p>
-    <p>
-      Bid-won items carry a <code>wonViaBid</code> flag. They are priced at the winning bid amount,
-      cannot be removed by the buyer, and are <strong>excluded</strong> from discount calculations when the order is submitted.
-    </p>
   </section>
 
   <section class="hiw-section hiw-admin">
@@ -431,8 +328,7 @@
       Each discount rule has an optional <strong>Exclude Sets</strong> flag. When checked, comics
       that are part of a set (i.e. claimed together as a group) are excluded from both the item
       count threshold and the discount savings for that rule. This lets you run a buy-X-get-one-free
-      or percentage deal that only applies to individual single comics, not set bundles. Bid-won
-      items always count toward thresholds but never receive a discount regardless of this flag.
+      or percentage deal that only applies to individual single comics, not set bundles.
     </p>
     <p>
       This page also lets you toggle <strong>Award Mode</strong> — when enabled, an Award button

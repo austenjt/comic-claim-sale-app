@@ -55,7 +55,7 @@
   /* ── Semantic state colors (badges, status, validation) ──────────────── */
   --color-success:       #5C7A3A;            /* AA-large on parchment, AA on dark */
   --color-success-bg:    var(--sage-light);
-  --color-warning:       #B45309;            /* darkened bid orange for AA-large */
+  --color-warning:       #B45309;            /* darkened amber for AA-large */
   --color-warning-hover: #94440A;
   --color-warning-bg:    #FBE4C8;
   --color-danger:        #A8553F;            /* darkened destructive red for AA-large */
@@ -375,9 +375,9 @@ hr {
    Sizes:    default md, --sm, --lg, --block (full-width)
    States:   :disabled / [aria-disabled="true"], --loading (adds spinner)
 
-   Existing per-component classes (.btn-claim, .btn-bid, .btn-release, etc.)
-   are migrated in their own component CSS to share these tokens / sizing
-   without renaming — see component CSS files.
+   Existing per-component classes (.btn-claim, .btn-release, etc.) are
+   migrated in their own component CSS to share these tokens / sizing without
+   renaming — see component CSS files.
    ────────────────────────────────────────────────────────────────────────── */
 
 .btn {
@@ -729,10 +729,10 @@ hr {
    Modal system  (Phase 2.4)
 
    Shared dialog primitives. Components may keep their existing class hooks
-   (.modal-backdrop, .bid-modal-overlay, .sl-modal-overlay, .add-book-modal,
-   .award-modal-overlay) but should compose these utility classes for the
-   overlay + dialog chrome. Per-component CSS continues to handle layout
-   specifics (form rows, custom widths, etc.).
+   (.modal-backdrop, .sl-modal-overlay, .add-book-modal, .award-modal-overlay)
+   but should compose these utility classes for the overlay + dialog chrome.
+   Per-component CSS continues to handle layout specifics (form rows, custom
+   widths, etc.).
 
    Required ARIA on the dialog element:
      role="dialog" aria-modal="true" aria-labelledby="<title-id>"

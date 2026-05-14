@@ -23,7 +23,6 @@ import { DashboardComponent } from './dashboard/dashboard.component';
 import { ComicDetailComponent } from './comic-detail/comic-detail.component';
 import { InventoryComponent } from './inventory/inventory.component';
 import { ComicSearchComponent } from './comic-search/comic-search.component';
-import { MessagesComponent } from './messages/messages.component';
 import { StandaloneListComponent } from './standalone-list/standalone-list.component';
 import { LoadGoCollectFormComponent } from './load-gocollect-form/load-gocollect-form.component';
 import { LoginComponent } from './login/login.component';
@@ -51,7 +50,6 @@ import { ShippingModalComponent } from './shipping-modal/shipping-modal.componen
         DashboardComponent,
         InventoryComponent,
         ComicDetailComponent,
-        MessagesComponent,
         ComicSearchComponent,
         LoadGoCollectFormComponent,
         LoginComponent,
@@ -81,7 +79,7 @@ import { ShippingModalComponent } from './shipping-modal/shipping-modal.componen
         StandaloneListComponent,
     ],
     providers: [
-        // Load app config (biddingMode, awardModeEnabled, etc.) before any component renders
+        // Load app config (awardModeEnabled, emailEnabled, etc.) before any component renders
         {
             provide: APP_INITIALIZER,
             useFactory: (config: ConfigService) => () => config.load(),
