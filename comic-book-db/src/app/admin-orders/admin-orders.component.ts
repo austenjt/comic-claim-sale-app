@@ -473,10 +473,10 @@ export class AdminOrdersComponent implements OnInit {
     const discount = cart.discountAmount ?? 0;
     const excludeSets = cart.discountExcludesSets === true;
     const excludeGraded = cart.discountExcludesGraded === true;
-    const visibleNonBid = this.visibleCartItems(cart).filter(i =>
+    const eligible = this.visibleCartItems(cart).filter(i =>
       !(excludeSets && i.collectionGroup != null && i.collectionGroup > 0)
       && !(excludeGraded && i.isGraded));
-    const base = visibleNonBid.reduce((sum, i) => sum + i.price, 0);
+    const base = eligible.reduce((sum, i) => sum + i.price, 0);
     if (discount <= 0 || base <= 0) return item.price;
     const factor = Math.max(0, base - discount) / base;
     return Math.round(item.price * factor * 100) / 100;
@@ -491,9 +491,8 @@ export class AdminOrdersComponent implements OnInit {
    * which categories were excluded, and whether the rule is BUY_X_GET_ONE_FREE.
    * Description format (rules joined by "; "):
    *   "50% off ($-9.88) (sets excluded)"
-   *   "50% off ($-9.88) (sets, auctions excluded)"
    *   "5% off (over 20 books, $-16.94)"
-   *   "Buy 10 get 1 free (1 free, $-0.75) (sets, auctions, graded excluded)"
+   *   "Buy 10 get 1 free (1 free, $-0.75) (sets, graded excluded)"
    *
    * Used as a fallback for orders archived before discountBreakdown was persisted.
    */

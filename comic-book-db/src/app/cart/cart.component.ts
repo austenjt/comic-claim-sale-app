@@ -191,7 +191,7 @@ export class CartComponent implements OnInit, OnDestroy {
 
   /**
    * Returns the eligible base price total for a given discount rule — i.e. the sum of prices
-   * for all non-bid items that this rule applies to (after honoring its exclude flags).
+   * for all items that this rule applies to (after honoring its exclude flags).
    */
   private eligibleBaseForRule(rule: CartDiscount): number {
     return this.visibleItems
@@ -252,12 +252,12 @@ export class CartComponent implements OnInit, OnDestroy {
    * When discountBreakdown is present (orders submitted after this feature shipped), each rule's
    * savings are distributed based on the rule type:
    *   - BUY_X_GET_ONE_FREE: the cheapest eligible item(s) are fully free ($0.00); all others
-   *     absorb nothing from this rule (bid items always return their original price).
+   *     absorb nothing from this rule.
    *   - All other rules: savings are distributed proportionally among eligible items, so
    *     set members skip set-excluded rules.
    *
-   * Falls back to a simple proportional spread across all non-bid items for older orders that
-   * were submitted before the breakdown field existed.
+   * Falls back to a simple proportional spread for older orders that were submitted before
+   * the breakdown field existed.
    */
   discountedItemPrice(item: CartItem): number {
     const breakdown = this.cart?.discountBreakdown;

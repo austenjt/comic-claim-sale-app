@@ -421,8 +421,8 @@ public class ComicService {
 
     /**
      * Reads a comic and returns it together with the Cosmos {@code _etag} captured from the
-     * read response. Use this when you need to perform an optimistic-locked update (e.g. bid
-     * placement) so that a concurrent writer can be detected.
+     * read response. Use this when you need to perform an optimistic-locked update so that a
+     * concurrent writer can be detected.
      */
     public Optional<ComicWithETag> getComicByIdWithETag(int id) {
         String idStr = String.valueOf(id);

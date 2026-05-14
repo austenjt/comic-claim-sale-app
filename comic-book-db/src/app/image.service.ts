@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { MessageService } from './message.service';
+import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
-import { catchError, map, tap } from 'rxjs/operators';
+import { catchError } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -13,14 +12,7 @@ export class ImageService {
   //private baseServiceUrl = 'http://localhost:7071/api';
   private imagesAPIUrl = this.baseServiceUrl + '/images';
 
-  private defaultMissingImage = 'assets/missing.png';
-
-  constructor(private http: HttpClient, private messageService: MessageService) {
-      this.log('Loading image service.  Please wait for database warmup...');
-      console.log(this.getRemoteImageNames().subscribe(names => {
-          console.log('Images available: ', names.length);
-      }));
-  }
+  constructor(private http: HttpClient) {}
 
   getImagesBaseURL() {
       return this.imagesAPIUrl;
@@ -29,19 +21,14 @@ export class ImageService {
   getRemoteImageNames(): Observable<string[]> {
     return this.http.get<string[]>(this.imagesAPIUrl)
       .pipe(
-        tap(_ => this.log('fetched image names from remote')),
-        catchError(this.handleError<string[]>('getRemoteImageNames', []))
+        catchError(this.handleError<string[]>([]))
       );
   }
 
   getRemoteImageByName(imageName: string): Observable<Blob | null> {
     return this.http.get(this.imagesAPIUrl + "/" + imageName, { responseType: 'blob' })
       .pipe(
-        tap(_ => this.log('fetched image ' + imageName + ' from remote')),
-        catchError(error => {
-          this.log(`Error fetching image ${imageName} from remote.`);
-          return of(null);
-        })
+        catchError(() => of(null))
       );
   }
 
@@ -53,19 +40,13 @@ export class ImageService {
   uploadComicImage(comicId: number, file: File): Observable<any> {
     const formData = new FormData();
     formData.append('file', file, file.name);
-    return this.http.post(`${this.baseServiceUrl}/comics/${comicId}/image`, formData)
-      .pipe(
-        tap(() => this.log(`Uploaded image for comic ${comicId}`))
-      );
+    return this.http.post(`${this.baseServiceUrl}/comics/${comicId}/image`, formData);
   }
 
   uploadComicBackImage(comicId: number, file: File): Observable<any> {
     const formData = new FormData();
     formData.append('file', file, file.name);
-    return this.http.post(`${this.baseServiceUrl}/comics/${comicId}/back-image`, formData)
-      .pipe(
-        tap(() => this.log(`Uploaded back image for comic ${comicId}`))
-      );
+    return this.http.post(`${this.baseServiceUrl}/comics/${comicId}/back-image`, formData);
   }
 
   createImage(imageName: string, image: Blob): Observable<any> {
@@ -75,33 +56,26 @@ export class ImageService {
     const urlWithForce = `${this.imagesAPIUrl}/${imageName}`;
     return this.http.post(urlWithForce, formData, { responseType: 'text' })
       .pipe(
-        tap(response => this.log(`API POST response: ${response}`)),
-        catchError(this.handleError('uploadImage', []))
+        catchError(this.handleError([]))
       );
   }
 
   updateImage(imageName: string, image: ArrayBuffer, force: Boolean): Observable<any> {
     const imageFile = new File([image], imageName, { type: 'image/jpeg' });
-    const formData = new FormData(); // form data needs to be resolved on receiving end!
+    const formData = new FormData();
     formData.append('file', imageFile, imageName);
     const urlWithForce = `${this.imagesAPIUrl}/${imageName}?force=${force}`;
     return this.http.put(urlWithForce, formData, { responseType: 'text' })
       .pipe(
-        tap(response => this.log(`API PUT update image response: ${response}`)),
-        catchError(this.handleError('uploadImage', []))
+        catchError(this.handleError([]))
       );
   }
 
-  private handleError<T>(operation = 'operation', result?: T) {
+  private handleError<T>(result?: T) {
     return (error: any): Observable<T> => {
       console.error(error);
-      this.log(`${operation} failed: ${error.message}`);
       return of(result as T);
     };
-  }
-
-  private log(message: string) {
-    this.messageService.add(`ImageService: ${message}`);
   }
 
 }
