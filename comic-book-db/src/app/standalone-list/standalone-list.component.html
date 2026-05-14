@@ -119,8 +119,11 @@
       <input type="text" [(ngModel)]="qa.publicNotes" placeholder="visible to buyers" />
     </div>
     <div class="qa-field">
-      <label>Personal Notes</label>
-      <input type="text" [(ngModel)]="qa.personalNotes" placeholder="private" />
+      <label>Add to Set</label>
+      <select [(ngModel)]="qa.collectionGroup">
+        <option [ngValue]="null">— None (standalone) —</option>
+        <option *ngFor="let s of qaSets" [ngValue]="s.collectionGroup">{{ s.title }}</option>
+      </select>
     </div>
     <div class="qa-field qa-field-checkbox">
       <label>For Sale</label>

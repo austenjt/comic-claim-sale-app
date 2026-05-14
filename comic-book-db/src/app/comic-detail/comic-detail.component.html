@@ -543,8 +543,8 @@
         </div>
       </div>
 
-      <!-- Claim Status -->
-      <div class="detail-section">
+      <!-- Claim Status — hidden for set members (claim the whole set from the Set Details page) -->
+      <div class="detail-section" *ngIf="parentSetId === null">
         <div class="detail-section-title">Claim Status</div>
 
         <!-- Sold -->

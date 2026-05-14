@@ -57,6 +57,7 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
   qaSaving = false;
   qaSuccess: string | false = false;
   qaError = '';
+  qaSets: Comic[] = [];
   qaShowFieldErrors = false;
   qaSeries: string[] = [];
   private qaLastSeries = '';
@@ -89,7 +90,7 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
     storageLocation: '',
     defects: '',
     publicNotes: '',
-    personalNotes: '',
+    collectionGroup: null as number | null,
     // Step 3 — grading
     gradingCompany: '',
     grade: null as number | null,
@@ -151,7 +152,7 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
       variant: '', barCode: '', printRun: null, keyIssue: '', writer: '', artist: '',
       isForSale: true, salePrice: null, targetPrice: null, personalEstimate: null,
       pricePaid: null, dateAcquired: '', purchasedFrom: '', purchaseReferenceURL: '',
-      storageLocation: '', defects: '', publicNotes: '', personalNotes: '',
+      storageLocation: '', defects: '', publicNotes: '', collectionGroup: null,
       gradingCompany: '', grade: null, certificationId: '', pageQuality: '', pedigree: null, signed: false
     };
   }
@@ -245,10 +246,10 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
       salePrice: this.qa.salePrice,
       dateSold: null,
       soldTo: null,
-      isForSale: this.qa.isForSale,
+      isForSale: this.qa.collectionGroup != null ? true : this.qa.isForSale,
       personalEstimate: this.qa.personalEstimate,
       targetPrice: this.qa.targetPrice,
-      collectionGroup: null,
+      collectionGroup: this.qa.collectionGroup,
       docType: 'COMIC',
       storageLocation: this.qa.storageLocation.trim() || null,
       goCollectInfo: null,
@@ -257,7 +258,7 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
       largeCachedImageId: null,
       smallBackImageId: null,
       largeBackImageId: null,
-      personalNotes: this.qa.personalNotes.trim() || null,
+      personalNotes: null,
       publicNotes: this.qa.publicNotes.trim() || null
     };
 
@@ -285,6 +286,9 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.enums = this.configService.getEnums();
     this.comicService.getSeriesList().subscribe(list => { this.qaSeries = list; });
+    this.comicService.getSets().subscribe(sets => {
+      this.qaSets = sets.filter(c => c.docType === 'SET').sort((a, b) => (a.title ?? '').localeCompare(b.title ?? ''));
+    });
   }
 
   ngOnDestroy() { }
