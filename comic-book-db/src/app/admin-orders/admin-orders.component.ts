@@ -656,7 +656,7 @@ export class AdminOrdersComponent implements OnInit {
 
   statusLabel(status: string): string {
     const labels: Record<string, string> = {
-      OPEN: 'Open', FINALIZING: 'Submitted', FINALIZED: 'Finalized'
+      OPEN: 'Open', SUBMITTED: 'Submitted'
     };
     return labels[status] ?? status;
   }
@@ -665,15 +665,32 @@ export class AdminOrdersComponent implements OnInit {
     return order.items.some(i => i.isTrade);
   }
 
+  /**
+   * Active stepper index for a submitted order.
+   * Regular: 0=Building, 1=Submitted, 2=Paid, 3=Complete
+   * Trade:   0=Building, 1=Submitted, 2=Trade Received, 3=Paid, 4=Complete
+   */
+  displayStep(order: Cart): number {
+    if (order.status === 'OPEN') return 0;
+    if (order.status === 'SUBMITTED') {
+      const trade = this.hasTradeItem(order);
+      if (trade && !order.tradeReceived) return 1;
+      if (trade && order.tradeReceived && order.paymentStatus !== 'PAID') return 2;
+      if (order.paymentStatus === 'PAID') return trade ? 3 : 2;
+      return 1;
+    }
+    return 99;
+  }
+
   canFulfill(order: Cart): boolean {
-    if (order.status !== 'FINALIZING' && order.status !== 'FINALIZED') return false;
+    if (order.status !== 'SUBMITTED') return false;
     if (this.hasTradeItem(order) && !order.tradeReceived) return false;
     return order.paymentStatus === 'PAID' && order.shipped === true;
   }
 
   fulfillTitle(order: Cart): string {
     if (this.canFulfill(order)) return '';
-    if (order.status !== 'FINALIZING' && order.status !== 'FINALIZED') {
+    if (order.status !== 'SUBMITTED') {
       return 'Order must be submitted before fulfillment';
     }
     if (this.hasTradeItem(order) && !order.tradeReceived) {

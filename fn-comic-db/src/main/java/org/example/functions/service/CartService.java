@@ -197,11 +197,11 @@ public class CartService {
     }
 
     /** Remove an item from the cart. If the item belongs to a set (collectionGroup > 0),
-     *  all other items in the same set are also removed. Allowed in OPEN or FINALIZING status. */
+     *  all other items in the same set are also removed. Allowed in OPEN or SUBMITTED status. */
     public Cart removeItem(String userId, String comicId) {
         Cart cart = getActiveCart(userId)
             .orElseThrow(() -> new IllegalStateException("No active cart found."));
-        if (cart.is(CartStatus.FINALIZED) || cart.is(CartStatus.FULFILLED)) {
+        if (cart.is(CartStatus.FULFILLED)) {
             throw new IllegalStateException("Cannot remove items from a " + cart.getStatus() + " cart.");
         }
 
@@ -238,14 +238,14 @@ public class CartService {
         return cart;
     }
 
-    /** Admin: award a comic to a user's cart at $0.00. Works for OPEN, FINALIZING, or FINALIZED carts; creates a new cart if needed.
+    /** Admin: award a comic to a user's cart at $0.00. Works for OPEN or SUBMITTED carts; creates a new cart if needed.
      *  Awarded items are flagged {@code isAwarded=true} and excluded from discount calculations. */
     public Cart awardItem(User user, String comicId) {
         if (isComicClaimed(comicId)) {
             throw new IllegalStateException("Comic " + comicId + " is already claimed by another user.");
         }
         Cart cart = getOrCreateCart(user);
-        if (!cart.is(CartStatus.OPEN) && !cart.is(CartStatus.FINALIZING) && !cart.is(CartStatus.FINALIZED)) {
+        if (!cart.is(CartStatus.OPEN) && !cart.is(CartStatus.SUBMITTED)) {
             throw new IllegalStateException("Cannot award to a cart with status: " + cart.getStatus());
         }
         ComicBook comic = ComicService.getServiceInstance().getComicById(Integer.parseInt(comicId))
@@ -306,7 +306,7 @@ public class CartService {
         return cart;
     }
 
-    /** Submit an order. Cart moves to FINALIZING; fulfillment is unlocked when the admin marks payment as PAID. */
+    /** Submit an order. Cart moves to SUBMITTED; fulfillment is unlocked when the admin marks payment as PAID. */
     public Cart submitOrder(String userId, String customerNotes) {
         Cart cart = getActiveCart(userId)
             .orElseThrow(() -> new IllegalStateException("No active cart found."));
@@ -335,7 +335,7 @@ public class CartService {
         cart.setDiscountBreakdown(discountResult.getBreakdown());
         int bookCount = (int) cart.getItems().stream().filter(i -> !i.isSetContainer()).count();
         cart.setShippingCost(ShippingCalculator.estimate(bookCount).getEstimatedCost());
-        cart.setStatus(CartStatus.FINALIZING);
+        cart.setStatus(CartStatus.SUBMITTED);
         cart.setPaymentStatus(PaymentStatus.UNPAID);
         if (customerNotes != null && !customerNotes.isBlank()) {
             cart.setCustomerNotes(customerNotes.trim());
@@ -389,15 +389,15 @@ public class CartService {
      * for the life of the cart. Status, payment status, and shipping fields are left
      * untouched; only the discount snapshot is updated.</p>
      *
-     * <p>Restricted to {@code FINALIZING} carts. {@code FULFILLED} carts have already
+     * <p>Restricted to {@code SUBMITTED} carts. {@code FULFILLED} carts have already
      * been archived and should be edited via the archived-orders flow if at all;
      * {@code OPEN} carts haven't run discount calculation yet (it runs on submit).</p>
      */
     public Cart refreshSubmittedDiscounts(String cartId) {
         Cart cart = findCartById(cartId);
-        if (!cart.is(CartStatus.FINALIZING)) {
+        if (!cart.is(CartStatus.SUBMITTED)) {
             throw new IllegalStateException(
-                "Can only refresh discounts on a FINALIZING cart (current: " + cart.getStatus() + ").");
+                "Can only refresh discounts on a SUBMITTED cart (current: " + cart.getStatus() + ").");
         }
         DiscountService.DiscountResult result = DiscountService.getServiceInstance().applyDiscounts(cart);
         cart.setDiscountAmount(result.getAmount());
@@ -411,11 +411,11 @@ public class CartService {
         return cart;
     }
 
-    /** Save a shipping address on an active FINALIZING or FINALIZED cart. */
+    /** Save a shipping address on a SUBMITTED cart. */
     public Cart saveShippingAddress(String userId, ShippingAddress address) {
         Cart cart = getActiveCart(userId)
             .orElseThrow(() -> new IllegalStateException("No active cart found."));
-        if (!cart.is(CartStatus.FINALIZING) && !cart.is(CartStatus.FINALIZED)) {
+        if (!cart.is(CartStatus.SUBMITTED)) {
             throw new IllegalStateException("Cart must be submitted before adding a shipping address.");
         }
         cart.setShippingAddress(address);
@@ -427,8 +427,8 @@ public class CartService {
     /** Admin: revert a submitted cart back to OPEN so the user can add more items. */
     public Cart unsubmitOrder(String cartId) {
         Cart cart = findCartById(cartId);
-        if (!cart.is(CartStatus.FINALIZING) && !cart.is(CartStatus.FINALIZED)) {
-            throw new IllegalStateException("Can only unsubmit a FINALIZING or FINALIZED cart (current: " + cart.getStatus() + ").");
+        if (!cart.is(CartStatus.SUBMITTED)) {
+            throw new IllegalStateException("Can only unsubmit a SUBMITTED cart (current: " + cart.getStatus() + ").");
         }
         cart.setStatus(CartStatus.OPEN);
         cart.setFinalizeAfter(null);
@@ -509,15 +509,15 @@ public class CartService {
         return result;
     }
 
-    /** Admin: submitted/finalized carts only (FINALIZING or FINALIZED), auto-finalizing as needed. */
+    /** Admin: all SUBMITTED carts (orders awaiting fulfillment). */
     public List<Cart> getAllActiveCarts() {
         SqlQuerySpec query = new SqlQuerySpec(
-            "SELECT * FROM c WHERE c.status IN ('FINALIZING', 'FINALIZED') ORDER BY c.createdAt DESC");
+            "SELECT * FROM c WHERE c.status IN ('SUBMITTED', 'FINALIZING', 'FINALIZED') ORDER BY c.createdAt DESC");
         List<Cart> result = new ArrayList<>();
         for (ObjectNode node : cartsContainer.queryItems(query, new CosmosQueryRequestOptions(), ObjectNode.class)) {
             try {
                 Cart cart = parseCartWithETag(node);
-                result.add(checkAndFinalize(cart));
+                result.add(cart);
             } catch (Exception e) {
                 log.error("Error parsing cart in getAllActiveCarts", e);
             }
@@ -581,21 +581,23 @@ public class CartService {
         return result;
     }
 
-    /** Sweeps all FINALIZING carts and transitions any past their deadline to FINALIZED. Returns count finalized. */
-    public int finalizeOverdueCarts() {
+    /**
+     * Sweeps legacy FINALIZING/FINALIZED documents and rewrites them as SUBMITTED.
+     * Once all documents have been migrated this becomes a no-op. Returns the count of
+     * documents updated.
+     */
+    public int sweepSubmittedOrders() {
         SqlQuerySpec query = new SqlQuerySpec(
-            "SELECT * FROM c WHERE c.status = 'FINALIZING'");
+            "SELECT * FROM c WHERE c.status IN ('FINALIZING', 'FINALIZED')");
         int count = 0;
         for (ObjectNode node : cartsContainer.queryItems(query, new CosmosQueryRequestOptions(), ObjectNode.class)) {
             try {
                 Cart cart = parseCartWithETag(node);
-                CartStatus before = cart.getStatus();
-                checkAndFinalize(cart);
-                if (cart.is(CartStatus.FINALIZED) && before != CartStatus.FINALIZED) {
-                    count++;
-                }
+                // fromJson already maps legacy values to SUBMITTED; saving migrates the document.
+                save(cart);
+                count++;
             } catch (Exception e) {
-                log.error("Error during finalization sweep: {}", e.getMessage());
+                log.error("Error during submitted-order sweep: {}", e.getMessage());
             }
         }
         return count;

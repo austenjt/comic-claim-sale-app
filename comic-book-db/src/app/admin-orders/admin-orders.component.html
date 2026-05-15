@@ -26,30 +26,44 @@
       </div>
     </div>
 
-    <!-- 3-stage stepper. Code emits OPEN/FINALIZING/FINALIZED/FULFILLED;
-         FINALIZING and FINALIZED both render as "Submitted" (active). -->
     <ol class="stepper stepper--compact" aria-label="Order status">
       <li class="stepper__step"
-          [class.is-done]="order.status !== 'OPEN'"
-          [class.is-current]="order.status === 'OPEN'"
-          [attr.aria-current]="order.status === 'OPEN' ? 'step' : null">
-        <span class="stepper__dot" aria-hidden="true">{{ order.status !== 'OPEN' ? '✓' : '1' }}</span>
-        <span class="stepper__label">Open</span>
+          [class.is-done]="displayStep(order) > 0"
+          [class.is-current]="displayStep(order) === 0"
+          [attr.aria-current]="displayStep(order) === 0 ? 'step' : null">
+        <span class="stepper__dot" aria-hidden="true">{{ displayStep(order) > 0 ? '✓' : '1' }}</span>
+        <span class="stepper__label">Building</span>
       </li>
       <li class="stepper__step"
-          [class.is-done]="order.status === 'FULFILLED'"
-          [class.is-current]="order.status === 'FINALIZING' || order.status === 'FINALIZED'"
-          [class.is-upcoming]="order.status === 'OPEN'"
-          [attr.aria-current]="(order.status === 'FINALIZING' || order.status === 'FINALIZED') ? 'step' : null">
-        <span class="stepper__dot" aria-hidden="true">{{ order.status === 'FULFILLED' ? '✓' : '2' }}</span>
+          [class.is-done]="displayStep(order) > 1"
+          [class.is-current]="displayStep(order) === 1"
+          [class.is-upcoming]="displayStep(order) < 1"
+          [attr.aria-current]="displayStep(order) === 1 ? 'step' : null">
+        <span class="stepper__dot" aria-hidden="true">{{ displayStep(order) > 1 ? '✓' : '2' }}</span>
         <span class="stepper__label">Submitted</span>
+      </li>
+      <li *ngIf="hasTradeItem(order)" class="stepper__step"
+          [class.is-done]="displayStep(order) > 2"
+          [class.is-current]="displayStep(order) === 2"
+          [class.is-upcoming]="displayStep(order) < 2"
+          [attr.aria-current]="displayStep(order) === 2 ? 'step' : null">
+        <span class="stepper__dot" aria-hidden="true">{{ displayStep(order) > 2 ? '✓' : '3' }}</span>
+        <span class="stepper__label">Trade Received</span>
+      </li>
+      <li class="stepper__step"
+          [class.is-done]="displayStep(order) > (hasTradeItem(order) ? 3 : 2)"
+          [class.is-current]="displayStep(order) === (hasTradeItem(order) ? 3 : 2)"
+          [class.is-upcoming]="displayStep(order) < (hasTradeItem(order) ? 3 : 2)"
+          [attr.aria-current]="displayStep(order) === (hasTradeItem(order) ? 3 : 2) ? 'step' : null">
+        <span class="stepper__dot" aria-hidden="true">{{ displayStep(order) > (hasTradeItem(order) ? 3 : 2) ? '✓' : (hasTradeItem(order) ? '4' : '3') }}</span>
+        <span class="stepper__label">Paid</span>
       </li>
       <li class="stepper__step"
           [class.is-current]="order.status === 'FULFILLED'"
           [class.is-upcoming]="order.status !== 'FULFILLED'"
           [attr.aria-current]="order.status === 'FULFILLED' ? 'step' : null">
-        <span class="stepper__dot" aria-hidden="true">3</span>
-        <span class="stepper__label">Fulfilled</span>
+        <span class="stepper__dot" aria-hidden="true">{{ hasTradeItem(order) ? '5' : '4' }}</span>
+        <span class="stepper__label">Complete</span>
       </li>
     </ol>
 

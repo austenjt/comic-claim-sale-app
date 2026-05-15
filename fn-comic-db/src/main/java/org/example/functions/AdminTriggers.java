@@ -127,7 +127,7 @@ public class AdminTriggers {
     // ─── POST /api/orders/{cartId}/refresh-discounts ─────────────────────────
 
     /**
-     * Admin: re-runs discount calculation on a FINALIZING cart and re-sends the
+     * Admin: re-runs discount calculation on a SUBMITTED cart and re-sends the
      * order-submitted email. Used to recover a cart whose discount snapshot was
      * computed before a discount-logic change shipped.
      */

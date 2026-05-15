@@ -9,32 +9,53 @@
   </div>
 
   <ng-container *ngIf="cart">
-    <!-- 3-stage visual stepper. Code emits 4 states; FINALIZING and FINALIZED
-         both read as "Submitted" (active/in-progress). See .stepper docs in
-         styles.css. Markup-only collapse — no .ts changes. -->
+    <!-- Expanded stepper: 4 steps (regular) or 5 steps (trade order).
+         displayStep: 0=Building, 1=Submitted, 2=Trade Received (trade only),
+         2/3=Paid, 3/4=Complete. -->
     <ol class="stepper" aria-label="Order status">
+      <!-- Step 0: Building -->
       <li class="stepper__step"
-          [class.is-done]="cart.status !== 'OPEN'"
-          [class.is-current]="cart.status === 'OPEN'"
+          [class.is-done]="displayStep > 0"
+          [class.is-current]="displayStep === 0"
           [class.is-upcoming]="false"
-          [attr.aria-current]="cart.status === 'OPEN' ? 'step' : null">
-        <span class="stepper__dot" aria-hidden="true">{{ cart.status !== 'OPEN' ? '✓' : '1' }}</span>
-        <span class="stepper__label">Open</span>
+          [attr.aria-current]="displayStep === 0 ? 'step' : null">
+        <span class="stepper__dot" aria-hidden="true">{{ displayStep > 0 ? '✓' : '1' }}</span>
+        <span class="stepper__label">Building</span>
       </li>
+      <!-- Step 1: Submitted -->
       <li class="stepper__step"
-          [class.is-done]="cart.status === 'FULFILLED'"
-          [class.is-current]="cart.status === 'FINALIZING' || cart.status === 'FINALIZED'"
-          [class.is-upcoming]="cart.status === 'OPEN'"
-          [attr.aria-current]="(cart.status === 'FINALIZING' || cart.status === 'FINALIZED') ? 'step' : null">
-        <span class="stepper__dot" aria-hidden="true">{{ cart.status === 'FULFILLED' ? '✓' : '2' }}</span>
+          [class.is-done]="displayStep > 1"
+          [class.is-current]="displayStep === 1"
+          [class.is-upcoming]="displayStep < 1"
+          [attr.aria-current]="displayStep === 1 ? 'step' : null">
+        <span class="stepper__dot" aria-hidden="true">{{ displayStep > 1 ? '✓' : '2' }}</span>
         <span class="stepper__label">Submitted</span>
       </li>
+      <!-- Step 2 (trade only): Trade Received -->
+      <li *ngIf="hasTradeItem" class="stepper__step"
+          [class.is-done]="displayStep > 2"
+          [class.is-current]="displayStep === 2"
+          [class.is-upcoming]="displayStep < 2"
+          [attr.aria-current]="displayStep === 2 ? 'step' : null">
+        <span class="stepper__dot" aria-hidden="true">{{ displayStep > 2 ? '✓' : '3' }}</span>
+        <span class="stepper__label">Trade Received</span>
+      </li>
+      <!-- Step 2/3: Paid -->
+      <li class="stepper__step"
+          [class.is-done]="displayStep > (hasTradeItem ? 3 : 2)"
+          [class.is-current]="displayStep === (hasTradeItem ? 3 : 2)"
+          [class.is-upcoming]="displayStep < (hasTradeItem ? 3 : 2)"
+          [attr.aria-current]="displayStep === (hasTradeItem ? 3 : 2) ? 'step' : null">
+        <span class="stepper__dot" aria-hidden="true">{{ displayStep > (hasTradeItem ? 3 : 2) ? '✓' : (hasTradeItem ? '4' : '3') }}</span>
+        <span class="stepper__label">Paid</span>
+      </li>
+      <!-- Last step: Complete -->
       <li class="stepper__step"
           [class.is-current]="cart.status === 'FULFILLED'"
           [class.is-upcoming]="cart.status !== 'FULFILLED'"
           [attr.aria-current]="cart.status === 'FULFILLED' ? 'step' : null">
-        <span class="stepper__dot" aria-hidden="true">3</span>
-        <span class="stepper__label">Fulfilled</span>
+        <span class="stepper__dot" aria-hidden="true">{{ hasTradeItem ? '5' : '4' }}</span>
+        <span class="stepper__label">Complete</span>
       </li>
     </ol>
 
@@ -178,7 +199,7 @@
       </ng-container>
     </div>
 
-    <div class="cart-actions finalizing-note" *ngIf="cart.status === 'FINALIZING'">
+    <div class="cart-actions finalizing-note" *ngIf="cart.status === 'SUBMITTED'">
       <p>
         Your order has been submitted. Complete checkout below.
         You can still remove items if needed.
@@ -250,7 +271,7 @@
       <p class="notes-value">{{ cart.adminNotes }}</p>
     </div>
 
-    <div class="cart-actions" *ngIf="cart.status === 'FINALIZED'">
+    <div class="cart-actions" *ngIf="cart.status === 'SUBMITTED'">
       <p class="finalized-note">
         Your order is finalized and with the seller. Payment details will be arranged directly.
       </p>

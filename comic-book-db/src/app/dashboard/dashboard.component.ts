@@ -269,8 +269,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   cartLockedTitle(): string {
     const status = this.myCart?.status;
-    if (status === 'FINALIZING') return 'Your order has been submitted and is in the review window.';
-    if (status === 'FINALIZED') return 'Your order is finalized — wait for fulfillment before claiming again.';
+    if (status === 'SUBMITTED') return 'Your order has been submitted — wait for fulfillment before claiming again.';
     return '';
   }
 

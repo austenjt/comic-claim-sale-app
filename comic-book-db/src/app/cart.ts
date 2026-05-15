@@ -35,7 +35,7 @@ export interface Cart {
   userName: string;
   userEmail: string;
   items: CartItem[];
-  status: 'OPEN' | 'FINALIZING' | 'FINALIZED' | 'FULFILLED';
+  status: 'OPEN' | 'SUBMITTED' | 'FULFILLED';
   createdAt: string;
   finalizeAfter?: string;
   finalizedAt?: string;

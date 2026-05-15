@@ -74,12 +74,12 @@ export class CartComponent implements OnInit, OnDestroy {
         comicId,
         setTitle: container?.comicTitle ?? item?.comicTitle ?? 'this set',
         bookCount: setCount,
-        isFinalizing: this.cart?.status === 'FINALIZING'
+        isFinalizing: this.cart?.status === 'SUBMITTED'
       };
       return;
     }
 
-    if (this.cart?.status === 'FINALIZING') {
+    if (this.cart?.status === 'SUBMITTED') {
       if (!window.confirm('Are you sure you want to remove a book from an established order?')) return;
     }
 
@@ -304,15 +304,30 @@ export class CartComponent implements OnInit, OnDestroy {
   get statusLabel(): string {
     switch (this.cart?.status) {
       case 'OPEN': return 'Open — add or remove items freely.';
-      case 'FINALIZING': return 'Submitted — your order is with the seller.';
-      case 'FINALIZED': return 'Finalized — awaiting fulfillment.';
+      case 'SUBMITTED': return 'Submitted — your order is with the seller.';
       case 'FULFILLED': return 'Fulfilled — your order has been shipped!';
       default: return '';
     }
   }
 
+  /**
+   * Active stepper index.
+   * Regular: 0=Building, 1=Submitted, 2=Paid, 3=Complete
+   * Trade:   0=Building, 1=Submitted, 2=Trade Received, 3=Paid, 4=Complete
+   */
+  get displayStep(): number {
+    if (!this.cart || this.cart.status === 'OPEN') return 0;
+    if (this.cart.status === 'SUBMITTED') {
+      if (this.hasTradeItem && !this.cart.tradeReceived) return 1;
+      if (this.hasTradeItem && this.cart.tradeReceived && this.cart.paymentStatus !== 'PAID') return 2;
+      if (this.cart.paymentStatus === 'PAID') return this.hasTradeItem ? 3 : 2;
+      return 1;
+    }
+    return 99;
+  }
+
   canRemove(): boolean {
-    return this.cart?.status === 'OPEN' || this.cart?.status === 'FINALIZING';
+    return this.cart?.status === 'OPEN' || this.cart?.status === 'SUBMITTED';
   }
 
   canRemoveItem(comicId: string): boolean {
@@ -331,7 +346,7 @@ export class CartComponent implements OnInit, OnDestroy {
   }
 
   canUnsubmit(): boolean {
-    return this.cart?.status === 'FINALIZING' || this.cart?.status === 'FINALIZED';
+    return this.cart?.status === 'SUBMITTED';
   }
 
   get isPaid(): boolean {
