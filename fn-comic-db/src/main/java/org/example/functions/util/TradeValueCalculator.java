@@ -24,6 +24,7 @@ public final class TradeValueCalculator {
     private static final Map<ComicGrade, BigDecimal> MULTIPLIERS = new EnumMap<>(ComicGrade.class);
 
     // These values need to sync with the values in trade-board.compoonent.ts in the front-end
+    // Maybe we could return these in the /config endpoint so the front end can calculate dynamically?
     static {
         MULTIPLIERS.put(ComicGrade.GEM_MINT,         new BigDecimal("3.50"));
         MULTIPLIERS.put(ComicGrade.MINT,              new BigDecimal("2.40"));
