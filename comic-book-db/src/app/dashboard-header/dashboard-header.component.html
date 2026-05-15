@@ -12,12 +12,7 @@
                 (click)="excludeClaimedChange.emit(!excludeClaimed)">
           {{ excludeClaimed ? 'Show Claimed' : 'Exclude Claimed' }}
         </button>
-        <button class="btn-exclude-claimed"
-                [class.btn-exclude-claimed-active]="showPricedOnly"
-                (click)="showPricedOnlyChange.emit(!showPricedOnly)">
-          {{ showPricedOnly ? 'Show Unpriced' : 'Exclude Unpriced' }}
-        </button>
-        <select class="sort-select"
+<select class="sort-select"
                 [value]="sortOrder"
                 (change)="sortOrderChange.emit($any($event.target).value)">
           <option value="oldest-first">Oldest First</option>

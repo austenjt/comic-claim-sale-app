@@ -52,10 +52,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
   get excludeClaimed() { return this._excludeClaimed; }
   set excludeClaimed(v: boolean) { this._excludeClaimed = v; this.currentPage = 1; this.savePrefs(); }
 
-  private _showPricedOnly = false;
-  get showPricedOnly() { return this._showPricedOnly; }
-  set showPricedOnly(v: boolean) { this._showPricedOnly = v; this.currentPage = 1; this.loadPage(); this.savePrefs(); }
-
   private _sortOrder = 'oldest-first';
   get sortOrder() { return this._sortOrder; }
   set sortOrder(v: string) { this._sortOrder = v; this.currentPage = 1; this.loadPage(); this.savePrefs(); }
@@ -101,8 +97,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     localStorage.setItem(DashboardComponent.PREFS_KEY, JSON.stringify({
       sortOrder: this._sortOrder,
       currentPage: this.currentPage,
-      excludeClaimed: this._excludeClaimed,
-      showPricedOnly: this._showPricedOnly
+      excludeClaimed: this._excludeClaimed
     }));
   }
 
@@ -114,7 +109,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
       if (prefs.sortOrder) this._sortOrder = prefs.sortOrder;
       if (prefs.currentPage) this.currentPage = prefs.currentPage;
       if (prefs.excludeClaimed != null) this._excludeClaimed = prefs.excludeClaimed;
-      if (prefs.showPricedOnly != null) this._showPricedOnly = prefs.showPricedOnly;
     } catch { /* ignore corrupt data */ }
   }
 
@@ -149,7 +143,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.loading = true;
 
     this.loadSub = this.comicService.getDashboardPage(
-      this.currentPage, this.sortOrder, this.showPricedOnly
+      this.currentPage, this.sortOrder
     ).subscribe({
       next: (response: PagedResponse<Comic>) => {
         this.loadSub = null;

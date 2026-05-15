@@ -13,12 +13,10 @@ export class DashboardHeaderComponent {
   @Input() totalPages: number = 0;
 
   get isFiltered(): boolean {
-    return this.excludeClaimed || this.showPricedOnly || this.totalPages > 1;
+    return this.excludeClaimed || this.totalPages > 1;
   }
   @Input() excludeClaimed: boolean = false;
   @Output() excludeClaimedChange = new EventEmitter<boolean>();
-  @Input() showPricedOnly: boolean = false;
-  @Output() showPricedOnlyChange = new EventEmitter<boolean>();
   @Input() sortOrder: string = 'oldest-first';
   @Output() sortOrderChange = new EventEmitter<string>();
   @Output() goToPage = new EventEmitter<number>();
