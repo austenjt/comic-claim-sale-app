@@ -134,8 +134,8 @@ export class CartService {
     return this.http.post<Cart>(`${this.apiBase}/awards`, { comicId, userId });
   }
 
-  addTradeItem(comicId: string): Observable<Cart> {
-    return this.http.post<Cart>(`${this.apiBase}/cart/trade`, { comicId });
+  addTradeItem(comicId: string, grade: number): Observable<Cart> {
+    return this.http.post<Cart>(`${this.apiBase}/cart/trade`, { comicId, grade });
   }
 
   markTradeReceived(cartId: string): Observable<Cart> {

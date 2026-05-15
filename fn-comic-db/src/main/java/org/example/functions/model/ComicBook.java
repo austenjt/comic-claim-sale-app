@@ -77,6 +77,10 @@ public class ComicBook {
      */
     private ListingType listingType;
 
+    // Trade valuation — NM reference price used by TradeValueCalculator
+    @JsonSerialize(using = MoneySerializer.class)
+    private BigDecimal nmEstimatedValue;
+
     // Valuation
     @JsonSerialize(using = MoneySerializer.class)
     private BigDecimal personalEstimate;

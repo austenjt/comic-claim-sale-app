@@ -17,6 +17,7 @@ import org.example.functions.model.ClaimNotification;
 import org.example.functions.model.ShippingAddress;
 import org.example.functions.model.ShippingEstimate;
 import org.example.functions.model.User;
+import org.example.functions.model.enums.ComicGrade;
 import org.example.functions.service.ArchiveService;
 import org.example.functions.service.CartService;
 import org.example.functions.util.AuthHelper;
@@ -159,8 +160,11 @@ public class CartTriggers {
             JsonNode body = OBJECT_MAPPER.readTree(request.getBody().orElse("{}"));
             String comicId = HttpHelper.getString(body, "comicId");
             if (comicId == null) return badRequest(request, "comicId is required");
+            JsonNode gradeNode = body.get("grade");
+            if (gradeNode == null || gradeNode.isNull()) return badRequest(request, "grade is required");
+            ComicGrade grade = ComicGrade.fromNumericGrade(gradeNode.asDouble());
 
-            Cart cart = CartService.getServiceInstance().addTradeItem(user, comicId);
+            Cart cart = CartService.getServiceInstance().addTradeItem(user, comicId, grade);
             return cors(request.createResponseBuilder(HttpStatus.OK))
                 .header("Content-Type", "application/json")
                 .body(OBJECT_MAPPER.writeValueAsString(cart)).build();

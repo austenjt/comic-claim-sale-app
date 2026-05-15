@@ -1,9 +1,10 @@
 <div class="trade-board-container">
   <h2>Trade Board</h2>
   <p class="trade-intro">
-    These are comics we're looking to add to our collection. If you own one, you can offer it as a
-    trade-in credit toward your order. Add it to your cart — the credit reduces your total.
-    After submitting, ship the comic to us; once we receive it your order will be fulfilled.
+    These are comics we're looking to add to our collection. If you own one, offer it as a
+    trade-in credit toward your order. The credit amount depends on the condition of your copy —
+    select your grade when you offer the trade. After submitting, ship the comic to us and your
+    order will be fulfilled once we receive it.
   </p>
 
   <div *ngIf="loading" class="trade-loading">Loading…</div>
@@ -24,21 +25,59 @@
       </a>
       <div class="wanted-info">
         <a [routerLink]="['/detail', comic.id]" class="wanted-title">{{ comicLabel(comic) }}</a>
-        <div class="wanted-credit">Trade Credit: {{ creditValue(comic) | currency }}</div>
+
+        <div *ngIf="comic.nmEstimatedValue" class="wanted-nm-value">
+          NM Value: {{ comic.nmEstimatedValue | currency }}
+        </div>
+        <div class="wanted-credit-note">Credit varies by condition</div>
+
         <div *ngIf="comic.publicNotes" class="wanted-notes">{{ comic.publicNotes }}</div>
 
         <ng-container *ngIf="canOffer()">
           <button class="btn-offer-trade"
                   [class.btn-offer-trade--done]="isAdded(comic)"
-                  [disabled]="isAdding(comic) || isAdded(comic)"
-                  (click)="offerTrade(comic)">
+                  [disabled]="isAdded(comic)"
+                  (click)="openModal(comic)">
             <ng-container *ngIf="isAdded(comic)">Added to Cart ✓</ng-container>
-            <ng-container *ngIf="isAdding(comic) && !isAdded(comic)">Adding…</ng-container>
-            <ng-container *ngIf="!isAdding(comic) && !isAdded(comic)">Offer Trade</ng-container>
+            <ng-container *ngIf="!isAdded(comic)">Offer Trade</ng-container>
           </button>
-          <div *ngIf="tradeErrors[comicKey(comic)]" class="trade-error">{{ tradeErrors[comicKey(comic)] }}</div>
         </ng-container>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- Grade selector modal -->
+<div class="modal-overlay" *ngIf="modalComic" (click)="closeModal()">
+  <div class="modal modal--sm trade-grade-modal" (click)="$event.stopPropagation()">
+    <h3 class="modal-title">Offer Trade</h3>
+    <p class="modal-comic-name">{{ comicLabel(modalComic) }}</p>
+
+    <div class="modal-field">
+      <label class="modal-label">What condition is your copy?</label>
+      <select class="modal-select" [(ngModel)]="selectedGrade">
+        <option *ngFor="let g of gradeOptions" [ngValue]="g.value">{{ g.label }}</option>
+      </select>
+    </div>
+
+    <div class="modal-preview">
+      <span class="modal-preview-label">Your trade credit:</span>
+      <span class="modal-preview-value">{{ previewCredit | currency }}</span>
+    </div>
+
+    <div *ngIf="!modalComic.nmEstimatedValue" class="modal-no-value">
+      This comic does not have a trade value set yet. Contact us for a custom quote.
+    </div>
+
+    <div *ngIf="submitError" class="modal-error">{{ submitError }}</div>
+
+    <div class="modal-actions">
+      <button class="btn-modal-cancel" (click)="closeModal()" [disabled]="submitting">Cancel</button>
+      <button class="btn-modal-confirm"
+              (click)="confirmTrade()"
+              [disabled]="submitting || !modalComic.nmEstimatedValue">
+        {{ submitting ? 'Adding…' : 'Add to Cart' }}
+      </button>
     </div>
   </div>
 </div>

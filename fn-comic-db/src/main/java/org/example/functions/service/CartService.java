@@ -16,6 +16,7 @@ import org.example.functions.email.EmailTemplates;
 import org.example.functions.util.EnvHelper;
 import org.example.functions.util.Mappers;
 import org.example.functions.util.ShippingCalculator;
+import org.example.functions.util.TradeValueCalculator;
 import org.example.functions.model.Cart;
 import org.example.functions.model.CartItem;
 import org.example.functions.model.ShippingAddress;
@@ -24,6 +25,7 @@ import org.example.functions.model.ComicBook;
 import org.example.functions.model.ComicNumber;
 import org.example.functions.model.User;
 import org.example.functions.model.enums.CartStatus;
+import org.example.functions.model.enums.ComicGrade;
 import org.example.functions.model.enums.ListingType;
 import org.example.functions.model.enums.PaymentStatus;
 
@@ -268,19 +270,24 @@ public class CartService {
 
     /**
      * Add a WANTED comic as a trade-in credit to the user's OPEN cart.
-     * The item is added with a negative price equal to the comic's salePrice (the credit value).
+     *
+     * <p>Credit = {@code nmEstimatedValue × TradeValueCalculator.multiplierFor(grade)}.
      * Only one trade item is allowed per cart.
+     *
+     * @param grade the user-reported condition of their trade-in copy
      */
-    public Cart addTradeItem(User user, String comicId) {
+    public Cart addTradeItem(User user, String comicId, ComicGrade grade) {
         ComicBook comic = ComicService.getServiceInstance().getComicById(Integer.parseInt(comicId))
             .orElseThrow(() -> new IllegalArgumentException("Comic not found: " + comicId));
 
         if (comic.getEffectiveListingType() != ListingType.WANTED) {
             throw new IllegalStateException("Comic " + comicId + " is not a WANTED item.");
         }
-        if (comic.getSalePrice() == null) {
-            throw new IllegalStateException("Comic " + comicId + " has no trade credit value set.");
+        if (comic.getNmEstimatedValue() == null) {
+            throw new IllegalStateException("Comic " + comicId + " has no NM estimated value set.");
         }
+
+        java.math.BigDecimal credit = TradeValueCalculator.calculate(comic.getNmEstimatedValue(), grade);
 
         Cart cart = getOrCreateCart(user);
         if (!cart.is(CartStatus.OPEN)) {
@@ -296,13 +303,13 @@ public class CartService {
         item.setComicId(comicId);
         item.setComicTitle(comic.getTitle());
         item.setComicNumber(formatComicNumber(comic.getNumber()));
-        item.setPrice(-comic.getSalePrice().doubleValue()); // negative = credit
+        item.setPrice(-credit.doubleValue()); // negative = credit
         item.setClaimedAt(Instant.now().toString());
         item.setTrade(true);
 
         cart.getItems().add(item);
         save(cart);
-        log.info("User {} added trade-in credit for comic {} (credit: ${}) to cart {}", user.getId(), comicId, comic.getSalePrice(), cart.getId());
+        log.info("User {} added trade-in for comic {} at grade {} (credit: ${}) to cart {}", user.getId(), comicId, grade, credit, cart.getId());
         return cart;
     }
 
