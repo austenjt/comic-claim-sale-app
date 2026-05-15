@@ -36,10 +36,12 @@
         <ng-container *ngIf="canOffer()">
           <button class="btn-offer-trade"
                   [class.btn-offer-trade--done]="isAdded(comic)"
-                  [disabled]="isAdded(comic)"
+                  [disabled]="isAdded(comic) || !comic.nmEstimatedValue"
+                  [title]="!comic.nmEstimatedValue ? 'Trade value not yet available for this comic' : ''"
                   (click)="openModal(comic)">
             <ng-container *ngIf="isAdded(comic)">Added to Cart ✓</ng-container>
-            <ng-container *ngIf="!isAdded(comic)">Offer Trade</ng-container>
+            <ng-container *ngIf="!isAdded(comic) && !comic.nmEstimatedValue">Value Pending</ng-container>
+            <ng-container *ngIf="!isAdded(comic) && comic.nmEstimatedValue">Offer Trade</ng-container>
           </button>
         </ng-container>
       </div>
