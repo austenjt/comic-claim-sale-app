@@ -23,6 +23,7 @@ public final class TradeValueCalculator {
      */
     private static final Map<ComicGrade, BigDecimal> MULTIPLIERS = new EnumMap<>(ComicGrade.class);
 
+    // These values need to sync with the values in trade-board.compoonent.ts in the front-end
     static {
         MULTIPLIERS.put(ComicGrade.GEM_MINT,         new BigDecimal("3.50"));
         MULTIPLIERS.put(ComicGrade.MINT,              new BigDecimal("2.40"));
