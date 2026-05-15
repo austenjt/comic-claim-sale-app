@@ -96,7 +96,7 @@ public class ComicService {
      * and (isForSale, salePrice) before deploying.
      */
     public PagedResponse<ComicBook> getTopLevelComicsPaged(
-            int pageNumber, int pageSize, String sort, boolean onlyPriced, boolean admin) {
+            int pageNumber, int pageSize, String sort, boolean admin) {
         int offset = (pageNumber - 1) * pageSize;
 
         // WHERE: top-level only (standalone comics + SET containers, no members)
@@ -105,14 +105,10 @@ public class ComicService {
              .append(" OR NOT IS_DEFINED(c.collectionGroup)")
              .append(" OR c.collectionGroup = null")
              .append(" OR c.collectionGroup <= 0)");
-        if (!admin) {
-            // Non-admins still see comics not marked for sale, but cannot claim them (enforced in CartService)
-        }
         where.append(" AND (NOT IS_DEFINED(c.dateSold) OR c.dateSold = null OR c.dateSold = '')");
-        if (onlyPriced) {
-            // SETs are always included; individual comics must have a price
-            where.append(" AND (c.docType = 'SET' OR (IS_DEFINED(c.salePrice) AND c.salePrice != null))");
-        }
+        // Exclude WANTED comics — they appear on the Trade Board, not the dashboard.
+        // Legacy documents without listingType are never WANTED, so they always pass this filter.
+        where.append(" AND (NOT IS_DEFINED(c.listingType) OR c.listingType != 'WANTED')");
         String whereClause = where.toString();
 
         // Price sorts: a SET's effective price is the sum of its members' prices, which isn't a stored field.
@@ -232,6 +228,24 @@ public class ComicService {
             case "z-a"           -> "c.title DESC";
             default              -> "c._ts ASC"; // oldest-first, claimed-first
         };
+    }
+
+    /**
+     * Returns all top-level comics whose {@code listingType} is {@code WANTED}, for the Trade Board.
+     * Only documents explicitly set to WANTED are returned — legacy documents without a listingType
+     * are never treated as WANTED.
+     */
+    public List<ComicBook> getWantedComics() {
+        String sql = "SELECT * FROM c WHERE c.listingType = 'WANTED'" +
+                     " AND (NOT IS_DEFINED(c.dateSold) OR c.dateSold = null OR c.dateSold = '')" +
+                     " ORDER BY c._ts DESC";
+        List<ComicBook> result = new ArrayList<>();
+        for (ObjectNode node : comicsContainer.queryItems(sql, new CosmosQueryRequestOptions(), ObjectNode.class)) {
+            ComicBook cb = nodeToComicBook(node);
+            if (cb != null) result.add(cb);
+        }
+        log.info("getWantedComics() returned {} items.", result.size());
+        return result;
     }
 
     public List<String> getUniqueSeries() {

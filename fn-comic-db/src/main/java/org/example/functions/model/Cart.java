@@ -33,6 +33,12 @@ public class Cart {
     private String adminNotes;           // internal notes from admin
     private String invoiceNumber;        // human-readable order number, e.g. "LCR-0042", set on submission
     private ShippingAddress shippingAddress; // collected during checkout after order submission
+    /**
+     * Set to {@code true} by admin once the physical trade-in item has been received.
+     * Fulfillment is blocked on carts with trade items until this is true.
+     * Null/false for carts that have no trade items (legacy and normal orders).
+     */
+    private Boolean tradeReceived;
 
     /**
      * Cosmos {@code _etag} captured at read time, used for optimistic-concurrency
@@ -116,6 +122,14 @@ public class Cart {
     public List<CartDiscount> getDiscountBreakdown() { return discountBreakdown; }
     public void setDiscountBreakdown(List<CartDiscount> discountBreakdown) {
         this.discountBreakdown = discountBreakdown != null ? discountBreakdown : new ArrayList<>();
+    }
+
+    public Boolean getTradeReceived() { return tradeReceived; }
+    public void setTradeReceived(Boolean tradeReceived) { this.tradeReceived = tradeReceived; }
+
+    /** Convenience: true if this cart contains at least one trade-in item. */
+    public boolean hasTradeItem() {
+        return items != null && items.stream().anyMatch(CartItem::isTrade);
     }
 
     /** Cosmos {@code _etag} captured at read time. Excluded from JSON serialization. */

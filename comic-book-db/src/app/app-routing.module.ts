@@ -10,7 +10,6 @@ import { PendingApprovalComponent } from './pending-approval/pending-approval.co
 import { AdminUsersComponent } from './admin-users/admin-users.component';
 import { AdminGuard } from './admin.guard';
 import { DocumentationComponent } from './documentation/documentation.component';
-import { CartComponent } from './cart/cart.component';
 import { AdminOrdersComponent } from './admin-orders/admin-orders.component';
 import { AuthGuard } from './auth.guard';
 import { AccountProfileComponent } from './account-profile/account-profile.component';
@@ -18,6 +17,7 @@ import { OrderHistoryComponent } from './order-history/order-history.component';
 import { AdminSalesComponent } from './admin-sales/admin-sales.component';
 import { ContactComponent } from './contact/contact.component';
 import { SetDetailComponent } from './set-detail/set-detail.component';
+import { TradeBoardComponent } from './trade-board/trade-board.component';
 
 const routes: Routes = [
   { path: '',               redirectTo: '/dashboard', pathMatch: 'full' },
@@ -30,12 +30,13 @@ const routes: Routes = [
   { path: 'pending-approval', component: PendingApprovalComponent },
   { path: 'admin/users',   component: AdminUsersComponent,   canActivate: [AdminGuard] },
   { path: 'documentation',  component: DocumentationComponent },
-  { path: 'cart',          component: CartComponent,         canActivate: [AuthGuard] },
+  { path: 'cart',          redirectTo: '/orders',            pathMatch: 'full' },
   { path: 'profile',       component: AccountProfileComponent, canActivate: [AuthGuard] },
   { path: 'admin/orders',  component: AdminOrdersComponent,  canActivate: [AdminGuard] },
   { path: 'orders',        component: OrderHistoryComponent, canActivate: [AuthGuard] },
   { path: 'sales',         component: AdminSalesComponent },
   { path: 'contact',       component: ContactComponent },
+  { path: 'trade',         component: TradeBoardComponent },
 ];
 
 @NgModule({

@@ -224,9 +224,14 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
     this.salePriceStr = this.editComic.salePrice != null
       ? Number(this.editComic.salePrice).toFixed(2)
       : '';
-    // Set members are always for sale — isForSale is controlled by the set container
+    // Derive listingType from isForSale for documents that pre-date the listingType field
+    if (!this.editComic.listingType) {
+      this.editComic.listingType = this.editComic.isForSale ? 'FOR_SALE' : 'NOT_LISTED';
+    }
+    // Set members are always for sale — listingType is controlled by the set container
     if (this.parentSetId !== null) {
       this.editComic.isForSale = true;
+      this.editComic.listingType = 'FOR_SALE';
     }
   }
 

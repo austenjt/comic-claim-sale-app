@@ -1,0 +1,44 @@
+<div class="trade-board-container">
+  <h2>Trade Board</h2>
+  <p class="trade-intro">
+    These are comics we're looking to add to our collection. If you own one, you can offer it as a
+    trade-in credit toward your order. Add it to your cart — the credit reduces your total.
+    After submitting, ship the comic to us; once we receive it your order will be fulfilled.
+  </p>
+
+  <div *ngIf="loading" class="trade-loading">Loading…</div>
+  <div *ngIf="error" class="error-message">{{ error }}</div>
+
+  <div *ngIf="!loading && wantedComics.length === 0 && !error" class="trade-empty">
+    No wanted comics at this time. Check back soon!
+  </div>
+
+  <div *ngIf="!auth.isLoggedIn()" class="trade-login-banner">
+    <a routerLink="/login">Log in</a> to offer a trade-in.
+  </div>
+
+  <div class="wanted-grid" *ngIf="wantedComics.length > 0">
+    <div class="wanted-card" *ngFor="let comic of wantedComics">
+      <a [routerLink]="['/detail', comic.id]" class="wanted-image-link">
+        <img [src]="imageUrl(comic)" [alt]="comicLabel(comic)" class="wanted-image">
+      </a>
+      <div class="wanted-info">
+        <a [routerLink]="['/detail', comic.id]" class="wanted-title">{{ comicLabel(comic) }}</a>
+        <div class="wanted-credit">Trade Credit: {{ creditValue(comic) | currency }}</div>
+        <div *ngIf="comic.publicNotes" class="wanted-notes">{{ comic.publicNotes }}</div>
+
+        <ng-container *ngIf="canOffer()">
+          <button class="btn-offer-trade"
+                  [class.btn-offer-trade--done]="isAdded(comic)"
+                  [disabled]="isAdding(comic) || isAdded(comic)"
+                  (click)="offerTrade(comic)">
+            <ng-container *ngIf="isAdded(comic)">Added to Cart ✓</ng-container>
+            <ng-container *ngIf="isAdding(comic) && !isAdded(comic)">Adding…</ng-container>
+            <ng-container *ngIf="!isAdding(comic) && !isAdded(comic)">Offer Trade</ng-container>
+          </button>
+          <div *ngIf="tradeErrors[comicKey(comic)]" class="trade-error">{{ tradeErrors[comicKey(comic)] }}</div>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+</div>

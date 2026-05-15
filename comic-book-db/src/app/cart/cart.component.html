@@ -54,8 +54,22 @@
       </thead>
       <tbody>
         <ng-container *ngFor="let row of groupedRows">
+          <!-- Trade credit row -->
+          <tr *ngIf="row.type === 'single' && row.isTrade" class="trade-credit-row">
+            <td>
+              <a [routerLink]="['/detail', row.items[0].comicId]">
+                {{ row.items[0].comicTitle }}{{ row.items[0].comicNumber ? ' ' + row.items[0].comicNumber : '' }}
+              </a>
+              <span class="trade-badge">TRADE CREDIT</span>
+            </td>
+            <td class="trade-credit-price">{{ row.items[0].price | currency }}</td>
+            <td>{{ row.claimedAt | date:'short' }}</td>
+            <td *ngIf="canRemove()">
+              <button class="btn-release" (click)="removeItem(row.removeId)">Remove</button>
+            </td>
+          </tr>
           <!-- Single comic: one row -->
-          <tr *ngIf="row.type === 'single'"
+          <tr *ngIf="row.type === 'single' && !row.isTrade"
               [class.graded-row]="row.isGraded">
             <td>
               <a [routerLink]="['/detail', row.items[0].comicId]">
@@ -156,6 +170,14 @@
       Your cart is empty. <a routerLink="/dashboard">Browse comics</a> to start claiming.
     </div>
 
+    <div class="cart-actions trade-shipping-note" *ngIf="hasTradeItem && cart.status !== 'OPEN'">
+      <strong>Trade-In Reminder:</strong> Please ship your trade-in comic to us.
+      Your order will be fulfilled once we receive it.
+      <ng-container *ngIf="cart.tradeReceived">
+        <span class="trade-received-badge">Trade Received ✓</span>
+      </ng-container>
+    </div>
+
     <div class="cart-actions finalizing-note" *ngIf="cart.status === 'FINALIZING'">
       <p>
         Your order has been submitted. Complete checkout below.
@@ -185,9 +207,16 @@
       <button class="btn-unsubmit" (click)="unsubmit()">UnSubmit Order</button>
     </div>
 
+    <div class="cart-actions balance-warning" *ngIf="cart.status === 'OPEN' && balanceNegative">
+      <p>Your trade credit exceeds the cart total. Add more comics or remove the trade-in to submit.</p>
+    </div>
+
     <div class="cart-actions" *ngIf="canSubmit()">
       <p class="submit-note">
         Ready to order? You can still remove items after submitting, but not add new ones.
+      </p>
+      <p *ngIf="hasTradeItem" class="submit-note trade-submit-note">
+        After submitting, you will need to ship your trade-in comic to us. We will fulfill your order once it arrives.
       </p>
       <div class="notes-group">
         <label for="customerNotes" class="notes-label">Notes for seller <span class="notes-optional">(optional)</span></label>

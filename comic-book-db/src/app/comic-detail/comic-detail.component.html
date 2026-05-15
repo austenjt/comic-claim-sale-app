@@ -457,10 +457,26 @@
       <div class="detail-section">
         <div class="detail-section-title">Sale Info</div>
         <div class="detail-item">
-          <span class="detail-label">For Sale</span>
-          <input class="detail-edit-checkbox" type="checkbox" [(ngModel)]="editComic!.isForSale"
-            [disabled]="parentSetId !== null"
-            [title]="parentSetId !== null ? 'Set members are always for sale — toggle this on the set page' : ''">
+          <span class="detail-label">Listing</span>
+          <div class="listing-type-radios"
+               [class.listing-type-radios--disabled]="parentSetId !== null"
+               [title]="parentSetId !== null ? 'Set members are always for sale — manage listing on the set page' : ''">
+            <label class="listing-type-radio-label">
+              <input type="radio" name="listingType" value="NOT_LISTED"
+                     [(ngModel)]="editComic!.listingType" [disabled]="parentSetId !== null">
+              Not Listed
+            </label>
+            <label class="listing-type-radio-label">
+              <input type="radio" name="listingType" value="FOR_SALE"
+                     [(ngModel)]="editComic!.listingType" [disabled]="parentSetId !== null">
+              For Sale
+            </label>
+            <label class="listing-type-radio-label listing-type-radio-wanted">
+              <input type="radio" name="listingType" value="WANTED"
+                     [(ngModel)]="editComic!.listingType" [disabled]="parentSetId !== null">
+              Wanted
+            </label>
+          </div>
         </div>
         <div class="detail-item">
           <span class="detail-label">Sale Price</span>

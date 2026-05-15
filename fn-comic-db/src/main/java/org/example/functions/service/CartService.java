@@ -24,6 +24,7 @@ import org.example.functions.model.ComicBook;
 import org.example.functions.model.ComicNumber;
 import org.example.functions.model.User;
 import org.example.functions.model.enums.CartStatus;
+import org.example.functions.model.enums.ListingType;
 import org.example.functions.model.enums.PaymentStatus;
 
 import java.time.Instant;
@@ -115,7 +116,7 @@ public class CartService {
         ComicBook comic = ComicService.getServiceInstance().getComicById(Integer.parseInt(comicId))
             .orElseThrow(() -> new IllegalArgumentException("Comic not found: " + comicId));
 
-        if (!Boolean.TRUE.equals(comic.getIsForSale())) {
+        if (comic.getEffectiveListingType() != ListingType.FOR_SALE) {
             throw new IllegalStateException("Comic " + comicId + " is not currently for sale.");
         }
         if (comic.getSalePrice() == null) {
@@ -142,7 +143,7 @@ public class CartService {
         if (!"SET".equals(container.getDocType())) {
             throw new IllegalArgumentException("Comic " + containerId + " is not a set container.");
         }
-        if (!Boolean.TRUE.equals(container.getIsForSale())) {
+        if (container.getEffectiveListingType() != ListingType.FOR_SALE) {
             throw new IllegalStateException("Set " + containerId + " is not currently for sale.");
         }
         Integer collectionGroup = container.getCollectionGroup();
@@ -265,6 +266,46 @@ public class CartService {
         return cart;
     }
 
+    /**
+     * Add a WANTED comic as a trade-in credit to the user's OPEN cart.
+     * The item is added with a negative price equal to the comic's salePrice (the credit value).
+     * Only one trade item is allowed per cart.
+     */
+    public Cart addTradeItem(User user, String comicId) {
+        ComicBook comic = ComicService.getServiceInstance().getComicById(Integer.parseInt(comicId))
+            .orElseThrow(() -> new IllegalArgumentException("Comic not found: " + comicId));
+
+        if (comic.getEffectiveListingType() != ListingType.WANTED) {
+            throw new IllegalStateException("Comic " + comicId + " is not a WANTED item.");
+        }
+        if (comic.getSalePrice() == null) {
+            throw new IllegalStateException("Comic " + comicId + " has no trade credit value set.");
+        }
+
+        Cart cart = getOrCreateCart(user);
+        if (!cart.is(CartStatus.OPEN)) {
+            throw new IllegalStateException("Cart is not open (status: " + cart.getStatus() + ").");
+        }
+
+        boolean alreadyHasTrade = cart.getItems().stream().anyMatch(CartItem::isTrade);
+        if (alreadyHasTrade) {
+            throw new IllegalStateException("Your cart already contains a trade-in item. Only one trade-in is allowed per order.");
+        }
+
+        CartItem item = new CartItem();
+        item.setComicId(comicId);
+        item.setComicTitle(comic.getTitle());
+        item.setComicNumber(formatComicNumber(comic.getNumber()));
+        item.setPrice(-comic.getSalePrice().doubleValue()); // negative = credit
+        item.setClaimedAt(Instant.now().toString());
+        item.setTrade(true);
+
+        cart.getItems().add(item);
+        save(cart);
+        log.info("User {} added trade-in credit for comic {} (credit: ${}) to cart {}", user.getId(), comicId, comic.getSalePrice(), cart.getId());
+        return cart;
+    }
+
     /** Submit an order. Cart moves to FINALIZING; fulfillment is unlocked when the admin marks payment as PAID. */
     public Cart submitOrder(String userId, String customerNotes) {
         Cart cart = getActiveCart(userId)
@@ -274,6 +315,17 @@ public class CartService {
         }
         if (cart.getItems().isEmpty()) {
             throw new IllegalStateException("Cannot submit an empty cart.");
+        }
+        // When a trade-in is present, validate that the net amount owed is non-negative.
+        // (Trade credit is a negative price; discounts haven't been calculated yet, so check
+        // raw item totals. After discounts are applied below, the final invoice may be lower
+        // but will never be negative in practice.)
+        if (cart.hasTradeItem()) {
+            double rawTotal = cart.getItems().stream().mapToDouble(CartItem::getPrice).sum();
+            if (rawTotal < 0) {
+                throw new IllegalStateException(
+                    "Your trade-in credit exceeds the value of your cart. Please add more items before submitting.");
+            }
         }
         DiscountService.DiscountResult discountResult = DiscountService.getServiceInstance().applyDiscounts(cart);
         cart.setDiscountAmount(discountResult.getAmount());
@@ -395,18 +447,36 @@ public class CartService {
         return cart;
     }
 
+    /** Admin: record that the physical trade-in item has been received, unblocking fulfillment. */
+    public Cart markTradeReceived(String cartId) {
+        Cart cart = findCartById(cartId);
+        if (!cart.hasTradeItem()) {
+            throw new IllegalStateException("Cart " + cartId + " does not contain a trade-in item.");
+        }
+        cart.setTradeReceived(true);
+        save(cart);
+        log.info("Trade item marked as received for cart {}", cartId);
+        return cart;
+    }
+
     /** Admin: mark a cart as FULFILLED and stamp soldTo/dateSold on each comic. */
     public Cart fulfillCart(String cartId) {
         Cart cart = findCartById(cartId);
+        if (cart.hasTradeItem() && !Boolean.TRUE.equals(cart.getTradeReceived())) {
+            throw new IllegalStateException(
+                "Cannot fulfill order " + cartId + ": trade-in item has not been marked as received.");
+        }
         cart.setStatus(CartStatus.FULFILLED);
         cart.setFulfilledAt(Instant.now().toString());
         save(cart);
         log.info("Cart {} marked as FULFILLED", cartId);
         ArchiveService.getServiceInstance().archiveCart(cart);
         sendFulfillmentEmail(cart);
-        // Stamp soldTo/dateSold on each comic, including set container rows
+        // Stamp soldTo/dateSold on each comic, including set container rows.
+        // Trade-in items are skipped — they are comics the user is sending to the admin, not sold inventory.
         String soldDate = Instant.now().toString();
         for (CartItem item : cart.getItems()) {
+            if (item.isTrade()) continue;
             try {
                 ComicService.getServiceInstance().getComicById(Integer.parseInt(item.getComicId()))
                     .ifPresent(comic -> {

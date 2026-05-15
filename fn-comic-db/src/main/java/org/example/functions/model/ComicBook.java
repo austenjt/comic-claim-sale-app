@@ -15,6 +15,7 @@ import lombok.Setter;
 import lombok.ToString;
 import org.example.functions.model.enums.CoverVariant;
 import org.example.functions.model.enums.Era;
+import org.example.functions.model.enums.ListingType;
 import org.example.functions.model.thirdParty.GrandComicDBInfo;
 import org.example.functions.model.thirdParty.GoCollectInfo;
 
@@ -70,6 +71,11 @@ public class ComicBook {
     private String soldTo;
     @JsonProperty("isForSale")
     private Boolean isForSale;
+    /**
+     * Replaces the legacy {@code isForSale} boolean. Use {@link #getEffectiveListingType()}
+     * in service-layer code to handle documents that pre-date this field.
+     */
+    private ListingType listingType;
 
     // Valuation
     @JsonSerialize(using = MoneySerializer.class)
@@ -101,6 +107,15 @@ public class ComicBook {
 
     // Analytics
     private Integer viewCount;
+
+    /**
+     * Returns the effective listing type, falling back to the legacy {@code isForSale} boolean
+     * for documents written before {@code listingType} was introduced.
+     */
+    public ListingType getEffectiveListingType() {
+        if (listingType != null) return listingType;
+        return Boolean.TRUE.equals(isForSale) ? ListingType.FOR_SALE : ListingType.NOT_LISTED;
+    }
 
     /**
      * Used to prevent duplicate data being added.

@@ -374,3 +374,67 @@ tfoot td { font-weight: bold; background: #adc178; }
      smallest widths — date is also visible in order-history detail view. */
   th:nth-child(3), td:nth-child(3) { display: none; }
 }
+
+/* ── Trade credit items ──────────────────────────────────────────────── */
+.trade-credit-row {
+  background: #f0fff0;
+}
+
+.trade-badge {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 0.5rem;
+  padding: 1px 6px;
+  background: #2a7a2a;
+  color: #fff;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border-radius: 3px;
+  vertical-align: middle;
+  line-height: 1.4;
+}
+
+.trade-credit-price {
+  color: #2a7a2a;
+  font-weight: 700;
+}
+
+.trade-submit-note {
+  color: #5a3d00;
+  background: #fff8e1;
+  border: 1px solid #ffe082;
+  border-radius: 5px;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.87rem;
+}
+
+.balance-warning {
+  background: #fff3cd;
+  border: 1px solid #ffc107;
+  border-radius: 6px;
+  color: #856404;
+  font-size: 0.9rem;
+  padding: 0.75rem 1rem;
+}
+
+.trade-shipping-note {
+  background: #e8f5e9;
+  border: 1px solid #a5d6a7;
+  border-radius: 6px;
+  color: #1b5e20;
+  font-size: 0.9rem;
+  padding: 0.75rem 1rem;
+}
+
+.trade-received-badge {
+  display: inline-block;
+  margin-left: 0.75rem;
+  background: #2a7a2a;
+  color: #fff;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 700;
+}

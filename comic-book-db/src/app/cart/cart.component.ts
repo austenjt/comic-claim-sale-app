@@ -14,6 +14,8 @@ interface CartRow {
   isGraded: boolean;
   containerTitle?: string;
   containerId?: string;
+  /** True when this row represents a trade-in credit item. */
+  isTrade?: boolean;
 }
 
 @Component({
@@ -153,11 +155,21 @@ export class CartComponent implements OnInit, OnDestroy {
           totalPrice: item.price,
           claimedAt: item.claimedAt,
           removeId: item.comicId,
-          isGraded: !!item.isGraded
+          isGraded: !!item.isGraded,
+          isTrade: !!item.isTrade
         });
       }
     }
     return rows;
+  }
+
+  get hasTradeItem(): boolean {
+    return this.cart?.items.some(i => i.isTrade) ?? false;
+  }
+
+  /** Net item total (includes negative trade credits, before discount). */
+  get netItemsTotal(): number {
+    return this.visibleItems.reduce((sum, i) => sum + i.price, 0);
   }
 
   get cartTotal(): number {
@@ -308,8 +320,14 @@ export class CartComponent implements OnInit, OnDestroy {
   }
 
   canSubmit(): boolean {
-    return this.cart?.status === 'OPEN' &&
-           this.visibleItems.length > 0;
+    if (this.cart?.status !== 'OPEN') return false;
+    if (this.visibleItems.length === 0) return false;
+    if (this.hasTradeItem && this.netItemsTotal < 0) return false;
+    return true;
+  }
+
+  get balanceNegative(): boolean {
+    return this.hasTradeItem && this.netItemsTotal < 0;
   }
 
   canUnsubmit(): boolean {

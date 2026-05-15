@@ -16,6 +16,10 @@
         <span class="order-status" [ngClass]="'status-' + order.status.toLowerCase()">
           {{ statusLabel(order.status) }}
         </span>
+        <span *ngIf="hasTradeItem(order)" class="trade-order-badge"
+              [class.trade-order-badge--received]="order.tradeReceived">
+          {{ order.tradeReceived ? 'Trade Received ✓' : 'Trade Order' }}
+        </span>
         <span *ngIf="order.invoiceNumber" class="order-invoice">Order #{{ order.invoiceNumber }}</span>
         <span class="order-date">Opened: {{ order.createdAt | date:'short' }}</span>
         <span *ngIf="order.finalizedAt" class="order-date">Finalized: {{ order.finalizedAt | date:'short' }}</span>
@@ -200,6 +204,13 @@
           Shipped
         </label>
       </div>
+      <button *ngIf="hasTradeItem(order) && !order.tradeReceived"
+        class="btn-mark-trade-received"
+        [disabled]="markingTradeReceivedId === order.id"
+        (click)="markTradeReceived(order)"
+        title="Confirm that the trade-in comic has been received — required before fulfillment">
+        {{ markingTradeReceivedId === order.id ? 'Marking…' : 'Mark Trade Received' }}
+      </button>
       <button
         class="btn-refresh-discounts"
         [disabled]="refreshingDiscountsId === order.id"

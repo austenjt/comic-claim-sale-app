@@ -54,6 +54,13 @@ export class ComicService {
     return this.http.get<PagedResponse<Comic>>(this.comicsUrl, { params });
   }
 
+  /** GET all WANTED comics (Trade Board). */
+  getWantedComics(): Observable<Comic[]> {
+    return this.http.get<Comic[]>(`${this.baseServiceUrl}/wanted`).pipe(
+      catchError(this.handleError<Comic[]>([]))
+    );
+  }
+
   getSeriesList(): Observable<string[]> {
     return this.http.get<string[]>(`${this.comicsUrl}/series`).pipe(
       catchError(this.handleError<string[]>([]))

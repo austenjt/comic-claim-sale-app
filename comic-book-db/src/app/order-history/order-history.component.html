@@ -1,5 +1,13 @@
 <div class="orders-container">
-  <h2>My Orders</h2>
+
+  <ng-container *ngIf="!auth.isAdmin()">
+    <app-cart></app-cart>
+    <div class="history-divider">
+      <span class="history-divider-label">Order History</span>
+    </div>
+  </ng-container>
+
+  <h2 *ngIf="auth.isAdmin()">My Orders</h2>
 
   <div *ngIf="loading">Loading…</div>
   <div *ngIf="error" class="error-message">{{ error }}</div>

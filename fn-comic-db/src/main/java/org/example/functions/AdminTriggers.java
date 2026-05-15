@@ -89,10 +89,37 @@ public class AdminTriggers {
             return cors(request.createResponseBuilder(HttpStatus.OK))
                 .header("Content-Type", "application/json")
                 .body(OBJECT_MAPPER.writeValueAsString(cart)).build();
+        } catch (IllegalStateException e) {
+            return cors(request.createResponseBuilder(HttpStatus.BAD_REQUEST)).body(e.getMessage()).build();
         } catch (IllegalArgumentException e) {
             return cors(request.createResponseBuilder(HttpStatus.NOT_FOUND)).body(e.getMessage()).build();
         } catch (Exception e) {
             log.error("fulfillOrder error", e);
+            return serverError(request, e);
+        }
+    }
+
+    // ─── POST /api/orders/{cartId}/receive-trade ─────────────────────────────
+
+    @FunctionName("receiveTradeItem")
+    public HttpResponseMessage receiveTradeItem(
+        @HttpTrigger(name = "receiveTradeItem", route = "orders/{cartId}/receive-trade",
+            methods = {HttpMethod.POST}, authLevel = AuthorizationLevel.ANONYMOUS)
+        HttpRequestMessage<Optional<String>> request,
+        @BindingName("cartId") String cartId)
+    {
+        if (AuthHelper.requireAdmin(request) == null) return unauthorized(request);
+        try {
+            Cart cart = CartService.getServiceInstance().markTradeReceived(cartId);
+            return cors(request.createResponseBuilder(HttpStatus.OK))
+                .header("Content-Type", "application/json")
+                .body(OBJECT_MAPPER.writeValueAsString(cart)).build();
+        } catch (IllegalStateException e) {
+            return cors(request.createResponseBuilder(HttpStatus.BAD_REQUEST)).body(e.getMessage()).build();
+        } catch (IllegalArgumentException e) {
+            return cors(request.createResponseBuilder(HttpStatus.NOT_FOUND)).body(e.getMessage()).build();
+        } catch (Exception e) {
+            log.error("receiveTradeItem error", e);
             return serverError(request, e);
         }
     }

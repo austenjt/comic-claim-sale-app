@@ -25,6 +25,8 @@ export interface CartItem {
   isSetContainer?: boolean;
   /** True when the source comic is graded (CGC/CBCS). Snapshotted at cart-add time. */
   isGraded?: boolean;
+  /** True when this item is a trade-in (negative credit, user sends comic to admin). */
+  isTrade?: boolean;
 }
 
 export interface Cart {
@@ -52,4 +54,5 @@ export interface Cart {
   invoiceNumber?: string | null;
   shippingEstimate?: ShippingEstimate | null;
   shippingAddress?: ShippingAddress | null;
+  tradeReceived?: boolean | null;
 }

@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { Title } from '@angular/platform-browser';
 import { CartService } from '../cart.service';
+import { AuthService } from '../auth.service';
 import { ArchivedOrder, ArchivedOrderItem } from '../archived-order';
 
 interface OrderHistoryRow {
@@ -22,9 +24,14 @@ export class OrderHistoryComponent implements OnInit {
   loading = false;
   error = '';
 
-  constructor(private cartService: CartService) {}
+  constructor(
+    private cartService: CartService,
+    public auth: AuthService,
+    private title: Title
+  ) {}
 
   ngOnInit() {
+    this.title.setTitle('My Orders — Lightning Comics PDX');
     this.loading = true;
     this.cartService.getOrderHistory().subscribe({
       next: orders => { this.orders = orders; this.loading = false; },

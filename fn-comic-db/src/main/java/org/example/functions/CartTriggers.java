@@ -145,6 +145,35 @@ public class CartTriggers {
         }
     }
 
+    // ─── POST /api/cart/trade ─────────────────────────────────────────────────
+
+    @FunctionName("addTradeItem")
+    public HttpResponseMessage addTradeItem(
+        @HttpTrigger(name = "addTradeItem", route = "cart/trade",
+            methods = {HttpMethod.POST}, authLevel = AuthorizationLevel.ANONYMOUS)
+        HttpRequestMessage<Optional<String>> request)
+    {
+        User user = AuthHelper.requireApproved(request);
+        if (user == null) return unauthorized(request);
+        try {
+            JsonNode body = OBJECT_MAPPER.readTree(request.getBody().orElse("{}"));
+            String comicId = HttpHelper.getString(body, "comicId");
+            if (comicId == null) return badRequest(request, "comicId is required");
+
+            Cart cart = CartService.getServiceInstance().addTradeItem(user, comicId);
+            return cors(request.createResponseBuilder(HttpStatus.OK))
+                .header("Content-Type", "application/json")
+                .body(OBJECT_MAPPER.writeValueAsString(cart)).build();
+        } catch (IllegalStateException e) {
+            return cors(request.createResponseBuilder(HttpStatus.CONFLICT)).body(e.getMessage()).build();
+        } catch (IllegalArgumentException e) {
+            return badRequest(request, e.getMessage());
+        } catch (Exception e) {
+            log.error("addTradeItem error", e);
+            return serverError(request, e);
+        }
+    }
+
     // ─── POST /api/cart/submit ────────────────────────────────────────────────
 
     @FunctionName("submitOrder")

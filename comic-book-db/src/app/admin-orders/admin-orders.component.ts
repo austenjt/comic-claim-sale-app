@@ -661,8 +661,13 @@ export class AdminOrdersComponent implements OnInit {
     return labels[status] ?? status;
   }
 
+  hasTradeItem(order: Cart): boolean {
+    return order.items.some(i => i.isTrade);
+  }
+
   canFulfill(order: Cart): boolean {
     if (order.status !== 'FINALIZING' && order.status !== 'FINALIZED') return false;
+    if (this.hasTradeItem(order) && !order.tradeReceived) return false;
     return order.paymentStatus === 'PAID' && order.shipped === true;
   }
 
@@ -671,8 +676,28 @@ export class AdminOrdersComponent implements OnInit {
     if (order.status !== 'FINALIZING' && order.status !== 'FINALIZED') {
       return 'Order must be submitted before fulfillment';
     }
+    if (this.hasTradeItem(order) && !order.tradeReceived) {
+      return 'Mark the trade as received before fulfillment';
+    }
     if (order.paymentStatus !== 'PAID') return 'Mark the order as Paid to enable fulfillment';
     if (!order.shipped) return 'Mark the order as Shipped to enable fulfillment';
     return '';
+  }
+
+  markingTradeReceivedId: string | null = null;
+
+  markTradeReceived(order: Cart) {
+    this.markingTradeReceivedId = order.id;
+    this.cartService.markTradeReceived(order.id).subscribe({
+      next: updated => {
+        const idx = this.orders.findIndex(o => o.id === order.id);
+        if (idx >= 0) this.orders[idx] = updated;
+        this.markingTradeReceivedId = null;
+      },
+      error: () => {
+        this.error = 'Failed to mark trade as received.';
+        this.markingTradeReceivedId = null;
+      }
+    });
   }
 }

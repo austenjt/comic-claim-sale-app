@@ -219,6 +219,41 @@ tfoot td { font-weight: bold; background: #adc178; }
 }
 .btn-unsubmit:hover { background: rgba(147, 197, 253, 0.14); }
 
+.trade-order-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  background: #1b5e20;
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  border-radius: 4px;
+  vertical-align: middle;
+  line-height: 1.5;
+}
+
+.trade-order-badge--received {
+  background: #2e7d32;
+  opacity: 0.75;
+}
+
+.btn-mark-trade-received {
+  padding: var(--space-2) var(--space-6);
+  background: #2e7d32;
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-14);
+  cursor: pointer;
+  font-weight: var(--fw-semibold);
+  transition: background-color var(--duration-base) var(--ease-standard);
+}
+
+.btn-mark-trade-received:hover:not(:disabled) { background: #1b5e20; }
+.btn-mark-trade-received:disabled { opacity: 0.55; cursor: default; }
+
 /* Refresh-discounts: same outline style as Unsubmit, in a distinct hue (warm amber) so the
    admin can pick it out. Used to recompute discount math on a submitted order. */
 .btn-refresh-discounts {

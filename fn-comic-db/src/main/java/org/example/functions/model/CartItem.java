@@ -27,6 +27,14 @@ public class CartItem {
     @JsonProperty("isGraded")
     private boolean isGraded;
 
+    /**
+     * True when this item is a trade-in credit — the user is offering a WANTED comic to the
+     * admin in exchange for store credit. The {@code price} is negative (credit value).
+     * Excluded from discount calculations and from the soldTo stamp on fulfillment.
+     */
+    @JsonProperty("isTrade")
+    private boolean isTrade;
+
     public CartItem() {}
 
     public String getComicId() { return comicId; }
@@ -55,4 +63,7 @@ public class CartItem {
 
     public boolean isGraded() { return isGraded; }
     public void setGraded(boolean graded) { isGraded = graded; }
+
+    public boolean isTrade() { return isTrade; }
+    public void setTrade(boolean trade) { isTrade = trade; }
 }

@@ -53,8 +53,7 @@ public class ComicTriggers {
                 int pageNumber = Integer.parseInt(pageNumberStr);
                 int pageSize = EnvHelper.getDashboardPageSize();
                 String sort = request.getQueryParameters().getOrDefault("sort", "oldest-first");
-                boolean onlyPriced = "true".equalsIgnoreCase(request.getQueryParameters().get("onlyPriced"));
-                PagedResponse<ComicBook> paged = comicService.getTopLevelComicsPaged(pageNumber, pageSize, sort, onlyPriced, admin);
+                PagedResponse<ComicBook> paged = comicService.getTopLevelComicsPaged(pageNumber, pageSize, sort, admin);
                 String body = admin
                     ? OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(paged)
                     : OBJECT_MAPPER.writerWithView(Views.Public.class).writeValueAsString(paged);
@@ -477,6 +476,34 @@ public class ComicTriggers {
             return csvToJsonConverter.loadGoCollectCsvData(request, collectionGroup, setPriceToPricePaid, markForSale);
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Data load failed to return results.", e);
+        }
+    }
+
+    // ─── GET /api/wanted ─────────────────────────────────────────────────────
+
+    @FunctionName("getWantedComics")
+    public HttpResponseMessage getWantedComics(
+        @HttpTrigger(
+            name = "getWantedComics",
+            route = "wanted",
+            methods = {HttpMethod.GET},
+            authLevel = AuthorizationLevel.ANONYMOUS)
+        HttpRequestMessage<Optional<String>> request)
+    {
+        log.info("Processing getWantedComics function.");
+        boolean admin = AuthHelper.isAdminRequest(request);
+        try {
+            List<ComicBook> wanted = ComicService.getServiceInstance().getWantedComics();
+            String body = admin
+                ? OBJECT_MAPPER.writeValueAsString(wanted)
+                : OBJECT_MAPPER.writerWithView(Views.Public.class).writeValueAsString(wanted);
+            return HttpHelper.cors(request.createResponseBuilder(HttpStatus.OK))
+                .header("Content-Type", "application/json")
+                .body(body)
+                .build();
+        } catch (JsonProcessingException e) {
+            log.error("getWantedComics serialization error", e);
+            return HttpHelper.getErrorResponse(request, "Failed to serialize wanted comics.");
         }
     }
 

@@ -1,5 +1,28 @@
 .orders-container { padding: 24px; max-width: 900px; margin: 0 auto; }
 
+.history-divider {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 2rem 0 1.5rem;
+}
+
+.history-divider::before,
+.history-divider::after {
+  content: '';
+  flex: 1;
+  border-top: 1px solid #ddd;
+}
+
+.history-divider-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #888;
+  white-space: nowrap;
+}
+
 /* Order line "Set" identity tag — solid warm-accent. */
 .set-tag {
   display: inline-flex;

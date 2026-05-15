@@ -43,6 +43,7 @@ import { SalesModalComponent } from './sales-modal/sales-modal.component';
 import { SquarePaymentModalComponent } from './square-payment-modal/square-payment-modal.component';
 import { ImageCaptureModalComponent } from './image-capture-modal/image-capture-modal.component';
 import { ShippingModalComponent } from './shipping-modal/shipping-modal.component';
+import { TradeBoardComponent } from './trade-board/trade-board.component';
 
 @NgModule({
     declarations: [
@@ -70,6 +71,7 @@ import { ShippingModalComponent } from './shipping-modal/shipping-modal.componen
         SquarePaymentModalComponent,
         ImageCaptureModalComponent,
         ShippingModalComponent,
+        TradeBoardComponent,
     ],
     bootstrap: [AppComponent],
     imports: [

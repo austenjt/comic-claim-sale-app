@@ -86,6 +86,7 @@ export interface Comic {
   dateSold: string | null;
   soldTo: string | null;
   isForSale: boolean | null;
+  listingType?: 'NOT_LISTED' | 'FOR_SALE' | 'WANTED' | null;
   personalEstimate: number | null;
   targetPrice: number | null;
   collectionGroup: number | null;
