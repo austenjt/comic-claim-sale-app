@@ -1,10 +1,8 @@
 <div class="trade-board-container">
   <h2>Trade Board</h2>
   <p class="trade-intro">
-    These are comics we're looking to add to our collection. If you own one, offer it as a
-    trade-in credit toward your order. The credit amount depends on the condition of your copy —
-    select your grade when you offer the trade. After submitting, ship the comic to us and your
-    order will be fulfilled once we receive it.
+    Comics we're looking to add to our collection. Own one? Offer it as trade-in credit toward your order.
+    <a routerLink="/documentation" fragment="trade-in" class="trade-learn-more">Learn how it works</a>
   </p>
 
   <div *ngIf="loading" class="trade-loading">Loading…</div>
@@ -21,29 +19,35 @@
   <div class="wanted-grid" *ngIf="wantedComics.length > 0">
     <div class="wanted-card" *ngFor="let comic of wantedComics">
       <a [routerLink]="['/detail', comic.id]" class="wanted-image-link">
-        <img [src]="imageUrl(comic)" [alt]="comicLabel(comic)" class="wanted-image">
-      </a>
-      <div class="wanted-info">
-        <a [routerLink]="['/detail', comic.id]" class="wanted-title">{{ comicLabel(comic) }}</a>
-
-        <div *ngIf="comic.nmEstimatedValue" class="wanted-nm-value">
-          NM Value: {{ comic.nmEstimatedValue | currency }}
+        <div class="image-container">
+          <img [src]="imageUrl(comic)" [alt]="comicLabel(comic)" loading="lazy">
         </div>
-        <div class="wanted-credit-note">Credit varies by condition</div>
-
-        <div *ngIf="comic.publicNotes" class="wanted-notes">{{ comic.publicNotes }}</div>
-
-        <ng-container *ngIf="canOffer()">
-          <button class="btn-offer-trade"
-                  [class.btn-offer-trade--done]="isAdded(comic)"
-                  [disabled]="isAdded(comic) || !comic.nmEstimatedValue"
-                  [title]="!comic.nmEstimatedValue ? 'Trade value not yet available for this comic' : ''"
-                  (click)="openModal(comic)">
-            <ng-container *ngIf="isAdded(comic)">Added to Cart ✓</ng-container>
-            <ng-container *ngIf="!isAdded(comic) && !comic.nmEstimatedValue">Value Pending</ng-container>
-            <ng-container *ngIf="!isAdded(comic) && comic.nmEstimatedValue">Offer Trade</ng-container>
-          </button>
-        </ng-container>
+      </a>
+      <div class="details">
+        <div class="comic-title">
+          <b><a [routerLink]="['/detail', comic.id]" class="comic-title-link">{{ comicLabel(comic) }}</a></b>
+        </div>
+        <div class="meta-grid">
+          <div *ngIf="comic.nmEstimatedValue" class="comic-price">NM Value: <b>{{ comic.nmEstimatedValue | currency }}</b></div>
+          <div class="wanted-credit-note">Credit varies by condition</div>
+          <div *ngIf="comic.publicNotes" class="wanted-notes">{{ comic.publicNotes }}</div>
+        </div>
+      </div>
+      <div class="card-footer">
+        <div class="footer-badges"></div>
+        <div class="footer-actions">
+          <ng-container *ngIf="canOffer()">
+            <button class="btn-offer-trade"
+                    [class.btn-offer-trade--done]="isAdded(comic)"
+                    [disabled]="isAdded(comic) || !comic.nmEstimatedValue"
+                    [title]="!comic.nmEstimatedValue ? 'Trade value not yet available for this comic' : ''"
+                    (click)="openModal(comic)">
+              <ng-container *ngIf="isAdded(comic)">Added to Cart ✓</ng-container>
+              <ng-container *ngIf="!isAdded(comic) && !comic.nmEstimatedValue">Value Pending</ng-container>
+              <ng-container *ngIf="!isAdded(comic) && comic.nmEstimatedValue">Offer Trade</ng-container>
+            </button>
+          </ng-container>
+        </div>
       </div>
     </div>
   </div>

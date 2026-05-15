@@ -11,7 +11,7 @@
   <!-- ── Buyer Sections ───────────────────────────────────────────────── -->
   <div class="hiw-section-label">For Buyers</div>
 
-  <section class="hiw-section">
+  <section class="hiw-section" id="getting-access">
     <h2>Getting Access</h2>
     <p>
       I am a private seller, selling from my personal collection, and so you'll need an approved account before you can claim anything.
@@ -35,7 +35,7 @@
     </ol>
   </section>
 
-  <section class="hiw-section">
+  <section class="hiw-section" id="dashboard">
     <h2>The Dashboard</h2>
     <p>
       The <a routerLink="/dashboard">Dashboard</a> is the main catalog — every comic currently
@@ -66,7 +66,7 @@
     </p>
   </section>
 
-  <section class="hiw-section">
+  <section class="hiw-section" id="sets">
     <h2>Sets</h2>
     <p>
       A <strong>Set</strong> is a bundle of comics sold together as a single unit — ideal for runs,
@@ -88,7 +88,7 @@
     </p>
   </section>
 
-  <section class="hiw-section">
+  <section class="hiw-section" id="comic-detail">
     <h2>Comic Detail Pages</h2>
     <p>
       Click any comic card on the dashboard to open its detail page. Here you'll find:
@@ -107,7 +107,7 @@
     </p>
   </section>
 
-  <section class="hiw-section">
+  <section class="hiw-section" id="your-cart">
     <h2>Your Cart</h2>
     <p>
       Your cart lives at <a routerLink="/orders">Orders</a> in the navigation. Every book you
@@ -150,7 +150,7 @@
     </p>
   </section>
 
-  <section class="hiw-section">
+  <section class="hiw-section" id="orders">
     <h2>Orders</h2>
     <p>
       The <a routerLink="/orders">Orders page</a> shows your complete order history — every fulfilled
@@ -159,7 +159,34 @@
     </p>
   </section>
 
-  <section class="hiw-section">
+  <section class="hiw-section" id="trade-in">
+    <h2>Trade-In Program</h2>
+    <p>
+      The <a routerLink="/trade">Trade Board</a> lists comics we are actively looking to add to our
+      collection. If you own one, you may offer it as trade-in credit toward your order. The credit
+      amount is based on the condition of your copy — select your grade when submitting the offer.
+    </p>
+    <ol>
+      <li>
+        <strong>Submit your cart</strong> — your trade offer will be reviewed and must be approved
+        by our team before proceeding.
+      </li>
+      <li>
+        <strong>Receive shipping instructions</strong> — once approved, you will receive an email
+        with our mailing address and instructions for sending your comic.
+      </li>
+      <li>
+        <strong>Pay your balance</strong> — after we receive and verify your comic, the Pay button
+        on your submitted cart will be activated so you can pay any remaining balance.
+      </li>
+      <li>
+        <strong>We ship your order</strong> — once payment is confirmed, your order will be
+        fulfilled and shipped to you.
+      </li>
+    </ol>
+  </section>
+
+  <section class="hiw-section" id="live-notifications">
     <h2>Live Notifications</h2>
     <p>
       The app polls for activity every few seconds and records events in the <strong>Logs panel</strong>
@@ -176,7 +203,7 @@
     </p>
   </section>
 
-  <section class="hiw-section">
+  <section class="hiw-section" id="your-profile">
     <h2>Your Profile</h2>
     <p>
       Your <a routerLink="/profile">Profile page</a> lets you update your contact details at any
@@ -187,7 +214,7 @@
     </p>
   </section>
 
-  <section class="hiw-section">
+  <section class="hiw-section" id="payment">
     <h2>Payment</h2>
     <p>
       Two payment options are available after you save your shipping address:
@@ -211,7 +238,7 @@
     </p>
   </section>
 
-  <section class="hiw-section">
+  <section class="hiw-section" id="contact">
     <h2>Contact</h2>
     <p>
       The <a routerLink="/contact">Contact page</a> is the best way to reach the seller outside of
@@ -223,7 +250,7 @@
   <!-- ── Admin Sections ────────────────────────────────────────────────── -->
   <div class="hiw-admin-divider"><span>Admin Reference</span></div>
 
-  <section class="hiw-section hiw-admin">
+  <section class="hiw-section hiw-admin" id="admin-dashboard">
     <h2>Dashboard (Admin View)</h2>
     <p>
       When logged in as Admin, the dashboard shows additional controls on each comic card when
@@ -239,7 +266,7 @@
     </ul>
   </section>
 
-  <section class="hiw-section hiw-admin">
+  <section class="hiw-section hiw-admin" id="admin-orders">
     <h2>Manage Orders</h2>
     <p>
       The <strong>Manage Orders</strong> screen is split into three sections: <em>Active Orders</em>
@@ -297,7 +324,7 @@
     <p>Order Archive records are never touched by a database reset — the full sales history is always preserved.</p>
   </section>
 
-  <section class="hiw-section hiw-admin">
+  <section class="hiw-section hiw-admin" id="admin-sales">
     <h2>Sales &amp; Discounts</h2>
     <p>
       The <strong>Sales</strong> page lets you configure discount rules automatically applied when
@@ -348,7 +375,7 @@
     <p>The Order Archive is never touched by a reset.</p>
   </section>
 
-  <section class="hiw-section hiw-admin">
+  <section class="hiw-section hiw-admin" id="admin-users">
     <h2>User Admin</h2>
     <p>
       The <strong>User Admin</strong> screen shows pending account requests at the top and approved
@@ -375,7 +402,7 @@
     </p>
   </section>
 
-  <section class="hiw-section hiw-admin">
+  <section class="hiw-section hiw-admin" id="admin-comics">
     <h2>Comics Management</h2>
     <p>
       The <strong>Comics Management</strong> screen is a full-featured data grid showing every
@@ -424,7 +451,7 @@
     </ul>
   </section>
 
-  <section class="hiw-section hiw-admin">
+  <section class="hiw-section hiw-admin" id="admin-comic-detail">
     <h2>Comic Detail Page (Admin View)</h2>
     <p>
       Admin detail pages include image management controls below the cover image.
@@ -448,7 +475,7 @@
   <!-- ── Platform Reference ───────────────────────────────────────────── -->
   <div class="hiw-section-label">Platform Reference</div>
 
-  <section class="hiw-section">
+  <section class="hiw-section" id="deploy">
     <h2>Deploy This Platform Yourself</h2>
     <p>
       This application is fully reproducible. If you're interested in running your own comic-selling
