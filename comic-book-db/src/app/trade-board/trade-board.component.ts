@@ -51,6 +51,7 @@ export class TradeBoardComponent implements OnInit {
   loading = false;
   error = '';
   addedTradeIds = new Set<string>();
+  claimedMap: Record<string, string> = {};
 
   // Grade selector modal
   modalComic: Comic | null = null;
@@ -75,6 +76,7 @@ export class TradeBoardComponent implements OnInit {
       next: comics => { this.wantedComics = comics; this.loading = false; },
       error: () => { this.error = 'Failed to load wanted comics.'; this.loading = false; }
     });
+    this.cartService.getClaimedMap().subscribe({ next: m => this.claimedMap = m, error: () => {} });
   }
 
   imageUrl(comic: Comic): string {
@@ -102,6 +104,10 @@ export class TradeBoardComponent implements OnInit {
 
   isAdded(comic: Comic): boolean {
     return this.addedTradeIds.has(this.comicKey(comic));
+  }
+
+  isOfferedByOther(comic: Comic): boolean {
+    return !this.isAdded(comic) && !!this.claimedMap[this.comicKey(comic)];
   }
 
   // ── Grade modal ────────────────────────────────────────────────────────────
