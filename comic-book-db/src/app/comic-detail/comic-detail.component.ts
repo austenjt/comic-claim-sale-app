@@ -51,6 +51,8 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
   saving = false;
   saveError = '';
   saveDone = false;
+  selectedTradeGrade: number | null = null;
+  tradeError = '';
   enums: ComicEnums = { coverVariants: [], gradingCompanies: [], grades: [], pageQualities: [] };
 
   constructor(
@@ -116,6 +118,8 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
     this.saving = false;
     this.saveError = '';
     this.saveDone = false;
+    this.selectedTradeGrade = null;
+    this.tradeError = '';
     this.imageUploading = false;
     this.imageUploadErrorSummary = '';
     this.imageUploadErrorDetail = '';
@@ -143,6 +147,28 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
            (this.myCart?.status === 'OPEN' || !this.myCart);
   }
 
+  private readonly GRADE_MULTIPLIERS: Record<number, number> = {
+    10.0: 3.50, 9.9: 2.40, 9.8: 1.25, 9.6: 1.10, 9.4: 1.00,
+     9.2: 0.75, 9.0: 0.55, 8.5: 0.40, 8.0: 0.22, 7.5: 0.14,
+     7.0: 0.13, 6.5: 0.12, 6.0: 0.10, 5.5: 0.08, 5.0: 0.06,
+     4.5: 0.05, 4.0: 0.04, 3.5: 0.04, 3.0: 0.02, 2.5: 0.02,
+     2.0: 0.00, 1.8: 0.00, 1.5: 0.00, 1.0: 0.00, 0.5: 0.00,
+  };
+
+  get previewTradeCredit(): number | null {
+    if (!this.selectedTradeGrade || !this.comic?.nmEstimatedValue) return null;
+    const multiplier = this.GRADE_MULTIPLIERS[this.selectedTradeGrade];
+    if (multiplier === undefined) return null;
+    return Math.round(this.comic.nmEstimatedValue * multiplier * 100) / 100;
+  }
+
+  canTrade(comicId: number): boolean {
+    return !this.claimedDate(comicId) &&
+           !this.comic?.soldTo &&
+           !!this.comic?.nmEstimatedValue &&
+           (this.myCart?.status === 'OPEN' || !this.myCart);
+  }
+
   claim(): void {
     if (!this.comic) return;
     this.claimError = '';
@@ -155,6 +181,23 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
       },
       error: err => {
         this.claimError = err?.error || 'Failed to claim comic.';
+        this.actionLoading = false;
+      }
+    });
+  }
+
+  tradeIn(): void {
+    if (!this.comic || !this.selectedTradeGrade) return;
+    this.tradeError = '';
+    this.actionLoading = true;
+    this.cartService.addTradeItem(String(this.comic.id), this.selectedTradeGrade).subscribe({
+      next: cart => {
+        this.myCart = cart;
+        this.claimedMap[String(this.comic!.id)] = new Date().toISOString();
+        this.actionLoading = false;
+      },
+      error: err => {
+        this.tradeError = err?.error || 'Failed to add trade item.';
         this.actionLoading = false;
       }
     });
@@ -218,6 +261,9 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
     }
     if (!this.editComic.grandComicDBInfo) {
       this.editComic.grandComicDBInfo = { gcdbIssueId: null, gcdbSeriesId: null, issueUrl: null, seriesUrl: null };
+    }
+    if (!this.editComic.trade) {
+      this.editComic.trade = { offeredGrade: null, calculatedPrice: null, offerAccepted: null, tradeReceived: null, tradeNotes: null, offeredBy: null, offeredAt: null };
     }
     this.editWritersStr = (this.editComic.writer ?? []).join(', ');
     this.editArtistsStr = (this.editComic.artist ?? []).join(', ');

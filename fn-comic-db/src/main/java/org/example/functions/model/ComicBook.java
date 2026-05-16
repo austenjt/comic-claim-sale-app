@@ -81,6 +81,9 @@ public class ComicBook {
     @JsonSerialize(using = MoneySerializer.class)
     private BigDecimal nmEstimatedValue;
 
+    // Trade offer details — populated when listingType = WANTED and a user has made an offer
+    private Trade trade;
+
     // Valuation
     @JsonSerialize(using = MoneySerializer.class)
     private BigDecimal personalEstimate;

@@ -15,9 +15,6 @@
       <button type="button" class="btn-nav-next" [disabled]="!nextItem" (click)="nextItem && navigateTo(nextItem)">Next &#8594;</button>
     </div>
     <div class="nav-right">
-      <button class="btn-share" (click)="copyShareLink()">
-        {{ linkCopied ? '✓ Link Copied!' : '&#128279; Share' }}
-      </button>
       <ng-container *ngIf="auth.isAdmin()">
         <button class="btn-save" [class.btn-save-done]="saveDone" (click)="saveComic()" [disabled]="saving"
                 [attr.aria-describedby]="saveError ? 'comic-save-error' : null">
@@ -170,7 +167,7 @@
           <input *ngIf="auth.isAdmin()" class="detail-edit-input" type="text" [(ngModel)]="editComic!.keyIssue">
         </div>
 
-        <div class="detail-item" *ngIf="auth.isAdmin() || comic.salePrice">
+        <div class="detail-item" *ngIf="comic.listingType !== 'WANTED' && (auth.isAdmin() || comic.salePrice)">
           <span class="detail-label">Sale Price</span>
           <span *ngIf="!auth.isAdmin()" class="detail-value">{{ comic.salePrice | currency:'USD':'symbol':'1.2-2' }}</span>
           <input *ngIf="auth.isAdmin()" class="detail-edit-input" type="text" inputmode="decimal" [(ngModel)]="salePriceStr" (blur)="onSalePriceBlur()">
@@ -178,6 +175,14 @@
         <div class="detail-item" *ngIf="comic.ebayListingUrl">
           <span class="detail-label">eBay Listing</span>
           <span class="detail-value"><a [href]="comic.ebayListingUrl" target="_blank" rel="noopener noreferrer">View on eBay</a></span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Share Link</span>
+          <span class="detail-value">
+            <button class="btn-share" (click)="copyShareLink()">
+              {{ linkCopied ? '✓ Link Copied!' : '&#128279; Share' }}
+            </button>
+          </span>
         </div>
       </div>
 
@@ -478,11 +483,6 @@
             </label>
           </div>
         </div>
-        <div class="detail-item" *ngIf="editComic!.listingType === 'WANTED'">
-          <span class="detail-label">NM Estimated Value</span>
-          <input class="detail-edit-input" type="number" step="0.01" [(ngModel)]="editComic!.nmEstimatedValue"
-                 placeholder="NM reference price for trade calc">
-        </div>
         <div class="detail-item">
           <span class="detail-label">Sale Price</span>
           <input class="detail-edit-input" type="text" inputmode="decimal" [(ngModel)]="salePriceStr" (blur)="onSalePriceBlur()">
@@ -564,9 +564,63 @@
         </div>
       </div>
 
-      <!-- Claim Status — hidden for set members (claim the whole set from the Set Details page) -->
+      <!-- Trade Info — visible to all users for WANTED comics -->
+      <div class="detail-section" *ngIf="comic.listingType === 'WANTED'">
+        <div class="detail-section-title">Trade Info</div>
+
+        <div class="detail-item" *ngIf="auth.isAdmin() || comic.nmEstimatedValue">
+          <span class="detail-label">NM Value</span>
+          <span *ngIf="!auth.isAdmin()" class="detail-value">{{ comic.nmEstimatedValue | currency:'USD':'symbol':'1.2-2' }}</span>
+          <input *ngIf="auth.isAdmin()" class="detail-edit-input" type="number" step="0.01" [(ngModel)]="editComic!.nmEstimatedValue" placeholder="NM reference price for trade calc">
+        </div>
+
+        <div class="detail-item" *ngIf="auth.isAdmin() || comic.trade?.offeredGrade">
+          <span class="detail-label">Offered Grade</span>
+          <span *ngIf="!auth.isAdmin()" class="detail-value">{{ comic.trade?.offeredGrade | number:'1.1-1' }}</span>
+          <select *ngIf="auth.isAdmin()" class="detail-edit-select" [(ngModel)]="editComic!.trade!.offeredGrade">
+            <option [ngValue]="null">—</option>
+            <option *ngFor="let g of enums.grades" [ngValue]="g.value">{{ g.label }}</option>
+          </select>
+        </div>
+
+        <div class="detail-item" *ngIf="comic.trade?.calculatedPrice">
+          <span class="detail-label">Trade Credit</span>
+          <span class="detail-value">{{ comic.trade?.calculatedPrice | currency:'USD':'symbol':'1.2-2' }}</span>
+        </div>
+
+        <div class="detail-item" *ngIf="auth.isAdmin() || comic.trade?.offerAccepted != null">
+          <span class="detail-label">Offer Accepted</span>
+          <span *ngIf="!auth.isAdmin()" class="detail-value">{{ comic.trade?.offerAccepted ? 'Yes' : 'No' }}</span>
+          <input *ngIf="auth.isAdmin()" class="detail-edit-checkbox" type="checkbox" [(ngModel)]="editComic!.trade!.offerAccepted">
+        </div>
+
+        <div class="detail-item" *ngIf="auth.isAdmin() || comic.trade?.tradeReceived != null">
+          <span class="detail-label">Trade Received</span>
+          <span *ngIf="!auth.isAdmin()" class="detail-value">{{ comic.trade?.tradeReceived ? 'Yes' : 'No' }}</span>
+          <input *ngIf="auth.isAdmin()" class="detail-edit-checkbox" type="checkbox" [(ngModel)]="editComic!.trade!.tradeReceived">
+        </div>
+
+        <div class="detail-item" *ngIf="auth.isAdmin() || comic.trade?.tradeNotes">
+          <span class="detail-label">Notes</span>
+          <span *ngIf="!auth.isAdmin()" class="detail-value">{{ comic.trade?.tradeNotes }}</span>
+          <textarea *ngIf="auth.isAdmin()" class="detail-edit-textarea" [(ngModel)]="editComic!.trade!.tradeNotes"></textarea>
+        </div>
+
+        <div class="detail-item" *ngIf="auth.isAdmin() || comic.trade?.offeredBy">
+          <span class="detail-label">Offered By</span>
+          <span *ngIf="!auth.isAdmin()" class="detail-value">{{ comic.trade?.offeredBy }}</span>
+          <input *ngIf="auth.isAdmin()" class="detail-edit-input" type="text" [(ngModel)]="editComic!.trade!.offeredBy">
+        </div>
+
+        <div class="detail-item" *ngIf="comic.trade?.offeredAt">
+          <span class="detail-label">Offered At</span>
+          <span class="detail-value">{{ comic.trade?.offeredAt | date:'medium' }}</span>
+        </div>
+      </div>
+
+      <!-- Claim/Trade Status — hidden for set members (claim the whole set from the Set Details page) -->
       <div class="detail-section" *ngIf="parentSetId === null">
-        <div class="detail-section-title">Claim Status</div>
+        <div class="detail-section-title">{{ comic.listingType === 'WANTED' ? 'Trade Status' : 'Claim Status' }}</div>
 
         <!-- Sold -->
         <ng-container *ngIf="comic.soldTo">
@@ -611,12 +665,13 @@
 
         <!-- Available -->
         <ng-container *ngIf="!comic.soldTo && !comic.sold && !claimedDate(comic.id) && !isInMyCart(comic.id)">
-          <div class="detail-item">
+          <div class="detail-item" *ngIf="comic.listingType !== 'WANTED'">
             <span class="detail-label">Status</span>
             <span class="detail-value claim-status-available">Available</span>
           </div>
 
-          <div class="detail-item" *ngIf="auth.isApproved() && !auth.isAdmin()">
+          <!-- Claim action for FOR_SALE comics -->
+          <div class="detail-item" *ngIf="auth.isApproved() && !auth.isAdmin() && comic.listingType !== 'WANTED'">
             <span class="detail-label"></span>
             <span class="detail-value">
               <div *ngIf="claimError" class="claim-error">{{ claimError }}</div>
@@ -631,6 +686,36 @@
               </span>
             </span>
           </div>
+
+          <!-- Trade action for WANTED comics -->
+          <ng-container *ngIf="auth.isApproved() && !auth.isAdmin() && comic.listingType === 'WANTED'">
+            <div class="detail-item">
+              <span class="detail-label">Your Grade</span>
+              <span class="detail-value">
+                <select class="detail-edit-select" [(ngModel)]="selectedTradeGrade">
+                  <option [ngValue]="null">Select your copy's grade…</option>
+                  <option *ngFor="let g of enums.grades" [ngValue]="g.value">{{ g.label }}</option>
+                </select>
+              </span>
+            </div>
+            <div class="detail-item" *ngIf="previewTradeCredit !== null">
+              <span class="detail-label">Trade Credit</span>
+              <span class="detail-value">{{ previewTradeCredit | currency:'USD':'symbol':'1.2-2' }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label"></span>
+              <span class="detail-value">
+                <div *ngIf="tradeError" class="claim-error">{{ tradeError }}</div>
+                <button *ngIf="canTrade(comic.id)" class="btn-claim-detail"
+                        (click)="tradeIn()" [disabled]="actionLoading || !selectedTradeGrade">
+                  {{ actionLoading ? 'Adding…' : 'Trade' }}
+                </button>
+                <span *ngIf="!canTrade(comic.id)" class="claim-blocked">
+                  Your cart must be open to add a trade item.
+                </span>
+              </span>
+            </div>
+          </ng-container>
         </ng-container>
 
       </div>
