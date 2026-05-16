@@ -39,7 +39,11 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
   backImageUploadErrorDetail = '';
   backImageUploadErrorExpanded = false;
   captureModalOpen = false;
-  captureModalTarget: 'front' | 'back' | null = null;
+  captureModalTarget: 'front' | 'back' | 'trade-front' | 'trade-back' | null = null;
+  tradeImageUploading = false;
+  tradeImageUploadError = '';
+  tradeBackImageUploading = false;
+  tradeBackImageUploadError = '';
   readonly Math = Math;
   linkCopied = false;
   pendingDelete = false;
@@ -130,6 +134,10 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
     this.backImageUploadErrorExpanded = false;
     this.captureModalOpen = false;
     this.captureModalTarget = null;
+    this.tradeImageUploading = false;
+    this.tradeImageUploadError = '';
+    this.tradeBackImageUploading = false;
+    this.tradeBackImageUploadError = '';
   }
 
   claimedDate(comicId: number): string | null {
@@ -263,7 +271,7 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
       this.editComic.grandComicDBInfo = { gcdbIssueId: null, gcdbSeriesId: null, issueUrl: null, seriesUrl: null };
     }
     if (!this.editComic.trade) {
-      this.editComic.trade = { offeredGrade: null, calculatedPrice: null, offerAccepted: null, tradeReceived: null, tradeNotes: null, offeredBy: null, offeredAt: null };
+      this.editComic.trade = { offeredGrade: null, calculatedPrice: null, offerAccepted: null, tradeReceived: null, tradeNotes: null, offeredBy: null, offeredAt: null, tradeFrontImageId: null, tradeSmallFrontImageId: null, tradeBackImageId: null, tradeSmallBackImageId: null };
     }
     this.editWritersStr = (this.editComic.writer ?? []).join(', ');
     this.editArtistsStr = (this.editComic.artist ?? []).join(', ');
@@ -340,7 +348,7 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
     this.zoomOpen = !this.zoomOpen;
   }
 
-  openCaptureModal(target: 'front' | 'back'): void {
+  openCaptureModal(target: 'front' | 'back' | 'trade-front' | 'trade-back'): void {
     this.captureModalTarget = target;
     this.captureModalOpen = true;
   }
@@ -350,6 +358,10 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
       this.uploadFrontImage(file);
     } else if (this.captureModalTarget === 'back') {
       this.uploadBackImage(file);
+    } else if (this.captureModalTarget === 'trade-front') {
+      this.uploadTradeFrontImage(file);
+    } else if (this.captureModalTarget === 'trade-back') {
+      this.uploadTradeBackImage(file);
     }
     this.captureModalOpen = false;
     this.captureModalTarget = null;
@@ -402,6 +414,48 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
         const sizeMB = (file.size / 1024 / 1024).toFixed(1);
         this.backImageUploadErrorSummary = `Upload failed (${sizeMB} MB).`;
         this.backImageUploadErrorDetail = err?.error || err?.message || 'Image may be too large or an invalid format.';
+      }
+    });
+  }
+
+  private uploadTradeFrontImage(file: File): void {
+    if (!this.comic) return;
+    this.tradeImageUploading = true;
+    this.tradeImageUploadError = '';
+    this.imageService.uploadTradeFrontImage(this.comic.id, file).subscribe({
+      next: (updatedComic: Comic) => {
+        this.tradeImageUploading = false;
+        if (this.comic && updatedComic.trade) {
+          if (!this.comic.trade) this.comic.trade = updatedComic.trade;
+          this.comic.trade.tradeFrontImageId = updatedComic.trade.tradeFrontImageId;
+          this.comic.trade.tradeSmallFrontImageId = updatedComic.trade.tradeSmallFrontImageId;
+        }
+      },
+      error: (err: any) => {
+        this.tradeImageUploading = false;
+        const sizeMB = (file.size / 1024 / 1024).toFixed(1);
+        this.tradeImageUploadError = `Upload failed (${sizeMB} MB). ${err?.error || err?.message || ''}`.trim();
+      }
+    });
+  }
+
+  private uploadTradeBackImage(file: File): void {
+    if (!this.comic) return;
+    this.tradeBackImageUploading = true;
+    this.tradeBackImageUploadError = '';
+    this.imageService.uploadTradeBackImage(this.comic.id, file).subscribe({
+      next: (updatedComic: Comic) => {
+        this.tradeBackImageUploading = false;
+        if (this.comic && updatedComic.trade) {
+          if (!this.comic.trade) this.comic.trade = updatedComic.trade;
+          this.comic.trade.tradeBackImageId = updatedComic.trade.tradeBackImageId;
+          this.comic.trade.tradeSmallBackImageId = updatedComic.trade.tradeSmallBackImageId;
+        }
+      },
+      error: (err: any) => {
+        this.tradeBackImageUploading = false;
+        const sizeMB = (file.size / 1024 / 1024).toFixed(1);
+        this.tradeBackImageUploadError = `Upload failed (${sizeMB} MB). ${err?.error || err?.message || ''}`.trim();
       }
     });
   }

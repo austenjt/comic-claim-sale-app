@@ -62,6 +62,10 @@ export interface TradeInfo {
   tradeNotes: string | null;
   offeredBy: string | null;
   offeredAt: string | null;
+  tradeFrontImageId: string | null;
+  tradeSmallFrontImageId: string | null;
+  tradeBackImageId: string | null;
+  tradeSmallBackImageId: string | null;
 }
 
 export interface GrandComicDBInfo {

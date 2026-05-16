@@ -38,6 +38,21 @@
              alt="Comic Image" loading="lazy"
              class="zoomable" (click)="toggleZoom()">
 
+        <div *ngIf="auth.isApproved() && !auth.isAdmin() && comic.listingType === 'WANTED' && isInMyCart(comic.id)" class="img-update-bar">
+          <ng-container *ngIf="activeImage === 'front'">
+            <button class="img-update-btn" (click)="openCaptureModal('trade-front')" [disabled]="tradeImageUploading">
+              {{ tradeImageUploading ? 'Uploading...' : 'Upload Your Copy - Front' }}
+            </button>
+            <div *ngIf="tradeImageUploadError" class="img-upload-error">{{ tradeImageUploadError }}</div>
+          </ng-container>
+          <ng-container *ngIf="activeImage === 'back'">
+            <button class="img-update-btn" (click)="openCaptureModal('trade-back')" [disabled]="tradeBackImageUploading">
+              {{ tradeBackImageUploading ? 'Uploading...' : 'Upload Your Copy - Back' }}
+            </button>
+            <div *ngIf="tradeBackImageUploadError" class="img-upload-error">{{ tradeBackImageUploadError }}</div>
+          </ng-container>
+        </div>
+
         <div *ngIf="auth.isAdmin()" class="img-update-bar">
           <ng-container *ngIf="activeImage === 'front'">
             <button class="img-update-btn" (click)="openCaptureModal('front')" [disabled]="imageUploading">

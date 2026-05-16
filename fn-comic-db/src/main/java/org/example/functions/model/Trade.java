@@ -28,4 +28,12 @@ public class Trade {
     private String offeredBy;
     /** ISO-8601 timestamp of when the offer was submitted. */
     private String offeredAt;
+    /** Large front image of the user's trade-in copy. */
+    private String tradeFrontImageId;
+    /** Thumbnail front image of the user's trade-in copy. */
+    private String tradeSmallFrontImageId;
+    /** Large back image of the user's trade-in copy. */
+    private String tradeBackImageId;
+    /** Thumbnail back image of the user's trade-in copy. */
+    private String tradeSmallBackImageId;
 }
