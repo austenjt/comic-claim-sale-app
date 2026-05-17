@@ -1,6 +1,7 @@
 package org.example.functions.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -22,6 +23,7 @@ public class ShippingEstimate {
     private double estimatedCost;
     /** Human-readable note shown to the user. */
     private String notes;
-    /** Always false — reserved for future free-shipping promotions. */
+    /** True when a free-shipping discount rule has waived shipping for this cart. */
+    @JsonProperty("isFree")
     private boolean isFree;
 }

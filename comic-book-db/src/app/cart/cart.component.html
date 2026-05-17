@@ -169,7 +169,19 @@
           <td></td>
           <td *ngIf="canRemove()"></td>
         </tr>
-        <tr *ngIf="shippingAmount > 0">
+        <tr *ngIf="cart.freeShippingApplied">
+          <td>Shipping</td>
+          <td class="shipping-free">FREE</td>
+          <td></td>
+          <td *ngIf="canRemove()"></td>
+        </tr>
+        <tr *ngIf="!cart.freeShippingApplied && cart.shippingEstimate?.isFree">
+          <td>Shipping <span class="shipping-note">(estimate)</span></td>
+          <td class="shipping-free">FREE</td>
+          <td></td>
+          <td *ngIf="canRemove()"></td>
+        </tr>
+        <tr *ngIf="shippingAmount > 0 && !cart.freeShippingApplied && !cart.shippingEstimate?.isFree">
           <td>Shipping</td>
           <td class="shipping-cost">
             {{ shippingAmount | currency }}

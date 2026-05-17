@@ -31,7 +31,7 @@
     </div>
 
     <div class="form-row" *ngIf="needsXBooks()">
-      <label>{{ formType === 'BUY_X_GET_ONE_FREE' ? 'Buy X books (get 1 free)' : 'Books per group (X)' }}</label>
+      <label>{{ formType === 'FREE_SHIPPING_OVER_X_BOOKS' ? 'Minimum books for free shipping' : formType === 'BUY_X_GET_ONE_FREE' ? 'Buy X books (get 1 free)' : 'Books per group (X)' }}</label>
       <input type="number" [(ngModel)]="formXBooks" min="1" step="1" />
     </div>
 
@@ -40,13 +40,13 @@
       <input type="checkbox" id="formActive" [(ngModel)]="formActive" name="formActive" />
     </div>
 
-    <div class="form-row">
+    <div class="form-row" *ngIf="formType !== 'FREE_SHIPPING_OVER_X_BOOKS'">
       <label for="formExcludeSets">Exclude Sets</label>
       <input type="checkbox" id="formExcludeSets" [(ngModel)]="formExcludeSets" name="formExcludeSets" />
       <span class="field-hint">When checked, comics that are part of a set will not receive this discount.</span>
     </div>
 
-    <div class="form-row">
+    <div class="form-row" *ngIf="formType !== 'FREE_SHIPPING_OVER_X_BOOKS'">
       <label for="formExcludeGraded">Exclude Graded</label>
       <input type="checkbox" id="formExcludeGraded" [(ngModel)]="formExcludeGraded" name="formExcludeGraded" />
       <span class="field-hint">When checked, graded comics (CGC/CBCS) will not receive this discount and won't count toward thresholds.</span>

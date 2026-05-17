@@ -353,6 +353,10 @@ public class CartService {
         cart.setDiscountBreakdown(discountResult.getBreakdown());
         int bookCount = (int) cart.getItems().stream().filter(i -> !i.isSetContainer()).count();
         cart.setShippingCost(ShippingCalculator.estimate(bookCount).getEstimatedCost());
+        if (discountResult.isFreeShippingApplied()) {
+            cart.setShippingCost(0.0);
+            cart.setFreeShippingApplied(true);
+        }
         cart.setStatus(CartStatus.SUBMITTED);
         cart.setPaymentStatus(PaymentStatus.UNPAID);
         if (customerNotes != null && !customerNotes.isBlank()) {

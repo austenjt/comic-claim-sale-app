@@ -289,8 +289,15 @@
           <span class="detail-value">No</span>
         </div>
 
+        <div class="detail-item" *ngIf="auth.isAdmin()">
+          <span class="detail-label">Grading Co.</span>
+          <select class="detail-edit-select" [(ngModel)]="editGradingCompany" (ngModelChange)="onGradingCompanyChange()">
+            <option *ngFor="let gc of enums.gradingCompanies" [value]="gc">{{ gc }}</option>
+          </select>
+        </div>
+
         <!-- CGC -->
-        <ng-container *ngIf="comic.comicCondition?.cgcCondition">
+        <ng-container *ngIf="auth.isAdmin() ? editGradingCompany === 'CGC' : !!comic.comicCondition?.cgcCondition">
           <div class="detail-subsection-title">CGC</div>
 
           <div class="detail-item" *ngIf="auth.isAdmin() || comic.comicCondition?.certificationId">
@@ -355,7 +362,7 @@
         </ng-container>
 
         <!-- CBCS -->
-        <ng-container *ngIf="comic.comicCondition?.cbcsCondition">
+        <ng-container *ngIf="auth.isAdmin() ? editGradingCompany === 'CBCS' : !!comic.comicCondition?.cbcsCondition">
           <div class="detail-subsection-title">CBCS</div>
 
           <div class="detail-item" *ngIf="auth.isAdmin() || comic.comicCondition?.certificationId">
@@ -436,8 +443,8 @@
         </ng-container>
 
         <!-- Raw / Not Certified — admin edit view -->
-        <ng-container *ngIf="auth.isAdmin() && !comic.comicCondition?.cgcCondition && !comic.comicCondition?.cbcsCondition">
-          <div class="detail-subsection-title">Raw</div>
+        <ng-container *ngIf="auth.isAdmin() && editGradingCompany !== 'CGC' && editGradingCompany !== 'CBCS'">
+          <div class="detail-subsection-title">{{ editGradingCompany || 'Raw' }}</div>
           <div class="detail-item">
             <span class="detail-label">Label</span>
             <input class="detail-edit-input" type="text" [(ngModel)]="editComic!.comicCondition!.notCertifiedLabel">

@@ -49,6 +49,7 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
   pendingDelete = false;
   deleting = false;
   editComic: Comic | null = null;
+  editGradingCompany = '';
   editWritersStr = '';
   editArtistsStr = '';
   salePriceStr = '';
@@ -271,6 +272,14 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
     if (!this.editComic.trade) {
       this.editComic.trade = { desiredGrade: null, offeredGrade: null, calculatedPrice: null, offerAccepted: null, tradeReceived: null, tradeNotes: null, offeredBy: null, offeredAt: null, tradeFrontImageId: null, tradeSmallFrontImageId: null, tradeBackImageId: null, tradeSmallBackImageId: null };
     }
+    const cond = this.editComic.comicCondition;
+    if (cond?.cgcCondition) {
+      this.editGradingCompany = 'CGC';
+    } else if (cond?.cbcsCondition) {
+      this.editGradingCompany = 'CBCS';
+    } else {
+      this.editGradingCompany = cond?.certificationCompany || 'NOT CERTIFIED';
+    }
     this.editWritersStr = (this.editComic.writer ?? []).join(', ');
     this.editArtistsStr = (this.editComic.artist ?? []).join(', ');
     this.salePriceStr = this.editComic.salePrice != null
@@ -284,6 +293,29 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
     if (this.parentSetId !== null) {
       this.editComic.isForSale = true;
       this.editComic.listingType = 'FOR_SALE';
+    }
+  }
+
+  onGradingCompanyChange(): void {
+    const cond = this.editComic?.comicCondition;
+    if (!cond) return;
+    cond.certificationCompany = this.editGradingCompany;
+    if (this.editGradingCompany === 'CGC') {
+      cond.isGraded = true;
+      if (!cond.cgcCondition) {
+        cond.cgcCondition = { label: null, grade: null, pageQuality: null, pedigree: null, signature: null, degreeOfRestoration: null, graderNotes: null };
+      }
+      cond.cbcsCondition = null;
+    } else if (this.editGradingCompany === 'CBCS') {
+      cond.isGraded = true;
+      cond.cgcCondition = null;
+      if (!cond.cbcsCondition) {
+        cond.cbcsCondition = { label: null, grade: null, pageQuality: null, pedigree: null, signature: null, degreeOfRestoration: null };
+      }
+    } else {
+      cond.isGraded = false;
+      cond.cgcCondition = null;
+      cond.cbcsCondition = null;
     }
   }
 

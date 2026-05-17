@@ -54,7 +54,7 @@ export class SalesModalComponent implements OnInit, OnDestroy {
   onEscape(): void { if (this.visible) this.close(); }
 
   iconText(d: Discount): string {
-    if (d.type === 'BUY_X_GET_ONE_FREE') return '🎁';
+    if (d.type === 'BUY_X_GET_ONE_FREE' || d.type === 'FREE_SHIPPING_OVER_X_BOOKS') return '🎁';
     return `${d.percentageOff}%`;
   }
 
@@ -67,6 +67,10 @@ export class SalesModalComponent implements OnInit, OnDestroy {
         return `Buy ${d.xBooks} books — get another book free${note}`;
       case 'PERCENT_OFF_OVER_X_BOOKS':
         return `${d.percentageOff}% off when you claim more than ${d.xBooks} book${d.xBooks === 1 ? '' : 's'}${note}`;
+      case 'FREE_SHIPPING_OVER_X_BOOKS':
+        return `Free shipping on orders with ${d.xBooks} or more books`;
+      default:
+        return '';
     }
   }
 

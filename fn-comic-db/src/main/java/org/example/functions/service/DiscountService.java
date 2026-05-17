@@ -119,7 +119,7 @@ public class DiscountService {
      */
     static DiscountResult computeDiscounts(Cart cart, List<Discount> active) {
         if (active == null || active.isEmpty()) {
-            return new DiscountResult(0.0, null, false, false, new ArrayList<>());
+            return new DiscountResult(0.0, null, false, false, false, new ArrayList<>());
         }
 
         // Awarded (isAwarded flag) and free ($0.00) items are excluded from both counting and discount application.
@@ -137,6 +137,7 @@ public class DiscountService {
         double totalSavings = 0.0;
         boolean anySetsExcluded = false;
         boolean anyGradedExcluded = false;
+        boolean freeShipping = false;
         List<String> descriptions = new ArrayList<>();
         List<CartDiscount> breakdown = new ArrayList<>();
         double baseSubtotal = baseItems.stream()
@@ -203,12 +204,21 @@ public class DiscountService {
                     }
                     break;
                 }
+                case FREE_SHIPPING_OVER_X_BOOKS: {
+                    if (itemCount >= d.getXBooks()) {
+                        freeShipping = true;
+                        String desc = String.format("Free shipping (%d books)", itemCount);
+                        descriptions.add(desc);
+                        breakdown.add(new CartDiscount(0.0, desc, excludeSets, excludeGraded));
+                    }
+                    break;
+                }
             }
         }
 
         totalSavings = Math.min(totalSavings, baseSubtotal);
         String description = descriptions.isEmpty() ? null : String.join("; ", descriptions);
-        return new DiscountResult(totalSavings, description, anySetsExcluded, anyGradedExcluded, breakdown);
+        return new DiscountResult(totalSavings, description, anySetsExcluded, anyGradedExcluded, freeShipping, breakdown);
     }
 
     /** Builds the human-readable parenthetical for which categories were excluded by a rule. */
@@ -290,15 +300,18 @@ public class DiscountService {
         private final String description;
         private final boolean excludedSets;
         private final boolean excludedGraded;
+        private final boolean freeShippingApplied;
         private final List<CartDiscount> breakdown;
 
         public DiscountResult(double amount, String description,
                               boolean excludedSets, boolean excludedGraded,
+                              boolean freeShippingApplied,
                               List<CartDiscount> breakdown) {
             this.amount = amount;
             this.description = description;
             this.excludedSets = excludedSets;
             this.excludedGraded = excludedGraded;
+            this.freeShippingApplied = freeShippingApplied;
             this.breakdown = breakdown;
         }
 
@@ -306,6 +319,7 @@ public class DiscountService {
         public String getDescription() { return description; }
         public boolean isExcludedSets() { return excludedSets; }
         public boolean isExcludedGraded() { return excludedGraded; }
+        public boolean isFreeShippingApplied() { return freeShippingApplied; }
         public List<CartDiscount> getBreakdown() { return breakdown; }
     }
 }
