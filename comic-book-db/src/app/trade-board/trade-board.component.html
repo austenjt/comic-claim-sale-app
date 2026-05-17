@@ -31,6 +31,8 @@
           <b><a [routerLink]="['/detail', comic.id]" class="comic-title-link">{{ comicLabel(comic) }}</a></b>
         </div>
         <div class="meta-grid">
+          <div *ngIf="comic.publisher" class="comic-publisher">{{ comic.publisher }}</div>
+          <div *ngIf="comic.publishedDate" class="comic-publish-date">{{ comic.publishedDate }}</div>
           <div *ngIf="comic.nmEstimatedValue" class="comic-price">NM Value: <b>{{ comic.nmEstimatedValue | currency }}</b></div>
           <div class="wanted-credit-note">Credit varies by condition</div>
           <div *ngIf="comic.publicNotes" class="wanted-notes">{{ comic.publicNotes }}</div>

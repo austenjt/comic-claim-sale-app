@@ -611,9 +611,10 @@
           <input *ngIf="auth.isAdmin()" class="detail-edit-input" type="number" step="0.01" [(ngModel)]="editComic!.nmEstimatedValue" placeholder="NM reference price for trade calc">
         </div>
 
-        <div class="detail-item" *ngIf="auth.isAdmin()">
+        <div class="detail-item" *ngIf="auth.isAdmin() || comic.trade?.desiredGrade">
           <span class="detail-label">Desired Grade</span>
-          <select class="detail-edit-select" [(ngModel)]="editComic!.trade!.desiredGrade">
+          <span *ngIf="!auth.isAdmin()" class="detail-value">{{ comic.trade?.desiredGrade | number:'1.1-1' }}</span>
+          <select *ngIf="auth.isAdmin()" class="detail-edit-select" [(ngModel)]="editComic!.trade!.desiredGrade">
             <option [ngValue]="null">Any grade</option>
             <option *ngFor="let g of enums.grades" [ngValue]="g.value">{{ g.label }}</option>
           </select>

@@ -160,6 +160,13 @@ h2 {
   padding-right: 4px;
 }
 
+.comic-publisher,
+.comic-publish-date {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  margin-bottom: 3px;
+}
+
 .comic-price {
   font-size: 0.8rem;
   color: var(--color-text-muted);
