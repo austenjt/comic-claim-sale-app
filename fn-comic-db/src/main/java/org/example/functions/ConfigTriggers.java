@@ -16,6 +16,7 @@ import org.example.functions.model.enums.GradingCompany;
 import org.example.functions.model.enums.PageQuality;
 import org.example.functions.util.EnvHelper;
 import org.example.functions.util.HttpHelper;
+import org.example.functions.util.TradeValueCalculator;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -61,6 +62,7 @@ public class ConfigTriggers {
                 Map<String, Object> entry = new LinkedHashMap<>();
                 entry.put("value", g.getNumericGrade());
                 entry.put("label", g.getLabel());
+                entry.put("multiplier", TradeValueCalculator.multiplierFor(g));
                 grades.add(entry);
             }
             response.put("grades", grades);

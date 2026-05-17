@@ -516,18 +516,40 @@ public class ComicService {
     }
 
     /**
-     * Atomically increments the viewCount for a comic and persists it.
-     * Does not write an audit log entry — view tracking is a system operation.
-     * @return the new viewCount, or 0 if the comic was not found
+     * Per-IP deduplication cache. Key = "viewerKey:comicId", value = timestamp of last counted view.
+     * Lives in memory only — resets on cold start, which is acceptable.
      */
-    public int incrementViewCount(int id) {
+    private static final java.util.concurrent.ConcurrentHashMap<String, Long> VIEW_SEEN =
+        new java.util.concurrent.ConcurrentHashMap<>();
+    private static final long VIEW_WINDOW_MS = 24L * 60 * 60 * 1000; // 24 hours
+
+    /**
+     * Increments viewCount for a comic, skipping the write if {@code viewerKey} (typically a
+     * hashed client IP) already viewed this comic within the last 24 hours.
+     * Does not write an audit log entry — view tracking is a system operation.
+     * @return the current viewCount (incremented or unchanged), or 0 if the comic was not found
+     */
+    public int incrementViewCount(int id, String viewerKey) {
         Optional<ComicBook> existing = getComicById(id);
         if (existing.isEmpty()) return 0;
         ComicBook comic = existing.get();
-        int newCount = (comic.getViewCount() == null ? 0 : comic.getViewCount()) + 1;
-        comic.setViewCount(newCount);
+        int currentCount = comic.getViewCount() != null ? comic.getViewCount() : 0;
+
+        String cacheKey = viewerKey + ":" + id;
+        long now = System.currentTimeMillis();
+        Long lastSeen = VIEW_SEEN.get(cacheKey);
+
+        if (lastSeen != null && (now - lastSeen) < VIEW_WINDOW_MS) {
+            return currentCount; // same viewer within 24 h — no increment
+        }
+
+        // Lazy eviction: remove entries older than the window to keep the map bounded
+        VIEW_SEEN.entrySet().removeIf(e -> (now - e.getValue()) >= VIEW_WINDOW_MS);
+        VIEW_SEEN.put(cacheKey, now);
+
+        comic.setViewCount(currentCount + 1);
         updateComic(comic);
-        return newCount;
+        return currentCount + 1;
     }
 
     public ComicBook createComic(ComicBook newComicBookObj) throws IOException {

@@ -14,6 +14,8 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Trade {
+    /** Minimum grade the admin considers acceptable for this trade-in. */
+    private ComicGrade desiredGrade;
     /** Grade of the copy the customer is offering. */
     private ComicGrade offeredGrade;
     /** Credit value calculated from nmEstimatedValue × grade multiplier at time of offer. */

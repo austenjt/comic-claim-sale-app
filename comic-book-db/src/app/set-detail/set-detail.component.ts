@@ -93,9 +93,7 @@ export class SetDetailComponent implements OnInit, OnDestroy {
           const count = (comic.items ?? []).length;
           this.titleService.setTitle(`${comic.title} Set — Lightning Comics PDX`);
           this.meta.updateTag({ name: 'description', content: `${comic.title} — set of ${count} comic${count !== 1 ? 's' : ''} available for claim at Lightning Comics PDX in Oregon City, OR.` });
-          this.comicService.recordView(id).subscribe(r => {
-            if (this.container) this.container.viewCount = r.viewCount;
-          });
+          this.maybeRecordView(id);
         }
       });
 
@@ -229,6 +227,19 @@ export class SetDetailComponent implements OnInit, OnDestroy {
   closeCaptureModal(): void {
     this.captureModalOpen = false;
     this.captureModalTarget = null;
+  }
+
+  private maybeRecordView(id: number): void {
+    const key = `lc-view-set-${id}`;
+    const last = localStorage.getItem(key);
+    const now = Date.now();
+    if (last && (now - parseInt(last, 10)) < 24 * 60 * 60 * 1000) {
+      return;
+    }
+    this.comicService.recordView(id).subscribe(r => {
+      if (this.container) this.container.viewCount = r.viewCount;
+      localStorage.setItem(key, String(now));
+    });
   }
 
   private uploadFrontImage(file: File): void {

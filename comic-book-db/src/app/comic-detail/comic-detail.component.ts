@@ -155,19 +155,17 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
            (this.myCart?.status === 'OPEN' || !this.myCart);
   }
 
-  private readonly GRADE_MULTIPLIERS: Record<number, number> = {
-    10.0: 3.50, 9.9: 2.40, 9.8: 1.25, 9.6: 1.10, 9.4: 1.00,
-     9.2: 0.75, 9.0: 0.55, 8.5: 0.40, 8.0: 0.22, 7.5: 0.14,
-     7.0: 0.13, 6.5: 0.12, 6.0: 0.10, 5.5: 0.08, 5.0: 0.06,
-     4.5: 0.05, 4.0: 0.04, 3.5: 0.04, 3.0: 0.02, 2.5: 0.02,
-     2.0: 0.00, 1.8: 0.00, 1.5: 0.00, 1.0: 0.00, 0.5: 0.00,
-  };
-
   get previewTradeCredit(): number | null {
     if (!this.selectedTradeGrade || !this.comic?.nmEstimatedValue) return null;
-    const multiplier = this.GRADE_MULTIPLIERS[this.selectedTradeGrade];
+    const multiplier = this.configService.gradeMultiplier(this.selectedTradeGrade);
     if (multiplier === undefined) return null;
     return Math.round(this.comic.nmEstimatedValue * multiplier * 100) / 100;
+  }
+
+  get tradeGradeWarning(): boolean {
+    const desired = this.comic?.trade?.desiredGrade;
+    if (!desired || !this.selectedTradeGrade) return false;
+    return Math.abs(this.selectedTradeGrade - desired) > 2.0;
   }
 
   canTrade(comicId: number): boolean {
@@ -271,7 +269,7 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
       this.editComic.grandComicDBInfo = { gcdbIssueId: null, gcdbSeriesId: null, issueUrl: null, seriesUrl: null };
     }
     if (!this.editComic.trade) {
-      this.editComic.trade = { offeredGrade: null, calculatedPrice: null, offerAccepted: null, tradeReceived: null, tradeNotes: null, offeredBy: null, offeredAt: null, tradeFrontImageId: null, tradeSmallFrontImageId: null, tradeBackImageId: null, tradeSmallBackImageId: null };
+      this.editComic.trade = { desiredGrade: null, offeredGrade: null, calculatedPrice: null, offerAccepted: null, tradeReceived: null, tradeNotes: null, offeredBy: null, offeredAt: null, tradeFrontImageId: null, tradeSmallFrontImageId: null, tradeBackImageId: null, tradeSmallBackImageId: null };
     }
     this.editWritersStr = (this.editComic.writer ?? []).join(', ');
     this.editArtistsStr = (this.editComic.artist ?? []).join(', ');
@@ -336,11 +334,9 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
         this.loading = false;
         if (comic) {
           this.buildPageMeta(comic);
-          this.comicService.recordView(id).subscribe(r => {
-            if (this.comic) this.comic.viewCount = r.viewCount;
-          });
         }
         if (comic && this.auth.isAdmin()) this.initEditComic(comic);
+        if (comic) this.maybeRecordView(id);
       });
   }
 
@@ -370,6 +366,19 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
   closeCaptureModal(): void {
     this.captureModalOpen = false;
     this.captureModalTarget = null;
+  }
+
+  private maybeRecordView(id: number): void {
+    const key = `lc-view-${id}`;
+    const last = localStorage.getItem(key);
+    const now = Date.now();
+    if (last && (now - parseInt(last, 10)) < 24 * 60 * 60 * 1000) {
+      return;
+    }
+    this.comicService.recordView(id).subscribe(r => {
+      if (this.comic) this.comic.viewCount = r.viewCount;
+      localStorage.setItem(key, String(now));
+    });
   }
 
   private uploadFrontImage(file: File): void {

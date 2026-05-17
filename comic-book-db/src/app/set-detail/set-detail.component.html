@@ -83,6 +83,12 @@
       <div class="detail-section">
         <div class="detail-section-title">Set Details</div>
 
+        <div class="detail-item">
+          <span class="detail-label">Title</span>
+          <span *ngIf="!auth.isAdmin()" class="detail-value">{{ container.title }}</span>
+          <input *ngIf="auth.isAdmin()" class="detail-edit-input" type="text" [(ngModel)]="editContainer!.title">
+        </div>
+
         <div class="detail-item" *ngIf="auth.isAdmin() || (container.series && container.series !== '')">
           <span class="detail-label">Series</span>
           <span *ngIf="!auth.isAdmin()" class="detail-value">{{ container.series }}</span>

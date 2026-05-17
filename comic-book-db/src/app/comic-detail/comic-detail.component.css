@@ -385,6 +385,15 @@ button {
   font-size: 0.85rem;
 }
 
+.trade-grade-warning {
+  background: #fff3e0;
+  border: 1px solid #ffb74d;
+  border-radius: 5px;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.84rem;
+  color: #e65100;
+}
+
 .btn-admin-delete {
   padding: var(--space-2) var(--space-4);
   background: transparent;

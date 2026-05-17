@@ -109,6 +109,12 @@
       <div class="detail-section">
         <div class="detail-section-title">Issue Details</div>
 
+        <div class="detail-item">
+          <span class="detail-label">Title</span>
+          <span *ngIf="!auth.isAdmin()" class="detail-value">{{comic.title}}</span>
+          <input *ngIf="auth.isAdmin()" class="detail-edit-input" type="text" [(ngModel)]="editComic!.title">
+        </div>
+
         <div class="detail-item" *ngIf="comic.id">
           <span class="detail-label">Internal ID</span>
           <span class="detail-value">{{comic.id}}</span>
@@ -395,50 +401,66 @@
           </div>
         </ng-container>
 
-        <!-- Raw / Not Certified -->
-        <ng-container *ngIf="(auth.isAdmin() && !comic.comicCondition?.cgcCondition && !comic.comicCondition?.cbcsCondition) || comic.comicCondition?.notCertifiedGrade || comic.comicCondition?.notCertifiedLabel || comic.comicCondition?.notCertifiedPageQuality">
-          <div class="detail-subsection-title">Raw</div>
-
-          <div class="detail-item" *ngIf="auth.isAdmin() || comic.comicCondition?.notCertifiedLabel">
-            <span class="detail-label">Label</span>
-            <span *ngIf="!auth.isAdmin()" class="detail-value">{{comic.comicCondition!.notCertifiedLabel}}</span>
-            <input *ngIf="auth.isAdmin()" class="detail-edit-input" type="text" [(ngModel)]="editComic!.comicCondition!.notCertifiedLabel">
+        <!-- Raw / Not Certified — non-admin read view -->
+        <ng-container *ngIf="!auth.isAdmin() && !comic.comicCondition?.cgcCondition && !comic.comicCondition?.cbcsCondition">
+          <div class="detail-item" *ngIf="comic.comicCondition?.notCertifiedGrade != null">
+            <span class="detail-label">Grade</span>
+            <span class="detail-value">{{comic.comicCondition!.notCertifiedGrade | number:'1.1-1'}}</span>
           </div>
+          <div class="detail-item" *ngIf="comic.comicCondition?.notCertifiedPageQuality != null">
+            <span class="detail-label">Page Quality</span>
+            <span class="detail-value">{{comic.comicCondition!.notCertifiedPageQuality}}</span>
+          </div>
+          <div class="detail-item" *ngIf="comic.comicCondition?.notCertifiedLabel">
+            <span class="detail-label">Label</span>
+            <span class="detail-value">{{comic.comicCondition!.notCertifiedLabel}}</span>
+          </div>
+          <div class="detail-item" *ngIf="comic.comicCondition?.notCertifiedPedigree">
+            <span class="detail-label">Pedigree</span>
+            <span class="detail-value">{{comic.comicCondition!.notCertifiedPedigree}}</span>
+          </div>
+          <div class="detail-item" *ngIf="comic.comicCondition?.notCertifiedDegreeOfRestoration">
+            <span class="detail-label">Restoration</span>
+            <span class="detail-value">{{comic.comicCondition!.notCertifiedDegreeOfRestoration}}</span>
+          </div>
+          <div class="detail-item" *ngIf="comic.comicCondition?.notCertifiedSignature">
+            <span class="detail-label">Signature</span>
+            <span class="detail-value">{{comic.comicCondition!.notCertifiedSignature}}</span>
+          </div>
+        </ng-container>
 
-          <div class="detail-item" *ngIf="auth.isAdmin() || comic.comicCondition?.notCertifiedGrade">
-            <span class="detail-label">Estimated Grade</span>
-            <span *ngIf="!auth.isAdmin()" class="detail-value">{{comic.comicCondition!.notCertifiedGrade | number:'1.1-1'}}</span>
-            <select *ngIf="auth.isAdmin()" class="detail-edit-select" [(ngModel)]="editComic!.comicCondition!.notCertifiedGrade">
+        <!-- Raw / Not Certified — admin edit view -->
+        <ng-container *ngIf="auth.isAdmin() && !comic.comicCondition?.cgcCondition && !comic.comicCondition?.cbcsCondition">
+          <div class="detail-subsection-title">Raw</div>
+          <div class="detail-item">
+            <span class="detail-label">Label</span>
+            <input class="detail-edit-input" type="text" [(ngModel)]="editComic!.comicCondition!.notCertifiedLabel">
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Grade</span>
+            <select class="detail-edit-select" [(ngModel)]="editComic!.comicCondition!.notCertifiedGrade">
               <option [ngValue]="null">—</option>
               <option *ngFor="let g of enums.grades" [ngValue]="g.value">{{g.label}}</option>
             </select>
           </div>
-
-          <div class="detail-item" *ngIf="auth.isAdmin() || comic.comicCondition?.notCertifiedPageQuality">
-            <span class="detail-label">Estimated Page Quality</span>
-            <span *ngIf="!auth.isAdmin()" class="detail-value">{{comic.comicCondition!.notCertifiedPageQuality}}</span>
-            <select *ngIf="auth.isAdmin()" class="detail-edit-select" [(ngModel)]="editComic!.comicCondition!.notCertifiedPageQuality">
+          <div class="detail-item">
+            <span class="detail-label">Page Quality</span>
+            <select class="detail-edit-select" [(ngModel)]="editComic!.comicCondition!.notCertifiedPageQuality">
               <option [ngValue]="null">—</option>
               <option *ngFor="let pq of enums.pageQualities" [value]="pq">{{pq}}</option>
             </select>
           </div>
-
-          <div class="detail-item" *ngIf="auth.isAdmin() || comic.comicCondition?.notCertifiedPedigree">
+          <div class="detail-item">
             <span class="detail-label">Pedigree</span>
-            <span *ngIf="!auth.isAdmin()" class="detail-value">{{comic.comicCondition!.notCertifiedPedigree}}</span>
-            <input *ngIf="auth.isAdmin()" class="detail-edit-input" type="text" [(ngModel)]="editComic!.comicCondition!.notCertifiedPedigree">
+            <input class="detail-edit-input" type="text" [(ngModel)]="editComic!.comicCondition!.notCertifiedPedigree">
           </div>
-
-          <div class="detail-item" *ngIf="auth.isAdmin() || comic.comicCondition?.notCertifiedDegreeOfRestoration">
+          <div class="detail-item">
             <span class="detail-label">Restoration</span>
-            <span *ngIf="!auth.isAdmin()" class="detail-value">{{comic.comicCondition!.notCertifiedDegreeOfRestoration}}</span>
-            <input *ngIf="auth.isAdmin()" class="detail-edit-input" type="text" [(ngModel)]="editComic!.comicCondition!.notCertifiedDegreeOfRestoration">
+            <input class="detail-edit-input" type="text" [(ngModel)]="editComic!.comicCondition!.notCertifiedDegreeOfRestoration">
           </div>
-
-          <div class="detail-item" *ngIf="auth.isAdmin() || comic.comicCondition?.notCertifiedSignature">
+          <div class="detail-item">
             <span class="detail-label">Signature</span>
-            <span *ngIf="!auth.isAdmin()" class="detail-value">{{comic.comicCondition!.notCertifiedSignature}}</span>
-            <input *ngIf="auth.isAdmin()" class="detail-edit-checkbox" type="checkbox" [(ngModel)]="editComic!.comicCondition!.notCertifiedSignature">
+            <input class="detail-edit-checkbox" type="checkbox" [(ngModel)]="editComic!.comicCondition!.notCertifiedSignature">
           </div>
         </ng-container>
 
@@ -589,6 +611,14 @@
           <input *ngIf="auth.isAdmin()" class="detail-edit-input" type="number" step="0.01" [(ngModel)]="editComic!.nmEstimatedValue" placeholder="NM reference price for trade calc">
         </div>
 
+        <div class="detail-item" *ngIf="auth.isAdmin()">
+          <span class="detail-label">Desired Grade</span>
+          <select class="detail-edit-select" [(ngModel)]="editComic!.trade!.desiredGrade">
+            <option [ngValue]="null">Any grade</option>
+            <option *ngFor="let g of enums.grades" [ngValue]="g.value">{{ g.label }}</option>
+          </select>
+        </div>
+
         <div class="detail-item" *ngIf="auth.isAdmin() || comic.trade?.offeredGrade">
           <span class="detail-label">Offered Grade</span>
           <span *ngIf="!auth.isAdmin()" class="detail-value">{{ comic.trade?.offeredGrade | number:'1.1-1' }}</span>
@@ -716,6 +746,12 @@
             <div class="detail-item" *ngIf="previewTradeCredit !== null">
               <span class="detail-label">Trade Credit</span>
               <span class="detail-value">{{ previewTradeCredit | currency:'USD':'symbol':'1.2-2' }}</span>
+            </div>
+            <div class="detail-item" *ngIf="tradeGradeWarning">
+              <span class="detail-label"></span>
+              <span class="detail-value trade-grade-warning">
+                ⚠ The grade you selected is not within 2 grades of what the seller is looking for. Try to find a closer graded copy to trade.
+              </span>
             </div>
             <div class="detail-item">
               <span class="detail-label"></span>

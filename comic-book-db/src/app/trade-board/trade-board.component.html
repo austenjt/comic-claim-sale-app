@@ -66,7 +66,7 @@
     <div class="modal-field">
       <label class="modal-label">What condition is your copy?</label>
       <select class="modal-select" [(ngModel)]="selectedGrade">
-        <option *ngFor="let g of gradeOptions" [ngValue]="g.value">{{ g.label }}</option>
+        <option *ngFor="let g of gradeOptions" [ngValue]="g.value">{{ g.value }} — {{ g.label }}</option>
       </select>
     </div>
 
@@ -77,6 +77,10 @@
 
     <div *ngIf="!modalComic.nmEstimatedValue" class="modal-no-value">
       This comic does not have a trade value set yet. Contact us for a custom quote.
+    </div>
+
+    <div *ngIf="gradeWarning" class="modal-grade-warning">
+      ⚠ The grade you selected is not within 2 grades of what we're looking for. Try to find a closer graded copy to trade.
     </div>
 
     <div *ngIf="submitError" class="modal-error">{{ submitError }}</div>

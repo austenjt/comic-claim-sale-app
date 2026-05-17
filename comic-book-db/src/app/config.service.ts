@@ -6,6 +6,7 @@ import { of } from 'rxjs';
 export interface GradeOption {
   value: number;
   label: string;
+  multiplier: number;
 }
 
 export interface ComicEnums {
@@ -62,5 +63,11 @@ export class ConfigService {
       grades: this._config.grades,
       pageQualities: this._config.pageQualities
     };
+  }
+
+  gradeMultiplier(gradeValue: number): number {
+    const key = String(gradeValue);
+    const opt = this._config.grades.find(g => String(g.value) === key);
+    return opt?.multiplier ?? 0;
   }
 }
