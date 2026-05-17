@@ -25,7 +25,8 @@ public class Cart {
     private Boolean discountExcludesSets; // true when any active discount rule excluded set items
     private Boolean discountExcludesGraded; // true when any active discount rule excluded graded comics
     private List<CartDiscount> discountBreakdown = new ArrayList<>(); // per-rule breakdown for frontend per-item display
-    private double shippingCost;         // snapshotted at submit time
+    private double shippingCost;          // snapshotted at submit time
+    private boolean freeShippingApplied; // true when a FREE_SHIPPING_OVER_X_BOOKS rule waived shipping
     private PaymentStatus paymentStatus; // set by admin
     private Boolean shipped;             // true once admin marks order as shipped
     private String trackingNumber;       // optional shipping tracking number
@@ -91,6 +92,9 @@ public class Cart {
 
     public double getShippingCost() { return shippingCost; }
     public void setShippingCost(double shippingCost) { this.shippingCost = shippingCost; }
+
+    public boolean isFreeShippingApplied() { return freeShippingApplied; }
+    public void setFreeShippingApplied(boolean freeShippingApplied) { this.freeShippingApplied = freeShippingApplied; }
 
     public PaymentStatus getPaymentStatus() { return paymentStatus; }
     public void setPaymentStatus(PaymentStatus paymentStatus) { this.paymentStatus = paymentStatus; }

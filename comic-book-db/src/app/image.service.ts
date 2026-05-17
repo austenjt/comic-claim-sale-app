@@ -51,6 +51,18 @@ export class ImageService {
     return this.http.post(`${this.baseServiceUrl}/comics/${comicId}/back-image`, formData);
   }
 
+  uploadTradeFrontImage(comicId: number, file: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('file', file, file.name);
+    return this.http.post(`${this.baseServiceUrl}/comics/${comicId}/trade-image`, formData);
+  }
+
+  uploadTradeBackImage(comicId: number, file: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('file', file, file.name);
+    return this.http.post(`${this.baseServiceUrl}/comics/${comicId}/trade-back-image`, formData);
+  }
+
   createImage(imageName: string, image: Blob): Observable<any> {
     const blobFile = new File([image], imageName, { type: image.type });
     const formData = new FormData();

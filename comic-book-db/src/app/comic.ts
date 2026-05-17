@@ -55,6 +55,21 @@ export interface GoCollectInfo {
   importDate: string | null;
 }
 
+export interface TradeInfo {
+  desiredGrade: number | null;
+  offeredGrade: number | null;
+  calculatedPrice: number | null;
+  offerAccepted: boolean | null;
+  tradeReceived: boolean | null;
+  tradeNotes: string | null;
+  offeredBy: string | null;
+  offeredAt: string | null;
+  tradeFrontImageId: string | null;
+  tradeSmallFrontImageId: string | null;
+  tradeBackImageId: string | null;
+  tradeSmallBackImageId: string | null;
+}
+
 export interface GrandComicDBInfo {
   gcdbIssueId: number | null;
   gcdbSeriesId: number | null;
@@ -89,6 +104,7 @@ export interface Comic {
   isForSale: boolean | null;
   listingType?: ListingType | null;
   nmEstimatedValue?: number | null;
+  trade?: TradeInfo | null;
   personalEstimate: number | null;
   targetPrice: number | null;
   collectionGroup: number | null;

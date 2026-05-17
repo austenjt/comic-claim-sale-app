@@ -46,6 +46,7 @@ export interface Cart {
   discountExcludesGraded?: boolean | null;
   discountBreakdown?: CartDiscount[] | null;
   shippingCost?: number;
+  freeShippingApplied?: boolean;
   paymentStatus?: 'UNPAID' | 'PARTIAL' | 'PAID' | null;
   shipped?: boolean | null;
   trackingNumber?: string | null;

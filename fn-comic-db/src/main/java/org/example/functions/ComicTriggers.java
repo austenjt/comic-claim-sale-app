@@ -92,7 +92,8 @@ public class ComicTriggers {
     {
         log.info("Processing recordView for comic id {}.", id);
         try {
-            int newCount = ComicService.getServiceInstance().incrementViewCount(Integer.parseInt(id));
+            String viewerKey = extractViewerKey(request);
+            int newCount = ComicService.getServiceInstance().incrementViewCount(Integer.parseInt(id), viewerKey);
             return HttpHelper.cors(request.createResponseBuilder(HttpStatus.OK))
                 .header("Content-Type", "application/json")
                 .body("{\"viewCount\":" + newCount + "}")
@@ -507,4 +508,20 @@ public class ComicTriggers {
         }
     }
 
+    /**
+     * Extracts a stable viewer key for deduplication. Prefers the first IP in X-Forwarded-For
+     * (set by Azure Front Door / load balancer), then X-Azure-ClientIP, then falls back to
+     * "unknown". The key is only used for in-memory 24-hour deduplication — it is never persisted.
+     */
+    private static String extractViewerKey(HttpRequestMessage<?> request) {
+        String xff = request.getHeaders().get("x-forwarded-for");
+        if (xff != null && !xff.isBlank()) {
+            return xff.split(",")[0].trim();
+        }
+        String azureIp = request.getHeaders().get("x-azure-clientip");
+        if (azureIp != null && !azureIp.isBlank()) {
+            return azureIp.trim();
+        }
+        return "unknown";
+    }
 }

@@ -185,6 +185,21 @@ button {
 .img-update-btn:hover:not(:disabled) { background-color: #6F5240; border-color: #6F5240; }
 .img-update-btn:disabled { opacity: 0.55; cursor: not-allowed; }
 
+.btn-img-delete {
+  margin-left: 8px;
+  padding: var(--space-1) var(--space-3);
+  background-color: #b94040;
+  color: var(--color-text-inverse);
+  border: 1px solid #b94040;
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-14);
+  font-weight: var(--fw-semibold);
+  cursor: pointer;
+  transition: background-color var(--duration-base) var(--ease-standard);
+}
+.btn-img-delete:hover:not(:disabled) { background-color: #8f2e2e; border-color: #8f2e2e; }
+.btn-img-delete:disabled { opacity: 0.55; cursor: not-allowed; }
+
 .img-upload-error {
   margin-top: 6px;
   font-size: 0.78rem;
@@ -317,6 +332,21 @@ button {
   opacity: 0.5;
   cursor: default;
 }
+
+.btn-copy-member {
+  padding: var(--space-1) var(--space-2);
+  background: transparent;
+  color: #6b7280;
+  border: 1px solid #6b7280;
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-12);
+  font-weight: var(--fw-semibold);
+  cursor: pointer;
+  margin: 0;
+  transition: background-color var(--duration-base) var(--ease-standard);
+}
+.btn-copy-member:hover:not(:disabled) { background: #f3f4f6; }
+.btn-copy-member:disabled { opacity: 0.5; cursor: default; }
 
 /* ── Add Book modal ─────────────────────────────────────────────────────── */
 /* Chrome (overlay/dialog/title) is provided by the shared .modal-overlay /

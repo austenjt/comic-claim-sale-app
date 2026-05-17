@@ -29,7 +29,8 @@ export class AdminSalesComponent implements OnInit {
   readonly typeOptions: { value: DiscountType; label: string }[] = [
     { value: 'RAW_PERCENTAGE', label: 'Flat % Off' },
     { value: 'BUY_X_GET_ONE_FREE', label: 'Buy X Get One Free' },
-    { value: 'PERCENT_OFF_OVER_X_BOOKS', label: '% Off Over X Books' }
+    { value: 'PERCENT_OFF_OVER_X_BOOKS', label: '% Off Over X Books' },
+    { value: 'FREE_SHIPPING_OVER_X_BOOKS', label: 'Free Shipping (X+ Books)' }
   ];
 
   constructor(
@@ -123,6 +124,10 @@ export class AdminSalesComponent implements OnInit {
         return `Every ${(this.formXBooks || 1) + 1} books: cheapest book is free.`;
       case 'PERCENT_OFF_OVER_X_BOOKS':
         return `${this.formPercentageOff}% off when cart has more than ${this.formXBooks} book${this.formXBooks === 1 ? '' : 's'}.`;
+      case 'FREE_SHIPPING_OVER_X_BOOKS':
+        return `Free shipping on orders with ${this.formXBooks} or more books.`;
+      default:
+        return '';
     }
   }
 
@@ -131,7 +136,7 @@ export class AdminSalesComponent implements OnInit {
   }
 
   needsXBooks(): boolean {
-    return this.formType === 'BUY_X_GET_ONE_FREE' || this.formType === 'PERCENT_OFF_OVER_X_BOOKS';
+    return this.formType === 'BUY_X_GET_ONE_FREE' || this.formType === 'PERCENT_OFF_OVER_X_BOOKS' || this.formType === 'FREE_SHIPPING_OVER_X_BOOKS';
   }
 
   describeDiscount(d: Discount): string {
@@ -143,6 +148,10 @@ export class AdminSalesComponent implements OnInit {
         return `Buy ${d.xBooks || '?'} get 1 free${note}`;
       case 'PERCENT_OFF_OVER_X_BOOKS':
         return `${d.percentageOff}% off over ${d.xBooks || '?'} books${note}`;
+      case 'FREE_SHIPPING_OVER_X_BOOKS':
+        return `Free shipping (${d.xBooks || '?'}+ books)`;
+      default:
+        return '';
     }
   }
 

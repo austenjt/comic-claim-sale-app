@@ -13,9 +13,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.fileupload.MultipartStream;
 import org.example.functions.model.ComicBook;
 import org.example.functions.model.ComicNumber;
+import org.example.functions.model.Trade;
+import org.example.functions.model.User;
 import org.example.functions.service.ComicService;
 import org.example.functions.service.ImageResizeService;
 import org.example.functions.service.ImageService;
+import org.example.functions.util.AuthHelper;
 import org.example.functions.util.HttpHelper;
 import org.example.functions.util.Mappers;
 
@@ -293,6 +296,150 @@ public class ImageTriggers {
                 .header("Content-Type", "text/plain")
                 .body("Error: " + e.getMessage())
                 .build();
+        }
+    }
+
+    // ─── POST /api/comics/{id}/trade-image ────────────────────────────────────
+
+    @FunctionName("uploadTradeComicImage")
+    public HttpResponseMessage uploadTradeComicImage(
+        @HttpTrigger(
+            name = "uploadTradeComicImage",
+            route = "comics/{id}/trade-image",
+            methods = {HttpMethod.POST},
+            authLevel = AuthorizationLevel.ANONYMOUS)
+        HttpRequestMessage<Optional<byte[]>> request,
+        @BindingName("id") String id)
+    {
+        User user = AuthHelper.requireApproved(request);
+        if (user == null) return HttpHelper.cors(request.createResponseBuilder(HttpStatus.UNAUTHORIZED)).body("Unauthorized").build();
+        log.info("Processing uploadTradeComicImage for comic id: {} by user: {}", id, user.getId());
+        try {
+            int comicId = Integer.parseInt(id);
+            ImageService imageService = ImageService.getServiceInstance();
+            ImageResizeService imageResizeService = ImageResizeService.getServiceInstance();
+            ComicService comicService = ComicService.getServiceInstance();
+
+            byte[] requestBody = request.getBody().orElseThrow(() -> new IllegalArgumentException("No body in image upload request."));
+            String boundary = extractBoundary(request.getHeaders().get("content-type"));
+            MultipartStream multipartStream = new MultipartStream(new ByteArrayInputStream(requestBody), boundary.getBytes());
+            List<byte[]> files = new ArrayList<>();
+            boolean nextPart = multipartStream.skipPreamble();
+            while (nextPart) {
+                String header = multipartStream.readHeaders();
+                if (header.contains("Content-Disposition: form-data; name=\"file\"")) {
+                    ByteArrayOutputStream fileContent = new ByteArrayOutputStream();
+                    multipartStream.readBodyData(fileContent);
+                    files.add(fileContent.toByteArray());
+                }
+                nextPart = multipartStream.readBoundary();
+            }
+            if (files.isEmpty()) throw new RuntimeException("No file part found in multipart upload.");
+            byte[] imageData = files.get(0);
+            imageData = imageResizeService.resizeIfTooTall(imageData, 900);
+
+            ComicBook comic = comicService.getComicById(comicId)
+                .orElseThrow(() -> new RuntimeException("Comic not found with id: " + comicId));
+            String comicNumberStr = comicNumberToString(comic.getNumber());
+
+            String largeImageName = comicId + "-trade-large.png";
+            imageService.updateImage(largeImageName, imageData, true, comicId, comic.getTitle(), comic.getSeries(), comicNumberStr);
+
+            String smallImageName = null;
+            try {
+                byte[] smallImageData = imageResizeService.resizeToHeight(imageData, 104);
+                smallImageName = comicId + "-trade-small.png";
+                imageService.updateImage(smallImageName, smallImageData, true, comicId, comic.getTitle(), comic.getSeries(), comicNumberStr);
+            } catch (Exception e) {
+                log.warn("Could not create trade thumbnail for comic {}, skipping small image.", comicId, e);
+            }
+
+            Trade trade = comic.getTrade() != null ? comic.getTrade() : new Trade();
+            trade.setTradeFrontImageId(largeImageName);
+            if (smallImageName != null) trade.setTradeSmallFrontImageId(smallImageName);
+            comic.setTrade(trade);
+            ComicBook updated = comicService.updateComic(comic);
+
+            return HttpHelper.cors(request.createResponseBuilder(HttpStatus.OK))
+                .header("Content-Type", "application/json")
+                .body(OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(updated))
+                .build();
+        } catch (Exception e) {
+            log.error("Error in uploadTradeComicImage.", e);
+            return HttpHelper.cors(request.createResponseBuilder(HttpStatus.INTERNAL_SERVER_ERROR))
+                .header("Content-Type", "text/plain").body("Error: " + e.getMessage()).build();
+        }
+    }
+
+    // ─── POST /api/comics/{id}/trade-back-image ───────────────────────────────
+
+    @FunctionName("uploadTradeComicBackImage")
+    public HttpResponseMessage uploadTradeComicBackImage(
+        @HttpTrigger(
+            name = "uploadTradeComicBackImage",
+            route = "comics/{id}/trade-back-image",
+            methods = {HttpMethod.POST},
+            authLevel = AuthorizationLevel.ANONYMOUS)
+        HttpRequestMessage<Optional<byte[]>> request,
+        @BindingName("id") String id)
+    {
+        User user = AuthHelper.requireApproved(request);
+        if (user == null) return HttpHelper.cors(request.createResponseBuilder(HttpStatus.UNAUTHORIZED)).body("Unauthorized").build();
+        log.info("Processing uploadTradeComicBackImage for comic id: {} by user: {}", id, user.getId());
+        try {
+            int comicId = Integer.parseInt(id);
+            ImageService imageService = ImageService.getServiceInstance();
+            ImageResizeService imageResizeService = ImageResizeService.getServiceInstance();
+            ComicService comicService = ComicService.getServiceInstance();
+
+            byte[] requestBody = request.getBody().orElseThrow(() -> new IllegalArgumentException("No body in image upload request."));
+            String boundary = extractBoundary(request.getHeaders().get("content-type"));
+            MultipartStream multipartStream = new MultipartStream(new ByteArrayInputStream(requestBody), boundary.getBytes());
+            List<byte[]> files = new ArrayList<>();
+            boolean nextPart = multipartStream.skipPreamble();
+            while (nextPart) {
+                String header = multipartStream.readHeaders();
+                if (header.contains("Content-Disposition: form-data; name=\"file\"")) {
+                    ByteArrayOutputStream fileContent = new ByteArrayOutputStream();
+                    multipartStream.readBodyData(fileContent);
+                    files.add(fileContent.toByteArray());
+                }
+                nextPart = multipartStream.readBoundary();
+            }
+            if (files.isEmpty()) throw new RuntimeException("No file part found in multipart upload.");
+            byte[] imageData = files.get(0);
+            imageData = imageResizeService.resizeIfTooTall(imageData, 900);
+
+            ComicBook comic = comicService.getComicById(comicId)
+                .orElseThrow(() -> new RuntimeException("Comic not found with id: " + comicId));
+            String comicNumberStr = comicNumberToString(comic.getNumber());
+
+            String largeImageName = comicId + "-trade-back-large.png";
+            imageService.updateImage(largeImageName, imageData, true, comicId, comic.getTitle(), comic.getSeries(), comicNumberStr);
+
+            String smallImageName = null;
+            try {
+                byte[] smallImageData = imageResizeService.resizeToHeight(imageData, 104);
+                smallImageName = comicId + "-trade-back-small.png";
+                imageService.updateImage(smallImageName, smallImageData, true, comicId, comic.getTitle(), comic.getSeries(), comicNumberStr);
+            } catch (Exception e) {
+                log.warn("Could not create trade back thumbnail for comic {}, skipping small image.", comicId, e);
+            }
+
+            Trade trade = comic.getTrade() != null ? comic.getTrade() : new Trade();
+            trade.setTradeBackImageId(largeImageName);
+            if (smallImageName != null) trade.setTradeSmallBackImageId(smallImageName);
+            comic.setTrade(trade);
+            ComicBook updated = comicService.updateComic(comic);
+
+            return HttpHelper.cors(request.createResponseBuilder(HttpStatus.OK))
+                .header("Content-Type", "application/json")
+                .body(OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(updated))
+                .build();
+        } catch (Exception e) {
+            log.error("Error in uploadTradeComicBackImage.", e);
+            return HttpHelper.cors(request.createResponseBuilder(HttpStatus.INTERNAL_SERVER_ERROR))
+                .header("Content-Type", "text/plain").body("Error: " + e.getMessage()).build();
         }
     }
 

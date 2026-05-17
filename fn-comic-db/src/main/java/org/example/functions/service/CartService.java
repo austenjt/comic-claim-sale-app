@@ -23,6 +23,7 @@ import org.example.functions.model.ShippingAddress;
 import org.example.functions.model.ClaimNotification;
 import org.example.functions.model.ComicBook;
 import org.example.functions.model.ComicNumber;
+import org.example.functions.model.Trade;
 import org.example.functions.model.User;
 import org.example.functions.model.enums.CartStatus;
 import org.example.functions.model.enums.ComicGrade;
@@ -309,6 +310,16 @@ public class CartService {
 
         cart.getItems().add(item);
         save(cart);
+
+        // Stamp offer details on the comic document so they are visible to all users
+        Trade trade = comic.getTrade() != null ? comic.getTrade() : new Trade();
+        trade.setOfferedGrade(grade);
+        trade.setCalculatedPrice(credit);
+        trade.setOfferedBy(user.getName() != null ? user.getName() : user.getEmail());
+        trade.setOfferedAt(Instant.now().toString());
+        comic.setTrade(trade);
+        ComicService.getServiceInstance().updateComic(comic);
+
         log.info("User {} added trade-in for comic {} at grade {} (credit: ${}) to cart {}", user.getId(), comicId, grade, credit, cart.getId());
         return cart;
     }
@@ -342,6 +353,10 @@ public class CartService {
         cart.setDiscountBreakdown(discountResult.getBreakdown());
         int bookCount = (int) cart.getItems().stream().filter(i -> !i.isSetContainer()).count();
         cart.setShippingCost(ShippingCalculator.estimate(bookCount).getEstimatedCost());
+        if (discountResult.isFreeShippingApplied()) {
+            cart.setShippingCost(0.0);
+            cart.setFreeShippingApplied(true);
+        }
         cart.setStatus(CartStatus.SUBMITTED);
         cart.setPaymentStatus(PaymentStatus.UNPAID);
         if (customerNotes != null && !customerNotes.isBlank()) {

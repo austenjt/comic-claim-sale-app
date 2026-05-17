@@ -14,9 +14,6 @@
       <button type="button" class="btn-nav-next" [disabled]="!nextItem" (click)="nextItem && navigateTo(nextItem)">Next &#8594;</button>
     </div>
     <div class="nav-right">
-      <button class="btn-share" (click)="copyShareLink()">
-        {{ linkCopied ? '✓ Link Copied!' : '&#128279; Share' }}
-      </button>
       <ng-container *ngIf="auth.isAdmin()">
         <button class="btn-save" [class.btn-save-done]="saveDone" (click)="saveContainer()" [disabled]="saving"
                 [attr.aria-describedby]="saveError ? 'set-save-error' : null">
@@ -43,14 +40,20 @@
              class="zoomable" (click)="toggleZoom()">
         <div *ngIf="auth.isAdmin()" class="img-update-bar">
           <ng-container *ngIf="activeImage === 'front'">
-            <button class="img-update-btn" (click)="openCaptureModal('front')" [disabled]="imageUploading">
+            <button class="img-update-btn" (click)="openCaptureModal('front')" [disabled]="imageUploading || saving">
               {{ imageUploading ? 'Uploading...' : 'Update Front Cover' }}
+            </button>
+            <button *ngIf="container.largeCachedImageId" class="btn-img-delete" (click)="clearFrontImage()" [disabled]="imageUploading || saving">
+              {{ saving ? '…' : 'Delete' }}
             </button>
             <div *ngIf="imageUploadError" class="img-upload-error">{{ imageUploadError }}</div>
           </ng-container>
           <ng-container *ngIf="activeImage === 'back'">
-            <button class="img-update-btn" (click)="openCaptureModal('back')" [disabled]="backImageUploading">
+            <button class="img-update-btn" (click)="openCaptureModal('back')" [disabled]="backImageUploading || saving">
               {{ backImageUploading ? 'Uploading...' : 'Update Back Cover' }}
+            </button>
+            <button *ngIf="container.largeBackImageId" class="btn-img-delete" (click)="clearBackImage()" [disabled]="backImageUploading || saving">
+              {{ saving ? '…' : 'Delete' }}
             </button>
             <div *ngIf="backImageUploadError" class="img-upload-error">{{ backImageUploadError }}</div>
           </ng-container>
@@ -85,6 +88,12 @@
 
       <div class="detail-section">
         <div class="detail-section-title">Set Details</div>
+
+        <div class="detail-item">
+          <span class="detail-label">Title</span>
+          <span *ngIf="!auth.isAdmin()" class="detail-value">{{ container.title }}</span>
+          <input *ngIf="auth.isAdmin()" class="detail-edit-input" type="text" [(ngModel)]="editContainer!.title">
+        </div>
 
         <div class="detail-item" *ngIf="auth.isAdmin() || (container.series && container.series !== '')">
           <span class="detail-label">Series</span>
@@ -121,6 +130,14 @@
         <div class="detail-item" *ngIf="container.ebayListingUrl">
           <span class="detail-label">eBay Listing</span>
           <span class="detail-value"><a [href]="container.ebayListingUrl" target="_blank" rel="noopener noreferrer">View on eBay</a></span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label"></span>
+          <span class="detail-value">
+            <button class="btn-share" (click)="copyShareLink()">
+              {{ linkCopied ? '✓ Link Copied!' : '&#128279; Share' }}
+            </button>
+          </span>
         </div>
       </div>
 
@@ -259,6 +276,11 @@
               [disabled]="removingId === member.id"
               (click)="$event.preventDefault(); $event.stopPropagation(); removeFromSet(member)">
               {{ removingId === member.id ? 'Removing…' : 'Remove' }}
+            </button>
+            <button *ngIf="auth.isAdmin()" class="btn-copy-member"
+              [disabled]="copyingId === member.id"
+              (click)="$event.preventDefault(); $event.stopPropagation(); copyMember(member, $event)">
+              {{ copiedId === member.id ? 'Copied ✓' : copyingId === member.id ? 'Copying…' : 'Copy' }}
             </button>
           </div>
         </div>

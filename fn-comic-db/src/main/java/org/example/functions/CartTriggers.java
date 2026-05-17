@@ -18,8 +18,11 @@ import org.example.functions.model.ShippingAddress;
 import org.example.functions.model.ShippingEstimate;
 import org.example.functions.model.User;
 import org.example.functions.model.enums.ComicGrade;
+import org.example.functions.model.Discount;
+import org.example.functions.model.enums.DiscountType;
 import org.example.functions.service.ArchiveService;
 import org.example.functions.service.CartService;
+import org.example.functions.service.DiscountService;
 import org.example.functions.util.AuthHelper;
 import org.example.functions.util.HttpHelper;
 import org.example.functions.util.Mappers;
@@ -50,6 +53,18 @@ public class CartTriggers {
                 Cart c = cart.get();
                 long bookCount = c.getItems().stream().filter(i -> !i.isSetContainer()).count();
                 ShippingEstimate shipping = ShippingCalculator.estimate((int) bookCount);
+                boolean freeShipping = DiscountService.getServiceInstance().getActiveDiscounts().stream()
+                    .filter(d -> d.getType() == DiscountType.FREE_SHIPPING_OVER_X_BOOKS)
+                    .anyMatch(d -> bookCount >= d.getXBooks());
+                if (freeShipping) {
+                    shipping = ShippingEstimate.builder()
+                        .bookCount(shipping.getBookCount())
+                        .packagingTier(shipping.getPackagingTier())
+                        .estimatedCost(0.0)
+                        .isFree(true)
+                        .notes("Free shipping applies (" + bookCount + " books).")
+                        .build();
+                }
                 ObjectNode cartNode = OBJECT_MAPPER.valueToTree(c);
                 cartNode.set("shippingEstimate", OBJECT_MAPPER.valueToTree(shipping));
                 body = OBJECT_MAPPER.writeValueAsString(cartNode);

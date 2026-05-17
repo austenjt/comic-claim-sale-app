@@ -162,28 +162,113 @@
   <section class="hiw-section" id="trade-in">
     <h2>Trade-In Program</h2>
     <p>
-      The <a routerLink="/trade">Trade Board</a> lists comics we are actively looking to add to our
-      collection. If you own one, you may offer it as trade-in credit toward your order. The credit
-      amount is based on the condition of your copy — select your grade when submitting the offer.
+      We are actively looking to add certain comics to our collection. If you own a copy of one of
+      those comics, you can offer it as a <strong>trade-in credit</strong> toward your order — reducing
+      what you owe. The credit amount is calculated automatically based on the condition of your copy.
     </p>
+
+    <h3>Finding WANTED Comics</h3>
+    <p>
+      There are two ways to browse comics we want:
+    </p>
+    <ul>
+      <li>
+        <strong>Trade Board</strong> (<a routerLink="/trade">lightningcomics.rocks/trade</a>) — a
+        dedicated page showing all WANTED comics as cards with cover image, title, NM estimated value,
+        and an <em>Offer Trade</em> button. If another buyer has already submitted an offer on a comic,
+        the button shows <em>Offered</em> and is disabled.
+      </li>
+      <li>
+        <strong>Comic Detail page</strong> — WANTED comics look slightly different from For-Sale
+        comics: there is no sale price displayed and no <em>Claim</em> button. Instead, a
+        <em>Trade Status</em> section appears with a grade selector and a <em>Trade</em> button, along
+        with a <em>Trade Info</em> section showing the NM estimated value and any offer details.
+      </li>
+    </ul>
+
+    <h3>How the Credit is Calculated</h3>
+    <p>
+      Each WANTED comic has an <strong>NM Estimated Value</strong> — the reference price for a
+      Near Mint (9.4) copy. Your trade credit is calculated as:
+    </p>
+    <p><em>Trade Credit = NM Value × Grade Multiplier</em></p>
+    <p>
+      Higher-grade copies earn a premium multiplier; lower grades receive less. For example, a Gem
+      Mint 10.0 copy earns 3.5× the NM value, while a Near Mint 9.4 earns 1.0×. You can see the
+      calculated credit <strong>before you commit</strong> — it updates live as you select a grade
+      from the dropdown on either the Comic Detail page or the Trade Board popup.
+    </p>
+
+    <h3>Submitting a Trade Offer</h3>
     <ol>
       <li>
-        <strong>Submit your cart</strong> — your trade offer will be reviewed and must be approved
-        by our team before proceeding.
+        <strong>Select your grade</strong> — on the Comic Detail page, choose your copy's condition
+        from the <em>Your Grade</em> dropdown. The <em>Trade Credit</em> updates immediately. On the
+        Trade Board, click <em>Offer Trade</em> to open a popup with the same grade selector and
+        live credit preview.
       </li>
       <li>
-        <strong>Receive shipping instructions</strong> — once approved, you will receive an email
-        with our mailing address and instructions for sending your comic.
+        <strong>Click Trade / Add to Cart</strong> — this adds the WANTED comic to your cart as a
+        trade-in credit line. The credit appears as a negative amount and reduces your cart total.
+        Only one trade item is allowed per order; attempting to add a second will show an error.
       </li>
       <li>
-        <strong>Pay your balance</strong> — after we receive and verify your comic, the Pay button
-        on your submitted cart will be activated so you can pay any remaining balance.
+        <strong>Upload photos of your copy</strong> — after adding the trade item, open the Comic
+        Detail page for that WANTED comic. You will see <em>Upload Your Copy — Front</em> and
+        <em>Upload Your Copy — Back</em> buttons below the cover image (switch to the Back tab for
+        the back photo). Upload clear, well-lit photos so we can verify the grade before approving
+        the offer.
       </li>
       <li>
-        <strong>We ship your order</strong> — once payment is confirmed, your order will be
-        fulfilled and shipped to you.
+        <strong>Add items to buy</strong> — continue browsing and claim any comics you want to
+        purchase. Your cart total reflects the trade credit automatically.
+      </li>
+      <li>
+        <strong>Submit your order</strong> — click <em>Submit Order</em> from your cart when ready.
+        Note: if the trade credit exceeds your cart total, submission is blocked — add more items
+        first so the remaining balance is non-negative.
       </li>
     </ol>
+
+    <h3>After You Submit</h3>
+    <ol>
+      <li>
+        <strong>Offer review</strong> — we review your offer, the photos you uploaded, and the grade
+        you selected. The <em>Trade Info</em> section on the comic's detail page will update to show
+        whether the offer has been accepted.
+      </li>
+      <li>
+        <strong>Ship your copy to us</strong> — once accepted, we will contact you with our mailing
+        address and packing instructions. Ship your comic so it arrives safely.
+      </li>
+      <li>
+        <strong>We verify receipt</strong> — once we receive and inspect your copy, the <em>Trade
+        Received</em> status on the detail page will update to <em>Yes</em>. At this point your cart
+        is unblocked for fulfillment.
+      </li>
+      <li>
+        <strong>Pay your balance</strong> — use the Pay Now or Pay Later button in your cart to
+        settle any remaining amount owed after the trade credit is applied.
+      </li>
+      <li>
+        <strong>We ship your order</strong> — once payment is confirmed your order is fulfilled and
+        shipped to you.
+      </li>
+    </ol>
+
+    <h3>Trade Info Section</h3>
+    <p>
+      The <em>Trade Info</em> section on a WANTED comic's detail page is visible to everyone and
+      shows the current state of any offer:
+    </p>
+    <ul>
+      <li><strong>NM Value</strong> — the reference price used for credit calculation</li>
+      <li><strong>Offered Grade</strong> — the grade submitted with the trade offer</li>
+      <li><strong>Trade Credit</strong> — the dollar amount of credit calculated at offer time</li>
+      <li><strong>Offer Accepted</strong> — whether we have reviewed and accepted the offer</li>
+      <li><strong>Trade Received</strong> — whether your physical copy has arrived with us</li>
+      <li><strong>Notes</strong> — any notes about the offer from our team</li>
+    </ul>
   </section>
 
   <section class="hiw-section" id="live-notifications">
@@ -469,6 +554,69 @@
     <p>
       Uploaded images are stored with metadata (comic ID, title, series, issue number) attached
       to each image record.
+    </p>
+  </section>
+
+  <section class="hiw-section hiw-admin" id="admin-trade">
+    <h2>Managing Trade-In Offers</h2>
+    <p>
+      WANTED comics are managed through the Listing type field on each comic's detail page. When a
+      buyer submits a trade offer, all offer details are recorded on the comic document and visible
+      in the <em>Trade Info</em> section — no separate orders screen is needed.
+    </p>
+
+    <h3>Marking a Comic as WANTED</h3>
+    <ol>
+      <li>
+        Open the comic's detail page while logged in as admin and scroll to the <em>Sale Info</em>
+        section.
+      </li>
+      <li>
+        Set <strong>Listing</strong> to <em>Wanted</em>. The comic disappears from the buyer
+        dashboard and appears on the Trade Board instead.
+      </li>
+      <li>
+        Set the <strong>NM Estimated Value</strong> in the <em>Trade Info</em> section — this is
+        the reference price used to calculate trade credits. Without this value, buyers cannot
+        submit a trade offer (the <em>Trade</em> button is disabled).
+      </li>
+      <li>Click <strong>Save</strong>.</li>
+    </ol>
+
+    <h3>Reviewing an Offer</h3>
+    <p>
+      When a buyer submits a trade offer, the <em>Trade Info</em> section on the comic's detail page
+      is automatically populated with:
+    </p>
+    <ul>
+      <li><strong>Offered Grade</strong> — the condition the buyer reported for their copy</li>
+      <li><strong>Trade Credit</strong> — the calculated credit amount at that grade</li>
+      <li><strong>Offered By</strong> — the buyer's name or email</li>
+      <li><strong>Offered At</strong> — timestamp of when the offer was submitted</li>
+    </ul>
+    <p>
+      The buyer also uploads front and back photos of their copy, which are stored and viewable by
+      scrolling to the front/back thumbnail on the detail page.
+    </p>
+    <p>
+      To accept the offer, check <strong>Offer Accepted</strong> in the Trade Info section and click
+      Save. Contact the buyer with your mailing address so they can ship their copy.
+    </p>
+
+    <h3>Confirming Receipt</h3>
+    <p>
+      Once the buyer's comic arrives and you have inspected it, check <strong>Trade Received</strong>
+      in the Trade Info section and click Save. This unblocks fulfillment for any cart that contains
+      a trade item for this comic. The status is visible to the buyer on the comic's detail page so
+      they know their copy has arrived.
+    </p>
+
+    <h3>Trade-In Items in Orders</h3>
+    <p>
+      Trade-in items appear in the buyer's cart and in your <em>Manage Orders</em> screen as a line
+      with a negative price (the credit amount). They are excluded from discount calculations and do
+      not trigger the <em>soldTo</em> stamp on fulfillment — the comic remains in your database in
+      WANTED status until you manually change its listing type or delete it.
     </p>
   </section>
 

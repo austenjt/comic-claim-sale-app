@@ -137,6 +137,11 @@
                 (click)="$event.preventDefault(); $event.stopPropagation(); openAwardModal(comic)">Award</button>
               <button *ngIf="auth.isAdmin() && !comic.isForSale" class="btn-sell"
                 (click)="$event.preventDefault(); $event.stopPropagation(); markForSale(comic)">Sell</button>
+              <button *ngIf="auth.isAdmin()" class="btn-copy"
+                [disabled]="copyingId === comic.id"
+                (click)="$event.preventDefault(); $event.stopPropagation(); copyComic(comic, $event)">
+                {{ copiedId === comic.id ? 'Copied ✓' : copyingId === comic.id ? 'Copying…' : 'Copy' }}
+              </button>
             </ng-template>
           </div>
         </div>

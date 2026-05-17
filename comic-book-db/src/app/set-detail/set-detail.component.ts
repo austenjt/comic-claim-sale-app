@@ -40,6 +40,8 @@ export class SetDetailComponent implements OnInit, OnDestroy {
   captureModalTarget: 'front' | 'back' | null = null;
 
   removingId: number | null = null;
+  copyingId: number | null = null;
+  copiedId: number | null = null;
   editContainer: Comic | null = null;
   saving = false;
   saveError = '';
@@ -107,6 +109,25 @@ export class SetDetailComponent implements OnInit, OnDestroy {
       this.cartService.getClaimedMap()
         .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe({ next: m => this.claimedMap = m, error: () => {} });
+      this.comicService.getComic(id).subscribe(comic => {
+        this.container = comic;
+        this.setMembers = comic?.items ?? [];
+        this.loading = false;
+        if (comic) {
+          // Populate nav so Prev/Next work when viewing member comics.
+          // Include the container first (docType='SET') so getSetContainerId() still resolves
+          // the "View Set" link on the comic-detail page.
+          const members = (comic.items ?? []).filter(m => m.docType !== 'SET');
+          this.navService.setList([comic, ...members]);
+          this.editContainer = structuredClone(comic);
+          const count = (comic.items ?? []).length;
+          this.titleService.setTitle(`${comic.title} Set — Lightning Comics PDX`);
+          this.meta.updateTag({ name: 'description', content: `${comic.title} — set of ${count} comic${count !== 1 ? 's' : ''} available for claim at Lightning Comics PDX in Oregon City, OR.` });
+          this.maybeRecordView(id);
+        }
+      });
+
+      this.cartService.getClaimedMap().subscribe({ next: m => this.claimedMap = m, error: () => {} });
       if (this.auth.isApproved()) {
         this.cartService.getMyCart()
           .pipe(takeUntilDestroyed(this.destroyRef))
@@ -248,6 +269,33 @@ export class SetDetailComponent implements OnInit, OnDestroy {
     this.captureModalTarget = null;
   }
 
+  private maybeRecordView(id: number): void {
+    const key = `lc-view-set-${id}`;
+    const last = localStorage.getItem(key);
+    const now = Date.now();
+    if (last && (now - parseInt(last, 10)) < 24 * 60 * 60 * 1000) {
+      return;
+    }
+    this.comicService.recordView(id).subscribe(r => {
+      if (this.container) this.container.viewCount = r.viewCount;
+      localStorage.setItem(key, String(now));
+    });
+  }
+
+  clearFrontImage(): void {
+    if (!this.editContainer) return;
+    this.editContainer.largeCachedImageId = null;
+    this.editContainer.smallCachedImageId = null;
+    this.saveContainer();
+  }
+
+  clearBackImage(): void {
+    if (!this.editContainer) return;
+    this.editContainer.largeBackImageId = null;
+    this.editContainer.smallBackImageId = null;
+    this.saveContainer();
+  }
+
   private uploadFrontImage(file: File): void {
     if (!this.container) return;
     this.imageUploading = true;
@@ -295,6 +343,29 @@ export class SetDetailComponent implements OnInit, OnDestroy {
         this.removingId = null;
       },
       error: () => { this.removingId = null; }
+    });
+  }
+
+  copyMember(comic: Comic, event: Event): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.copyingId = comic.id;
+    const copy: Comic = {
+      ...comic,
+      id: -1,
+      title: comic.title + ' (Copied)',
+      dateSold: null,
+      soldTo: null,
+      sold: null,
+      items: undefined,
+    };
+    this.comicService.addComic(copy).subscribe({
+      next: () => {
+        this.copyingId = null;
+        this.copiedId = comic.id;
+        setTimeout(() => { this.copiedId = null; }, 2000);
+      },
+      error: () => { this.copyingId = null; }
     });
   }
 

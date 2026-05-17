@@ -42,18 +42,25 @@ export class ComicDetailComponent implements OnInit {
   backImageUploadErrorDetail = '';
   backImageUploadErrorExpanded = false;
   captureModalOpen = false;
-  captureModalTarget: 'front' | 'back' | null = null;
+  captureModalTarget: 'front' | 'back' | 'trade-front' | 'trade-back' | null = null;
+  tradeImageUploading = false;
+  tradeImageUploadError = '';
+  tradeBackImageUploading = false;
+  tradeBackImageUploadError = '';
   readonly Math = Math;
   linkCopied = false;
   pendingDelete = false;
   deleting = false;
   editComic: Comic | null = null;
+  editGradingCompany = '';
   editWritersStr = '';
   editArtistsStr = '';
   salePriceStr = '';
   saving = false;
   saveError = '';
   saveDone = false;
+  selectedTradeGrade: number | null = null;
+  tradeError = '';
   enums: ComicEnums = { coverVariants: [], gradingCompanies: [], grades: [], pageQualities: [] };
 
   constructor(
@@ -123,6 +130,8 @@ export class ComicDetailComponent implements OnInit {
     this.saving = false;
     this.saveError = '';
     this.saveDone = false;
+    this.selectedTradeGrade = null;
+    this.tradeError = '';
     this.imageUploading = false;
     this.imageUploadErrorSummary = '';
     this.imageUploadErrorDetail = '';
@@ -133,6 +142,10 @@ export class ComicDetailComponent implements OnInit {
     this.backImageUploadErrorExpanded = false;
     this.captureModalOpen = false;
     this.captureModalTarget = null;
+    this.tradeImageUploading = false;
+    this.tradeImageUploadError = '';
+    this.tradeBackImageUploading = false;
+    this.tradeBackImageUploadError = '';
   }
 
   claimedDate(comicId: number): string | null {
@@ -150,6 +163,26 @@ export class ComicDetailComponent implements OnInit {
            (this.myCart?.status === 'OPEN' || !this.myCart);
   }
 
+  get previewTradeCredit(): number | null {
+    if (!this.selectedTradeGrade || !this.comic?.nmEstimatedValue) return null;
+    const multiplier = this.configService.gradeMultiplier(this.selectedTradeGrade);
+    if (multiplier === undefined) return null;
+    return Math.round(this.comic.nmEstimatedValue * multiplier * 100) / 100;
+  }
+
+  get tradeGradeWarning(): boolean {
+    const desired = this.comic?.trade?.desiredGrade;
+    if (!desired || !this.selectedTradeGrade) return false;
+    return Math.abs(this.selectedTradeGrade - desired) > 2.0;
+  }
+
+  canTrade(comicId: number): boolean {
+    return !this.claimedDate(comicId) &&
+           !this.comic?.soldTo &&
+           !!this.comic?.nmEstimatedValue &&
+           (this.myCart?.status === 'OPEN' || !this.myCart);
+  }
+
   claim(): void {
     if (!this.comic) return;
     this.claimError = '';
@@ -162,6 +195,23 @@ export class ComicDetailComponent implements OnInit {
       },
       error: err => {
         this.claimError = err?.error || 'Failed to claim comic.';
+        this.actionLoading = false;
+      }
+    });
+  }
+
+  tradeIn(): void {
+    if (!this.comic || !this.selectedTradeGrade) return;
+    this.tradeError = '';
+    this.actionLoading = true;
+    this.cartService.addTradeItem(String(this.comic.id), this.selectedTradeGrade).subscribe({
+      next: cart => {
+        this.myCart = cart;
+        this.claimedMap[String(this.comic!.id)] = new Date().toISOString();
+        this.actionLoading = false;
+      },
+      error: err => {
+        this.tradeError = err?.error || 'Failed to add trade item.';
         this.actionLoading = false;
       }
     });
@@ -286,6 +336,17 @@ export class ComicDetailComponent implements OnInit {
     if (!this.editComic.grandComicDBInfo) {
       this.editComic.grandComicDBInfo = { gcdbIssueId: null, gcdbSeriesId: null, issueUrl: null, seriesUrl: null };
     }
+    if (!this.editComic.trade) {
+      this.editComic.trade = { desiredGrade: null, offeredGrade: null, calculatedPrice: null, offerAccepted: null, tradeReceived: null, tradeNotes: null, offeredBy: null, offeredAt: null, tradeFrontImageId: null, tradeSmallFrontImageId: null, tradeBackImageId: null, tradeSmallBackImageId: null };
+    }
+    const cond = this.editComic.comicCondition;
+    if (cond?.cgcCondition) {
+      this.editGradingCompany = 'CGC';
+    } else if (cond?.cbcsCondition) {
+      this.editGradingCompany = 'CBCS';
+    } else {
+      this.editGradingCompany = cond?.certificationCompany || 'NOT CERTIFIED';
+    }
     this.editWritersStr = (this.editComic.writer ?? []).join(', ');
     this.editArtistsStr = (this.editComic.artist ?? []).join(', ');
     this.salePriceStr = this.editComic.salePrice != null
@@ -299,6 +360,29 @@ export class ComicDetailComponent implements OnInit {
     if (this.parentSetId !== null) {
       this.editComic.isForSale = true;
       this.editComic.listingType = ListingType.FOR_SALE;
+    }
+  }
+
+  onGradingCompanyChange(): void {
+    const cond = this.editComic?.comicCondition;
+    if (!cond) return;
+    cond.certificationCompany = this.editGradingCompany;
+    if (this.editGradingCompany === 'CGC') {
+      cond.isGraded = true;
+      if (!cond.cgcCondition) {
+        cond.cgcCondition = { label: null, grade: null, pageQuality: null, pedigree: null, signature: null, degreeOfRestoration: null, graderNotes: null };
+      }
+      cond.cbcsCondition = null;
+    } else if (this.editGradingCompany === 'CBCS') {
+      cond.isGraded = true;
+      cond.cgcCondition = null;
+      if (!cond.cbcsCondition) {
+        cond.cbcsCondition = { label: null, grade: null, pageQuality: null, pedigree: null, signature: null, degreeOfRestoration: null };
+      }
+    } else {
+      cond.isGraded = false;
+      cond.cgcCondition = null;
+      cond.cbcsCondition = null;
     }
   }
 
@@ -358,6 +442,14 @@ export class ComicDetailComponent implements OnInit {
       )
       .subscribe(r => {
         if (r && this.comic) this.comic.viewCount = r.viewCount;
+      .subscribe(comic => {
+        this.comic = comic;
+        this.loading = false;
+        if (comic) {
+          this.buildPageMeta(comic);
+        }
+        if (comic && this.auth.isAdmin()) this.initEditComic(comic);
+        if (comic) this.maybeRecordView(id);
       });
   }
 
@@ -372,6 +464,7 @@ export class ComicDetailComponent implements OnInit {
   }
 
   openCaptureModal(target: 'front' | 'back'): void {
+  openCaptureModal(target: 'front' | 'back' | 'trade-front' | 'trade-back'): void {
     this.captureModalTarget = target;
     this.captureModalOpen = true;
   }
@@ -381,6 +474,10 @@ export class ComicDetailComponent implements OnInit {
       this.uploadFrontImage(file);
     } else if (this.captureModalTarget === 'back') {
       this.uploadBackImage(file);
+    } else if (this.captureModalTarget === 'trade-front') {
+      this.uploadTradeFrontImage(file);
+    } else if (this.captureModalTarget === 'trade-back') {
+      this.uploadTradeBackImage(file);
     }
     this.captureModalOpen = false;
     this.captureModalTarget = null;
@@ -389,6 +486,33 @@ export class ComicDetailComponent implements OnInit {
   closeCaptureModal(): void {
     this.captureModalOpen = false;
     this.captureModalTarget = null;
+  }
+
+  private maybeRecordView(id: number): void {
+    const key = `lc-view-${id}`;
+    const last = localStorage.getItem(key);
+    const now = Date.now();
+    if (last && (now - parseInt(last, 10)) < 24 * 60 * 60 * 1000) {
+      return;
+    }
+    this.comicService.recordView(id).subscribe(r => {
+      if (this.comic) this.comic.viewCount = r.viewCount;
+      localStorage.setItem(key, String(now));
+    });
+  }
+
+  clearFrontImage(): void {
+    if (!this.editComic) return;
+    this.editComic.largeCachedImageId = null;
+    this.editComic.smallCachedImageId = null;
+    this.saveComic();
+  }
+
+  clearBackImage(): void {
+    if (!this.editComic) return;
+    this.editComic.largeBackImageId = null;
+    this.editComic.smallBackImageId = null;
+    this.saveComic();
   }
 
   private uploadFrontImage(file: File): void {
@@ -433,6 +557,48 @@ export class ComicDetailComponent implements OnInit {
         const sizeMB = (file.size / 1024 / 1024).toFixed(1);
         this.backImageUploadErrorSummary = `Upload failed (${sizeMB} MB).`;
         this.backImageUploadErrorDetail = err?.error || err?.message || 'Image may be too large or an invalid format.';
+      }
+    });
+  }
+
+  private uploadTradeFrontImage(file: File): void {
+    if (!this.comic) return;
+    this.tradeImageUploading = true;
+    this.tradeImageUploadError = '';
+    this.imageService.uploadTradeFrontImage(this.comic.id, file).subscribe({
+      next: (updatedComic: Comic) => {
+        this.tradeImageUploading = false;
+        if (this.comic && updatedComic.trade) {
+          if (!this.comic.trade) this.comic.trade = updatedComic.trade;
+          this.comic.trade.tradeFrontImageId = updatedComic.trade.tradeFrontImageId;
+          this.comic.trade.tradeSmallFrontImageId = updatedComic.trade.tradeSmallFrontImageId;
+        }
+      },
+      error: (err: any) => {
+        this.tradeImageUploading = false;
+        const sizeMB = (file.size / 1024 / 1024).toFixed(1);
+        this.tradeImageUploadError = `Upload failed (${sizeMB} MB). ${err?.error || err?.message || ''}`.trim();
+      }
+    });
+  }
+
+  private uploadTradeBackImage(file: File): void {
+    if (!this.comic) return;
+    this.tradeBackImageUploading = true;
+    this.tradeBackImageUploadError = '';
+    this.imageService.uploadTradeBackImage(this.comic.id, file).subscribe({
+      next: (updatedComic: Comic) => {
+        this.tradeBackImageUploading = false;
+        if (this.comic && updatedComic.trade) {
+          if (!this.comic.trade) this.comic.trade = updatedComic.trade;
+          this.comic.trade.tradeBackImageId = updatedComic.trade.tradeBackImageId;
+          this.comic.trade.tradeSmallBackImageId = updatedComic.trade.tradeSmallBackImageId;
+        }
+      },
+      error: (err: any) => {
+        this.tradeBackImageUploading = false;
+        const sizeMB = (file.size / 1024 / 1024).toFixed(1);
+        this.tradeBackImageUploadError = `Upload failed (${sizeMB} MB). ${err?.error || err?.message || ''}`.trim();
       }
     });
   }

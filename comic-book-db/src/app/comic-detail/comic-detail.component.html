@@ -51,10 +51,28 @@
              alt="Comic Image" loading="lazy"
              class="zoomable" (click)="toggleZoom()">
 
+        <div *ngIf="auth.isApproved() && !auth.isAdmin() && comic.listingType === 'WANTED' && isInMyCart(comic.id)" class="img-update-bar">
+          <ng-container *ngIf="activeImage === 'front'">
+            <button class="img-update-btn" (click)="openCaptureModal('trade-front')" [disabled]="tradeImageUploading">
+              {{ tradeImageUploading ? 'Uploading...' : 'Upload Your Copy - Front' }}
+            </button>
+            <div *ngIf="tradeImageUploadError" class="img-upload-error">{{ tradeImageUploadError }}</div>
+          </ng-container>
+          <ng-container *ngIf="activeImage === 'back'">
+            <button class="img-update-btn" (click)="openCaptureModal('trade-back')" [disabled]="tradeBackImageUploading">
+              {{ tradeBackImageUploading ? 'Uploading...' : 'Upload Your Copy - Back' }}
+            </button>
+            <div *ngIf="tradeBackImageUploadError" class="img-upload-error">{{ tradeBackImageUploadError }}</div>
+          </ng-container>
+        </div>
+
         <div *ngIf="auth.isAdmin()" class="img-update-bar">
           <ng-container *ngIf="activeImage === 'front'">
-            <button class="img-update-btn" (click)="openCaptureModal('front')" [disabled]="imageUploading">
+            <button class="img-update-btn" (click)="openCaptureModal('front')" [disabled]="imageUploading || saving">
               {{ imageUploading ? 'Uploading...' : 'Update Front Cover' }}
+            </button>
+            <button *ngIf="comic.largeCachedImageId" class="btn-img-delete" (click)="clearFrontImage()" [disabled]="imageUploading || saving">
+              {{ saving ? '…' : 'Delete' }}
             </button>
             <div *ngIf="imageUploadErrorSummary" class="img-upload-error">
               {{ imageUploadErrorSummary }}
@@ -65,8 +83,11 @@
             </div>
           </ng-container>
           <ng-container *ngIf="activeImage === 'back'">
-            <button class="img-update-btn" (click)="openCaptureModal('back')" [disabled]="backImageUploading">
+            <button class="img-update-btn" (click)="openCaptureModal('back')" [disabled]="backImageUploading || saving">
               {{ backImageUploading ? 'Uploading...' : 'Update Back Cover' }}
+            </button>
+            <button *ngIf="comic.largeBackImageId" class="btn-img-delete" (click)="clearBackImage()" [disabled]="backImageUploading || saving">
+              {{ saving ? '…' : 'Delete' }}
             </button>
             <div *ngIf="backImageUploadErrorSummary" class="img-upload-error">
               {{ backImageUploadErrorSummary }}
@@ -106,6 +127,12 @@
       <!-- Issue Details -->
       <div class="detail-section">
         <div class="detail-section-title">Issue Details</div>
+
+        <div class="detail-item">
+          <span class="detail-label">Title</span>
+          <span *ngIf="!auth.isAdmin()" class="detail-value">{{comic.title}}</span>
+          <input *ngIf="auth.isAdmin()" class="detail-edit-input" type="text" [(ngModel)]="editComic!.title">
+        </div>
 
         <div class="detail-item" *ngIf="comic.id">
           <span class="detail-label">Internal ID</span>
@@ -180,7 +207,7 @@
           <input *ngIf="auth.isAdmin()" class="detail-edit-input" type="text" [(ngModel)]="editComic!.keyIssue">
         </div>
 
-        <div class="detail-item" *ngIf="auth.isAdmin() || comic.salePrice">
+        <div class="detail-item" *ngIf="comic.listingType !== 'WANTED' && (auth.isAdmin() || comic.salePrice)">
           <span class="detail-label">Sale Price</span>
           <span *ngIf="!auth.isAdmin()" class="detail-value">{{ comic.salePrice | currency:'USD':'symbol':'1.2-2' }}</span>
           <input *ngIf="auth.isAdmin()" class="detail-edit-input" type="text" inputmode="decimal" [(ngModel)]="salePriceStr" (blur)="onSalePriceBlur()">
@@ -188,6 +215,14 @@
         <div class="detail-item" *ngIf="comic.ebayListingUrl">
           <span class="detail-label">eBay Listing</span>
           <span class="detail-value"><a [href]="comic.ebayListingUrl" target="_blank" rel="noopener noreferrer">View on eBay</a></span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Share Link</span>
+          <span class="detail-value">
+            <button class="btn-share" (click)="copyShareLink()">
+              {{ linkCopied ? '✓ Link Copied!' : '&#128279; Share' }}
+            </button>
+          </span>
         </div>
       </div>
 
@@ -267,8 +302,15 @@
           <span class="detail-value">No</span>
         </div>
 
+        <div class="detail-item" *ngIf="auth.isAdmin()">
+          <span class="detail-label">Grading Co.</span>
+          <select class="detail-edit-select" [(ngModel)]="editGradingCompany" (ngModelChange)="onGradingCompanyChange()">
+            <option *ngFor="let gc of enums.gradingCompanies" [value]="gc">{{ gc }}</option>
+          </select>
+        </div>
+
         <!-- CGC -->
-        <ng-container *ngIf="comic.comicCondition?.cgcCondition">
+        <ng-container *ngIf="auth.isAdmin() ? editGradingCompany === 'CGC' : !!comic.comicCondition?.cgcCondition">
           <div class="detail-subsection-title">CGC</div>
 
           <div class="detail-item" *ngIf="auth.isAdmin() || comic.comicCondition?.certificationId">
@@ -333,7 +375,7 @@
         </ng-container>
 
         <!-- CBCS -->
-        <ng-container *ngIf="comic.comicCondition?.cbcsCondition">
+        <ng-container *ngIf="auth.isAdmin() ? editGradingCompany === 'CBCS' : !!comic.comicCondition?.cbcsCondition">
           <div class="detail-subsection-title">CBCS</div>
 
           <div class="detail-item" *ngIf="auth.isAdmin() || comic.comicCondition?.certificationId">
@@ -385,50 +427,66 @@
           </div>
         </ng-container>
 
-        <!-- Raw / Not Certified -->
-        <ng-container *ngIf="(auth.isAdmin() && !comic.comicCondition?.cgcCondition && !comic.comicCondition?.cbcsCondition) || comic.comicCondition?.notCertifiedGrade || comic.comicCondition?.notCertifiedLabel || comic.comicCondition?.notCertifiedPageQuality">
-          <div class="detail-subsection-title">Raw</div>
-
-          <div class="detail-item" *ngIf="auth.isAdmin() || comic.comicCondition?.notCertifiedLabel">
-            <span class="detail-label">Label</span>
-            <span *ngIf="!auth.isAdmin()" class="detail-value">{{comic.comicCondition!.notCertifiedLabel}}</span>
-            <input *ngIf="auth.isAdmin()" class="detail-edit-input" type="text" [(ngModel)]="editComic!.comicCondition!.notCertifiedLabel">
+        <!-- Raw / Not Certified — non-admin read view -->
+        <ng-container *ngIf="!auth.isAdmin() && !comic.comicCondition?.cgcCondition && !comic.comicCondition?.cbcsCondition">
+          <div class="detail-item" *ngIf="comic.comicCondition?.notCertifiedGrade != null">
+            <span class="detail-label">Grade</span>
+            <span class="detail-value">{{comic.comicCondition!.notCertifiedGrade | number:'1.1-1'}}</span>
           </div>
+          <div class="detail-item" *ngIf="comic.comicCondition?.notCertifiedPageQuality != null">
+            <span class="detail-label">Page Quality</span>
+            <span class="detail-value">{{comic.comicCondition!.notCertifiedPageQuality}}</span>
+          </div>
+          <div class="detail-item" *ngIf="comic.comicCondition?.notCertifiedLabel">
+            <span class="detail-label">Label</span>
+            <span class="detail-value">{{comic.comicCondition!.notCertifiedLabel}}</span>
+          </div>
+          <div class="detail-item" *ngIf="comic.comicCondition?.notCertifiedPedigree">
+            <span class="detail-label">Pedigree</span>
+            <span class="detail-value">{{comic.comicCondition!.notCertifiedPedigree}}</span>
+          </div>
+          <div class="detail-item" *ngIf="comic.comicCondition?.notCertifiedDegreeOfRestoration">
+            <span class="detail-label">Restoration</span>
+            <span class="detail-value">{{comic.comicCondition!.notCertifiedDegreeOfRestoration}}</span>
+          </div>
+          <div class="detail-item" *ngIf="comic.comicCondition?.notCertifiedSignature">
+            <span class="detail-label">Signature</span>
+            <span class="detail-value">{{comic.comicCondition!.notCertifiedSignature}}</span>
+          </div>
+        </ng-container>
 
-          <div class="detail-item" *ngIf="auth.isAdmin() || comic.comicCondition?.notCertifiedGrade">
-            <span class="detail-label">Estimated Grade</span>
-            <span *ngIf="!auth.isAdmin()" class="detail-value">{{comic.comicCondition!.notCertifiedGrade | number:'1.1-1'}}</span>
-            <select *ngIf="auth.isAdmin()" class="detail-edit-select" [(ngModel)]="editComic!.comicCondition!.notCertifiedGrade">
+        <!-- Raw / Not Certified — admin edit view -->
+        <ng-container *ngIf="auth.isAdmin() && editGradingCompany !== 'CGC' && editGradingCompany !== 'CBCS'">
+          <div class="detail-subsection-title">{{ editGradingCompany || 'Raw' }}</div>
+          <div class="detail-item">
+            <span class="detail-label">Label</span>
+            <input class="detail-edit-input" type="text" [(ngModel)]="editComic!.comicCondition!.notCertifiedLabel">
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Grade</span>
+            <select class="detail-edit-select" [(ngModel)]="editComic!.comicCondition!.notCertifiedGrade">
               <option [ngValue]="null">—</option>
               <option *ngFor="let g of enums.grades" [ngValue]="g.value">{{g.label}}</option>
             </select>
           </div>
-
-          <div class="detail-item" *ngIf="auth.isAdmin() || comic.comicCondition?.notCertifiedPageQuality">
-            <span class="detail-label">Estimated Page Quality</span>
-            <span *ngIf="!auth.isAdmin()" class="detail-value">{{comic.comicCondition!.notCertifiedPageQuality}}</span>
-            <select *ngIf="auth.isAdmin()" class="detail-edit-select" [(ngModel)]="editComic!.comicCondition!.notCertifiedPageQuality">
+          <div class="detail-item">
+            <span class="detail-label">Page Quality</span>
+            <select class="detail-edit-select" [(ngModel)]="editComic!.comicCondition!.notCertifiedPageQuality">
               <option [ngValue]="null">—</option>
               <option *ngFor="let pq of enums.pageQualities" [value]="pq">{{pq}}</option>
             </select>
           </div>
-
-          <div class="detail-item" *ngIf="auth.isAdmin() || comic.comicCondition?.notCertifiedPedigree">
+          <div class="detail-item">
             <span class="detail-label">Pedigree</span>
-            <span *ngIf="!auth.isAdmin()" class="detail-value">{{comic.comicCondition!.notCertifiedPedigree}}</span>
-            <input *ngIf="auth.isAdmin()" class="detail-edit-input" type="text" [(ngModel)]="editComic!.comicCondition!.notCertifiedPedigree">
+            <input class="detail-edit-input" type="text" [(ngModel)]="editComic!.comicCondition!.notCertifiedPedigree">
           </div>
-
-          <div class="detail-item" *ngIf="auth.isAdmin() || comic.comicCondition?.notCertifiedDegreeOfRestoration">
+          <div class="detail-item">
             <span class="detail-label">Restoration</span>
-            <span *ngIf="!auth.isAdmin()" class="detail-value">{{comic.comicCondition!.notCertifiedDegreeOfRestoration}}</span>
-            <input *ngIf="auth.isAdmin()" class="detail-edit-input" type="text" [(ngModel)]="editComic!.comicCondition!.notCertifiedDegreeOfRestoration">
+            <input class="detail-edit-input" type="text" [(ngModel)]="editComic!.comicCondition!.notCertifiedDegreeOfRestoration">
           </div>
-
-          <div class="detail-item" *ngIf="auth.isAdmin() || comic.comicCondition?.notCertifiedSignature">
+          <div class="detail-item">
             <span class="detail-label">Signature</span>
-            <span *ngIf="!auth.isAdmin()" class="detail-value">{{comic.comicCondition!.notCertifiedSignature}}</span>
-            <input *ngIf="auth.isAdmin()" class="detail-edit-checkbox" type="checkbox" [(ngModel)]="editComic!.comicCondition!.notCertifiedSignature">
+            <input class="detail-edit-checkbox" type="checkbox" [(ngModel)]="editComic!.comicCondition!.notCertifiedSignature">
           </div>
         </ng-container>
 
@@ -487,11 +545,6 @@
               Wanted
             </label>
           </div>
-        </div>
-        <div class="detail-item" *ngIf="editComic!.listingType === 'WANTED'">
-          <span class="detail-label">NM Estimated Value</span>
-          <input class="detail-edit-input" type="number" step="0.01" [(ngModel)]="editComic!.nmEstimatedValue"
-                 placeholder="NM reference price for trade calc">
         </div>
         <div class="detail-item">
           <span class="detail-label">Sale Price</span>
@@ -574,9 +627,72 @@
         </div>
       </div>
 
-      <!-- Claim Status — hidden for set members (claim the whole set from the Set Details page) -->
+      <!-- Trade Info — visible to all users for WANTED comics -->
+      <div class="detail-section" *ngIf="comic.listingType === 'WANTED'">
+        <div class="detail-section-title">Trade Info</div>
+
+        <div class="detail-item" *ngIf="auth.isAdmin() || comic.nmEstimatedValue">
+          <span class="detail-label">NM Value</span>
+          <span *ngIf="!auth.isAdmin()" class="detail-value">{{ comic.nmEstimatedValue | currency:'USD':'symbol':'1.2-2' }}</span>
+          <input *ngIf="auth.isAdmin()" class="detail-edit-input" type="number" step="0.01" [(ngModel)]="editComic!.nmEstimatedValue" placeholder="NM reference price for trade calc">
+        </div>
+
+        <div class="detail-item" *ngIf="auth.isAdmin() || comic.trade?.desiredGrade">
+          <span class="detail-label">Desired Grade</span>
+          <span *ngIf="!auth.isAdmin()" class="detail-value">{{ comic.trade?.desiredGrade | number:'1.1-1' }}</span>
+          <select *ngIf="auth.isAdmin()" class="detail-edit-select" [(ngModel)]="editComic!.trade!.desiredGrade">
+            <option [ngValue]="null">Any grade</option>
+            <option *ngFor="let g of enums.grades" [ngValue]="g.value">{{ g.label }}</option>
+          </select>
+        </div>
+
+        <div class="detail-item" *ngIf="auth.isAdmin() || comic.trade?.offeredGrade">
+          <span class="detail-label">Offered Grade</span>
+          <span *ngIf="!auth.isAdmin()" class="detail-value">{{ comic.trade?.offeredGrade | number:'1.1-1' }}</span>
+          <select *ngIf="auth.isAdmin()" class="detail-edit-select" [(ngModel)]="editComic!.trade!.offeredGrade">
+            <option [ngValue]="null">—</option>
+            <option *ngFor="let g of enums.grades" [ngValue]="g.value">{{ g.label }}</option>
+          </select>
+        </div>
+
+        <div class="detail-item" *ngIf="comic.trade?.calculatedPrice">
+          <span class="detail-label">Trade Credit</span>
+          <span class="detail-value">{{ comic.trade?.calculatedPrice | currency:'USD':'symbol':'1.2-2' }}</span>
+        </div>
+
+        <div class="detail-item" *ngIf="auth.isAdmin() || comic.trade?.offerAccepted != null">
+          <span class="detail-label">Offer Accepted</span>
+          <span *ngIf="!auth.isAdmin()" class="detail-value">{{ comic.trade?.offerAccepted ? 'Yes' : 'No' }}</span>
+          <input *ngIf="auth.isAdmin()" class="detail-edit-checkbox" type="checkbox" [(ngModel)]="editComic!.trade!.offerAccepted">
+        </div>
+
+        <div class="detail-item" *ngIf="auth.isAdmin() || comic.trade?.tradeReceived != null">
+          <span class="detail-label">Trade Received</span>
+          <span *ngIf="!auth.isAdmin()" class="detail-value">{{ comic.trade?.tradeReceived ? 'Yes' : 'No' }}</span>
+          <input *ngIf="auth.isAdmin()" class="detail-edit-checkbox" type="checkbox" [(ngModel)]="editComic!.trade!.tradeReceived">
+        </div>
+
+        <div class="detail-item" *ngIf="auth.isAdmin() || comic.trade?.tradeNotes">
+          <span class="detail-label">Notes</span>
+          <span *ngIf="!auth.isAdmin()" class="detail-value">{{ comic.trade?.tradeNotes }}</span>
+          <textarea *ngIf="auth.isAdmin()" class="detail-edit-textarea" [(ngModel)]="editComic!.trade!.tradeNotes"></textarea>
+        </div>
+
+        <div class="detail-item" *ngIf="auth.isAdmin() || comic.trade?.offeredBy">
+          <span class="detail-label">Offered By</span>
+          <span *ngIf="!auth.isAdmin()" class="detail-value">{{ comic.trade?.offeredBy }}</span>
+          <input *ngIf="auth.isAdmin()" class="detail-edit-input" type="text" [(ngModel)]="editComic!.trade!.offeredBy">
+        </div>
+
+        <div class="detail-item" *ngIf="comic.trade?.offeredAt">
+          <span class="detail-label">Offered At</span>
+          <span class="detail-value">{{ comic.trade?.offeredAt | date:'medium' }}</span>
+        </div>
+      </div>
+
+      <!-- Claim/Trade Status — hidden for set members (claim the whole set from the Set Details page) -->
       <div class="detail-section" *ngIf="parentSetId === null">
-        <div class="detail-section-title">Claim Status</div>
+        <div class="detail-section-title">{{ comic.listingType === 'WANTED' ? 'Trade Status' : 'Claim Status' }}</div>
 
         <!-- Sold -->
         <ng-container *ngIf="comic.soldTo">
@@ -621,12 +737,13 @@
 
         <!-- Available -->
         <ng-container *ngIf="!comic.soldTo && !comic.sold && !claimedDate(comic.id) && !isInMyCart(comic.id)">
-          <div class="detail-item">
+          <div class="detail-item" *ngIf="comic.listingType !== 'WANTED'">
             <span class="detail-label">Status</span>
             <span class="detail-value claim-status-available">Available</span>
           </div>
 
-          <div class="detail-item" *ngIf="auth.isApproved() && !auth.isAdmin()">
+          <!-- Claim action for FOR_SALE comics -->
+          <div class="detail-item" *ngIf="auth.isApproved() && !auth.isAdmin() && comic.listingType !== 'WANTED'">
             <span class="detail-label"></span>
             <span class="detail-value">
               <div *ngIf="claimError" class="claim-error">{{ claimError }}</div>
@@ -641,6 +758,42 @@
               </span>
             </span>
           </div>
+
+          <!-- Trade action for WANTED comics -->
+          <ng-container *ngIf="auth.isApproved() && !auth.isAdmin() && comic.listingType === 'WANTED'">
+            <div class="detail-item">
+              <span class="detail-label">Your Grade</span>
+              <span class="detail-value">
+                <select class="detail-edit-select" [(ngModel)]="selectedTradeGrade">
+                  <option [ngValue]="null">Select your copy's grade…</option>
+                  <option *ngFor="let g of enums.grades" [ngValue]="g.value">{{ g.label }}</option>
+                </select>
+              </span>
+            </div>
+            <div class="detail-item" *ngIf="previewTradeCredit !== null">
+              <span class="detail-label">Trade Credit</span>
+              <span class="detail-value">{{ previewTradeCredit | currency:'USD':'symbol':'1.2-2' }}</span>
+            </div>
+            <div class="detail-item" *ngIf="tradeGradeWarning">
+              <span class="detail-label"></span>
+              <span class="detail-value trade-grade-warning">
+                ⚠ The grade you selected is not within 2 grades of what the seller is looking for. Try to find a closer graded copy to trade.
+              </span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label"></span>
+              <span class="detail-value">
+                <div *ngIf="tradeError" class="claim-error">{{ tradeError }}</div>
+                <button *ngIf="canTrade(comic.id)" class="btn-claim-detail"
+                        (click)="tradeIn()" [disabled]="actionLoading || !selectedTradeGrade">
+                  {{ actionLoading ? 'Adding…' : 'Trade' }}
+                </button>
+                <span *ngIf="!canTrade(comic.id)" class="claim-blocked">
+                  Your cart must be open to add a trade item.
+                </span>
+              </span>
+            </div>
+          </ng-container>
         </ng-container>
 
       </div>

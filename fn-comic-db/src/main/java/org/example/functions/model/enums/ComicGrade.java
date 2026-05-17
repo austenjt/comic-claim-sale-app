@@ -5,8 +5,8 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum ComicGrade {
     GEM_MINT(10.0, "Gem Mint"),
-    MINT(9.9, "Mint"),
-    NEAR_MINT_MINT(9.8, "Near Mint/Mint"),
+    MINT_PLUS(9.9, "Mint Plus"),
+    MINT(9.8, "Mint"),
     NEAR_MINT_PLUS(9.6, "Near Mint+"),
     NEAR_MINT(9.4, "Near Mint"),
     NEAR_MINT_MINUS(9.2, "Near Mint-"),

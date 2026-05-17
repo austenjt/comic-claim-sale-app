@@ -5,7 +5,10 @@
     <a routerLink="/documentation" fragment="trade-in" class="trade-learn-more">Learn how it works</a>
   </p>
 
-  <div *ngIf="loading" class="trade-loading">Loading…</div>
+  <div *ngIf="loading" class="warming-up">
+    <div class="warming-up-spinner"></div>
+    <span>Please wait while things warm up. This site is not always on, and turns on when visited.</span>
+  </div>
   <div *ngIf="error" class="error-message">{{ error }}</div>
 
   <div *ngIf="!loading && wantedComics.length === 0 && !error" class="trade-empty">
@@ -28,6 +31,8 @@
           <b><a [routerLink]="['/detail', comic.id]" class="comic-title-link">{{ comicLabel(comic) }}</a></b>
         </div>
         <div class="meta-grid">
+          <div *ngIf="comic.publisher" class="comic-publisher">{{ comic.publisher }}</div>
+          <div *ngIf="comic.publishedDate" class="comic-publish-date">{{ comic.publishedDate }}</div>
           <div *ngIf="comic.nmEstimatedValue" class="comic-price">NM Value: <b>{{ comic.nmEstimatedValue | currency }}</b></div>
           <div class="wanted-credit-note">Credit varies by condition</div>
           <div *ngIf="comic.publicNotes" class="wanted-notes">{{ comic.publicNotes }}</div>
@@ -39,12 +44,13 @@
           <ng-container *ngIf="canOffer()">
             <button class="btn-offer-trade"
                     [class.btn-offer-trade--done]="isAdded(comic)"
-                    [disabled]="isAdded(comic) || !comic.nmEstimatedValue"
+                    [disabled]="isAdded(comic) || isOfferedByOther(comic) || !comic.nmEstimatedValue"
                     [title]="!comic.nmEstimatedValue ? 'Trade value not yet available for this comic' : ''"
                     (click)="openModal(comic)">
               <ng-container *ngIf="isAdded(comic)">Added to Cart ✓</ng-container>
-              <ng-container *ngIf="!isAdded(comic) && !comic.nmEstimatedValue">Value Pending</ng-container>
-              <ng-container *ngIf="!isAdded(comic) && comic.nmEstimatedValue">Offer Trade</ng-container>
+              <ng-container *ngIf="isOfferedByOther(comic) && !isAdded(comic)">Offered</ng-container>
+              <ng-container *ngIf="!isAdded(comic) && !isOfferedByOther(comic) && !comic.nmEstimatedValue">Value Pending</ng-container>
+              <ng-container *ngIf="!isAdded(comic) && !isOfferedByOther(comic) && comic.nmEstimatedValue">Offer Trade</ng-container>
             </button>
           </ng-container>
         </div>
@@ -62,7 +68,7 @@
     <div class="modal-field">
       <label class="modal-label">What condition is your copy?</label>
       <select class="modal-select" [(ngModel)]="selectedGrade">
-        <option *ngFor="let g of gradeOptions" [ngValue]="g.value">{{ g.label }}</option>
+        <option *ngFor="let g of gradeOptions" [ngValue]="g.value">{{ g.value }} — {{ g.label }}</option>
       </select>
     </div>
 
@@ -73,6 +79,10 @@
 
     <div *ngIf="!modalComic.nmEstimatedValue" class="modal-no-value">
       This comic does not have a trade value set yet. Contact us for a custom quote.
+    </div>
+
+    <div *ngIf="gradeWarning" class="modal-grade-warning">
+      ⚠ The grade you selected is not within 2 grades of what we're looking for. Try to find a closer graded copy to trade.
     </div>
 
     <div *ngIf="submitError" class="modal-error">{{ submitError }}</div>
