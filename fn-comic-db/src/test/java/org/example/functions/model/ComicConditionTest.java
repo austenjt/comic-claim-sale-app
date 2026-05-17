@@ -46,7 +46,7 @@ class ComicConditionTest {
     @Test
     void setCgcCondition_throwsWhenNotGraded() {
         ComicCondition condition = new ComicCondition();
-        CGCCondition cgc = CGCCondition.builder().grade(ComicGrade.NEAR_MINT_MINT).build();
+        CGCCondition cgc = CGCCondition.builder().grade(ComicGrade.MINT).build();
         assertThrows(IllegalStateException.class,
             () -> condition.setCgcCondition(cgc));
     }
@@ -54,7 +54,7 @@ class ComicConditionTest {
     @Test
     void setCgcCondition_succeedsWhenGraded() {
         ComicCondition condition = ComicCondition.builder().isGraded(true).build();
-        CGCCondition cgc = CGCCondition.builder().grade(ComicGrade.NEAR_MINT_MINT).build();
+        CGCCondition cgc = CGCCondition.builder().grade(ComicGrade.MINT).build();
         assertDoesNotThrow(() -> condition.setCgcCondition(cgc));
         assertEquals(cgc, condition.getCgcCondition());
     }
@@ -85,7 +85,7 @@ class ComicConditionTest {
             .isGraded(true)
             .certificationCompany(GradingCompany.CBCS)
             .build();
-        CGCCondition cgc = CGCCondition.builder().grade(ComicGrade.NEAR_MINT_MINT).build();
+        CGCCondition cgc = CGCCondition.builder().grade(ComicGrade.MINT).build();
         assertThrows(IllegalStateException.class,
             () -> condition.setCgcCondition(cgc));
     }
@@ -96,7 +96,7 @@ class ComicConditionTest {
             .isGraded(true)
             .certificationCompany(GradingCompany.CGC)
             .build();
-        CGCCondition cgc = CGCCondition.builder().grade(ComicGrade.NEAR_MINT_MINT).build();
+        CGCCondition cgc = CGCCondition.builder().grade(ComicGrade.MINT).build();
         assertDoesNotThrow(() -> condition.setCgcCondition(cgc));
         assertEquals(cgc, condition.getCgcCondition());
     }
@@ -146,7 +146,7 @@ class ComicConditionTest {
 
     @Test
     void builder_allowsSettingProtectedFieldsRegardlessOfIsGraded() {
-        CGCCondition cgc = CGCCondition.builder().grade(ComicGrade.NEAR_MINT_MINT).build();
+        CGCCondition cgc = CGCCondition.builder().grade(ComicGrade.MINT).build();
 
         assertDoesNotThrow(() -> ComicCondition.builder()
             .isGraded(false)

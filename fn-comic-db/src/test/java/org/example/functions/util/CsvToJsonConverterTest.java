@@ -169,7 +169,7 @@ class CsvToJsonConverterTest {
             .findFirst()
             .orElseThrow(() -> new AssertionError("Adventures of Cyclops not found in captured comics"));
         assertFalse(cyclops.getComicCondition().getIsGraded());
-        assertEquals(ComicGrade.NEAR_MINT_MINT, cyclops.getComicCondition().getNotCertifiedGrade());
+        assertEquals(ComicGrade.MINT, cyclops.getComicCondition().getNotCertifiedGrade());
         assertNull(cyclops.getComicCondition().getCgcCondition());
         assertNull(cyclops.getComicCondition().getCbcsCondition());
     }
