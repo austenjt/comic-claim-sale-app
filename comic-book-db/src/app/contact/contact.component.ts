@@ -1,16 +1,20 @@
 import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { Title, Meta } from '@angular/platform-browser';
 import { ConfigService } from '../config.service';
+import { environment } from '../../environments/environment';
 
 @Component({
     selector: 'app-contact',
     templateUrl: './contact.component.html',
     styleUrls: ['./contact.component.css'],
-    standalone: false
+    standalone: true,
+    imports: [CommonModule, FormsModule],
 })
 export class ContactComponent implements OnInit {
-  private readonly apiBase = 'https://fn-comicBook-db-1703810588398.azurewebsites.net/api';
+  private readonly apiBase = environment.apiBase;
 
   name = '';
   email = '';

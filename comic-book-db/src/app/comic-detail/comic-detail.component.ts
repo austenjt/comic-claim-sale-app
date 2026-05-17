@@ -1,4 +1,5 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, DestroyRef, HostListener, OnInit, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Title, Meta } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Location } from '@angular/common';
@@ -11,7 +12,9 @@ import { CartService } from '../cart.service';
 import { AuthService } from '../auth.service';
 import { ConfigService, ComicEnums } from '../config.service';
 import { DashboardNavService, NavItem } from '../dashboard-nav.service';
-import { Observable, of, map, Subscription } from 'rxjs';
+import { Observable, of } from 'rxjs';
+import { switchMap, tap } from 'rxjs/operators';
+import { DocType, ListingType } from '../comic.enums';
 
 @Component({
     selector: 'app-comic-detail',
@@ -19,7 +22,7 @@ import { Observable, of, map, Subscription } from 'rxjs';
     styleUrls: ['./comic-detail.component.css'],
     standalone: false
 })
-export class ComicDetailComponent implements OnInit, OnDestroy {
+export class ComicDetailComponent implements OnInit {
 
   comic: Comic | undefined;
   activeImage: 'front' | 'back' = 'front';
@@ -29,7 +32,7 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
   claimError = '';
   loading = true;
   actionLoading = false;
-  private routeParamSub: Subscription | null = null;
+  private destroyRef = inject(DestroyRef);
   imageUploading = false;
   imageUploadErrorSummary = '';
   imageUploadErrorDetail = '';
@@ -86,15 +89,19 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.enums = this.configService.getEnums();
-    // Subscribe to paramMap so navigating detail→detail (same route, different :id)
-    // properly reloads the comic even when Angular reuses the component instance.
-    this.routeParamSub = this.route.paramMap.subscribe(params => {
+    // paramMap so navigating detail→detail (same route, different :id) reloads even when
+    // Angular reuses the component instance.
+    this.route.paramMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
       const id = parseInt(params.get('id')!, 10);
       this.resetForNewComic();
       this.loadComic(id);
-      this.cartService.getClaimedMap().subscribe({ next: m => this.claimedMap = m, error: () => {} });
+      this.cartService.getClaimedMap()
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe({ next: m => this.claimedMap = m, error: () => {} });
       if (this.auth.isApproved() && !this.auth.isAdmin()) {
-        this.cartService.getMyCart().subscribe({ next: cart => this.myCart = cart, error: () => {} });
+        this.cartService.getMyCart()
+          .pipe(takeUntilDestroyed(this.destroyRef))
+          .subscribe({ next: cart => this.myCart = cart, error: () => {} });
       }
     });
   }
@@ -177,12 +184,10 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
     });
   }
 
-  ngOnDestroy(): void {
-    if (this.routeParamSub) this.routeParamSub.unsubscribe();
-  }
-
   private loadClaimedMap(): void {
-    this.cartService.getClaimedMap().subscribe({ next: m => this.claimedMap = m, error: () => {} });
+    this.cartService.getClaimedMap()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({ next: m => this.claimedMap = m, error: () => {} });
   }
 
   private buildPageMeta(comic: Comic): void {
@@ -196,8 +201,70 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
     const desc = parts.length
       ? `${heading}. ${parts.join(', ')}. Available for claim at Lightning Comics PDX.`
       : `${heading}. Available for claim at Lightning Comics PDX in Oregon City, OR.`;
-    this.titleService.setTitle(`${heading} — Lightning Comics PDX`);
+    const title = `${heading} — Lightning Comics PDX`;
+    const imageId = comic.largeCachedImageId ?? comic.smallCachedImageId;
+    const imageUrl = imageId ? this.imageService.getRemoteImageURLByName(imageId) : '';
+    const canonical = window.location.origin + window.location.pathname;
+
+    this.titleService.setTitle(title);
     this.meta.updateTag({ name: 'description', content: desc });
+
+    // Open Graph
+    this.meta.updateTag({ property: 'og:title', content: title });
+    this.meta.updateTag({ property: 'og:description', content: desc });
+    this.meta.updateTag({ property: 'og:type', content: 'product' });
+    this.meta.updateTag({ property: 'og:url', content: canonical });
+    if (imageUrl) this.meta.updateTag({ property: 'og:image', content: imageUrl });
+
+    // Twitter
+    this.meta.updateTag({ name: 'twitter:card', content: imageUrl ? 'summary_large_image' : 'summary' });
+    this.meta.updateTag({ name: 'twitter:title', content: title });
+    this.meta.updateTag({ name: 'twitter:description', content: desc });
+    if (imageUrl) this.meta.updateTag({ name: 'twitter:image', content: imageUrl });
+
+    this.updateCanonicalLink(canonical);
+    this.updateProductJsonLd(comic, heading, desc, imageUrl, canonical);
+  }
+
+  private updateCanonicalLink(href: string): void {
+    let link = document.querySelector<HTMLLinkElement>('link[rel="canonical"]');
+    if (!link) {
+      link = document.createElement('link');
+      link.setAttribute('rel', 'canonical');
+      document.head.appendChild(link);
+    }
+    link.setAttribute('href', href);
+  }
+
+  private updateProductJsonLd(comic: Comic, heading: string, description: string, imageUrl: string, canonical: string): void {
+    const inStock = !comic.soldTo && !!comic.salePrice;
+    const product: Record<string, unknown> = {
+      '@context': 'https://schema.org',
+      '@type': 'Product',
+      name: heading,
+      description,
+      url: canonical,
+      brand: comic.publisher ? { '@type': 'Brand', name: comic.publisher } : undefined,
+      sku: String(comic.id),
+    };
+    if (imageUrl) product.image = imageUrl;
+    if (comic.salePrice != null) {
+      product.offers = {
+        '@type': 'Offer',
+        price: comic.salePrice.toFixed(2),
+        priceCurrency: 'USD',
+        url: canonical,
+        availability: inStock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+      };
+    }
+
+    const existing = document.getElementById('comic-jsonld');
+    if (existing) existing.remove();
+    const script = document.createElement('script');
+    script.type = 'application/ld+json';
+    script.id = 'comic-jsonld';
+    script.text = JSON.stringify(product, (_k, v) => v === undefined ? undefined : v);
+    document.head.appendChild(script);
   }
 
   private initEditComic(comic: Comic): void {
@@ -226,12 +293,12 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
       : '';
     // Derive listingType from isForSale for documents that pre-date the listingType field
     if (!this.editComic.listingType) {
-      this.editComic.listingType = this.editComic.isForSale ? 'FOR_SALE' : 'NOT_LISTED';
+      this.editComic.listingType = this.editComic.isForSale ? ListingType.FOR_SALE : ListingType.NOT_LISTED;
     }
     // Set members are always for sale — listingType is controlled by the set container
     if (this.parentSetId !== null) {
       this.editComic.isForSale = true;
-      this.editComic.listingType = 'FOR_SALE';
+      this.editComic.listingType = ListingType.FOR_SALE;
     }
   }
 
@@ -277,21 +344,31 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
 
   private loadComic(id: number): void {
     this.comicService.getComic(id)
-      .subscribe(comic => {
-        this.comic = comic;
-        this.loading = false;
-        if (comic) {
-          this.buildPageMeta(comic);
-          this.comicService.recordView(id).subscribe(r => {
-            if (this.comic) this.comic.viewCount = r.viewCount;
-          });
-        }
-        if (comic && this.auth.isAdmin()) this.initEditComic(comic);
+      .pipe(
+        tap(comic => {
+          this.comic = comic;
+          this.loading = false;
+          if (comic) {
+            this.buildPageMeta(comic);
+            if (this.auth.isAdmin()) this.initEditComic(comic);
+          }
+        }),
+        switchMap(comic => comic ? this.comicService.recordView(id) : of(null)),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe(r => {
+        if (r && this.comic) this.comic.viewCount = r.viewCount;
       });
   }
 
   toggleZoom(): void {
     this.zoomOpen = !this.zoomOpen;
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscape(): void {
+    if (this.zoomOpen) this.zoomOpen = false;
+    else if (this.captureModalOpen) this.closeCaptureModal();
   }
 
   openCaptureModal(target: 'front' | 'back'): void {
@@ -377,7 +454,7 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
   /** Returns the SET container's ID when this comic is a member of a set, null otherwise. */
   get parentSetId(): number | null {
     const group = this.comic?.collectionGroup;
-    if (!group || this.comic?.docType === 'SET') return null;
+    if (!group || this.comic?.docType === DocType.SET) return null;
     return this.navService.getSetContainerId(group);
   }
 
@@ -397,7 +474,7 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
   }
 
   navigateTo(item: NavItem): void {
-    const route = item.docType === 'SET' ? ['/set', item.id] : ['/detail', item.id];
+    const route = item.docType === DocType.SET ? ['/set', item.id] : ['/detail', item.id];
     this.router.navigate(route);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }

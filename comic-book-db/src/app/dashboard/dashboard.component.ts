@@ -1,4 +1,5 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, DestroyRef, HostListener, OnInit, OnDestroy, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Title, Meta } from '@angular/platform-browser';
 import { Comic, PagedResponse } from '../comic';
 import { ComicService } from '../comic.service';
@@ -12,6 +13,7 @@ import { DashboardNavService } from '../dashboard-nav.service';
 import { Cart } from '../cart';
 import { User } from '../user';
 import { Observable, of, Subscription } from 'rxjs';
+import { DocType } from '../comic.enums';
 
 @Component({
     selector: 'app-dashboard',
@@ -58,13 +60,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   private loadSub: Subscription | null = null;
   private loadRetryTimer: any = null;
+  private destroyRef = inject(DestroyRef);
 
   get displayComics(): Comic[] {
     let result = this.pageItems;
     if (this.excludeClaimed) {
       result = result.filter(c => {
         if (this.recentlyActedIds.has(String(c.id))) return true;
-        return c.docType === 'SET'
+        return c.docType === DocType.SET
           ? !this.isSetClaimedByOther(c) && !this.isSetInMyCart(c)
           : !this.isClaimedByOther(c.id) && !this.isInMyCart(c.id);
       });
@@ -119,15 +122,19 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.loadPage();
     this.loadClaimedMap();
     if (this.auth.isApproved()) {
-      this.cartService.getMyCart().subscribe({ next: cart => this.myCart = cart, error: () => {} });
+      this.cartService.getMyCart()
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe({ next: cart => this.myCart = cart, error: () => {} });
     }
-    this.logService.newClaimEvent$.subscribe(n => {
-      if (n.eventType === 'RETURN') {
-        delete this.claimedMap[n.comicId];
-      } else {
-        this.claimedMap[n.comicId] = n.claimedAt;
-      }
-    });
+    this.logService.newClaimEvent$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(n => {
+        if (n.eventType === 'RETURN') {
+          delete this.claimedMap[n.comicId];
+        } else {
+          this.claimedMap[n.comicId] = n.claimedAt;
+        }
+      });
   }
 
   ngOnDestroy(): void {
@@ -202,7 +209,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   claim(comic: Comic): void {
     this.claimError = '';
-    if (comic.docType === 'SET') {
+    if (comic.docType === DocType.SET) {
       this.claimSet(comic);
       return;
     }
@@ -293,6 +300,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.awardingComic = null;
     this.selectedUserId = null;
     this.awardError = '';
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscape(): void {
+    if (this.awardingComic) this.closeAwardModal();
   }
 
   isSetInMyCart(container: Comic): boolean {

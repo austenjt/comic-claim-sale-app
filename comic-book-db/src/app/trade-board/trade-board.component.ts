@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import { Comic } from '../comic';
 import { ComicService } from '../comic.service';
@@ -44,7 +46,8 @@ const GRADE_OPTIONS: GradeOption[] = [
     selector: 'app-trade-board',
     templateUrl: './trade-board.component.html',
     styleUrls: ['./trade-board.component.css'],
-    standalone: false
+    standalone: true,
+    imports: [CommonModule, FormsModule],
 })
 export class TradeBoardComponent implements OnInit {
   wantedComics: Comic[] = [];
@@ -59,6 +62,8 @@ export class TradeBoardComponent implements OnInit {
   submitError = '';
 
   readonly gradeOptions = GRADE_OPTIONS;
+
+  trackById(_index: number, c: Comic): number { return c.id; }
 
   constructor(
     private comicService: ComicService,

@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { CartService } from '../cart.service';
 import { Cart, CartDiscount, CartItem } from '../cart';
 import { ArchivedOrder, ArchivedOrderItem } from '../archived-order';
@@ -30,7 +32,8 @@ interface ArchivedCartRow {
     selector: 'app-admin-orders',
     templateUrl: './admin-orders.component.html',
     styleUrls: ['./admin-orders.component.css'],
-    standalone: false
+    standalone: true,
+    imports: [CommonModule, FormsModule],
 })
 export class AdminOrdersComponent implements OnInit {
   orders: Cart[] = [];
@@ -43,6 +46,11 @@ export class AdminOrdersComponent implements OnInit {
   fulfilledCartId: string | null = null;
 
   constructor(private cartService: CartService, private configService: ConfigService) {}
+
+  trackByRow(_index: number, row: { collectionGroup: number | null; removeId?: string; items: { comicId?: string }[] }): string {
+    return row.removeId ?? (row.items[0] as any)?.comicId ?? String(row.collectionGroup ?? _index);
+  }
+  trackByComicId(_index: number, item: { comicId?: string }): string { return item.comicId ?? String(_index); }
 
   ngOnInit() {
     this.loadOrders();

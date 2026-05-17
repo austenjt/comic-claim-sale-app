@@ -1,6 +1,6 @@
-import { Component, HostListener, OnInit, OnDestroy } from '@angular/core';
+import { Component, DestroyRef, HostListener, OnInit, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
-import { Subscription } from 'rxjs';
 import { SalesModalService } from '../sales-modal.service';
 import { DiscountService } from '../discount.service';
 import { Discount } from '../discount';
@@ -11,12 +11,12 @@ import { Discount } from '../discount';
   styleUrls: ['./sales-modal.component.css'],
   standalone: false
 })
-export class SalesModalComponent implements OnInit, OnDestroy {
+export class SalesModalComponent implements OnInit {
   visible = false;
   discounts: Discount[] = [];
   loading = false;
 
-  private sub!: Subscription;
+  private destroyRef = inject(DestroyRef);
 
   constructor(
     private modalService: SalesModalService,
@@ -25,14 +25,12 @@ export class SalesModalComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.sub = this.modalService.visible$.subscribe(v => {
-      this.visible = v;
-      if (v) this.loadDiscounts();
-    });
-  }
-
-  ngOnDestroy(): void {
-    this.sub?.unsubscribe();
+    this.modalService.visible$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(v => {
+        this.visible = v;
+        if (v) this.loadDiscounts();
+      });
   }
 
   private loadDiscounts(): void {
@@ -44,6 +42,8 @@ export class SalesModalComponent implements OnInit, OnDestroy {
   }
 
   close(): void { this.modalService.hide(); }
+
+  trackByDiscountId(_index: number, d: Discount): string { return d.id; }
 
   browse(): void {
     this.modalService.hide();

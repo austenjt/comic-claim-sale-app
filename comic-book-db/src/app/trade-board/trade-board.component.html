@@ -17,7 +17,7 @@
   </div>
 
   <div class="wanted-grid" *ngIf="wantedComics.length > 0">
-    <div class="wanted-card" *ngFor="let comic of wantedComics">
+    <div class="wanted-card" *ngFor="let comic of wantedComics; trackBy: trackById">
       <a [routerLink]="['/detail', comic.id]" class="wanted-image-link">
         <div class="image-container">
           <img [src]="imageUrl(comic)" [alt]="comicLabel(comic)" loading="lazy">

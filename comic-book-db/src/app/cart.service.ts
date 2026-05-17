@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { Cart } from './cart';
 import { ArchivedOrder } from './archived-order';
 import { ShippingAddress } from './user';
+import { environment } from '../environments/environment';
 
 export interface ClaimNotification {
   eventType: string;
@@ -17,7 +18,7 @@ export interface ClaimNotification {
 
 @Injectable({ providedIn: 'root' })
 export class CartService {
-  private readonly apiBase = 'https://fn-comicBook-db-1703810588398.azurewebsites.net/api';
+  private readonly apiBase = environment.apiBase;
 
   constructor(private http: HttpClient) {}
 

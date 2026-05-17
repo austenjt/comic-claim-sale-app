@@ -76,7 +76,7 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let d of discounts" [class.inactive]="!d.isActive">
+      <tr *ngFor="let d of discounts; trackBy: trackByDiscountId" [class.inactive]="!d.isActive">
         <td>{{ d.name }}</td>
         <td>{{ d.type }}</td>
         <td>{{ describeDiscount(d) }}</td>

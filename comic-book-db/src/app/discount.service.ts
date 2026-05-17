@@ -2,10 +2,11 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Discount } from './discount';
+import { environment } from '../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class DiscountService {
-  private readonly apiBase = 'https://fn-comicBook-db-1703810588398.azurewebsites.net/api';
+  private readonly apiBase = environment.apiBase;
 
   constructor(private http: HttpClient) {}
 

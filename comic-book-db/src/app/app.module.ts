@@ -1,4 +1,4 @@
-import { APP_INITIALIZER, NgModule } from '@angular/core';
+import { APP_INITIALIZER, ErrorHandler, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
@@ -14,6 +14,7 @@ import {
 import { ConfigService } from './config.service';
 import { AuthInterceptor } from './auth.interceptor';
 import { HttpLoggingInterceptor } from './http-logging.interceptor';
+import { GlobalErrorHandler } from './telemetry.service';
 import { msalGuardConfig, msalInstanceFactory, msalInterceptorConfig } from './auth.config';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -28,14 +29,10 @@ import { LoadGoCollectFormComponent } from './load-gocollect-form/load-gocollect
 import { LoginComponent } from './login/login.component';
 import { AuthCallbackComponent } from './auth-callback/auth-callback.component';
 import { PendingApprovalComponent } from './pending-approval/pending-approval.component';
-import { AdminUsersComponent } from './admin-users/admin-users.component';
-import { DocumentationComponent } from './documentation/documentation.component';
 import { CartComponent } from './cart/cart.component';
-import { AdminOrdersComponent } from './admin-orders/admin-orders.component';
 import { AccountProfileComponent } from './account-profile/account-profile.component';
 import { OrderHistoryComponent } from './order-history/order-history.component';
 import { AdminSalesComponent } from './admin-sales/admin-sales.component';
-import { ContactComponent } from './contact/contact.component';
 import { SetDetailComponent } from './set-detail/set-detail.component';
 import { DashboardHeaderComponent } from './dashboard-header/dashboard-header.component';
 import { PaginationBarComponent } from './pagination-bar/pagination-bar.component';
@@ -43,7 +40,6 @@ import { SalesModalComponent } from './sales-modal/sales-modal.component';
 import { SquarePaymentModalComponent } from './square-payment-modal/square-payment-modal.component';
 import { ImageCaptureModalComponent } from './image-capture-modal/image-capture-modal.component';
 import { ShippingModalComponent } from './shipping-modal/shipping-modal.component';
-import { TradeBoardComponent } from './trade-board/trade-board.component';
 
 @NgModule({
     declarations: [
@@ -56,14 +52,10 @@ import { TradeBoardComponent } from './trade-board/trade-board.component';
         LoginComponent,
         AuthCallbackComponent,
         PendingApprovalComponent,
-        AdminUsersComponent,
-        DocumentationComponent,
         CartComponent,
-        AdminOrdersComponent,
         AccountProfileComponent,
         OrderHistoryComponent,
         AdminSalesComponent,
-        ContactComponent,
         SetDetailComponent,
         DashboardHeaderComponent,
         PaginationBarComponent,
@@ -71,7 +63,6 @@ import { TradeBoardComponent } from './trade-board/trade-board.component';
         SquarePaymentModalComponent,
         ImageCaptureModalComponent,
         ShippingModalComponent,
-        TradeBoardComponent,
     ],
     bootstrap: [AppComponent],
     imports: [
@@ -96,6 +87,9 @@ import { TradeBoardComponent } from './trade-board/trade-board.component';
         MsalService,
         MsalGuard,
         MsalBroadcastService,
+
+        // Global error handler — routes uncaught errors through TelemetryService
+        { provide: ErrorHandler, useClass: GlobalErrorHandler },
 
         // HTTP interceptors (order matters: logging first, then Bearer token attachment)
         { provide: HTTP_INTERCEPTORS, useClass: HttpLoggingInterceptor, multi: true },

@@ -60,14 +60,14 @@
       <!-- Thumbnail strip -->
       <div class="thumbnail-strip">
         <div class="thumb" [class.thumb-active]="activeImage === 'front'" (click)="selectImage('front')">
-          <img [src]="getSmallImageURL(container.smallCachedImageId) | async" alt="Front Cover">
+          <img [src]="getSmallImageURL(container.smallCachedImageId) | async" alt="Front Cover" loading="lazy">
           <span class="thumb-label">Front</span>
         </div>
         <div class="thumb"
              *ngIf="container.largeCachedImageId && (auth.isAdmin() || container.largeBackImageId)"
              [class.thumb-active]="activeImage === 'back'"
              (click)="selectImage('back')">
-          <img [src]="getSmallImageURL(container.smallBackImageId) | async" alt="Back Cover">
+          <img [src]="getSmallImageURL(container.smallBackImageId) | async" alt="Back Cover" loading="lazy">
           <span class="thumb-label">Back</span>
         </div>
       </div>
@@ -209,7 +209,7 @@
       <p class="add-book-hint" *ngIf="addBookSearchTerm && addBookSearching">Searching…</p>
       <p class="add-book-hint" *ngIf="addBookSearchTerm && !addBookSearching && addBookSearchResults.length === 0">No matching books found.</p>
       <ul class="add-book-list" *ngIf="addBookSearchResults.length > 0">
-        <li *ngFor="let comic of addBookSearchResults"
+        <li *ngFor="let comic of addBookSearchResults; trackBy: trackById"
             class="add-book-row"
             [class.add-book-row-disabled]="addBookSaving"
             (click)="confirmAddBook(comic)">
@@ -231,7 +231,7 @@
       <button *ngIf="auth.isAdmin()" class="btn-add-book" (click)="openAddBookModal()">+ Add Book</button>
     </div>
     <div class="comics-list">
-      <a *ngFor="let member of displayMembers" routerLink="/detail/{{ member.id }}">
+      <a *ngFor="let member of displayMembers; trackBy: trackById" routerLink="/detail/{{ member.id }}">
         <div class="image-container" [class.two-images]="member.smallBackImageId">
           <img [src]="getMemberImageURL(member.smallCachedImageId) | async" alt="Front Cover" loading="lazy">
           <img *ngIf="member.smallBackImageId"

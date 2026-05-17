@@ -21,7 +21,7 @@
       </div>
 
       <ul *ngIf="!loading && discounts.length > 0" class="deal-list">
-        <li *ngFor="let d of discounts" class="deal-card">
+        <li *ngFor="let d of discounts; trackBy: trackByDiscountId" class="deal-card">
           <div class="deal-icon" aria-hidden="true">{{ iconText(d) }}</div>
           <div class="deal-content">
             <div class="deal-name">{{ d.name }}</div>

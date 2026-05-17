@@ -74,7 +74,7 @@
         </tr>
       </thead>
       <tbody>
-        <ng-container *ngFor="let row of groupedRows">
+        <ng-container *ngFor="let row of groupedRows; trackBy: trackByRow">
           <!-- Trade credit row -->
           <tr *ngIf="row.type === 'single' && row.isTrade" class="trade-credit-row">
             <td>
@@ -132,7 +132,7 @@
                 <button class="btn-release" (click)="removeItem(row.removeId)">Release</button>
               </td>
             </tr>
-            <tr *ngFor="let comic of row.items"
+            <tr *ngFor="let comic of row.items; trackBy: trackByComicId"
                 class="set-member-row"
                 [class.graded-row]="comic.isGraded">
               <td class="set-member-comic">

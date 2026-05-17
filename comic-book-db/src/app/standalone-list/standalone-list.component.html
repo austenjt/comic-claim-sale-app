@@ -15,7 +15,8 @@
       <label for="qa-title">Title</label>
       <input type="text" id="qa-title" [(ngModel)]="qa.title" (blur)="qaDefaultSeries()" placeholder="e.g. Amazing Spider-Man"
              [attr.aria-invalid]="qaShowFieldErrors && !qa.title.trim() ? 'true' : null"
-             [attr.aria-describedby]="qaError ? 'qa-error' : null" />
+             [attr.aria-describedby]="qaShowFieldErrors && !qa.title.trim() ? 'qa-title-error' : (qaError ? 'qa-error' : null)" />
+      <span *ngIf="qaShowFieldErrors && !qa.title.trim()" id="qa-title-error" class="field-error">Title is required.</span>
     </div>
     <div class="qa-field">
       <label>Series</label>
@@ -28,7 +29,8 @@
       <label for="qa-number">Number</label>
       <input type="text" id="qa-number" [(ngModel)]="qa.number" placeholder="e.g. 1, 121, NN"
              [attr.aria-invalid]="qaShowFieldErrors && !qa.number.trim() ? 'true' : null"
-             [attr.aria-describedby]="qaError ? 'qa-error' : null" />
+             [attr.aria-describedby]="qaShowFieldErrors && !qa.number.trim() ? 'qa-number-error' : (qaError ? 'qa-error' : null)" />
+      <span *ngIf="qaShowFieldErrors && !qa.number.trim()" id="qa-number-error" class="field-error">Number is required.</span>
     </div>
     <div class="qa-field">
       <label>Publisher</label>
@@ -80,7 +82,8 @@
       <label for="qa-sale-price">Sale Price ($)</label>
       <input type="number" id="qa-sale-price" [(ngModel)]="qa.salePrice" min="0" step="0.25" placeholder="leave blank if not priced"
              [attr.aria-invalid]="qaShowFieldErrors && qa.isForSale && (qa.salePrice === null || qa.salePrice === undefined) ? 'true' : null"
-             [attr.aria-describedby]="qaError ? 'qa-error' : null" />
+             [attr.aria-describedby]="qaShowFieldErrors && qa.isForSale && (qa.salePrice === null || qa.salePrice === undefined) ? 'qa-sale-price-error' : (qaError ? 'qa-error' : null)" />
+      <span *ngIf="qaShowFieldErrors && qa.isForSale && (qa.salePrice === null || qa.salePrice === undefined)" id="qa-sale-price-error" class="field-error">Sale Price is required when For Sale is checked.</span>
     </div>
     <div class="qa-field">
       <label>Target Price ($)</label>
@@ -122,7 +125,7 @@
       <label>Add to Set</label>
       <select [(ngModel)]="qa.collectionGroup">
         <option [ngValue]="null">— None (standalone) —</option>
-        <option *ngFor="let s of qaSets" [ngValue]="s.collectionGroup">{{ s.title }}</option>
+        <option *ngFor="let s of qaSets; trackBy: trackBySetId" [ngValue]="s.collectionGroup">{{ s.title }}</option>
       </select>
     </div>
     <div class="qa-field qa-field-checkbox">
@@ -137,19 +140,21 @@
       <label for="qa-grading-company">Grading Company</label>
       <select id="qa-grading-company" [(ngModel)]="qa.gradingCompany"
               [attr.aria-invalid]="qaShowFieldErrors && !qa.gradingCompany ? 'true' : null"
-              [attr.aria-describedby]="qaError ? 'qa-error' : null">
+              [attr.aria-describedby]="qaShowFieldErrors && !qa.gradingCompany ? 'qa-gc-error' : (qaError ? 'qa-error' : null)">
         <option value="">— select —</option>
         <option *ngFor="let gc of enums.gradingCompanies" [value]="gc">{{ gc }}</option>
       </select>
+      <span *ngIf="qaShowFieldErrors && !qa.gradingCompany" id="qa-gc-error" class="field-error">Select a grading company.</span>
     </div>
     <div class="qa-field" [class.qa-field-error]="qaShowFieldErrors && (qa.grade === null || qa.grade === undefined)">
       <label for="qa-grade">Grade</label>
       <select id="qa-grade" [(ngModel)]="qa.grade"
               [attr.aria-invalid]="qaShowFieldErrors && (qa.grade === null || qa.grade === undefined) ? 'true' : null"
-              [attr.aria-describedby]="qaError ? 'qa-error' : null">
+              [attr.aria-describedby]="qaShowFieldErrors && (qa.grade === null || qa.grade === undefined) ? 'qa-grade-error' : (qaError ? 'qa-error' : null)">
         <option [ngValue]="null">— select —</option>
         <option *ngFor="let g of enums.grades" [ngValue]="g.value">{{ g.value }} — {{ g.label }}</option>
       </select>
+      <span *ngIf="qaShowFieldErrors && (qa.grade === null || qa.grade === undefined)" id="qa-grade-error" class="field-error">Select a grade.</span>
     </div>
     <div class="qa-field">
       <label>Certification ID</label>
@@ -249,7 +254,7 @@
         No sets found.
       </p>
       <ul class="sl-item-list" *ngIf="deleteSetAvailableSets.length > 0">
-        <li *ngFor="let set of deleteSetAvailableSets"
+        <li *ngFor="let set of deleteSetAvailableSets; trackBy: trackBySetId"
             class="sl-item-row"
             (click)="selectSetForDelete(set)">
           <span class="sl-item-badge">Group {{ set.collectionGroup }}</span>
@@ -311,7 +316,7 @@
       <div *ngIf="editSetNameError" class="qa-error">{{ editSetNameError }}</div>
       <p class="sl-modal-subtitle" *ngIf="editSetNameAvailableSets.length === 0 && !editSetNameError">No sets found.</p>
       <ul class="sl-item-list" *ngIf="editSetNameAvailableSets.length > 0">
-        <li *ngFor="let set of editSetNameAvailableSets"
+        <li *ngFor="let set of editSetNameAvailableSets; trackBy: trackBySetId"
             class="sl-item-row"
             (click)="selectSetForRename(set)">
           <span class="sl-item-badge">Group {{ set.collectionGroup }}</span>
@@ -358,7 +363,7 @@
     <p class="sl-modal-subtitle" *ngIf="!viewSetsLoading && viewSetsList.length === 0 && !viewSetsError">No sets found.</p>
     <div *ngIf="viewSetsError" class="qa-error">{{ viewSetsError }}</div>
     <ul class="sl-item-list" *ngIf="viewSetsList.length > 0">
-      <li *ngFor="let set of viewSetsList" class="sl-item-row sl-item-row-plain">
+      <li *ngFor="let set of viewSetsList; trackBy: trackBySetId" class="sl-item-row sl-item-row-plain">
         <span class="sl-item-badge">Group {{ set.collectionGroup }}</span>
         <span class="sl-item-name">{{ set.title }}</span>
         <span class="sl-item-count" *ngIf="set.items?.length">{{ set.items!.length }} book{{ set.items!.length !== 1 ? 's' : '' }}</span>

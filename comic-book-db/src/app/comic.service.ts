@@ -5,6 +5,8 @@ import { Observable, of, from } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
 
 import { Comic, PagedResponse } from './comic';
+import { environment } from '../environments/environment';
+import { TelemetryService } from './telemetry.service';
 
 export interface CsvUploadResult {
   succeeded: any[];
@@ -16,8 +18,7 @@ export interface CsvUploadResult {
 @Injectable({ providedIn: 'root' })
 export class ComicService {
 
-  private baseServiceUrl = 'https://fn-comicBook-db-1703810588398.azurewebsites.net/api';
-  //private baseServiceUrl = 'http://localhost:7071/api';
+  private baseServiceUrl = environment.apiBase;
   private comicsUrl = this.baseServiceUrl + '/comics';
   private setsUrl = this.baseServiceUrl + '/sets';
   private dataLoadUrl = this.comicsUrl + '/data';
@@ -28,20 +29,7 @@ export class ComicService {
     headers: new HttpHeaders({ 'Content-Type': 'application/json' })
   };
 
-  constructor(private http: HttpClient) {}
-
-  /** Flattens a nested comics response into a flat list that includes set members. */
-  private flattenComics(nestedComics: Comic[]): Comic[] {
-    const result: Comic[] = [];
-    for (const comic of nestedComics) {
-      const { items, ...rest } = comic as any;
-      result.push(rest as Comic);
-      if (items && items.length > 0) {
-        result.push(...items);
-      }
-    }
-    return result;
-  }
+  constructor(private http: HttpClient, private telemetry: TelemetryService) {}
 
   /** GET a single page of for-sale comics from the server. Errors propagate for fallback handling. */
   getDashboardPage(
@@ -94,15 +82,6 @@ export class ComicService {
     return this.http.get<Comic[]>(`${this.comicsUrl}/single`).pipe(
       catchError(this.handleError<Comic[]>([]))
     );
-  }
-
-  /** GET comics from the server as a flat list (set members included at top level). */
-  getRemoteComics(): Observable<Comic[]> {
-    return this.http.get<Comic[]>(this.comicsUrl)
-      .pipe(
-        map(nested => this.flattenComics(nested)),
-        catchError(this.handleError<Comic[]>([]))
-      );
   }
 
   /** GET comic by id. Return `undefined` when id not found */
@@ -205,7 +184,7 @@ export class ComicService {
 
   private handleError<T>(result?: T) {
     return (error: any): Observable<T> => {
-      console.error(error);
+      this.telemetry.report(error, 'ComicService');
       return of(result as T);
     };
   }

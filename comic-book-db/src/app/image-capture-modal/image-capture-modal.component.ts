@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, ViewChild, ElementRef, OnDestroy, NgZone } from '@angular/core';
+import { Component, HostListener, Input, Output, EventEmitter, ViewChild, ElementRef, OnDestroy, NgZone } from '@angular/core';
 
 @Component({
   selector: 'app-image-capture-modal',
@@ -112,6 +112,11 @@ export class ImageCaptureModalComponent implements OnDestroy {
     this.capturedBlob = null;
     this.cameraError = '';
     this.closed.emit();
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscape(): void {
+    this.close();
   }
 
   // ── Crop ──────────────────────────────────────────────────────────

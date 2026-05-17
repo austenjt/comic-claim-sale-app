@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
+import { environment } from '../environments/environment';
+
 export interface NumberValidationResult {
   value: string;
   valid: boolean;
@@ -14,7 +16,7 @@ export interface NumberValidationResult {
 @Injectable({ providedIn: 'root' })
 export class ValidationService {
 
-  private baseUrl = 'https://fn-comicBook-db-1703810588398.azurewebsites.net/api';
+  private baseUrl = environment.apiBase;
 
   constructor(private http: HttpClient) {}
 

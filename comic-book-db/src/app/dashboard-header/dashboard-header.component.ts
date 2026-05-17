@@ -1,10 +1,11 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 
 @Component({
     selector: 'app-dashboard-header',
     templateUrl: './dashboard-header.component.html',
     styleUrls: ['./dashboard-header.component.css'],
-    standalone: false
+    standalone: false,
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DashboardHeaderComponent {
   @Input() itemCount: number = 0;

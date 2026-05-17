@@ -5,6 +5,7 @@ import { CommonModule } from '@angular/common';
 import { Comic } from '../comic';
 import { ComicService } from '../comic.service';
 import { ConfigService, ComicEnums } from '../config.service';
+import { ERA_OPTIONS, DocType, NumberSentinel, GradingCompany } from '../comic.enums';
 
 @Component({
     selector: 'app-standalone-list',
@@ -62,7 +63,7 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
   qaSeries: string[] = [];
   private qaLastSeries = '';
 
-  readonly ERA_OPTIONS = ['Golden Age', 'Silver Age', 'Bronze Age', 'Copper Age', 'Modern Age'];
+  readonly ERA_OPTIONS = ERA_OPTIONS;
 
   qa = {
     // Step 1 — identity
@@ -173,14 +174,14 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
 
     const company = this.qa.gradingCompany;
     let comicCondition: any;
-    if (this.qaStep === 3 && company && company !== 'NOT CERTIFIED') {
+    if (this.qaStep === 3 && company && company !== GradingCompany.NOT_CERTIFIED) {
       // Graded slab
       const pedigreeStr = this.qa.pedigree ? 'Yes' : null;
       comicCondition = {
         isGraded: true,
         certificationCompany: company,
         certificationId: this.qa.certificationId.trim() || null,
-        cgcCondition: company === 'CGC' ? {
+        cgcCondition: company === GradingCompany.CGC ? {
           label: null,
           grade: this.qa.grade,
           pageQuality: this.qa.pageQuality || null,
@@ -189,7 +190,7 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
           degreeOfRestoration: null,
           graderNotes: null
         } : null,
-        cbcsCondition: company === 'CBCS' ? {
+        cbcsCondition: company === GradingCompany.CBCS ? {
           label: null,
           grade: this.qa.grade,
           pageQuality: this.qa.pageQuality || null,
@@ -198,17 +199,17 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
           degreeOfRestoration: null
         } : null,
         notCertifiedLabel: null,
-        notCertifiedGrade: (company === 'PGX') ? this.qa.grade : null,
-        notCertifiedPageQuality: (company === 'PGX') ? (this.qa.pageQuality || null) : null,
-        notCertifiedPedigree: (company === 'PGX') ? pedigreeStr : null,
+        notCertifiedGrade: (company === GradingCompany.PGX) ? this.qa.grade : null,
+        notCertifiedPageQuality: (company === GradingCompany.PGX) ? (this.qa.pageQuality || null) : null,
+        notCertifiedPedigree: (company === GradingCompany.PGX) ? pedigreeStr : null,
         notCertifiedDegreeOfRestoration: null,
-        notCertifiedSignature: (company === 'PGX') ? this.qa.signed : null
+        notCertifiedSignature: (company === GradingCompany.PGX) ? this.qa.signed : null
       };
     } else {
       // Not graded / saved from step 2
       comicCondition = {
         isGraded: false,
-        certificationCompany: 'NOT CERTIFIED',
+        certificationCompany: GradingCompany.NOT_CERTIFIED,
         certificationId: null,
         cgcCondition: null,
         cbcsCondition: null,
@@ -250,7 +251,7 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
       personalEstimate: this.qa.personalEstimate,
       targetPrice: this.qa.targetPrice,
       collectionGroup: this.qa.collectionGroup,
-      docType: 'COMIC',
+      docType: DocType.COMIC,
       storageLocation: this.qa.storageLocation.trim() || null,
       goCollectInfo: null,
       grandComicDBInfo: null,
@@ -287,7 +288,7 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
     this.enums = this.configService.getEnums();
     this.comicService.getSeriesList().subscribe(list => { this.qaSeries = list; });
     this.comicService.getSets().subscribe(sets => {
-      this.qaSets = sets.filter(c => c.docType === 'SET').sort((a, b) => (a.title ?? '').localeCompare(b.title ?? ''));
+      this.qaSets = sets.filter(c => c.docType === DocType.SET).sort((a, b) => (a.title ?? '').localeCompare(b.title ?? ''));
     });
   }
 
@@ -336,7 +337,7 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
     this.comicService.getSets().subscribe({
       next: sets => {
         this.viewSetsList = sets
-          .filter(c => c.docType === 'SET')
+          .filter(c => c.docType === DocType.SET)
           .sort((a, b) => (a.collectionGroup ?? 0) - (b.collectionGroup ?? 0));
         this.viewSetsLoading = false;
       },
@@ -356,7 +357,7 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
     this.comicService.getSets().subscribe({
       next: sets => {
         this.editSetNameAvailableSets = sets
-          .filter(c => c.docType === 'SET')
+          .filter(c => c.docType === DocType.SET)
           .sort((a, b) => (a.collectionGroup ?? 0) - (b.collectionGroup ?? 0));
         this.showEditSetNameModal = true;
       },
@@ -413,7 +414,7 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
       id: -1,
       title: this.addSetName.trim(),
       series: '',
-      number: { volume: null, number: null, sentinel: 'SET' },
+      number: { volume: null, number: null, sentinel: NumberSentinel.SET },
       publisher: null,
       publishedDate: null,
       era: null,
@@ -425,7 +426,7 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
       artist: [],
       comicCondition: {
         isGraded: false,
-        certificationCompany: 'NOT CERTIFIED',
+        certificationCompany: GradingCompany.NOT_CERTIFIED,
         certificationId: null,
         cgcCondition: null,
         cbcsCondition: null,
@@ -448,7 +449,7 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
       personalEstimate: null,
       targetPrice: null,
       collectionGroup: this.addSetCollectionGroup,
-      docType: 'SET',
+      docType: DocType.SET,
       storageLocation: null,
       goCollectInfo: null,
       grandComicDBInfo: null,
@@ -540,6 +541,9 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
     this.deleteSetError = '';
     this.deleteSetConfirmFull = false;
   }
+
+  trackBySetId(_index: number, set: Comic): number { return set.id; }
+  trackByValue(_index: number, value: string | number): string | number { return value; }
 
   comicNumberLabel(comic: Comic): string {
     const n = comic.number;

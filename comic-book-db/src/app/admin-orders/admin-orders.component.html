@@ -72,7 +72,7 @@
         <tr><th>Comic</th><th>Price</th><th>Claimed</th><th></th></tr>
       </thead>
       <tbody>
-        <ng-container *ngFor="let row of groupedRows(order)">
+        <ng-container *ngFor="let row of groupedRows(order); trackBy: trackByRow">
           <!-- Single comic: one row -->
           <tr *ngIf="row.type === 'single'"
               [class.graded-row]="row.isGraded">
@@ -112,7 +112,7 @@
                   title="Release this set back to available">Release Set</button>
               </td>
             </tr>
-            <tr *ngFor="let comic of row.items"
+            <tr *ngFor="let comic of row.items; trackBy: trackByComicId"
                 class="set-member-row"
                 [class.graded-row]="comic.isGraded">
               <td class="set-member-comic">
@@ -291,7 +291,7 @@
         <tr><th>Comic</th><th>Price</th><th>Claimed</th><th></th></tr>
       </thead>
       <tbody>
-        <ng-container *ngFor="let row of groupedRows(cart)">
+        <ng-container *ngFor="let row of groupedRows(cart); trackBy: trackByRow">
           <!-- Single comic: one row -->
           <tr *ngIf="row.type === 'single'"
               [class.graded-row]="row.isGraded">
@@ -318,7 +318,7 @@
                   title="Release this set back to available">Release Set</button>
               </td>
             </tr>
-            <tr *ngFor="let comic of row.items"
+            <tr *ngFor="let comic of row.items; trackBy: trackByComicId"
                 class="set-member-row"
                 [class.graded-row]="comic.isGraded">
               <td class="set-member-comic">
@@ -405,7 +405,7 @@
         <tr><th>Comic</th><th>Price</th><th>Claimed</th></tr>
       </thead>
       <tbody>
-        <ng-container *ngFor="let row of groupedArchivedRows(order)">
+        <ng-container *ngFor="let row of groupedArchivedRows(order); trackBy: trackByRow">
           <!-- Single comic: one row -->
           <tr *ngIf="row.type === 'single'">
             <td>{{ row.items[0].comicTitle }}{{ row.items[0].comicNumber ? ' ' + row.items[0].comicNumber : '' }}</td>
@@ -435,7 +435,7 @@
               </td>
               <td>{{ row.claimedAt | date:'short' }}</td>
             </tr>
-            <tr *ngFor="let comic of row.items" class="set-member-row">
+            <tr *ngFor="let comic of row.items; trackBy: trackByComicId" class="set-member-row">
               <td class="set-member-comic">{{ comic.comicTitle }}{{ comic.comicNumber ? ' ' + comic.comicNumber : '' }}</td>
               <td class="set-member-price">
                 <ng-container *ngIf="showArchivedItemDiscounts(order)">

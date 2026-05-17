@@ -89,10 +89,10 @@
       <a routerLink="/detail/{{comic.id}}" [class.card-sold]="comic.soldTo" [class.card-deleting]="deletingId === comic.id">
         <div class="image-container" [class.two-images]="comic.smallBackImageId">
             <img [src]="getFullImageURLByName(comic.smallCachedImageId) | async" alt="Front Cover" loading="lazy"
-                 [style.filter]="comic.soldTo ? 'grayscale(80%)' : null">
+                 [class.is-sold]="comic.soldTo">
             <img *ngIf="comic.smallBackImageId"
                  [src]="getFullImageURLByName(comic.smallBackImageId) | async" alt="Back Cover" loading="lazy"
-                 [style.filter]="comic.soldTo ? 'grayscale(80%)' : null">
+                 [class.is-sold]="comic.soldTo">
         </div>
         <div class="details">
             <div class="comic-title"><b>{{comic.title}}{{comicNumberLabel(comic)}}</b></div>
