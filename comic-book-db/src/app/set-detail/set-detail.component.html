@@ -277,6 +277,11 @@
               (click)="$event.preventDefault(); $event.stopPropagation(); removeFromSet(member)">
               {{ removingId === member.id ? 'Removing…' : 'Remove' }}
             </button>
+            <button *ngIf="auth.isAdmin()" class="btn-copy-member"
+              [disabled]="copyingId === member.id"
+              (click)="$event.preventDefault(); $event.stopPropagation(); copyMember(member, $event)">
+              {{ copiedId === member.id ? 'Copied ✓' : copyingId === member.id ? 'Copying…' : 'Copy' }}
+            </button>
           </div>
         </div>
       </a>

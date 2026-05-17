@@ -333,6 +333,21 @@ button {
   cursor: default;
 }
 
+.btn-copy-member {
+  padding: var(--space-1) var(--space-2);
+  background: transparent;
+  color: #6b7280;
+  border: 1px solid #6b7280;
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-12);
+  font-weight: var(--fw-semibold);
+  cursor: pointer;
+  margin: 0;
+  transition: background-color var(--duration-base) var(--ease-standard);
+}
+.btn-copy-member:hover:not(:disabled) { background: #f3f4f6; }
+.btn-copy-member:disabled { opacity: 0.5; cursor: default; }
+
 /* ── Add Book modal ─────────────────────────────────────────────────────── */
 /* Chrome (overlay/dialog/title) is provided by the shared .modal-overlay /
    .modal / .modal__title classes in global styles.css (see .add-book-modal

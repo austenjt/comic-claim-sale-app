@@ -372,7 +372,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
       soldTo: null,
       sold: null,
       items: undefined,
-      ...(comic.docType === 'SET' ? { collectionGroup: null } : {}),
     };
     this.comicService.addComic(copy).subscribe({
       next: () => {

@@ -37,6 +37,8 @@ export class SetDetailComponent implements OnInit, OnDestroy {
   captureModalTarget: 'front' | 'back' | null = null;
 
   removingId: number | null = null;
+  copyingId: number | null = null;
+  copiedId: number | null = null;
   editContainer: Comic | null = null;
   saving = false;
   saveError = '';
@@ -303,6 +305,29 @@ export class SetDetailComponent implements OnInit, OnDestroy {
         this.removingId = null;
       },
       error: () => { this.removingId = null; }
+    });
+  }
+
+  copyMember(comic: Comic, event: Event): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.copyingId = comic.id;
+    const copy: Comic = {
+      ...comic,
+      id: -1,
+      title: comic.title + ' (Copied)',
+      dateSold: null,
+      soldTo: null,
+      sold: null,
+      items: undefined,
+    };
+    this.comicService.addComic(copy).subscribe({
+      next: () => {
+        this.copyingId = null;
+        this.copiedId = comic.id;
+        setTimeout(() => { this.copiedId = null; }, 2000);
+      },
+      error: () => { this.copyingId = null; }
     });
   }
 
