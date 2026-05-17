@@ -40,14 +40,20 @@
              class="zoomable" (click)="toggleZoom()">
         <div *ngIf="auth.isAdmin()" class="img-update-bar">
           <ng-container *ngIf="activeImage === 'front'">
-            <button class="img-update-btn" (click)="openCaptureModal('front')" [disabled]="imageUploading">
+            <button class="img-update-btn" (click)="openCaptureModal('front')" [disabled]="imageUploading || saving">
               {{ imageUploading ? 'Uploading...' : 'Update Front Cover' }}
+            </button>
+            <button *ngIf="container.largeCachedImageId" class="btn-img-delete" (click)="clearFrontImage()" [disabled]="imageUploading || saving">
+              {{ saving ? '…' : 'Delete' }}
             </button>
             <div *ngIf="imageUploadError" class="img-upload-error">{{ imageUploadError }}</div>
           </ng-container>
           <ng-container *ngIf="activeImage === 'back'">
-            <button class="img-update-btn" (click)="openCaptureModal('back')" [disabled]="backImageUploading">
+            <button class="img-update-btn" (click)="openCaptureModal('back')" [disabled]="backImageUploading || saving">
               {{ backImageUploading ? 'Uploading...' : 'Update Back Cover' }}
+            </button>
+            <button *ngIf="container.largeBackImageId" class="btn-img-delete" (click)="clearBackImage()" [disabled]="backImageUploading || saving">
+              {{ saving ? '…' : 'Delete' }}
             </button>
             <div *ngIf="backImageUploadError" class="img-upload-error">{{ backImageUploadError }}</div>
           </ng-container>

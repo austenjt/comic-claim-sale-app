@@ -242,6 +242,20 @@ export class SetDetailComponent implements OnInit, OnDestroy {
     });
   }
 
+  clearFrontImage(): void {
+    if (!this.editContainer) return;
+    this.editContainer.largeCachedImageId = null;
+    this.editContainer.smallCachedImageId = null;
+    this.saveContainer();
+  }
+
+  clearBackImage(): void {
+    if (!this.editContainer) return;
+    this.editContainer.largeBackImageId = null;
+    this.editContainer.smallBackImageId = null;
+    this.saveContainer();
+  }
+
   private uploadFrontImage(file: File): void {
     if (!this.container) return;
     this.imageUploading = true;

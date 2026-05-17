@@ -40,6 +40,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
   pendingDeleteId: number | null = null;
   deletingId: number | null = null;
   claimingSetId: number | null = null;
+  copyingId: number | null = null;
+  copiedId: number | null = null;
 
   // IDs acted on (claimed/awarded) this session — kept in list even when excludeClaimed is on
   private recentlyActedIds = new Set<string>();
@@ -355,6 +357,30 @@ export class DashboardComponent implements OnInit, OnDestroy {
         this.loadPage();
       },
       error: () => { this.deletingId = null; }
+    });
+  }
+
+  copyComic(comic: Comic, event: Event): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.copyingId = comic.id;
+    const copy: Comic = {
+      ...comic,
+      id: -1,
+      title: comic.title + ' (Copied)',
+      dateSold: null,
+      soldTo: null,
+      sold: null,
+      items: undefined,
+      ...(comic.docType === 'SET' ? { collectionGroup: null } : {}),
+    };
+    this.comicService.addComic(copy).subscribe({
+      next: () => {
+        this.copyingId = null;
+        this.copiedId = comic.id;
+        setTimeout(() => { this.copiedId = null; this.loadPage(); }, 2000);
+      },
+      error: () => { this.copyingId = null; }
     });
   }
 

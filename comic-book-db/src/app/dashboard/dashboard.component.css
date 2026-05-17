@@ -187,7 +187,8 @@ h2 {
 .btn-in-cart,
 .btn-claimed,
 .btn-award,
-.btn-sell {
+.btn-sell,
+.btn-copy {
   padding: var(--space-1) var(--space-4);
   border-radius: var(--radius-sm);
   font-size: var(--fs-14);
@@ -290,6 +291,17 @@ h2 {
   background: #1b4332;
   border-color: #1b4332;
 }
+
+.btn-copy {
+  background: #6b7280;
+  color: var(--color-text-inverse);
+  border-color: #6b7280;
+}
+.btn-copy:hover:not(:disabled) {
+  background: #4b5563;
+  border-color: #4b5563;
+}
+.btn-copy:disabled { opacity: 0.55; cursor: not-allowed; }
 
 /* Delete-card — outline danger, smaller geometry */
 .btn-delete-card {

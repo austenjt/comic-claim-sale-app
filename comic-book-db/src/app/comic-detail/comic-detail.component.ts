@@ -381,6 +381,20 @@ export class ComicDetailComponent implements OnInit, OnDestroy {
     });
   }
 
+  clearFrontImage(): void {
+    if (!this.editComic) return;
+    this.editComic.largeCachedImageId = null;
+    this.editComic.smallCachedImageId = null;
+    this.saveComic();
+  }
+
+  clearBackImage(): void {
+    if (!this.editComic) return;
+    this.editComic.largeBackImageId = null;
+    this.editComic.smallBackImageId = null;
+    this.saveComic();
+  }
+
   private uploadFrontImage(file: File): void {
     if (!this.comic) return;
     this.imageUploading = true;
