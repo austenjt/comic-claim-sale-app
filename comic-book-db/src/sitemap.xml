@@ -6,7 +6,22 @@
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://lightningcomics.rocks/how-it-works</loc>
+    <loc>https://lightningcomics.rocks/dashboard</loc>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://lightningcomics.rocks/sales</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://lightningcomics.rocks/trade</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://lightningcomics.rocks/documentation</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>

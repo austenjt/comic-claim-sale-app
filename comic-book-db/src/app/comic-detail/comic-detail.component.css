@@ -2,6 +2,22 @@ button {
   margin-bottom: 1rem;
 }
 
+/* Loading skeleton — shown while the comic record is fetching. Mirrors the
+   two-column layout of the loaded page so the user sees stable scaffolding. */
+.comic-detail-skeleton {
+  display: grid;
+  grid-template-columns: minmax(0, 320px) 1fr;
+  gap: var(--space-6);
+  max-width: 960px;
+  margin: var(--space-6) auto;
+  padding: 0 var(--space-4);
+}
+.comic-detail-skeleton__image { display: flex; justify-content: center; }
+.comic-detail-skeleton__body  { display: flex; flex-direction: column; }
+@media (max-width: 768px) {
+  .comic-detail-skeleton { grid-template-columns: 1fr; }
+}
+
 .page-nav {
   display: flex;
   align-items: center;

@@ -39,6 +39,8 @@ export class AdminSalesComponent implements OnInit {
     private salesModal: SalesModalService
   ) {}
 
+  trackByDiscountId(_index: number, d: Discount): string { return d.id; }
+
   ngOnInit() {
     this.load();
   }

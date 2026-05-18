@@ -18,7 +18,7 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let user of pendingUsers">
+      <tr *ngFor="let user of pendingUsers; trackBy: trackById">
         <td>{{ user.name }}</td>
         <td>{{ user.email }}</td>
         <td>{{ user.createdDate | date:'short' }}</td>
@@ -34,7 +34,7 @@
   </div>
 
   <div class="user-card-list" *ngIf="existingUsers.length > 0">
-    <div class="user-card" *ngFor="let user of existingUsers">
+    <div class="user-card" *ngFor="let user of existingUsers; trackBy: trackById">
       <div class="user-card-header">
         <span class="status-badge"
           [class.badge-active]="user.status === 'APPROVED'"

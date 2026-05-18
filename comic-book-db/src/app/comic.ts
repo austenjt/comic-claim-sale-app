@@ -1,3 +1,4 @@
+import { DocType, ListingType } from './comic.enums';
 
 export interface PagedResponse<T> {
   items: T[];
@@ -101,13 +102,13 @@ export interface Comic {
   dateSold: string | null;
   soldTo: string | null;
   isForSale: boolean | null;
-  listingType?: 'NOT_LISTED' | 'FOR_SALE' | 'WANTED' | null;
+  listingType?: ListingType | null;
   nmEstimatedValue?: number | null;
   trade?: TradeInfo | null;
   personalEstimate: number | null;
   targetPrice: number | null;
   collectionGroup: number | null;
-  docType: string | null;
+  docType: DocType | string | null;
   storageLocation: string | null;
   goCollectInfo: GoCollectInfo | null;
   grandComicDBInfo: GrandComicDBInfo | null;

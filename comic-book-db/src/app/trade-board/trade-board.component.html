@@ -20,7 +20,7 @@
   </div>
 
   <div class="wanted-grid" *ngIf="wantedComics.length > 0">
-    <div class="wanted-card" *ngFor="let comic of wantedComics">
+    <div class="wanted-card" *ngFor="let comic of wantedComics; trackBy: trackById">
       <a [routerLink]="['/detail', comic.id]" class="wanted-image-link">
         <div class="image-container">
           <img [src]="imageUrl(comic)" [alt]="comicLabel(comic)" loading="lazy">
@@ -44,8 +44,8 @@
           <ng-container *ngIf="canOffer()">
             <button class="btn-offer-trade"
                     [class.btn-offer-trade--done]="isAdded(comic)"
-                    [disabled]="isAdded(comic) || isOfferedByOther(comic) || !comic.nmEstimatedValue"
-                    [title]="!comic.nmEstimatedValue ? 'Trade value not yet available for this comic' : ''"
+                    [disabled]="isAdded(comic) || isOfferedByOther(comic) || !comic.nmEstimatedValue || auth.isAdmin()"
+                    [title]="auth.isAdmin() ? 'Admins cannot offer trades' : (!comic.nmEstimatedValue ? 'Trade value not yet available for this comic' : '')"
                     (click)="openModal(comic)">
               <ng-container *ngIf="isAdded(comic)">Added to Cart ✓</ng-container>
               <ng-container *ngIf="isOfferedByOther(comic) && !isAdded(comic)">Offered</ng-container>

@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import { Comic } from '../comic';
 import { ComicService } from '../comic.service';
@@ -11,7 +13,8 @@ import { ConfigService, GradeOption } from '../config.service';
     selector: 'app-trade-board',
     templateUrl: './trade-board.component.html',
     styleUrls: ['./trade-board.component.css'],
-    standalone: false
+    standalone: true,
+    imports: [CommonModule, FormsModule],
 })
 export class TradeBoardComponent implements OnInit {
   wantedComics: Comic[] = [];
@@ -25,6 +28,10 @@ export class TradeBoardComponent implements OnInit {
   selectedGrade: number = 9.4; // default Near Mint
   submitting = false;
   submitError = '';
+
+  readonly gradeOptions = GRADE_OPTIONS;
+
+  trackById(_index: number, c: Comic): number { return c.id; }
 
   constructor(
     private comicService: ComicService,
@@ -69,7 +76,7 @@ export class TradeBoardComponent implements OnInit {
   }
 
   canOffer(): boolean {
-    return this.auth.isLoggedIn() && !this.auth.isAdmin();
+    return this.auth.isLoggedIn();
   }
 
   isAdded(comic: Comic): boolean {

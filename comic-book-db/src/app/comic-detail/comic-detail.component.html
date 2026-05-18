@@ -1,6 +1,16 @@
-<div *ngIf="loading" class="warming-up">
-  <div class="warming-up-spinner"></div>
-  <span>Please wait while things warm up. This site is not always on, and turns on when visited.</span>
+<div *ngIf="loading" class="comic-detail-skeleton" aria-busy="true" aria-live="polite">
+  <div class="comic-detail-skeleton__image">
+    <div class="skeleton skeleton--image"></div>
+  </div>
+  <div class="comic-detail-skeleton__body">
+    <div class="skeleton skeleton--title"></div>
+    <div class="skeleton skeleton--line"></div>
+    <div class="skeleton skeleton--line"></div>
+    <div class="skeleton skeleton--line skeleton--short"></div>
+    <div class="skeleton skeleton--line"></div>
+    <div class="skeleton skeleton--line skeleton--short"></div>
+  </div>
+  <span class="sr-only">Loading comic details…</span>
 </div>
 
 <div *ngIf="comic">
@@ -10,11 +20,14 @@
       <a *ngIf="parentSetId" class="btn-view-set" [routerLink]="['/set', parentSetId]">&#128218; View Set</a>
     </div>
     <div class="nav-center">
-      <button type="button" class="btn-nav-prev" [disabled]="!prevItem" (click)="prevItem && navigateTo(prevItem)">&#8592; Prev</button>
+      <button type="button" class="btn-nav-prev" aria-label="Previous comic" [disabled]="!prevItem" (click)="prevItem && navigateTo(prevItem)">&#8592; Prev</button>
       <span *ngIf="navPosition.total > 0" class="nav-position">{{ navPosition.index }} of {{ navPosition.total }}</span>
-      <button type="button" class="btn-nav-next" [disabled]="!nextItem" (click)="nextItem && navigateTo(nextItem)">Next &#8594;</button>
+      <button type="button" class="btn-nav-next" aria-label="Next comic" [disabled]="!nextItem" (click)="nextItem && navigateTo(nextItem)">Next &#8594;</button>
     </div>
     <div class="nav-right">
+      <button class="btn-share" aria-label="Copy share link to clipboard" (click)="copyShareLink()">
+        {{ linkCopied ? '✓ Link Copied!' : '&#128279; Share' }}
+      </button>
       <ng-container *ngIf="auth.isAdmin()">
         <button class="btn-save" [class.btn-save-done]="saveDone" (click)="saveComic()" [disabled]="saving"
                 [attr.aria-describedby]="saveError ? 'comic-save-error' : null">
@@ -90,14 +103,14 @@
       <!-- Thumbnail strip -->
       <div class="thumbnail-strip">
         <div class="thumb" [class.thumb-active]="activeImage === 'front'" (click)="selectImage('front')">
-          <img [src]="getSmallImageURLByName(comic.smallCachedImageId) | async" alt="Front Cover">
+          <img [src]="getSmallImageURLByName(comic.smallCachedImageId) | async" alt="Front Cover" loading="lazy">
           <span class="thumb-label">Front</span>
         </div>
         <div class="thumb"
              *ngIf="comic.largeCachedImageId && (auth.isAdmin() || comic.largeBackImageId)"
              [class.thumb-active]="activeImage === 'back'"
              (click)="selectImage('back')">
-          <img [src]="getSmallImageURLByName(comic.smallBackImageId) | async" alt="Back Cover">
+          <img [src]="getSmallImageURLByName(comic.smallBackImageId) | async" alt="Back Cover" loading="lazy">
           <span class="thumb-label">Back</span>
         </div>
       </div>

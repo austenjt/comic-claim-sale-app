@@ -894,6 +894,36 @@ hr {
   to { transform: rotate(360deg); }
 }
 
+/* ── Skeleton placeholders ────────────────────────────────────────────────
+   Lightweight loading shimmers for detail-page content. Compose like:
+     <div class="skeleton skeleton--image"></div>
+     <div class="skeleton skeleton--line"></div>
+   Honors prefers-reduced-motion (animation collapses globally). */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(108, 88, 76, 0.08) 0%,
+    rgba(108, 88, 76, 0.16) 50%,
+    rgba(108, 88, 76, 0.08) 100%
+  );
+  background-size: 200% 100%;
+  border-radius: var(--radius-sm);
+  animation: skeleton-shimmer 1.4s ease-in-out infinite;
+}
+
+.skeleton--image { width: 100%; aspect-ratio: 2 / 3; max-width: 320px; border-radius: var(--radius-md); }
+.skeleton--title { height: 28px; width: 60%; margin-bottom: var(--space-3); }
+.skeleton--line  { height: 14px; width: 100%; margin-bottom: var(--space-2); }
+.skeleton--line.skeleton--short { width: 40%; }
+
+@keyframes skeleton-shimmer {
+  0%   { background-position: 100% 0; }
+  100% { background-position: -100% 0; }
+}
+
+/* ── Sold-out image filter (binds via [class.is-sold] on the <img>) ─────── */
+.is-sold { filter: grayscale(80%); }
+
 /* ──────────────────────────────────────────────────────────────────────────
    Detail-page utilities
    Shared by the Comic Detail and Set Detail pages. Renders each admin-

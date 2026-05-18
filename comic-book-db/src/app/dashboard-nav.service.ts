@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Comic } from './comic';
+import { DocType } from './comic.enums';
 
 export interface NavItem {
   id: number;
@@ -21,7 +22,7 @@ export class DashboardNavService {
 
   /** Returns the ID of the SET container for a given collectionGroup, or null if not found. */
   getSetContainerId(collectionGroup: number): number | null {
-    const container = this.navList.find(c => c.docType === 'SET' && c.collectionGroup === collectionGroup);
+    const container = this.navList.find(c => c.docType === DocType.SET && c.collectionGroup === collectionGroup);
     return container?.id ?? null;
   }
 

@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { UserService } from '../user.service';
 import { User } from '../user';
 import { CartService } from '../cart.service';
@@ -7,7 +9,8 @@ import { CartService } from '../cart.service';
     selector: 'app-admin-users',
     templateUrl: './admin-users.component.html',
     styleUrls: ['./admin-users.component.css'],
-    standalone: false
+    standalone: true,
+    imports: [CommonModule, FormsModule],
 })
 export class AdminUsersComponent implements OnInit {
   pendingUsers: User[] = [];
@@ -21,6 +24,8 @@ export class AdminUsersComponent implements OnInit {
   resetError = '';
 
   constructor(private userService: UserService, private cartService: CartService) {}
+
+  trackById(_index: number, user: User): string { return user.id; }
 
   ngOnInit() {
     this.loadAll();

@@ -10,9 +10,11 @@ import {
   MsalInterceptorConfiguration,
 } from '@azure/msal-angular';
 
+import { environment } from '../environments/environment';
+
 const clientId        = '5b837ae4-4513-4d73-9b4b-9a697a26f5ea';
 const tenantSubdomain = 'lightningcomics';
-const apiBase         = 'https://fn-comicBook-db-1703810588398.azurewebsites.net/api';
+const apiBase         = environment.apiBase;
 
 /**
  * MSAL PublicClientApplication instance.

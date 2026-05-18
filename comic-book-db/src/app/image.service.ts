@@ -3,16 +3,18 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
+import { environment } from '../environments/environment';
+import { TelemetryService } from './telemetry.service';
+
 @Injectable({
   providedIn: 'root'
 })
 export class ImageService {
 
-  private baseServiceUrl = 'https://fn-comicBook-db-1703810588398.azurewebsites.net/api';
-  //private baseServiceUrl = 'http://localhost:7071/api';
+  private baseServiceUrl = environment.apiBase;
   private imagesAPIUrl = this.baseServiceUrl + '/images';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private telemetry: TelemetryService) {}
 
   getImagesBaseURL() {
       return this.imagesAPIUrl;
@@ -85,7 +87,7 @@ export class ImageService {
 
   private handleError<T>(result?: T) {
     return (error: any): Observable<T> => {
-      console.error(error);
+      this.telemetry.report(error, 'ImageService');
       return of(result as T);
     };
   }

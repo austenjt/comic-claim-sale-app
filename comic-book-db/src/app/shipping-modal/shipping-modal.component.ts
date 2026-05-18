@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
+import { Component, HostListener, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { Cart } from '../cart';
 import { ShippingAddress } from '../user';
 import { CartService } from '../cart.service';
@@ -105,5 +105,10 @@ export class ShippingModalComponent implements OnInit {
 
   close() {
     this.closed.emit();
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscape(): void {
+    if (!this.saving) this.close();
   }
 }

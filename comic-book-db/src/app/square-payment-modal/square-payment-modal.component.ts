@@ -1,6 +1,8 @@
 import { Component, Input, Output, EventEmitter, AfterViewInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
+import { environment } from '../../environments/environment';
+
 declare const Square: any;
 
 const SQUARE_APP_ID = 'sq0idp-EMJ-NrW8et-5t0JmeLJDoQ';
@@ -62,7 +64,7 @@ export class SquarePaymentModalComponent implements AfterViewInit, OnDestroy {
       return;
     }
 
-    this.http.post<{ success: boolean; error?: string }>('https://fn-comicBook-db-1703810588398.azurewebsites.net/api/payment', {
+    this.http.post<{ success: boolean; error?: string }>(`${environment.apiBase}/payment`, {
       nonce: token,
       amountCents: Math.round(this.amountDollars * 100),
       cartId: this.cartId

@@ -1,8 +1,10 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, DestroyRef, HostListener, OnDestroy, OnInit, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Title, Meta } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Location } from '@angular/common';
-import { Observable, of, Subscription } from 'rxjs';
+import { Observable, of } from 'rxjs';
+import { switchMap, tap } from 'rxjs/operators';
 
 import { Comic } from '../comic';
 import { Cart } from '../cart';
@@ -11,6 +13,7 @@ import { ImageService } from '../image.service';
 import { CartService } from '../cart.service';
 import { AuthService } from '../auth.service';
 import { DashboardNavService, NavItem } from '../dashboard-nav.service';
+import { DocType } from '../comic.enums';
 
 @Component({
     selector: 'app-set-detail',
@@ -53,7 +56,7 @@ export class SetDetailComponent implements OnInit, OnDestroy {
   addBookError = '';
   zoomOpen = false;
   private addBookSearchTimer: any = null;
-  private routeParamSub: Subscription | null = null;
+  private destroyRef = inject(DestroyRef);
 
   constructor(
     private route: ActivatedRoute,
@@ -69,9 +72,9 @@ export class SetDetailComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    // Subscribe to paramMap so navigating set→set (same route, different :id)
-    // properly reloads the container even when Angular reuses the component instance.
-    this.routeParamSub = this.route.paramMap.subscribe(params => {
+    // paramMap so navigating set→set (same route, different :id) reloads even when
+    // Angular reuses the component instance.
+    this.route.paramMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
       const id = parseInt(params.get('id')!, 10);
       this.container = undefined;
       this.setMembers = [];
@@ -81,6 +84,31 @@ export class SetDetailComponent implements OnInit, OnDestroy {
       this.linkCopied = false;
       this.activeImage = 'front';
 
+      this.comicService.getComic(id)
+        .pipe(
+          tap(comic => {
+            this.container = comic;
+            this.setMembers = comic?.items ?? [];
+            this.loading = false;
+            if (comic) {
+              const members = (comic.items ?? []).filter(m => m.docType !== DocType.SET);
+              this.navService.setList([comic, ...members]);
+              this.editContainer = structuredClone(comic);
+              const count = (comic.items ?? []).length;
+              this.titleService.setTitle(`${comic.title} Set — Lightning Comics PDX`);
+              this.meta.updateTag({ name: 'description', content: `${comic.title} — set of ${count} comic${count !== 1 ? 's' : ''} available for claim at Lightning Comics PDX in Oregon City, OR.` });
+            }
+          }),
+          switchMap(comic => comic ? this.comicService.recordView(id) : of(null)),
+          takeUntilDestroyed(this.destroyRef),
+        )
+        .subscribe(r => {
+          if (r && this.container) this.container.viewCount = r.viewCount;
+        });
+
+      this.cartService.getClaimedMap()
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe({ next: m => this.claimedMap = m, error: () => {} });
       this.comicService.getComic(id).subscribe(comic => {
         this.container = comic;
         this.setMembers = comic?.items ?? [];
@@ -101,13 +129,14 @@ export class SetDetailComponent implements OnInit, OnDestroy {
 
       this.cartService.getClaimedMap().subscribe({ next: m => this.claimedMap = m, error: () => {} });
       if (this.auth.isApproved()) {
-        this.cartService.getMyCart().subscribe({ next: cart => this.myCart = cart, error: () => {} });
+        this.cartService.getMyCart()
+          .pipe(takeUntilDestroyed(this.destroyRef))
+          .subscribe({ next: cart => this.myCart = cart, error: () => {} });
       }
     });
   }
 
   ngOnDestroy(): void {
-    if (this.routeParamSub) this.routeParamSub.unsubscribe();
     if (this.addBookSearchTimer) clearTimeout(this.addBookSearchTimer);
   }
 
@@ -131,9 +160,18 @@ export class SetDetailComponent implements OnInit, OnDestroy {
     this.zoomOpen = !this.zoomOpen;
   }
 
-  get displayMembers(): Comic[] {
-    return this.setMembers.filter(m => m.docType !== 'SET');
+  @HostListener('document:keydown.escape')
+  onEscape(): void {
+    if (this.zoomOpen) this.zoomOpen = false;
+    else if (this.captureModalOpen) this.closeCaptureModal();
+    else if (this.showAddBookModal) this.showAddBookModal = false;
   }
+
+  get displayMembers(): Comic[] {
+    return this.setMembers.filter(m => m.docType !== DocType.SET);
+  }
+
+  trackById(_index: number, c: Comic): number { return c.id; }
 
   comicNumberLabel(comic: Comic): string {
     const n = comic.number;
@@ -351,7 +389,7 @@ export class SetDetailComponent implements OnInit, OnDestroy {
     this.addBookSearchTimer = setTimeout(() => {
       this.comicService.searchComics(term).subscribe(results => {
         this.addBookSearchResults = results.filter(
-          c => c.docType !== 'SET' && (!c.collectionGroup || c.collectionGroup <= 0)
+          c => c.docType !== DocType.SET && (!c.collectionGroup || c.collectionGroup <= 0)
         );
         this.addBookSearching = false;
       });
@@ -411,7 +449,7 @@ export class SetDetailComponent implements OnInit, OnDestroy {
   }
 
   navigateTo(item: NavItem): void {
-    const route = item.docType === 'SET' ? ['/set', item.id] : ['/detail', item.id];
+    const route = item.docType === DocType.SET ? ['/set', item.id] : ['/detail', item.id];
     this.router.navigate(route);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }

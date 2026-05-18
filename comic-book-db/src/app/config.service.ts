@@ -3,6 +3,8 @@ import { HttpClient } from '@angular/common/http';
 import { catchError, firstValueFrom } from 'rxjs';
 import { of } from 'rxjs';
 
+import { environment } from '../environments/environment';
+
 export interface GradeOption {
   value: number;
   label: string;
@@ -33,8 +35,7 @@ const DEFAULT_CONFIG: AppConfig = {
 @Injectable({ providedIn: 'root' })
 export class ConfigService {
 
-  private readonly apiBase = 'https://fn-comicBook-db-1703810588398.azurewebsites.net/api';
-  // private readonly apiBase = 'http://localhost:7071/api';
+  private readonly apiBase = environment.apiBase;
 
   private _config: AppConfig = DEFAULT_CONFIG;
 

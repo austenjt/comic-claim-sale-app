@@ -123,6 +123,11 @@ export class CartComponent implements OnInit, OnDestroy {
     return this.cart?.items.filter(i => !i.isSetContainer) ?? [];
   }
 
+  trackByRow(_index: number, row: { collectionGroup: number | null; removeId?: string; items: { comicId?: string }[] }): string {
+    return row.removeId ?? (row.items[0] as any)?.comicId ?? String(row.collectionGroup ?? _index);
+  }
+  trackByComicId(_index: number, item: { comicId?: string }): string { return item.comicId ?? String(_index); }
+
   get groupedRows(): CartRow[] {
     const all = this.cart?.items ?? [];
     const nonContainers = all.filter(i => !i.isSetContainer);
