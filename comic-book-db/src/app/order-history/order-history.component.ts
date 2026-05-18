@@ -40,10 +40,10 @@ export class OrderHistoryComponent implements OnInit {
   }
 
   trackByOrderId(_index: number, o: ArchivedOrder): string { return o.id; }
-  trackByRow(_index: number, row: { collectionGroup: number | null; items: { comicId?: string }[] }): string {
+  trackByRow(_index: number, row: { collectionGroup: number | null; items: { comicId?: string | null }[] }): string {
     return (row.items[0] as any)?.comicId ?? String(row.collectionGroup ?? _index);
   }
-  trackByComicId(_index: number, item: { comicId?: string }): string { return item.comicId ?? String(_index); }
+  trackByComicId(_index: number, item: { comicId?: string | null }): string { return item.comicId ?? String(_index); }
 
   groupedRows(order: ArchivedOrder): OrderHistoryRow[] {
     const isContainer = (i: ArchivedOrderItem) => i.comicNumber === '#SET';

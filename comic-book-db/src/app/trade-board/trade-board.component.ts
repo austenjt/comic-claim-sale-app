@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import { Comic } from '../comic';
 import { ComicService } from '../comic.service';
@@ -14,7 +15,7 @@ import { ConfigService, GradeOption } from '../config.service';
     templateUrl: './trade-board.component.html',
     styleUrls: ['./trade-board.component.css'],
     standalone: true,
-    imports: [CommonModule, FormsModule],
+    imports: [CommonModule, FormsModule, RouterModule],
 })
 export class TradeBoardComponent implements OnInit {
   wantedComics: Comic[] = [];
@@ -28,8 +29,6 @@ export class TradeBoardComponent implements OnInit {
   selectedGrade: number = 9.4; // default Near Mint
   submitting = false;
   submitError = '';
-
-  readonly gradeOptions = GRADE_OPTIONS;
 
   trackById(_index: number, c: Comic): number { return c.id; }
 

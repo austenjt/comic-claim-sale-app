@@ -297,9 +297,9 @@ export class ComicDetailComponent implements OnInit {
       brand: comic.publisher ? { '@type': 'Brand', name: comic.publisher } : undefined,
       sku: String(comic.id),
     };
-    if (imageUrl) product.image = imageUrl;
+    if (imageUrl) product['image'] = imageUrl;
     if (comic.salePrice != null) {
-      product.offers = {
+      product['offers'] = {
         '@type': 'Offer',
         price: comic.salePrice.toFixed(2),
         priceCurrency: 'USD',
@@ -442,14 +442,6 @@ export class ComicDetailComponent implements OnInit {
       )
       .subscribe(r => {
         if (r && this.comic) this.comic.viewCount = r.viewCount;
-      .subscribe(comic => {
-        this.comic = comic;
-        this.loading = false;
-        if (comic) {
-          this.buildPageMeta(comic);
-        }
-        if (comic && this.auth.isAdmin()) this.initEditComic(comic);
-        if (comic) this.maybeRecordView(id);
       });
   }
 
@@ -463,7 +455,6 @@ export class ComicDetailComponent implements OnInit {
     else if (this.captureModalOpen) this.closeCaptureModal();
   }
 
-  openCaptureModal(target: 'front' | 'back'): void {
   openCaptureModal(target: 'front' | 'back' | 'trade-front' | 'trade-back'): void {
     this.captureModalTarget = target;
     this.captureModalOpen = true;

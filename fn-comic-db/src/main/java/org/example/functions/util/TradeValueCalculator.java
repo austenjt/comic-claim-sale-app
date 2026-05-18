@@ -27,8 +27,8 @@ public final class TradeValueCalculator {
     // Maybe we could return these in the /config endpoint so the front end can calculate dynamically?
     static {
         MULTIPLIERS.put(ComicGrade.GEM_MINT,          new BigDecimal("5.50"));
-        MULTIPLIERS.put(ComicGrade.MINT,               new BigDecimal("3.40"));
-        MULTIPLIERS.put(ComicGrade.NEAR_MINT_MINT,     new BigDecimal("2.25"));
+        MULTIPLIERS.put(ComicGrade.MINT_PLUS,          new BigDecimal("3.40"));
+        MULTIPLIERS.put(ComicGrade.MINT,               new BigDecimal("2.25"));
         MULTIPLIERS.put(ComicGrade.NEAR_MINT_PLUS,     new BigDecimal("1.66"));
         MULTIPLIERS.put(ComicGrade.NEAR_MINT,         new BigDecimal("1.00"));
         MULTIPLIERS.put(ComicGrade.NEAR_MINT_MINUS,   new BigDecimal("0.75"));
