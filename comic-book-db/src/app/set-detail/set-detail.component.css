@@ -10,11 +10,11 @@ button {
    (shared with comic-detail). Only the thumbnail trigger cursor is local. */
 
 .page-nav {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   margin-bottom: 0;
+  flex-wrap: wrap;
 }
 
 .page-nav button {
@@ -24,6 +24,7 @@ button {
 .nav-left {
   display: flex;
   align-items: center;
+  gap: 8px;
 }
 
 .nav-center {
@@ -35,7 +36,6 @@ button {
 .nav-right {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
   gap: 10px;
 }
 
