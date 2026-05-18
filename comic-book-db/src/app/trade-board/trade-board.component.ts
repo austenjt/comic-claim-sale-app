@@ -76,7 +76,7 @@ export class TradeBoardComponent implements OnInit {
   }
 
   canOffer(): boolean {
-    return this.auth.isLoggedIn() && !this.auth.isAdmin();
+    return this.auth.isLoggedIn();
   }
 
   isAdded(comic: Comic): boolean {

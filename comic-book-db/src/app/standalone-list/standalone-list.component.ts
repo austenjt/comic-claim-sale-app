@@ -206,7 +206,10 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
         notCertifiedSignature: (company === GradingCompany.PGX) ? this.qa.signed : null
       };
     } else {
-      // Not graded / saved from step 2
+      // Not graded / saved from step 2. When the user reached step 3 and picked
+      // NOT CERTIFIED, persist the grade/page quality/pedigree/signed values they entered.
+      const enteredOnStep3 = this.qaStep === 3 && company === GradingCompany.NOT_CERTIFIED;
+      const pedigreeStr = enteredOnStep3 && this.qa.pedigree ? 'Yes' : null;
       comicCondition = {
         isGraded: false,
         certificationCompany: GradingCompany.NOT_CERTIFIED,
@@ -214,11 +217,11 @@ export class StandaloneListComponent implements OnInit, OnDestroy {
         cgcCondition: null,
         cbcsCondition: null,
         notCertifiedLabel: null,
-        notCertifiedGrade: null,
-        notCertifiedPageQuality: null,
-        notCertifiedPedigree: null,
+        notCertifiedGrade: enteredOnStep3 ? this.qa.grade : null,
+        notCertifiedPageQuality: enteredOnStep3 ? (this.qa.pageQuality || null) : null,
+        notCertifiedPedigree: pedigreeStr,
         notCertifiedDegreeOfRestoration: null,
-        notCertifiedSignature: null
+        notCertifiedSignature: enteredOnStep3 ? this.qa.signed : null
       };
     }
 

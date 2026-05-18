@@ -26,10 +26,10 @@ public final class TradeValueCalculator {
     // These values need to sync with the values in trade-board.compoonent.ts in the front-end
     // Maybe we could return these in the /config endpoint so the front end can calculate dynamically?
     static {
-        MULTIPLIERS.put(ComicGrade.GEM_MINT,          new BigDecimal("3.50"));
-        MULTIPLIERS.put(ComicGrade.MINT,              new BigDecimal("2.40"));
-        MULTIPLIERS.put(ComicGrade.MINT,              new BigDecimal("1.25"));
-        MULTIPLIERS.put(ComicGrade.NEAR_MINT_PLUS,    new BigDecimal("1.10"));
+        MULTIPLIERS.put(ComicGrade.GEM_MINT,          new BigDecimal("5.50"));
+        MULTIPLIERS.put(ComicGrade.MINT,               new BigDecimal("3.40"));
+        MULTIPLIERS.put(ComicGrade.NEAR_MINT_MINT,     new BigDecimal("2.25"));
+        MULTIPLIERS.put(ComicGrade.NEAR_MINT_PLUS,     new BigDecimal("1.66"));
         MULTIPLIERS.put(ComicGrade.NEAR_MINT,         new BigDecimal("1.00"));
         MULTIPLIERS.put(ComicGrade.NEAR_MINT_MINUS,   new BigDecimal("0.75"));
         MULTIPLIERS.put(ComicGrade.VERY_FINE_NEAR_MINT, new BigDecimal("0.55"));

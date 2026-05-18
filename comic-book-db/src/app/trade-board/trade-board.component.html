@@ -44,8 +44,8 @@
           <ng-container *ngIf="canOffer()">
             <button class="btn-offer-trade"
                     [class.btn-offer-trade--done]="isAdded(comic)"
-                    [disabled]="isAdded(comic) || isOfferedByOther(comic) || !comic.nmEstimatedValue"
-                    [title]="!comic.nmEstimatedValue ? 'Trade value not yet available for this comic' : ''"
+                    [disabled]="isAdded(comic) || isOfferedByOther(comic) || !comic.nmEstimatedValue || auth.isAdmin()"
+                    [title]="auth.isAdmin() ? 'Admins cannot offer trades' : (!comic.nmEstimatedValue ? 'Trade value not yet available for this comic' : '')"
                     (click)="openModal(comic)">
               <ng-container *ngIf="isAdded(comic)">Added to Cart ✓</ng-container>
               <ng-container *ngIf="isOfferedByOther(comic) && !isAdded(comic)">Offered</ng-container>
