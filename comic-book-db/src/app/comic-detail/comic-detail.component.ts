@@ -14,7 +14,7 @@ import { ConfigService, ComicEnums } from '../config.service';
 import { DashboardNavService, NavItem } from '../dashboard-nav.service';
 import { Observable, of } from 'rxjs';
 import { switchMap, tap } from 'rxjs/operators';
-import { DocType, ListingType } from '../comic.enums';
+import { DocType, ListingType, ERA_OPTIONS } from '../comic.enums';
 
 @Component({
     selector: 'app-comic-detail',
@@ -48,6 +48,7 @@ export class ComicDetailComponent implements OnInit {
   tradeBackImageUploading = false;
   tradeBackImageUploadError = '';
   readonly Math = Math;
+  readonly eraOptions = ERA_OPTIONS;
   linkCopied = false;
   pendingDelete = false;
   deleting = false;

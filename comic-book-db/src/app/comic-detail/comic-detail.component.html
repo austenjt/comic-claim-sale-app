@@ -177,7 +177,10 @@
         <div class="detail-item" *ngIf="auth.isAdmin() || comic.era">
           <span class="detail-label">Era</span>
           <span *ngIf="!auth.isAdmin()" class="detail-value">{{comic.era}}</span>
-          <input *ngIf="auth.isAdmin()" class="detail-edit-input" type="text" [(ngModel)]="editComic!.era">
+          <select *ngIf="auth.isAdmin()" class="detail-edit-input" [(ngModel)]="editComic!.era">
+            <option [ngValue]="null">— None —</option>
+            <option *ngFor="let e of eraOptions" [ngValue]="e">{{ e }}</option>
+          </select>
         </div>
 
         <div class="detail-item" *ngIf="auth.isAdmin() || comic.variant">
