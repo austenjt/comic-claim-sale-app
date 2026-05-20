@@ -339,7 +339,7 @@
             <span *ngIf="!auth.isAdmin()" class="detail-value">{{comic.comicCondition!.cgcCondition!.grade | number:'1.1-1'}}</span>
             <select *ngIf="auth.isAdmin()" class="detail-edit-select" [(ngModel)]="editComic!.comicCondition!.cgcCondition!.grade">
               <option [ngValue]="null">—</option>
-              <option *ngFor="let g of enums.grades" [ngValue]="g.value">{{g.label}}</option>
+              <option *ngFor="let g of enums.grades" [ngValue]="g.value">{{ g.value | number:'1.1-1' }} — {{g.label}}</option>
             </select>
           </div>
 
@@ -398,7 +398,7 @@
             <span *ngIf="!auth.isAdmin()" class="detail-value">{{comic.comicCondition!.cbcsCondition!.grade | number:'1.1-1'}}</span>
             <select *ngIf="auth.isAdmin()" class="detail-edit-select" [(ngModel)]="editComic!.comicCondition!.cbcsCondition!.grade">
               <option [ngValue]="null">—</option>
-              <option *ngFor="let g of enums.grades" [ngValue]="g.value">{{g.label}}</option>
+              <option *ngFor="let g of enums.grades" [ngValue]="g.value">{{ g.value | number:'1.1-1' }} — {{g.label}}</option>
             </select>
           </div>
 
@@ -469,7 +469,7 @@
             <span class="detail-label">Grade</span>
             <select class="detail-edit-select" [(ngModel)]="editComic!.comicCondition!.notCertifiedGrade">
               <option [ngValue]="null">—</option>
-              <option *ngFor="let g of enums.grades" [ngValue]="g.value">{{g.label}}</option>
+              <option *ngFor="let g of enums.grades" [ngValue]="g.value">{{ g.value | number:'1.1-1' }} — {{g.label}}</option>
             </select>
           </div>
           <div class="detail-item">
@@ -645,7 +645,7 @@
           <span *ngIf="!auth.isAdmin()" class="detail-value">{{ comic.trade?.desiredGrade | number:'1.1-1' }}</span>
           <select *ngIf="auth.isAdmin()" class="detail-edit-select" [(ngModel)]="editComic!.trade!.desiredGrade">
             <option [ngValue]="null">Any grade</option>
-            <option *ngFor="let g of enums.grades" [ngValue]="g.value">{{ g.label }}</option>
+            <option *ngFor="let g of enums.grades" [ngValue]="g.value">{{ g.value | number:'1.1-1' }} — {{ g.label }}</option>
           </select>
         </div>
 
@@ -654,7 +654,7 @@
           <span *ngIf="!auth.isAdmin()" class="detail-value">{{ comic.trade?.offeredGrade | number:'1.1-1' }}</span>
           <select *ngIf="auth.isAdmin()" class="detail-edit-select" [(ngModel)]="editComic!.trade!.offeredGrade">
             <option [ngValue]="null">—</option>
-            <option *ngFor="let g of enums.grades" [ngValue]="g.value">{{ g.label }}</option>
+            <option *ngFor="let g of enums.grades" [ngValue]="g.value">{{ g.value | number:'1.1-1' }} — {{ g.label }}</option>
           </select>
         </div>
 
@@ -769,7 +769,7 @@
               <span class="detail-value">
                 <select class="detail-edit-select" [(ngModel)]="selectedTradeGrade">
                   <option [ngValue]="null">Select your copy's grade…</option>
-                  <option *ngFor="let g of enums.grades" [ngValue]="g.value">{{ g.label }}</option>
+                  <option *ngFor="let g of enums.grades" [ngValue]="g.value">{{ g.value | number:'1.1-1' }} — {{ g.label }}</option>
                 </select>
               </span>
             </div>

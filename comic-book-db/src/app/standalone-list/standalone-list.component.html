@@ -152,7 +152,7 @@
               [attr.aria-invalid]="qaShowFieldErrors && (qa.grade === null || qa.grade === undefined) ? 'true' : null"
               [attr.aria-describedby]="qaShowFieldErrors && (qa.grade === null || qa.grade === undefined) ? 'qa-grade-error' : (qaError ? 'qa-error' : null)">
         <option [ngValue]="null">— select —</option>
-        <option *ngFor="let g of enums.grades" [ngValue]="g.value">{{ g.value }} — {{ g.label }}</option>
+        <option *ngFor="let g of enums.grades" [ngValue]="g.value">{{ g.value | number:'1.1-1' }} — {{ g.label }}</option>
       </select>
       <span *ngIf="qaShowFieldErrors && (qa.grade === null || qa.grade === undefined)" id="qa-grade-error" class="field-error">Select a grade.</span>
     </div>
