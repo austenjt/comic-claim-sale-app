@@ -52,6 +52,7 @@
           <img [src]="getFullImageURLByName(comic.smallCachedImageId) | async" alt="Set Cover" loading="lazy">
           <img *ngIf="comic.smallBackImageId"
                [src]="getFullImageURLByName(comic.smallBackImageId) | async" alt="Set Back Cover" loading="lazy">
+          <span *ngIf="comic.ebayListingUrl" class="ebay-badge" title="Listed on eBay">e</span>
         </div>
         <div class="details">
           <div class="comic-title"><b>{{ comic.title }}</b></div>
@@ -93,6 +94,7 @@
             <img *ngIf="comic.smallBackImageId"
                  [src]="getFullImageURLByName(comic.smallBackImageId) | async" alt="Back Cover" loading="lazy"
                  [class.is-sold]="comic.soldTo">
+            <span *ngIf="comic.ebayListingUrl" class="ebay-badge" title="Listed on eBay">e</span>
         </div>
         <div class="details">
             <div class="comic-title"><b>{{comic.title}}{{comicNumberLabel(comic)}}</b></div>
