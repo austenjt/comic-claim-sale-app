@@ -52,7 +52,6 @@
           <img [src]="getFullImageURLByName(comic.smallCachedImageId) | async" alt="Set Cover" loading="lazy">
           <img *ngIf="comic.smallBackImageId"
                [src]="getFullImageURLByName(comic.smallBackImageId) | async" alt="Set Back Cover" loading="lazy">
-          <span *ngIf="comic.ebayListingUrl" class="ebay-badge" title="Listed on eBay">e</span>
         </div>
         <div class="details">
           <div class="comic-title"><b>{{ comic.title }}</b></div>
@@ -65,6 +64,7 @@
         </div>
         <div class="card-footer">
           <div class="footer-badges">
+            <span *ngIf="comic.ebayListingUrl" class="ebay-badge" title="EBay listed">e</span>
             <span class="badge-set">Set {{ comic.collectionGroup }}</span>
           </div>
           <div class="footer-actions">
@@ -94,7 +94,6 @@
             <img *ngIf="comic.smallBackImageId"
                  [src]="getFullImageURLByName(comic.smallBackImageId) | async" alt="Back Cover" loading="lazy"
                  [class.is-sold]="comic.soldTo">
-            <span *ngIf="comic.ebayListingUrl" class="ebay-badge" title="Listed on eBay">e</span>
         </div>
         <div class="details">
             <div class="comic-title"><b>{{comic.title}}{{comicNumberLabel(comic)}}</b></div>
@@ -112,6 +111,7 @@
         </div>
         <div class="card-footer">
           <div class="footer-badges">
+            <span *ngIf="comic.ebayListingUrl" class="ebay-badge" title="EBay listed">e</span>
             <span *ngIf="comic.comicCondition?.cgcCondition?.grade || comic.comicCondition?.cbcsCondition?.grade"
                   class="badge-graded">Graded</span>
             <span *ngIf="comic.docType !== 'SET' && comic.keyIssue" class="badge-key-issue">Key Issue</span>
