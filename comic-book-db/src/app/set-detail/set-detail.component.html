@@ -260,9 +260,9 @@
             <div *ngIf="member.series && member.series !== ''" class="comic-series">Series: <b>{{ member.series }}</b></div>
             <div *ngIf="member.publisher" class="comic-publisher">Publisher: <b>{{ member.publisher }}</b></div>
             <div *ngIf="member.publishedDate" class="comic-published">Published: <b>{{ member.publishedDate }}</b></div>
-            <div *ngIf="member.comicCondition?.cgcCondition?.grade" class="comic-grade-certified">CGC: <b>{{ member.comicCondition?.cgcCondition?.grade }}</b></div>
-            <div *ngIf="member.comicCondition?.cbcsCondition?.grade" class="comic-grade-certified">CBCS: <b>{{ member.comicCondition?.cbcsCondition?.grade }}</b></div>
-            <div *ngIf="member.comicCondition?.notCertifiedGrade" class="comic-grade-est">Grade: <b>{{ member.comicCondition?.notCertifiedGrade }}</b></div>
+            <div *ngIf="member.comicCondition?.cgcCondition?.grade" class="comic-grade-certified">CGC: <b>{{ member.comicCondition?.cgcCondition?.grade | number:'1.1-1' }}</b></div>
+            <div *ngIf="member.comicCondition?.cbcsCondition?.grade" class="comic-grade-certified">CBCS: <b>{{ member.comicCondition?.cbcsCondition?.grade | number:'1.1-1' }}</b></div>
+            <div *ngIf="member.comicCondition?.notCertifiedGrade" class="comic-grade-est">Grade: <b>{{ member.comicCondition?.notCertifiedGrade | number:'1.1-1' }}</b></div>
             <div class="comic-price">Price: <b>{{ (member.salePrice ?? 0) | currency:'USD':'symbol':'1.2-2' }}</b></div>
           </div>
         </div>
