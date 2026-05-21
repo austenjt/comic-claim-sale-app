@@ -467,6 +467,9 @@ h2 {
 .badge-set {
   background: var(--color-warm-accent-deep);
   color: var(--color-text-inverse);
+  padding: var(--space-1) var(--space-2);
+  font-size: var(--fs-14);
+  line-height: 1.15;
 }
 
 /* ── Dashboard Footer ──────────────────────────────────────────────────────── */
