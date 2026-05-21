@@ -13,7 +13,6 @@ import { CartService } from '../cart.service';
     imports: [CommonModule, FormsModule],
 })
 export class AdminUsersComponent implements OnInit {
-  pendingUsers: User[] = [];
   existingUsers: User[] = [];
   loading = false;
   error = '';
@@ -33,25 +32,9 @@ export class AdminUsersComponent implements OnInit {
 
   loadAll() {
     this.loading = true;
-    this.userService.getPendingUsers().subscribe({
-      next: users => { this.pendingUsers = users; },
-      error: () => { this.error = 'Failed to load pending users.'; }
-    });
     this.userService.getApprovedUsers().subscribe({
       next: users => { this.existingUsers = users; this.loading = false; },
-      error: () => { this.error = 'Failed to load approved users.'; this.loading = false; }
-    });
-  }
-
-  approve(user: User) {
-    this.userService.approveUser(user.id).subscribe({
-      next: () => {
-        this.pendingUsers = this.pendingUsers.filter(u => u.id !== user.id);
-        this.userService.getApprovedUsers().subscribe({
-          next: users => { this.existingUsers = users; }
-        });
-      },
-      error: () => { this.error = 'Failed to approve user.'; }
+      error: () => { this.error = 'Failed to load users.'; this.loading = false; }
     });
   }
 

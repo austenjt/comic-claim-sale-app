@@ -44,8 +44,8 @@ public class UserService {
     }
 
     /**
-     * Called on first login via Entra — creates a PENDING user record from the JWT identity.
-     * If the email matches the configured admin email, auto-approves and sets isAdmin=true.
+     * Called on first login via Entra — creates an APPROVED user record from the JWT identity.
+     * If the email matches the configured admin email, sets isAdmin=true.
      */
     public User createFromIdentity(UserIdentity identity) {
         User user = new User();
@@ -53,14 +53,13 @@ public class UserService {
         user.setName(identity.getDisplayName() != null ? identity.getDisplayName() : identity.getEmail());
         user.setEmail(identity.getEmail());
         user.setEntraOid(identity.getOid());
-        user.setStatus(UserStatus.PENDING);
+        user.setStatus(UserStatus.APPROVED);
         user.setCreatedDate(Instant.now().toString());
+        user.setApprovedDate(Instant.now().toString());
 
         String adminEmail = EnvHelper.getAdminEmail();
         if (adminEmail != null && adminEmail.equalsIgnoreCase(identity.getEmail())) {
             user.setAdmin(true);
-            user.setStatus(UserStatus.APPROVED);
-            user.setApprovedDate(Instant.now().toString());
         }
 
         ObjectNode node = OBJECT_MAPPER.valueToTree(user);

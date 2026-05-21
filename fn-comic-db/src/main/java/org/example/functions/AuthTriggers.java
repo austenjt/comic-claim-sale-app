@@ -26,7 +26,7 @@ import java.util.Optional;
  * GET /api/auth/me
  *   - Validates the Entra Bearer JWT
  *   - Looks up the user in CosmosDB by email
- *   - If no record exists, creates a PENDING user and returns 202
+ *   - If no record exists, creates an APPROVED user and returns 200
  *   - If PENDING or SUSPENDED, returns 403
  *   - If APPROVED, returns 200 with the user object
  */
@@ -69,16 +69,12 @@ public class AuthTriggers {
             Optional<User> optUser = userService.findByEmail(identity.getEmail());
 
             if (optUser.isEmpty()) {
-                // First login — create a PENDING record so the admin can approve
+                // First login — auto-approve and return the user object
                 User newUser = userService.createFromIdentity(identity);
-                log.info("Created PENDING user for {} (oid={})", identity.getEmail(), identity.getOid());
-
-                ObjectNode resp = OBJECT_MAPPER.createObjectNode();
-                resp.put("status", "PENDING");
-                resp.put("id", newUser.getId());
-                return cors(request.createResponseBuilder(HttpStatus.ACCEPTED))
+                log.info("Created APPROVED user for {} (oid={})", identity.getEmail(), identity.getOid());
+                return cors(request.createResponseBuilder(HttpStatus.OK))
                     .header("Content-Type", "application/json")
-                    .body(OBJECT_MAPPER.writeValueAsString(resp))
+                    .body(OBJECT_MAPPER.writeValueAsString(safeUserNode(newUser)))
                     .build();
             }
 

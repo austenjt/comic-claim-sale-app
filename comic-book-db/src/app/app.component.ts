@@ -61,8 +61,8 @@ export class AppComponent implements OnInit {
                 }
               },
               error: (err) => {
-                // 403 = PENDING or SUSPENDED
-                if (err?.status === 403 || err?.status === 202) {
+                // 403 = SUSPENDED
+                if (err?.status === 403) {
                   this.router.navigate(['/pending-approval']);
                 }
               }

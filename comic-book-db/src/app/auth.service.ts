@@ -70,17 +70,11 @@ export class AuthService {
    * Fetches the current user from GET /api/auth/me (validates JWT, looks up CosmosDB record).
    * - Returns the User on success (status APPROVED).
    * - Emits null and clears MSAL cache on 401.
-   * - Re-throws 403 (PENDING/SUSPENDED) so callers can show the appropriate message.
+   * - Re-throws 403 (SUSPENDED) so callers can show the appropriate message.
    */
   loadCurrentUser(): Observable<User | null> {
-    return this.http.get<User>(this.meUrl, { observe: 'response' }).pipe(
-      map(response => {
-        if (response.status === 202) {
-          // First signup — backend created a PENDING record. 202 is a 2xx so HttpClient
-          // treats it as success; throw here so catchError can route to pending-approval.
-          throw new HttpErrorResponse({ status: 202, error: 'Account pending approval' });
-        }
-        const user = response.body!;
+    return this.http.get<User>(this.meUrl).pipe(
+      map(user => {
         this.currentUser$.next(user);
         return user;
       }),
@@ -92,8 +86,7 @@ export class AuthService {
           this.currentUser$.next(null);
           return of(null);
         }
-        // 202 (new PENDING user) and 403 (returning PENDING/SUSPENDED) both re-throw
-        // so AppComponent can navigate to /pending-approval.
+        // 403 (SUSPENDED) re-throws so AppComponent can navigate to /pending-approval.
         return throwError(() => err);
       }),
     );
