@@ -76,7 +76,19 @@ ul.search-result {
   color: var(--color-text-muted);
 }
 
-.search-result li a:hover .search-result-number {
+.search-result-set {
+  margin-left: 6px;
+  font-size: 0.85em;
+  font-style: italic;
+  color: var(--color-text-muted);
+}
+
+.search-result li a:hover .search-result-number,
+.search-result li a:hover .search-result-set {
+  color: rgba(240,234,210,0.75);
+}
+
+.search-result li a.sold:hover .search-result-set {
   color: rgba(240,234,210,0.75);
 }
 

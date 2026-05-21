@@ -9,6 +9,9 @@
         <span *ngIf="comic.number?.number != null || comic.number?.sentinel != null" class="search-result-number">
           #{{ comic.number?.sentinel ?? comic.number?.number }}
         </span>
+        <span *ngIf="comic.collectionGroup" class="search-result-set">
+          · Set {{ comic.collectionGroup }}
+        </span>
       </a>
     </li>
   </ul>
