@@ -683,6 +683,28 @@ public class ComicService {
         log.info("All comics deleted.");
     }
 
+    /** Zeroes viewCount on every comic that has been viewed, and clears the in-memory dedup cache. */
+    public int resetAllViewCounts() {
+        SqlQuerySpec query = new SqlQuerySpec(
+            "SELECT * FROM c WHERE IS_DEFINED(c.viewCount) AND c.viewCount > 0");
+        CosmosPagedIterable<ObjectNode> items = comicsContainer.queryItems(
+            query, new CosmosQueryRequestOptions(), ObjectNode.class);
+        int count = 0;
+        for (ObjectNode node : items) {
+            node.put("viewCount", 0);
+            String id = node.get("id").asText();
+            try {
+                comicsContainer.replaceItem(node, id, new PartitionKey(id), new CosmosItemRequestOptions());
+                count++;
+            } catch (Exception e) {
+                log.warn("Failed to reset viewCount for comic {}: {}", id, e.getMessage());
+            }
+        }
+        VIEW_SEEN.clear();
+        log.info("Reset viewCount for {} comics.", count);
+        return count;
+    }
+
     private int getRandomId() {
         Random rand = new Random();
         return 10000000 + rand.nextInt(90000000);

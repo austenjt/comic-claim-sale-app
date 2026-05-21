@@ -13,7 +13,7 @@ import { AuthService } from '../auth.service';
 import { ConfigService, ComicEnums } from '../config.service';
 import { DashboardNavService, NavItem } from '../dashboard-nav.service';
 import { Observable, of } from 'rxjs';
-import { switchMap, tap } from 'rxjs/operators';
+import { tap } from 'rxjs/operators';
 import { DocType, ListingType, ERA_OPTIONS } from '../comic.enums';
 
 @Component({
@@ -436,14 +436,12 @@ export class ComicDetailComponent implements OnInit {
           if (comic) {
             this.buildPageMeta(comic);
             if (this.auth.isAdmin()) this.initEditComic(comic);
+            this.maybeRecordView(id);
           }
         }),
-        switchMap(comic => comic ? this.comicService.recordView(id) : of(null)),
         takeUntilDestroyed(this.destroyRef),
       )
-      .subscribe(r => {
-        if (r && this.comic) this.comic.viewCount = r.viewCount;
-      });
+      .subscribe();
   }
 
   toggleZoom(): void {
@@ -487,9 +485,9 @@ export class ComicDetailComponent implements OnInit {
     if (last && (now - parseInt(last, 10)) < 24 * 60 * 60 * 1000) {
       return;
     }
+    localStorage.setItem(key, String(now));
     this.comicService.recordView(id).subscribe(r => {
       if (this.comic) this.comic.viewCount = r.viewCount;
-      localStorage.setItem(key, String(now));
     });
   }
 

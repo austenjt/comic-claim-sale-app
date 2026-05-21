@@ -150,6 +150,10 @@ export class ComicService {
     );
   }
 
+  resetViewCounts(): Observable<{ reset: number }> {
+    return this.http.post<{ reset: number }>(`${this.baseServiceUrl}/comics/reset-views`, {});
+  }
+
   /** PUT: update the comic on the server */
   updateComic(comic: Comic): Observable<any> {
     return this.http.put(this.comicsUrl, comic, this.httpOptions).pipe(

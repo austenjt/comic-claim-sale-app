@@ -64,8 +64,8 @@
         </div>
         <div class="card-footer">
           <div class="footer-badges">
-            <span *ngIf="comic.ebayListingUrl" class="ebay-badge" title="EBay listed">e</span>
-            <span class="badge-set">Set {{ comic.collectionGroup }}</span>
+            <span *ngIf="comic.ebayListingUrl" class="ebay-badge" data-tooltip="eBay listed">e</span>
+            <span class="badge-set" [attr.data-tooltip]="'Set ' + comic.collectionGroup"><i>s</i></span>
           </div>
           <div class="footer-actions">
             <span *ngIf="isSetClaimedByOther(comic)" class="comic-claimed-status">Claimed</span>
@@ -111,7 +111,7 @@
         </div>
         <div class="card-footer">
           <div class="footer-badges">
-            <span *ngIf="comic.ebayListingUrl" class="ebay-badge" title="EBay listed">e</span>
+            <span *ngIf="comic.ebayListingUrl" class="ebay-badge" data-tooltip="eBay listed">e</span>
             <span *ngIf="comic.comicCondition?.cgcCondition?.grade || comic.comicCondition?.cbcsCondition?.grade"
                   class="badge-graded">Graded</span>
             <span *ngIf="comic.docType !== 'SET' && comic.keyIssue" class="badge-key-issue">Key Issue</span>

@@ -526,6 +526,28 @@ public class AdminTriggers {
         }
     }
 
+    // ─── POST /api/comics/reset-views ────────────────────────────────────────
+
+    @FunctionName("resetViewCounts")
+    public HttpResponseMessage resetViewCounts(
+        @HttpTrigger(name = "resetViewCounts", route = "comics/reset-views",
+            methods = {HttpMethod.POST}, authLevel = AuthorizationLevel.ANONYMOUS)
+        HttpRequestMessage<Optional<String>> request)
+    {
+        if (AuthHelper.requireAdmin(request) == null) return unauthorized(request);
+        try {
+            int count = ComicService.getServiceInstance().resetAllViewCounts();
+            ObjectNode resp = OBJECT_MAPPER.createObjectNode();
+            resp.put("reset", count);
+            return cors(request.createResponseBuilder(HttpStatus.OK))
+                .header("Content-Type", "application/json")
+                .body(OBJECT_MAPPER.writeValueAsString(resp)).build();
+        } catch (Exception e) {
+            log.error("resetViewCounts error", e);
+            return serverError(request, e);
+        }
+    }
+
     // ─── POST /api/reset ─────────────────────────────────────────────────────
 
     @FunctionName("resetDatabase")

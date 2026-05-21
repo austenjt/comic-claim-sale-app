@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { UserService } from '../user.service';
 import { User } from '../user';
 import { CartService } from '../cart.service';
+import { ComicService } from '../comic.service';
 
 @Component({
     selector: 'app-admin-users',
@@ -22,7 +23,15 @@ export class AdminUsersComponent implements OnInit {
   resetSuccess = '';
   resetError = '';
 
-  constructor(private userService: UserService, private cartService: CartService) {}
+  resetCountsInProgress = false;
+  resetCountsSuccess = '';
+  resetCountsError = '';
+
+  constructor(
+    private userService: UserService,
+    private cartService: CartService,
+    private comicService: ComicService,
+  ) {}
 
   trackById(_index: number, user: User): string { return user.id; }
 
@@ -53,6 +62,22 @@ export class AdminUsersComponent implements OnInit {
         next: users => { this.existingUsers = users; }
       }),
       error: () => { this.error = 'Failed to reactivate user.'; }
+    });
+  }
+
+  resetViewCounts() {
+    this.resetCountsInProgress = true;
+    this.resetCountsSuccess = '';
+    this.resetCountsError = '';
+    this.comicService.resetViewCounts().subscribe({
+      next: (res) => {
+        this.resetCountsSuccess = `Reset complete. ${res.reset} comic${res.reset !== 1 ? 's' : ''} updated.`;
+        this.resetCountsInProgress = false;
+      },
+      error: () => {
+        this.resetCountsError = 'Reset failed. Check the server logs.';
+        this.resetCountsInProgress = false;
+      }
     });
   }
 

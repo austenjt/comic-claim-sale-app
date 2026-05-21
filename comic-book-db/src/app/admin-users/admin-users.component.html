@@ -77,6 +77,21 @@
     </div>
   </div>
 
+  <!-- Reset View Counts -->
+  <div class="section-divider"></div>
+  <h3>Reset Counts</h3>
+  <p class="reset-warning">Resets the view count on all comics back to zero.</p>
+
+  <div *ngIf="resetCountsSuccess" class="success-message">{{ resetCountsSuccess }}</div>
+  <div *ngIf="resetCountsError" class="error-message">{{ resetCountsError }}</div>
+
+  <button
+    class="btn-secondary"
+    [disabled]="resetCountsInProgress"
+    (click)="resetViewCounts()">
+    {{ resetCountsInProgress ? 'Resetting…' : 'Reset View Counts' }}
+  </button>
+
   <!-- Database Reset -->
   <div class="section-divider"></div>
   <h3 class="danger-title">Reset Database</h3>
