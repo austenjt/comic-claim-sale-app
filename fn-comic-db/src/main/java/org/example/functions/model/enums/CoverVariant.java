@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum CoverVariant {
     DIRECT_EDITION("Direct Edition"),
+    NEWSSTAND("Newsstand"),
     COVER_A("Cover A"),
     COVER_B("Cover B"),
     COVER_C("Cover C"),
@@ -30,6 +31,7 @@ public enum CoverVariant {
     GLOW_IN_THE_DARK("Glow in the Dark"),
     DIE_CUT("Die-Cut"),
     GATEFOLD("Gatefold"),
+    DOUBLE_SIZED("Double-Sized"),
     WRAPAROUND("Wraparound"),
     CONNECTING("Connecting"),
     LIMITED_EDITION("Limited Edition"),
@@ -48,7 +50,6 @@ public enum CoverVariant {
     STORE_EXCLUSIVE("Store Exclusive"),
     ONE_OF_N("One of N"),
     CONVENTION_EXCLUSIVE("Convention Exclusive"),
-    NEWSSTAND("Newsstand"),
     CANADIAN_PRICE("Canadian Price"),
     UK_PRICE("UK Price"),
     GOLD_EDITION("Gold Edition"),

@@ -259,6 +259,7 @@
           <div class="meta-grid">
             <div *ngIf="member.series && member.series !== ''" class="comic-series">Series: <b>{{ member.series }}</b></div>
             <div *ngIf="member.publisher" class="comic-publisher">Publisher: <b>{{ member.publisher }}</b></div>
+            <div *ngIf="member.variant" class="comic-variant">Variant: <b>{{ member.variant }}</b></div>
             <div *ngIf="member.publishedDate" class="comic-published">Published: <b>{{ member.publishedDate }}</b></div>
             <div *ngIf="member.comicCondition?.cgcCondition?.grade" class="comic-grade-certified">CGC: <b>{{ member.comicCondition?.cgcCondition?.grade | number:'1.1-1' }}</b></div>
             <div *ngIf="member.comicCondition?.cbcsCondition?.grade" class="comic-grade-certified">CBCS: <b>{{ member.comicCondition?.cbcsCondition?.grade | number:'1.1-1' }}</b></div>
