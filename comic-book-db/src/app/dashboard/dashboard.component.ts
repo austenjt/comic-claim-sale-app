@@ -384,6 +384,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
       soldTo: null,
       sold: null,
       items: undefined,
+      smallCachedImageId: null,
+      largeCachedImageId: null,
+      smallBackImageId: null,
+      largeBackImageId: null,
+      comicCondition: null,
+      salePrice: null,
+      viewCount: null,
+      ebayListingUrl: null,
     };
     this.comicService.addComic(copy).subscribe({
       next: () => {
