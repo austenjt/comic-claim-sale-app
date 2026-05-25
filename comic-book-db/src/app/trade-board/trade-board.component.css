@@ -167,6 +167,12 @@ h2 {
   margin-bottom: 3px;
 }
 
+.comic-grade {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  margin-bottom: 3px;
+}
+
 .comic-price {
   font-size: 0.8rem;
   color: var(--color-text-muted);
@@ -211,6 +217,32 @@ h2 {
   align-items: center;
   gap: 6px;
 }
+
+/* ── Admin Copy button ──────────────────────────────────────────────────── */
+
+.btn-copy {
+  height: 28px;
+  padding: 0 14px;
+  font-size: 0.83rem;
+  font-weight: 700;
+  border-radius: 4px;
+  cursor: pointer;
+  white-space: nowrap;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  border: 1px solid transparent;
+  background: #6b7280;
+  color: var(--color-text-inverse);
+  border-color: #6b7280;
+}
+.btn-copy:hover:not(:disabled) {
+  background: #4b5563;
+  border-color: #4b5563;
+}
+.btn-copy:disabled { opacity: 0.55; cursor: not-allowed; }
 
 /* ── Offer Trade button ─────────────────────────────────────────────────── */
 
@@ -328,6 +360,11 @@ h2 {
   padding: 0.6rem 0.8rem;
   font-size: 0.84rem;
   color: var(--color-text-muted);
+}
+
+.modal-required-hint {
+  font-size: 0.8rem;
+  color: var(--color-danger);
 }
 
 .modal-grade-warning {

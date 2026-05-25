@@ -33,6 +33,7 @@
         <div class="meta-grid">
           <div *ngIf="comic.publisher" class="comic-publisher">{{ comic.publisher }}</div>
           <div *ngIf="comic.publishedDate" class="comic-publish-date">{{ comic.publishedDate }}</div>
+          <div *ngIf="comic.trade?.desiredGrade" class="comic-grade">Grade: <b>{{ comic.trade?.desiredGrade | number:'1.1-1' }}</b></div>
           <div *ngIf="comic.nmEstimatedValue" class="comic-price">NM Value: <b>{{ comic.nmEstimatedValue | currency }}</b></div>
           <div class="wanted-credit-note">Credit varies by condition</div>
           <div *ngIf="comic.publicNotes" class="wanted-notes">{{ comic.publicNotes }}</div>
@@ -41,6 +42,11 @@
       <div class="card-footer">
         <div class="footer-badges"></div>
         <div class="footer-actions">
+          <button *ngIf="auth.isAdmin()" class="btn-copy"
+                  [disabled]="copyingId === comic.id"
+                  (click)="$event.preventDefault(); $event.stopPropagation(); copyComic(comic, $event)">
+            {{ copiedId === comic.id ? 'Copied ✓' : copyingId === comic.id ? 'Copying…' : 'Copy' }}
+          </button>
           <ng-container *ngIf="canOffer()">
             <button class="btn-offer-trade"
                     [class.btn-offer-trade--done]="isAdded(comic)"
@@ -67,9 +73,11 @@
 
     <div class="modal-field">
       <label class="modal-label">What condition is your copy?</label>
-      <select class="modal-select" [(ngModel)]="selectedGrade">
+      <select class="modal-select" [(ngModel)]="selectedGrade" required>
+        <option [ngValue]="null" disabled>— Select grade —</option>
         <option *ngFor="let g of gradeOptions" [ngValue]="g.value">{{ g.value }} — {{ g.label }}</option>
       </select>
+      <div *ngIf="selectedGrade == null" class="modal-required-hint">Grade is required.</div>
     </div>
 
     <div class="modal-preview">
@@ -91,7 +99,7 @@
       <button class="btn-modal-cancel" (click)="closeModal()" [disabled]="submitting">Cancel</button>
       <button class="btn-modal-confirm"
               (click)="confirmTrade()"
-              [disabled]="submitting || !modalComic.nmEstimatedValue">
+              [disabled]="submitting || !modalComic.nmEstimatedValue || selectedGrade == null">
         {{ submitting ? 'Adding…' : 'Add to Cart' }}
       </button>
     </div>

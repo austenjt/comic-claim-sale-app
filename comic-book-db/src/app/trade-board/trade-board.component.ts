@@ -23,10 +23,12 @@ export class TradeBoardComponent implements OnInit {
   error = '';
   addedTradeIds = new Set<string>();
   claimedMap: Record<string, string> = {};
+  copyingId: number | null = null;
+  copiedId: number | null = null;
 
   // Grade selector modal
   modalComic: Comic | null = null;
-  selectedGrade: number = 9.4; // default Near Mint
+  selectedGrade: number | null = null; // must be explicitly chosen
   submitting = false;
   submitError = '';
 
@@ -86,11 +88,45 @@ export class TradeBoardComponent implements OnInit {
     return !this.isAdded(comic) && !!this.claimedMap[this.comicKey(comic)];
   }
 
+  // ── Admin: duplicate comic ──────────────────────────────────────────────────
+
+  copyComic(comic: Comic, event: Event): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.copyingId = comic.id;
+    const copy: Comic = {
+      ...comic,
+      id: -1,
+      title: comic.title + ' (Copied)',
+      dateSold: null,
+      soldTo: null,
+      sold: null,
+      items: undefined,
+      smallCachedImageId: null,
+      largeCachedImageId: null,
+      smallBackImageId: null,
+      largeBackImageId: null,
+      comicCondition: null,
+      salePrice: null,
+      viewCount: null,
+      ebayListingUrl: null,
+    };
+    this.comicService.addComic(copy).subscribe({
+      next: (created) => {
+        this.copyingId = null;
+        this.copiedId = comic.id;
+        this.wantedComics.push(created);
+        setTimeout(() => { this.copiedId = null; }, 2000);
+      },
+      error: () => { this.copyingId = null; }
+    });
+  }
+
   // ── Grade modal ────────────────────────────────────────────────────────────
 
   openModal(comic: Comic): void {
     this.modalComic = comic;
-    this.selectedGrade = 9.4;
+    this.selectedGrade = null;
     this.submitError = '';
     this.submitting = false;
   }
@@ -101,19 +137,23 @@ export class TradeBoardComponent implements OnInit {
   }
 
   get previewCredit(): number {
-    if (!this.modalComic?.nmEstimatedValue) return 0;
+    if (!this.modalComic?.nmEstimatedValue || this.selectedGrade == null) return 0;
     const multiplier = this.configService.gradeMultiplier(this.selectedGrade);
     return Math.round(this.modalComic.nmEstimatedValue * multiplier * 100) / 100;
   }
 
   get gradeWarning(): boolean {
     const desired = this.modalComic?.trade?.desiredGrade;
-    if (!desired) return false;
-    return Math.abs(this.selectedGrade - desired) > 2.0;
+    if (desired == null || this.selectedGrade == null) return false;
+    const grades = this.gradeOptions;
+    const desiredIdx = grades.findIndex(g => g.value === desired);
+    const selectedIdx = grades.findIndex(g => g.value === this.selectedGrade);
+    if (desiredIdx < 0 || selectedIdx < 0) return false;
+    return Math.abs(desiredIdx - selectedIdx) > 2;
   }
 
   confirmTrade(): void {
-    if (!this.modalComic) return;
+    if (!this.modalComic || this.selectedGrade == null) return;
     this.submitting = true;
     this.submitError = '';
     const id = this.comicKey(this.modalComic);
