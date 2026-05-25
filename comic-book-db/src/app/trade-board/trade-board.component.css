@@ -179,6 +179,13 @@ h2 {
   margin-bottom: 3px;
 }
 
+.comic-offered-grade,
+.comic-offered-value {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  margin-bottom: 3px;
+}
+
 .wanted-credit-note {
   font-size: 0.8rem;
   color: var(--color-text-muted);
