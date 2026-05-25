@@ -18,7 +18,7 @@ public class Trade {
     private ComicGrade desiredGrade;
     /** Grade of the copy the customer is offering. */
     private ComicGrade offeredGrade;
-    /** Credit value calculated from nmEstimatedValue × grade multiplier at time of offer. */
+    /** Credit value calculated from expectedValue × multiplier(offeredGrade) / multiplier(desiredGrade). */
     @JsonSerialize(using = MoneySerializer.class)
     private BigDecimal calculatedPrice;
     /** Set by admin once the trade terms are agreed upon. */

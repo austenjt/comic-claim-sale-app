@@ -272,7 +272,7 @@ public class CartService {
     /**
      * Add a WANTED comic as a trade-in credit to the user's OPEN cart.
      *
-     * <p>Credit = {@code nmEstimatedValue × TradeValueCalculator.multiplierFor(grade)}.
+     * <p>Credit = {@code expectedValue × multiplier(grade) / multiplier(desiredGrade)}.
      * Only one trade item is allowed per cart.
      *
      * @param grade the user-reported condition of their trade-in copy
@@ -284,11 +284,15 @@ public class CartService {
         if (comic.getEffectiveListingType() != ListingType.WANTED) {
             throw new IllegalStateException("Comic " + comicId + " is not a WANTED item.");
         }
-        if (comic.getNmEstimatedValue() == null) {
-            throw new IllegalStateException("Comic " + comicId + " has no NM estimated value set.");
+        if (comic.getExpectedValue() == null) {
+            throw new IllegalStateException("Comic " + comicId + " has no expected value set.");
+        }
+        ComicGrade desiredGrade = comic.getTrade() != null ? comic.getTrade().getDesiredGrade() : null;
+        if (desiredGrade == null) {
+            throw new IllegalStateException("Comic " + comicId + " has no desired grade set.");
         }
 
-        java.math.BigDecimal credit = TradeValueCalculator.calculate(comic.getNmEstimatedValue(), grade);
+        java.math.BigDecimal credit = TradeValueCalculator.calculate(comic.getExpectedValue(), grade, desiredGrade);
 
         Cart cart = getOrCreateCart(user);
         if (!cart.is(CartStatus.OPEN)) {

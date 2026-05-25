@@ -11,7 +11,7 @@ import java.util.Map;
  * Calculates the trade-in credit value for a comic based on its NM estimated value
  * and the condition the user reports for their trade-in copy.
  *
- * <p>Credit = nmEstimatedValue × gradeMultiplier(grade), rounded to 2 decimal places.
+ * <p>Credit = expectedValue × multiplier(offeredGrade) / multiplier(desiredGrade), rounded to 2 decimal places.
  */
 public final class TradeValueCalculator {
 
@@ -54,15 +54,23 @@ public final class TradeValueCalculator {
     }
 
     /**
-     * @param nmEstimatedValue the NM reference price for the wanted comic (must be non-null and positive)
-     * @param grade            the condition of the user's trade-in copy
+     * @param expectedValue the price the admin will pay at the desired grade
+     * @param offeredGrade  the condition of the user's trade-in copy
+     * @param desiredGrade  the grade the admin is looking for
      * @return trade-in credit amount, rounded to 2 decimal places
      */
-    public static BigDecimal calculate(BigDecimal nmEstimatedValue, ComicGrade grade) {
-        if (nmEstimatedValue == null) throw new IllegalArgumentException("nmEstimatedValue must not be null");
-        if (grade == null) throw new IllegalArgumentException("grade must not be null");
-        BigDecimal multiplier = MULTIPLIERS.get(grade);
-        return nmEstimatedValue.multiply(multiplier).setScale(2, RoundingMode.HALF_UP);
+    public static BigDecimal calculate(BigDecimal expectedValue, ComicGrade offeredGrade, ComicGrade desiredGrade) {
+        if (expectedValue == null) throw new IllegalArgumentException("expectedValue must not be null");
+        if (offeredGrade == null) throw new IllegalArgumentException("offeredGrade must not be null");
+        if (desiredGrade == null) throw new IllegalArgumentException("desiredGrade must not be null");
+        BigDecimal offeredMult = MULTIPLIERS.get(offeredGrade);
+        BigDecimal desiredMult = MULTIPLIERS.get(desiredGrade);
+        if (desiredMult.compareTo(BigDecimal.ZERO) == 0) {
+            return BigDecimal.ZERO.setScale(2);
+        }
+        return expectedValue.multiply(offeredMult)
+                .divide(desiredMult, 10, RoundingMode.HALF_UP)
+                .setScale(2, RoundingMode.HALF_UP);
     }
 
     /** Returns the multiplier for a given grade (useful for previewing in API responses). */
