@@ -137,9 +137,13 @@ export class TradeBoardComponent implements OnInit {
   }
 
   get previewCredit(): number {
-    if (!this.modalComic?.nmEstimatedValue || this.selectedGrade == null) return 0;
-    const multiplier = this.configService.gradeMultiplier(this.selectedGrade);
-    return Math.round(this.modalComic.nmEstimatedValue * multiplier * 100) / 100;
+    if (!this.modalComic?.expectedValue || this.selectedGrade == null) return 0;
+    const desiredGrade = this.modalComic.trade?.desiredGrade;
+    if (desiredGrade == null) return 0;
+    const offeredMult = this.configService.gradeMultiplier(this.selectedGrade);
+    const desiredMult = this.configService.gradeMultiplier(desiredGrade);
+    if (!desiredMult) return 0;
+    return Math.round(this.modalComic.expectedValue * (offeredMult / desiredMult) * 100) / 100;
   }
 
   get gradeWarning(): boolean {

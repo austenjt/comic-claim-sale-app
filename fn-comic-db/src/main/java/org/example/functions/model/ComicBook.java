@@ -1,5 +1,6 @@
 package org.example.functions.model;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -77,9 +78,10 @@ public class ComicBook {
      */
     private ListingType listingType;
 
-    // Trade valuation — NM reference price used by TradeValueCalculator
+    // Trade valuation — price the admin will pay at the desired grade
     @JsonSerialize(using = MoneySerializer.class)
-    private BigDecimal nmEstimatedValue;
+    @JsonAlias("nmEstimatedValue")
+    private BigDecimal expectedValue;
 
     // Trade offer details — populated when listingType = WANTED and a user has made an offer
     private Trade trade;

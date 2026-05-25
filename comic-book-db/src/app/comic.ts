@@ -103,7 +103,7 @@ export interface Comic {
   soldTo: string | null;
   isForSale: boolean | null;
   listingType?: ListingType | null;
-  nmEstimatedValue?: number | null;
+  expectedValue?: number | null;
   trade?: TradeInfo | null;
   personalEstimate: number | null;
   targetPrice: number | null;

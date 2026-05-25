@@ -630,10 +630,10 @@
       <div class="detail-section" *ngIf="comic.listingType === 'WANTED'">
         <div class="detail-section-title">Trade Info</div>
 
-        <div class="detail-item" *ngIf="auth.isAdmin() || comic.nmEstimatedValue">
-          <span class="detail-label">NM Value</span>
-          <span *ngIf="!auth.isAdmin()" class="detail-value">{{ comic.nmEstimatedValue | currency:'USD':'symbol':'1.2-2' }}</span>
-          <input *ngIf="auth.isAdmin()" class="detail-edit-input" type="number" step="0.01" [(ngModel)]="editComic!.nmEstimatedValue" placeholder="NM reference price for trade calc">
+        <div class="detail-item" *ngIf="auth.isAdmin() || comic.expectedValue">
+          <span class="detail-label">Expected Value</span>
+          <span *ngIf="!auth.isAdmin()" class="detail-value">{{ comic.expectedValue | currency:'USD':'symbol':'1.2-2' }}</span>
+          <input *ngIf="auth.isAdmin()" class="detail-edit-input" type="number" step="0.01" [(ngModel)]="editComic!.expectedValue" placeholder="Price at desired grade">
         </div>
 
         <div class="detail-item" *ngIf="auth.isAdmin() || comic.trade?.desiredGrade">

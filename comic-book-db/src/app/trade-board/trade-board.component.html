@@ -34,7 +34,7 @@
           <div *ngIf="comic.publisher" class="comic-publisher">{{ comic.publisher }}</div>
           <div *ngIf="comic.publishedDate" class="comic-publish-date">{{ comic.publishedDate }}</div>
           <div *ngIf="comic.trade?.desiredGrade" class="comic-grade">Grade: <b>{{ comic.trade?.desiredGrade | number:'1.1-1' }}</b></div>
-          <div *ngIf="comic.nmEstimatedValue" class="comic-price">NM Value: <b>{{ comic.nmEstimatedValue | currency }}</b></div>
+          <div *ngIf="comic.expectedValue" class="comic-price">Expected Value: <b>{{ comic.expectedValue | currency }}</b></div>
           <div class="wanted-credit-note">Credit varies by condition</div>
           <div *ngIf="comic.publicNotes" class="wanted-notes">{{ comic.publicNotes }}</div>
         </div>
@@ -50,13 +50,13 @@
           <ng-container *ngIf="canOffer()">
             <button class="btn-offer-trade"
                     [class.btn-offer-trade--done]="isAdded(comic)"
-                    [disabled]="isAdded(comic) || isOfferedByOther(comic) || !comic.nmEstimatedValue || auth.isAdmin()"
-                    [title]="auth.isAdmin() ? 'Admins cannot offer trades' : (!comic.nmEstimatedValue ? 'Trade value not yet available for this comic' : '')"
+                    [disabled]="isAdded(comic) || isOfferedByOther(comic) || !comic.expectedValue || auth.isAdmin()"
+                    [title]="auth.isAdmin() ? 'Admins cannot offer trades' : (!comic.expectedValue ? 'Trade value not yet available for this comic' : '')"
                     (click)="openModal(comic)">
               <ng-container *ngIf="isAdded(comic)">Added to Cart ✓</ng-container>
               <ng-container *ngIf="isOfferedByOther(comic) && !isAdded(comic)">Offered</ng-container>
-              <ng-container *ngIf="!isAdded(comic) && !isOfferedByOther(comic) && !comic.nmEstimatedValue">Value Pending</ng-container>
-              <ng-container *ngIf="!isAdded(comic) && !isOfferedByOther(comic) && comic.nmEstimatedValue">Offer Trade</ng-container>
+              <ng-container *ngIf="!isAdded(comic) && !isOfferedByOther(comic) && !comic.expectedValue">Value Pending</ng-container>
+              <ng-container *ngIf="!isAdded(comic) && !isOfferedByOther(comic) && comic.expectedValue">Offer Trade</ng-container>
             </button>
           </ng-container>
         </div>
@@ -85,7 +85,7 @@
       <span class="modal-preview-value">{{ previewCredit | currency }}</span>
     </div>
 
-    <div *ngIf="!modalComic.nmEstimatedValue" class="modal-no-value">
+    <div *ngIf="!modalComic.expectedValue" class="modal-no-value">
       This comic does not have a trade value set yet. Contact us for a custom quote.
     </div>
 
@@ -99,7 +99,7 @@
       <button class="btn-modal-cancel" (click)="closeModal()" [disabled]="submitting">Cancel</button>
       <button class="btn-modal-confirm"
               (click)="confirmTrade()"
-              [disabled]="submitting || !modalComic.nmEstimatedValue || selectedGrade == null">
+              [disabled]="submitting || !modalComic.expectedValue || selectedGrade == null">
         {{ submitting ? 'Adding…' : 'Add to Cart' }}
       </button>
     </div>

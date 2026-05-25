@@ -165,10 +165,13 @@ export class ComicDetailComponent implements OnInit {
   }
 
   get previewTradeCredit(): number | null {
-    if (!this.selectedTradeGrade || !this.comic?.nmEstimatedValue) return null;
-    const multiplier = this.configService.gradeMultiplier(this.selectedTradeGrade);
-    if (multiplier === undefined) return null;
-    return Math.round(this.comic.nmEstimatedValue * multiplier * 100) / 100;
+    if (!this.selectedTradeGrade || !this.comic?.expectedValue) return null;
+    const desiredGrade = this.comic.trade?.desiredGrade;
+    if (desiredGrade == null) return null;
+    const offeredMult = this.configService.gradeMultiplier(this.selectedTradeGrade);
+    const desiredMult = this.configService.gradeMultiplier(desiredGrade);
+    if (offeredMult === undefined || !desiredMult) return null;
+    return Math.round(this.comic.expectedValue * (offeredMult / desiredMult) * 100) / 100;
   }
 
   get tradeGradeWarning(): boolean {
@@ -180,7 +183,7 @@ export class ComicDetailComponent implements OnInit {
   canTrade(comicId: number): boolean {
     return !this.claimedDate(comicId) &&
            !this.comic?.soldTo &&
-           !!this.comic?.nmEstimatedValue &&
+           !!this.comic?.expectedValue &&
            (this.myCart?.status === 'OPEN' || !this.myCart);
   }
 
