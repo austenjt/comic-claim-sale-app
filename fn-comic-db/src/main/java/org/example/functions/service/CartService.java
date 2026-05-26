@@ -266,19 +266,25 @@ public class CartService {
      * update the corresponding CartItem.price in any open/submitted cart so the cart total stays current.
      */
     public void syncTradeCartItemPrice(String comicId, java.math.BigDecimal newSalePrice) {
-        SqlQuerySpec query = new SqlQuerySpec(
-            "SELECT * FROM c JOIN item IN c.items WHERE item.comicId = @comicId AND item.isTrade = true AND c.status NOT IN ('FULFILLED', 'DELETED')",
+        // JOIN queries return composite {c:..., item:...} nodes, not plain cart documents.
+        // Fetch only IDs here, then load each cart via findCartById.
+        SqlQuerySpec idQuery = new SqlQuerySpec(
+            "SELECT c.id FROM c JOIN item IN c.items WHERE item.comicId = @comicId AND item.isTrade = true AND c.status NOT IN ('FULFILLED', 'DELETED')",
             List.of(new SqlParameter("@comicId", comicId)));
-        for (ObjectNode node : cartsContainer.queryItems(query, new CosmosQueryRequestOptions(), ObjectNode.class)) {
+        List<String> cartIds = new ArrayList<>();
+        for (ObjectNode node : cartsContainer.queryItems(idQuery, new CosmosQueryRequestOptions(), ObjectNode.class)) {
+            if (node.has("id")) cartIds.add(node.get("id").asText());
+        }
+        for (String cartId : cartIds) {
             try {
-                Cart cart = OBJECT_MAPPER.treeToValue(node, Cart.class);
+                Cart cart = findCartById(cartId);
                 cart.getItems().stream()
                     .filter(i -> comicId.equals(i.getComicId()) && i.isTrade())
                     .forEach(i -> i.setPrice(newSalePrice != null ? -newSalePrice.doubleValue() : 0.0));
                 save(cart);
                 log.info("Synced trade cart item price for comic {} in cart {} to ${}", comicId, cart.getId(), newSalePrice);
             } catch (Exception e) {
-                log.error("Failed to sync trade cart item price for comic {} in cart", comicId, e);
+                log.error("Failed to sync trade cart item price for comic {} in cart {}", comicId, cartId, e);
             }
         }
     }

@@ -210,7 +210,7 @@
           <input *ngIf="auth.isAdmin()" class="detail-edit-input" type="text" [(ngModel)]="editComic!.keyIssue">
         </div>
 
-        <div class="detail-item" *ngIf="auth.isAdmin() || (comic.listingType !== 'WANTED' && comic.salePrice)">
+        <div class="detail-item" *ngIf="auth.isAdmin() || comic.salePrice">
           <span class="detail-label">{{ comic.listingType === 'WANTED' ? 'Trade Credit' : 'Sale Price' }}</span>
           <span *ngIf="!auth.isAdmin()" class="detail-value">{{ comic.salePrice | currency:'USD':'symbol':'1.2-2' }}</span>
           <input *ngIf="auth.isAdmin()" class="detail-edit-input" type="text" inputmode="decimal" [(ngModel)]="salePriceStr" (blur)="onSalePriceBlur()">
