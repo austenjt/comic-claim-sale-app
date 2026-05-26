@@ -776,7 +776,7 @@
             <div class="detail-item" *ngIf="tradeGradeWarning">
               <span class="detail-label"></span>
               <span class="detail-value trade-grade-warning">
-                ⚠ The grade you selected is not within 2 grades of what the seller is looking for. Try to find a closer graded copy to trade.
+                Your grade is outside of the expected trade range. Offer a different book or offer this book in a grade closer to what is expected.
               </span>
             </div>
             <div class="detail-item">
@@ -784,7 +784,7 @@
               <span class="detail-value">
                 <div *ngIf="tradeError" class="claim-error">{{ tradeError }}</div>
                 <button *ngIf="canTrade(comic.id)" class="btn-claim-detail"
-                        (click)="tradeIn()" [disabled]="actionLoading || !selectedTradeGrade">
+                        (click)="tradeIn()" [disabled]="actionLoading || !selectedTradeGrade || tradeGradeWarning">
                   {{ actionLoading ? 'Adding…' : 'Trade' }}
                 </button>
                 <span *ngIf="!canTrade(comic.id)" class="claim-blocked">
