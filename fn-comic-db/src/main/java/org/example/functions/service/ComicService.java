@@ -23,6 +23,7 @@ import org.example.functions.model.PagedResponse;
 import org.example.functions.util.Mappers;
 import org.example.functions.model.ComicBook;
 import org.example.functions.model.FieldChange;
+import org.example.functions.model.enums.ListingType;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -479,6 +480,17 @@ public class ComicService {
             updatedComicBook.setViewCount(oldComic.getViewCount());
         }
         replaceComic(updatedComicBook, ifMatchETag);
+        // When admin edits salePrice on a WANTED comic with an active offer, sync the cart item credit
+        if (oldComic != null
+                && updatedComicBook.getEffectiveListingType() == ListingType.WANTED
+                && updatedComicBook.getTrade() != null
+                && updatedComicBook.getTrade().getOfferedGrade() != null) {
+            BigDecimal oldPrice = oldComic.getSalePrice();
+            BigDecimal newPrice = updatedComicBook.getSalePrice();
+            if (!Objects.equals(oldPrice, newPrice)) {
+                CartService.getServiceInstance().syncTradeCartItemPrice(String.valueOf(updatedComicBook.getId()), newPrice);
+            }
+        }
         if (oldComic != null && editedBy != null) {
             List<FieldChange> changes = diffComics(oldComic, updatedComicBook);
             if (!changes.isEmpty()) {

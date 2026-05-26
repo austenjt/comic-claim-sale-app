@@ -36,7 +36,7 @@
           <div *ngIf="comic.trade?.desiredGrade" class="comic-grade">Grade: <b>{{ comic.trade?.desiredGrade | number:'1.1-1' }}</b></div>
           <div *ngIf="comic.expectedValue" class="comic-price">Expected Value: <b>{{ comic.expectedValue | currency }}</b></div>
           <div *ngIf="comic.trade?.offeredGrade != null" class="comic-offered-grade">Offered Grade: <b>{{ comic.trade?.offeredGrade | number:'1.1-1' }}</b></div>
-          <div *ngIf="comic.trade?.calculatedPrice != null" class="comic-offered-value">Calculated Value: <b>{{ comic.trade?.calculatedPrice | currency }}</b></div>
+          <div *ngIf="comic.salePrice != null && comic.trade?.offeredGrade != null" class="comic-offered-value">Calculated Value: <b>{{ comic.salePrice | currency }}</b></div>
           <div class="wanted-credit-note">Credit varies by condition</div>
           <div *ngIf="comic.publicNotes" class="wanted-notes">{{ comic.publicNotes }}</div>
         </div>

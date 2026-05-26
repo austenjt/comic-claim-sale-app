@@ -341,7 +341,7 @@ export class ComicDetailComponent implements OnInit {
       this.editComic.grandComicDBInfo = { gcdbIssueId: null, gcdbSeriesId: null, issueUrl: null, seriesUrl: null };
     }
     if (!this.editComic.trade) {
-      this.editComic.trade = { desiredGrade: null, offeredGrade: null, calculatedPrice: null, offerAccepted: null, tradeReceived: null, tradeNotes: null, offeredBy: null, offeredAt: null, tradeFrontImageId: null, tradeSmallFrontImageId: null, tradeBackImageId: null, tradeSmallBackImageId: null };
+      this.editComic.trade = { desiredGrade: null, offeredGrade: null, offerAccepted: null, tradeReceived: null, tradeNotes: null, offeredBy: null, offeredAt: null, tradeFrontImageId: null, tradeSmallFrontImageId: null, tradeBackImageId: null, tradeSmallBackImageId: null };
     }
     const cond = this.editComic.comicCondition;
     if (cond?.cgcCondition) {

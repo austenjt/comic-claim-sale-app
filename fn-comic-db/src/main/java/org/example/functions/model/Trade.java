@@ -1,13 +1,10 @@
 package org.example.functions.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.example.functions.model.enums.ComicGrade;
-import org.example.functions.util.MoneySerializer;
-import java.math.BigDecimal;
 
 @Getter
 @Setter
@@ -18,9 +15,6 @@ public class Trade {
     private ComicGrade desiredGrade;
     /** Grade of the copy the customer is offering. */
     private ComicGrade offeredGrade;
-    /** Credit value calculated from expectedValue × multiplier(offeredGrade) / multiplier(desiredGrade). */
-    @JsonSerialize(using = MoneySerializer.class)
-    private BigDecimal calculatedPrice;
     /** Set by admin once the trade terms are agreed upon. */
     private Boolean offerAccepted;
     /** Set by admin once the physical comic has been received. */

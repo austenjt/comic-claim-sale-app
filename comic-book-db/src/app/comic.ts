@@ -58,7 +58,6 @@ export interface GoCollectInfo {
 export interface TradeInfo {
   desiredGrade: number | null;
   offeredGrade: number | null;
-  calculatedPrice: number | null;
   offerAccepted: boolean | null;
   tradeReceived: boolean | null;
   tradeNotes: string | null;

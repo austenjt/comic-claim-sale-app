@@ -250,14 +250,36 @@ public class CartService {
             if (comic != null && comic.getTrade() != null) {
                 Trade trade = comic.getTrade();
                 trade.setOfferedGrade(null);
-                trade.setCalculatedPrice(null);
                 trade.setOfferedBy(null);
                 trade.setOfferedAt(null);
+                comic.setSalePrice(null);
                 ComicService.getServiceInstance().updateComic(comic);
                 log.info("Cleared trade offer fields on comic {} after cart removal", comicId);
             }
         } catch (Exception e) {
             log.error("Failed to clear trade offer fields on comic {}", comicId, e);
+        }
+    }
+
+    /**
+     * When an admin edits salePrice on a WANTED comic that has an active trade offer,
+     * update the corresponding CartItem.price in any open/submitted cart so the cart total stays current.
+     */
+    public void syncTradeCartItemPrice(String comicId, java.math.BigDecimal newSalePrice) {
+        SqlQuerySpec query = new SqlQuerySpec(
+            "SELECT * FROM c JOIN item IN c.items WHERE item.comicId = @comicId AND item.isTrade = true AND c.status NOT IN ('FULFILLED', 'DELETED')",
+            List.of(new SqlParameter("@comicId", comicId)));
+        for (ObjectNode node : cartsContainer.queryItems(query, new CosmosQueryRequestOptions(), ObjectNode.class)) {
+            try {
+                Cart cart = OBJECT_MAPPER.treeToValue(node, Cart.class);
+                cart.getItems().stream()
+                    .filter(i -> comicId.equals(i.getComicId()) && i.isTrade())
+                    .forEach(i -> i.setPrice(newSalePrice != null ? -newSalePrice.doubleValue() : 0.0));
+                save(cart);
+                log.info("Synced trade cart item price for comic {} in cart {} to ${}", comicId, cart.getId(), newSalePrice);
+            } catch (Exception e) {
+                log.error("Failed to sync trade cart item price for comic {} in cart", comicId, e);
+            }
         }
     }
 
@@ -335,13 +357,14 @@ public class CartService {
         cart.getItems().add(item);
         save(cart);
 
-        // Stamp offer details on the comic document so they are visible to all users
+        // Stamp offer details on the comic document so they are visible to all users.
+        // salePrice stores the credit value so the admin can edit it from the detail page.
         Trade trade = comic.getTrade() != null ? comic.getTrade() : new Trade();
         trade.setOfferedGrade(grade);
-        trade.setCalculatedPrice(credit);
         trade.setOfferedBy(user.getName() != null ? user.getName() : user.getEmail());
         trade.setOfferedAt(Instant.now().toString());
         comic.setTrade(trade);
+        comic.setSalePrice(credit);
         ComicService.getServiceInstance().updateComic(comic);
 
         log.info("User {} added trade-in for comic {} at grade {} (credit: ${}) to cart {}", user.getId(), comicId, grade, credit, cart.getId());

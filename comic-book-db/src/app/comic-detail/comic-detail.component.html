@@ -211,7 +211,7 @@
         </div>
 
         <div class="detail-item" *ngIf="auth.isAdmin() || (comic.listingType !== 'WANTED' && comic.salePrice)">
-          <span class="detail-label">Sale Price</span>
+          <span class="detail-label">{{ comic.listingType === 'WANTED' ? 'Trade Credit' : 'Sale Price' }}</span>
           <span *ngIf="!auth.isAdmin()" class="detail-value">{{ comic.salePrice | currency:'USD':'symbol':'1.2-2' }}</span>
           <input *ngIf="auth.isAdmin()" class="detail-edit-input" type="text" inputmode="decimal" [(ngModel)]="salePriceStr" (blur)="onSalePriceBlur()">
         </div>
@@ -652,11 +652,6 @@
             <option [ngValue]="null">—</option>
             <option *ngFor="let g of enums.grades" [ngValue]="g.value">{{ g.value | number:'1.1-1' }} — {{ g.label }}</option>
           </select>
-        </div>
-
-        <div class="detail-item" *ngIf="comic.trade?.calculatedPrice">
-          <span class="detail-label">Trade Credit</span>
-          <span class="detail-value">{{ comic.trade?.calculatedPrice | currency:'USD':'symbol':'1.2-2' }}</span>
         </div>
 
         <div class="detail-item" *ngIf="auth.isAdmin() || comic.trade?.offerAccepted != null">
