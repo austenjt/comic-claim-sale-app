@@ -237,8 +237,28 @@ public class CartService {
         save(cart);
         for (CartItem removed : toRemove) {
             writeReturnEvent(removed);
+            if (removed.isTrade()) {
+                clearTradeOffer(removed.getComicId());
+            }
         }
         return cart;
+    }
+
+    private void clearTradeOffer(String comicId) {
+        try {
+            ComicBook comic = ComicService.getServiceInstance().getComicById(Integer.parseInt(comicId)).orElse(null);
+            if (comic != null && comic.getTrade() != null) {
+                Trade trade = comic.getTrade();
+                trade.setOfferedGrade(null);
+                trade.setCalculatedPrice(null);
+                trade.setOfferedBy(null);
+                trade.setOfferedAt(null);
+                ComicService.getServiceInstance().updateComic(comic);
+                log.info("Cleared trade offer fields on comic {} after cart removal", comicId);
+            }
+        } catch (Exception e) {
+            log.error("Failed to clear trade offer fields on comic {}", comicId, e);
+        }
     }
 
     /** Admin: award a comic to a user's cart at $0.00. Works for OPEN or SUBMITTED carts; creates a new cart if needed.
