@@ -15,8 +15,8 @@ import { AdminSalesComponent } from './admin-sales/admin-sales.component';
 import { SetDetailComponent } from './set-detail/set-detail.component';
 
 const routes: Routes = [
-  { path: '',               redirectTo: '/dashboard', pathMatch: 'full' },
-  { path: 'dashboard',     component: DashboardComponent },
+  { path: '',               redirectTo: '/selling', pathMatch: 'full' },
+  { path: 'selling',       component: DashboardComponent },
   { path: 'detail/:id',    component: ComicDetailComponent },
   { path: 'set/:id',       component: SetDetailComponent },
   { path: 'inventory',     component: InventoryComponent },

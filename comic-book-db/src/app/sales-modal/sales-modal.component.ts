@@ -47,7 +47,7 @@ export class SalesModalComponent implements OnInit {
 
   browse(): void {
     this.modalService.hide();
-    this.router.navigate(['/dashboard']);
+    this.router.navigate(['/selling']);
   }
 
   @HostListener('document:keydown.escape')

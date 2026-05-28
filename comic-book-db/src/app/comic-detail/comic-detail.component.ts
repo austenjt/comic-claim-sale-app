@@ -639,7 +639,7 @@ export class ComicDetailComponent implements OnInit {
   }
 
   goBack(): void {
-    this.router.navigate(['/dashboard']);
+    this.router.navigate(['/selling']);
   }
 
   copyShareLink(): void {

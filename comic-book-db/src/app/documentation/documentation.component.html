@@ -4,7 +4,7 @@
     <h1>Documentation</h1>
     <p class="hiw-subtitle">Everything you need to know about browsing, claiming, and ordering.</p>
     <div class="hiw-actions">
-      <a routerLink="/dashboard" class="hiw-btn hiw-btn-secondary">Browse Comics</a>
+      <a routerLink="/selling" class="hiw-btn hiw-btn-secondary">Browse Comics</a>
     </div>
   </div>
 
@@ -35,10 +35,10 @@
     </ol>
   </section>
 
-  <section class="hiw-section" id="dashboard">
-    <h2>The Dashboard</h2>
+  <section class="hiw-section" id="selling">
+    <h2>The Selling Page</h2>
     <p>
-      The <a routerLink="/dashboard">Dashboard</a> is the main catalog — every comic currently
+      The <a routerLink="/selling">Selling page</a> is the main catalog — every comic currently
       available for sale shown as a card with cover image, title, series, grade, and price.
     </p>
     <ul>
@@ -62,7 +62,7 @@
       Use the search bar to filter by title or series. Use the sort dropdown to order comics by
       <em>Oldest First</em>, <em>Newest First</em>, <em>A–Z Sort</em>, <em>Z–A Sort</em>,
       <em>Highest Price</em>, <em>Lowest Price</em>, or <em>Claimed First</em>.
-      The dashboard filter buttons let you hide already-claimed items or hide unpriced items.
+      The selling page filter buttons let you hide already-claimed items or hide unpriced items.
     </p>
   </section>
 
@@ -91,7 +91,7 @@
   <section class="hiw-section" id="comic-detail">
     <h2>Comic Detail Pages</h2>
     <p>
-      Click any comic card on the dashboard to open its detail page. Here you'll find:
+      Click any comic card on the selling page to open its detail page. Here you'll find:
     </p>
     <ul>
       <li>High-resolution front and back cover images</li>
@@ -275,7 +275,7 @@
     <h2>Live Notifications</h2>
     <p>
       The app polls for activity every few seconds and records events in the <strong>Logs panel</strong>
-      at the bottom of the dashboard. Click <em>Logs</em> in the footer to expand it.
+      at the bottom of the selling page. Click <em>Logs</em> in the footer to expand it.
     </p>
     <ul>
       <li>When <strong>someone claims</strong> a comic: <em>"Title #N" added to cart of user UserName — $XX</em></li>
@@ -335,10 +335,10 @@
   <!-- ── Admin Sections ────────────────────────────────────────────────── -->
   <div class="hiw-admin-divider"><span>Admin Reference</span></div>
 
-  <section class="hiw-section hiw-admin" id="admin-dashboard">
-    <h2>Dashboard (Admin View)</h2>
+  <section class="hiw-section hiw-admin" id="admin-selling">
+    <h2>Selling Page (Admin View)</h2>
     <p>
-      When logged in as Admin, the dashboard shows additional controls on each comic card when
+      When logged in as Admin, the selling page shows additional controls on each comic card when
       <strong>Award Mode</strong> is enabled (toggled from the Sales page).
     </p>
     <ul>
@@ -386,7 +386,7 @@
         <strong>Mark as Fulfilled</strong> — enabled once a cart reaches <em>Finalized</em> status,
         or earlier if the order is still Submitted but payment has been marked as Paid. Uses a
         two-click confirmation. The second click permanently archives the order, stamps each comic
-        with the buyer's name and sold date, and removes them from the dashboard.
+        with the buyer's name and sold date, and removes them from the selling page.
       </li>
     </ul>
     <p>
@@ -444,7 +444,7 @@
     </p>
     <p>
       This page also lets you toggle <strong>Award Mode</strong> — when enabled, an Award button
-      appears on unclaimed comics on the dashboard.
+      appears on unclaimed comics on the selling page.
     </p>
     <h3>Reset Database</h3>
     <p>
@@ -496,17 +496,17 @@
     </p>
     <ul>
       <li>
-        <strong>For Sale</strong> — controls whether a comic appears on the buyer-facing dashboard.
+        <strong>For Sale</strong> — controls whether a comic appears on the buyer-facing selling page.
         Unchecking it hides the comic immediately without deleting it.
       </li>
       <li>
         <strong>Sale Price vs Target Price</strong> — Target Price is your internal reference;
-        Sale Price is what buyers see on the dashboard and pay in their cart. Books without a Sale
+        Sale Price is what buyers see on the selling page and pay in their cart. Books without a Sale
         Price do not show a Claim button.
       </li>
       <li>
         <strong>Date fields</strong> — Date Acquired, Published Date, and Date Sold use YYYY-MM-DD
-        format. Setting a Date Sold automatically hides the comic from the dashboard.
+        format. Setting a Date Sold automatically hides the comic from the selling page.
       </li>
       <li>
         <strong>Quick Add</strong> — use the Quick Add wizard at the top of the page to add a new
@@ -526,7 +526,7 @@
       </li>
       <li>
         <strong>Add to Set</strong> — assigns an existing standalone comic to a set. The comic
-        becomes a member and no longer appears as a standalone item on the dashboard.
+        becomes a member and no longer appears as a standalone item on the selling page.
       </li>
       <li>
         <strong>Delete Set</strong> — removes the set container and ungroups its members, making
@@ -544,7 +544,7 @@
     <ul>
       <li>
         <strong>Update Front Cover</strong> — uploads a new front cover image. Automatically resized
-        if very large; a small thumbnail is generated for the dashboard.
+        if very large; a small thumbnail is generated for the selling page.
       </li>
       <li>
         <strong>Update Back Cover</strong> — uploads a back cover image. This section only appears
@@ -573,7 +573,7 @@
       </li>
       <li>
         Set <strong>Listing</strong> to <em>Wanted</em>. The comic disappears from the buyer
-        dashboard and appears on the Trade Board instead.
+        selling page and appears on the Trade Board instead.
       </li>
       <li>
         Set the <strong>NM Estimated Value</strong> in the <em>Trade Info</em> section — this is

@@ -1,0 +1,606 @@
+h2 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+
+.comics-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 0;
+  margin: 0;
+}
+
+.comics-list a {
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  color: inherit;
+  box-sizing: border-box;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(108,88,76,0.1);
+  width: calc(33.333% - 12px);
+  overflow: hidden;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.comics-list a:hover {
+  box-shadow: 0 6px 18px rgba(123,143,75,0.15);
+  transform: translateY(-2px);
+  background-color: var(--color-surface);
+  text-decoration: none;
+}
+
+/* Tablet */
+@media screen and (max-width: 900px) {
+  .comics-list a {
+    width: calc(50% - 8px);
+  }
+}
+
+/* Mobile */
+@media screen and (max-width: 600px) {
+  .comics-list a {
+    width: 100%;
+  }
+}
+
+/* Small phones — tighten gap and inner padding so cards still feel
+   intentional at ~360px wide. */
+@media screen and (max-width: 480px) {
+  .comics-list { gap: var(--space-3); }
+  .image-container { padding: var(--space-2); min-height: 64px; }
+  .image-container img { height: 110px; }
+  .details { padding: var(--space-2) var(--space-3); }
+  .card-footer { padding: var(--space-1) var(--space-2); }
+}
+
+.image-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #c8d4a8;
+  padding: 14px;
+  border-bottom: 1px solid var(--color-border);
+  min-height: 80px;
+}
+
+.ebay-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  height: 28px;
+  padding: 0 var(--space-2);
+  background: #999;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  border-radius: 4px;
+  line-height: 1;
+  cursor: default;
+  box-sizing: border-box;
+}
+
+.ebay-badge::after,
+.badge-set::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 0;
+  background: var(--color-bg);
+  color: #000;
+  border: 1px solid #000;
+  font-size: 0.72rem;
+  font-style: normal;
+  font-weight: 400;
+  letter-spacing: normal;
+  text-transform: none;
+  white-space: nowrap;
+  padding: 3px 7px;
+  border-radius: 3px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.12s ease 0.25s;
+  z-index: 10;
+}
+
+.ebay-badge:hover::after,
+.badge-set:hover::after {
+  opacity: 1;
+}
+
+.image-container img {
+  height: 130px;
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
+  border: none;
+}
+
+.image-container.two-images {
+  gap: 6px;
+}
+
+.image-container.two-images img {
+  max-width: 48%;
+}
+
+.details {
+  padding: 12px 14px;
+  flex-grow: 1;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  background-color: var(--color-surface);
+}
+
+.card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px 10px;
+  min-height: 36px;
+  border-top: 1px solid var(--color-border);
+  background-color: var(--color-surface);
+  flex-shrink: 0;
+}
+
+.footer-badges {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.footer-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* All buttons and inline labels in the card footer share the same 28px height */
+.footer-actions button {
+  height: 28px;
+  padding: 0 14px;
+  font-size: 0.83rem;
+  font-weight: 700;
+  border-radius: 4px;
+  cursor: pointer;
+  white-space: nowrap;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.comic-title {
+  font-size: 0.95rem;
+  margin-bottom: 4px;
+  color: var(--color-text);
+}
+
+.meta-grid {
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+
+.meta-grid > * {
+  width: 50%;
+  box-sizing: border-box;
+  padding-right: 4px;
+}
+
+.comic-number,
+.comic-series,
+.comic-volume,
+.comic-publisher,
+.comic-published,
+.comic-era,
+.comic-variant,
+.comic-publishdate,
+.comic-barcode,
+.comic-grade-certified,
+.comic-grade-est {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  margin-bottom: 3px;
+}
+
+.comic-key-issue {
+  font-size: 0.8rem;
+  color: var(--color-danger);
+  font-weight: 600;
+  margin-bottom: 3px;
+}
+
+.comic-estimate,
+.comic-price {
+  font-size: 0.85rem;
+  margin-top: 8px;
+  color: #7b8f4b;
+  font-weight: 600;
+}
+
+/* ── Footer action buttons (cards) ─────────────────────────────────────────
+   All share the same pill geometry; variants differ only in fill / text.
+   Padding/font-size driven by the spacing + type scale from styles.css. */
+.btn-claim,
+.btn-in-cart,
+.btn-claimed,
+.btn-award,
+.btn-sell,
+.btn-copy {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-1) var(--space-4);
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-14);
+  font-weight: var(--fw-bold);
+  line-height: 1.15;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition:
+    background-color var(--duration-base) var(--ease-standard),
+    border-color     var(--duration-base) var(--ease-standard),
+    color            var(--duration-base) var(--ease-standard),
+    box-shadow       var(--duration-base) var(--ease-standard);
+}
+
+/* Primary action: Claim — Deep Olive fill, Parchment text (4.83:1 AA) */
+.btn-claim {
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+  border-color: var(--color-primary);
+}
+.btn-claim:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+  border-color: var(--color-primary-hover);
+}
+.btn-claim:disabled {
+  background: #b8c89a;
+  border-color: #b8c89a;
+  cursor: not-allowed;
+}
+
+/* In-cart marker — outline primary, non-interactive */
+.btn-in-cart {
+  background: transparent;
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+  cursor: default;
+}
+
+/* Claimed marker — muted, non-interactive */
+.btn-claimed {
+  background: #c8d4a8;
+  color: var(--color-text-muted);
+  border-color: #c8d4a8;
+  cursor: default;
+}
+
+.claim-error {
+  color: var(--color-danger);
+  text-align: center;
+  margin-bottom: var(--space-3);
+}
+
+.comic-claimed-status {
+  font-size: var(--fs-12);
+  font-weight: var(--fw-semibold);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.card-sold {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.card-deleting {
+  opacity: 0.3;
+  pointer-events: none;
+  filter: grayscale(100%);
+}
+
+.sold-label {
+  font-size: var(--fs-14);
+  font-weight: var(--fw-bold);
+  color: var(--color-danger);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Award — admin special action.
+   Switched from off-palette purple (#7c3aed) to a deep Tan that's on-palette
+   (warm accent family) and AA-passing with Parchment text (4.83:1 on #8C6750). */
+.btn-award {
+  height: 28px;
+  box-sizing: border-box;
+  background: #8C6750;
+  color: var(--color-text-inverse);
+  border-color: #8C6750;
+}
+.btn-award:hover:not(:disabled) {
+  background: #6F523F;
+  border-color: #6F523F;
+}
+
+/* Sell — admin action to mark an item as for sale */
+.btn-sell {
+  background: #2d6a4f;
+  color: var(--color-text-inverse);
+  border-color: #2d6a4f;
+}
+.btn-sell:hover:not(:disabled) {
+  background: #1b4332;
+  border-color: #1b4332;
+}
+
+.btn-copy {
+  height: 28px;
+  box-sizing: border-box;
+  background: #6b7280;
+  color: var(--color-text-inverse);
+  border-color: #6b7280;
+}
+.btn-copy:hover:not(:disabled) {
+  background: #4b5563;
+  border-color: #4b5563;
+}
+.btn-copy:disabled { opacity: 0.55; cursor: not-allowed; }
+
+/* Delete-card — outline danger, smaller geometry */
+.btn-delete-card {
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-12);
+  font-weight: var(--fw-semibold);
+  cursor: pointer;
+  background: transparent;
+  color: var(--color-danger);
+  border: 1px solid var(--color-danger);
+  transition:
+    background-color var(--duration-base) var(--ease-standard),
+    color            var(--duration-base) var(--ease-standard);
+}
+.btn-delete-card:hover { background: var(--color-danger-bg); }
+.btn-delete-card-confirm {
+  border-color: var(--color-danger);
+  color: var(--color-danger);
+  background: var(--color-danger-bg);
+}
+.btn-delete-card-confirm:hover { background: rgba(168, 85, 63, 0.22); }
+
+/* Award modal — chrome (overlay/dialog) is provided by the shared
+   .modal-overlay / .modal classes in global styles.css. The .award-modal
+   class only customises the surface tint (sage-light vs parchment) so it
+   stands out as a distinct admin action. */
+.award-modal {
+  background: var(--sage-light);
+}
+
+.award-subtitle {
+  font-size: 0.88rem;
+  color: #79675c;
+  margin-bottom: 16px;
+}
+
+.award-user-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 16px;
+  max-height: 260px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.award-user-row {
+  border: 1px solid #b8c89a;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.award-radio-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  cursor: pointer;
+  background: #f0ead2;
+  color: #6c584c;
+  font-size: 0.9rem;
+  transition: background 0.15s;
+}
+.award-radio-label:hover { background: #c8d4a8; }
+.award-radio-label input[type="radio"] { cursor: pointer; flex-shrink: 0; }
+
+.award-user-name { font-weight: 500; color: #6c584c; }
+
+.award-user-email {
+  font-size: 0.78rem;
+  color: #79675c;
+}
+
+.award-modal-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.award-confirm-btn {
+  padding: 8px 22px;
+  border-radius: 4px;
+  border: none;
+  background: #7b8f4b;
+  color: #f0ead2;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+.award-confirm-btn:hover:not(:disabled) { background: #6b7e3e; }
+.award-confirm-btn:disabled { background: #c8d4a8; color: #79675c; cursor: not-allowed; }
+
+.award-cancel-btn {
+  padding: 8px 22px;
+  border-radius: 4px;
+  border: 1px solid #b8c89a;
+  background: transparent;
+  color: #79675c;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+.award-cancel-btn:hover { background: #c8d4a8; }
+
+.award-error {
+  color: var(--color-danger);
+  font-size: 0.88rem;
+  margin-bottom: 10px;
+}
+
+.award-loading {
+  color: #79675c;
+  font-size: 0.88rem;
+  margin-bottom: 10px;
+}
+
+
+/* ── Footer badges ─────────────────────────────────────────────────────────── */
+/* Identity badges shown on the comic card footer. Solid-fill variants of the
+   shared .pill geometry — semantic tokens drive each color. */
+
+.badge-graded,
+.badge-set,
+.badge-key-issue {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.65rem;
+  font-weight: var(--fw-bold);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 3px var(--space-2);
+  border-radius: var(--radius-sm);
+  line-height: 1.4;
+  pointer-events: none;
+}
+
+.badge-graded {
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+}
+
+.badge-key-issue {
+  background: var(--color-warning);
+  color: var(--color-text-inverse);
+}
+
+.badge-set {
+  position: relative;
+  height: 28px;
+  box-sizing: border-box;
+  justify-content: center;
+  padding: 0 var(--space-2);
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: none;
+  letter-spacing: normal;
+  line-height: 1;
+  pointer-events: auto;
+  cursor: default;
+  background: var(--color-warm-accent-deep);
+  color: var(--color-text-inverse);
+}
+
+/* ── Dashboard Footer ──────────────────────────────────────────────────────── */
+
+.dashboard-footer {
+  margin-top: 2rem;
+  padding: 0.75rem 0;
+  border-top: 1px solid var(--color-border);
+}
+
+.footer-main-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.footer-address {
+  font-size: 0.78rem;
+  color: var(--color-text-muted, #888);
+}
+
+.footer-logs-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  padding: 0.25rem 0.7rem;
+  font-size: 0.78rem;
+  color: var(--color-text-muted, #888);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.footer-logs-toggle:hover {
+  background: var(--color-surface);
+  color: var(--color-text, #444);
+}
+
+.footer-logs-count {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: 0 5px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--color-text-muted, #888);
+  min-width: 18px;
+  text-align: center;
+}
+
+.footer-logs-panel {
+  margin-top: 0.5rem;
+  max-height: 220px;
+  overflow-y: auto;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  background: var(--color-bg, #f9f6ee);
+  font-family: ui-monospace, monospace;
+  font-size: 0.78rem;
+}
+
+.footer-log-entry {
+  display: flex;
+  gap: 0.75rem;
+  padding: 0.2rem 0.6rem;
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text, #444);
+}
+.footer-log-entry:last-child { border-bottom: none; }
+
+.footer-log-entry.footer-log-error { color: var(--color-danger); }
+
+.footer-log-time {
+  color: var(--color-text-muted, #888);
+  flex-shrink: 0;
+}
+
+.footer-log-msg { flex: 1; }
+
+.footer-log-empty {
+  padding: 0.5rem 0.6rem;
+  color: var(--color-text-muted, #888);
+  font-style: italic;
+  font-family: inherit;
+  font-size: 0.82rem;
+}
+

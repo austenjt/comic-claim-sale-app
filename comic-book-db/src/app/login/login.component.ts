@@ -16,7 +16,7 @@ export class LoginComponent implements OnInit {
 
   ngOnInit(): void {
     if (this.auth.isAuthenticated && this.auth.isLoggedIn()) {
-      this.router.navigate(['/dashboard']);
+      this.router.navigate(['/selling']);
     }
   }
 

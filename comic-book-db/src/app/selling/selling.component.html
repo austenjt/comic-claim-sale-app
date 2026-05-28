@@ -1,0 +1,166 @@
+<app-dashboard-header
+  [itemCount]="displayComics.length"
+  [totalCount]="totalCount"
+  [currentPage]="currentPage"
+  [totalPages]="totalPages"
+  [(excludeClaimed)]="excludeClaimed"
+[(sortOrder)]="sortOrder"
+  (goToPage)="goToPage($event)">
+</app-dashboard-header>
+
+<!-- Award modal -->
+<div *ngIf="awardingComic" class="award-modal-overlay modal-overlay" (click)="closeAwardModal()">
+  <div class="award-modal modal modal--lg" role="dialog" aria-modal="true"
+       aria-labelledby="award-modal-title"
+       (click)="$event.stopPropagation()">
+    <h3 id="award-modal-title" class="modal__title">Award "{{ awardingComic.title }}"</h3>
+    <p class="award-subtitle">Select a user to add this book to their cart at $0.00:</p>
+    <div *ngIf="awardError" id="award-error" role="alert" class="award-error">{{ awardError }}</div>
+    <div *ngIf="awardLoading" class="award-loading">Awarding…</div>
+    <ul class="award-user-list" role="radiogroup" aria-label="Select user to award"
+        [attr.aria-describedby]="awardError ? 'award-error' : null"
+        [attr.aria-invalid]="awardError ? 'true' : null">
+      <li *ngFor="let user of approvedUsers" class="award-user-row">
+        <label class="award-radio-label">
+          <input type="radio" name="awardUser" [value]="user.id" [(ngModel)]="selectedUserId" [disabled]="awardLoading" />
+          <span class="award-user-name">{{ user.name }}</span>
+          <span class="award-user-email">{{ user.email }}</span>
+        </label>
+      </li>
+    </ul>
+    <div class="award-modal-actions">
+      <button class="award-confirm-btn" (click)="confirmAward()" [disabled]="!selectedUserId || awardLoading">Award</button>
+      <button class="award-cancel-btn" (click)="closeAwardModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="claimError" class="claim-error">{{ claimError }}</div>
+
+<div *ngIf="loading" class="warming-up">
+  <div class="warming-up-spinner"></div>
+  <span>Please wait while things warm up. This site is not always on, and turns on when visited.</span>
+</div>
+
+<div class="comics-list">
+  <ng-container *ngFor="let comic of displayComics; trackBy: trackById">
+
+    <!-- SET CARD -->
+    <ng-container *ngIf="comic.docType === 'SET'; else normalCard">
+      <a routerLink="/set/{{comic.id}}">
+        <div class="image-container" [class.two-images]="comic.smallBackImageId">
+          <img [src]="getFullImageURLByName(comic.smallCachedImageId) | async" alt="Set Cover" loading="lazy">
+          <img *ngIf="comic.smallBackImageId"
+               [src]="getFullImageURLByName(comic.smallBackImageId) | async" alt="Set Back Cover" loading="lazy">
+        </div>
+        <div class="details">
+          <div class="comic-title"><b>{{ comic.title }}</b></div>
+          <div class="meta-grid">
+            <div *ngIf="comic.series && comic.series !== ''" class="comic-series">Series: <b>{{ comic.series }}</b></div>
+            <div *ngIf="comic.publisher" class="comic-publisher">Publisher: <b>{{ comic.publisher }}</b></div>
+            <div class="comic-number">Books: <b>{{ comic.items?.length ?? 0 }}</b></div>
+            <div *ngIf="getSetPrice(comic) > 0" class="comic-price">Total: <b>{{ getSetPrice(comic) | currency:'USD':'symbol':'1.2-2' }}</b></div>
+          </div>
+        </div>
+        <div class="card-footer">
+          <div class="footer-badges">
+            <span *ngIf="comic.ebayListingUrl" class="ebay-badge" data-tooltip="eBay listed">eBay</span>
+            <span class="badge-set" [attr.data-tooltip]="'Set ' + comic.collectionGroup">Set</span>
+          </div>
+          <div class="footer-actions">
+            <span *ngIf="isSetClaimedByOther(comic)" class="comic-claimed-status">Claimed</span>
+            <ng-container *ngIf="auth.isApproved() && !auth.isAdmin()">
+              <button *ngIf="isSetInMyCart(comic)" class="btn-in-cart" disabled>In Your Cart</button>
+              <button *ngIf="showClaimSetButton(comic) || claimingSetId === comic.id" class="btn-claim"
+                [disabled]="!canClaimSet(comic) || claimingSetId === comic.id"
+                [title]="canClaimSet(comic) ? '' : cartLockedTitle()"
+                (click)="$event.preventDefault(); $event.stopPropagation(); claim(comic)">
+                {{ claimingSetId === comic.id ? 'Adding…' : 'Claim Set' }}
+              </button>
+            </ng-container>
+            <button *ngIf="auth.isAdmin() && !comic.isForSale" class="btn-sell"
+              (click)="$event.preventDefault(); $event.stopPropagation(); markForSale(comic)">Sell</button>
+          </div>
+        </div>
+      </a>
+    </ng-container>
+
+    <!-- NORMAL CARD -->
+    <ng-template #normalCard>
+      <a routerLink="/detail/{{comic.id}}" [class.card-sold]="comic.soldTo" [class.card-deleting]="deletingId === comic.id">
+        <div class="image-container" [class.two-images]="comic.smallBackImageId">
+            <img [src]="getFullImageURLByName(comic.smallCachedImageId) | async" alt="Front Cover" loading="lazy"
+                 [class.is-sold]="comic.soldTo">
+            <img *ngIf="comic.smallBackImageId"
+                 [src]="getFullImageURLByName(comic.smallBackImageId) | async" alt="Back Cover" loading="lazy"
+                 [class.is-sold]="comic.soldTo">
+        </div>
+        <div class="details">
+            <div class="comic-title"><b>{{comic.title}}{{comicNumberLabel(comic)}}</b></div>
+            <div class="meta-grid">
+              <div *ngIf="comic.series && comic.series !== ''" class="comic-series">Series: <b>{{comic.series}}</b></div>
+              <div *ngIf="comic.publisher" class="comic-publisher">Publisher: <b>{{comic.publisher}}</b></div>
+              <div *ngIf="comic.variant" class="comic-variant">Variant: <b>{{comic.variant}}</b></div>
+              <div *ngIf="comic.publishedDate" class="comic-published">Published: <b>{{comic.publishedDate}}</b></div>
+              <div *ngIf="comic.number?.number != null || comic.number?.sentinel != null" class="comic-number">
+                Number: <b>{{ comic.number?.sentinel ?? comic.number?.number }}</b>
+              </div>
+              <div *ngIf="comic.comicCondition?.notCertifiedGrade" class="comic-grade-est">Est. Grade: <b>{{comic.comicCondition?.notCertifiedGrade | number:'1.1-1'}}</b></div>
+              <div *ngIf="comic.salePrice && !comic.soldTo" class="comic-price">Price: <b>{{ comic.salePrice | currency:'USD':'symbol':'1.2-2' }}</b></div>
+            </div>
+        </div>
+        <div class="card-footer">
+          <div class="footer-badges">
+            <span *ngIf="comic.ebayListingUrl" class="ebay-badge" data-tooltip="eBay listed">eBay</span>
+            <span *ngIf="comic.comicCondition?.cgcCondition?.grade || comic.comicCondition?.cbcsCondition?.grade"
+                  class="badge-graded">Graded</span>
+            <span *ngIf="comic.docType !== 'SET' && comic.keyIssue" class="badge-key-issue">Key Issue</span>
+          </div>
+          <div class="footer-actions">
+            <ng-container *ngIf="comic.soldTo; else notSold">
+              <span class="sold-label">Sold to {{ comic.soldTo }}</span>
+            </ng-container>
+            <ng-template #notSold>
+              <span *ngIf="isClaimedByOther(comic.id)" class="comic-claimed-status">
+                Claimed · {{ claimedDate(comic.id) | date:'shortDate' }}
+              </span>
+              <ng-container *ngIf="auth.isApproved() && !auth.isAdmin()">
+                <button *ngIf="isInMyCart(comic.id)" class="btn-in-cart" disabled>In Your Cart</button>
+
+                <!-- Normal claim -->
+                <button *ngIf="showClaimButton(comic)" class="btn-claim"
+                  [disabled]="!canClaim(comic)"
+                  [title]="canClaim(comic) ? '' : cartLockedTitle()"
+                  (click)="$event.preventDefault(); $event.stopPropagation(); claim(comic)">Claim</button>
+              </ng-container>
+
+              <button *ngIf="auth.isAdmin() && configService.awardModeEnabled && !claimedDate(comic.id) && !comic.comicCondition?.cgcCondition?.grade && !comic.comicCondition?.cbcsCondition?.grade"
+                class="btn-award"
+                (click)="$event.preventDefault(); $event.stopPropagation(); openAwardModal(comic)">Award</button>
+              <button *ngIf="auth.isAdmin() && !comic.isForSale" class="btn-sell"
+                (click)="$event.preventDefault(); $event.stopPropagation(); markForSale(comic)">Sell</button>
+              <button *ngIf="auth.isAdmin()" class="btn-copy"
+                [disabled]="copyingId === comic.id"
+                (click)="$event.preventDefault(); $event.stopPropagation(); copyComic(comic, $event)">
+                {{ copiedId === comic.id ? 'Copied ✓' : copyingId === comic.id ? 'Copying…' : 'Copy' }}
+              </button>
+            </ng-template>
+          </div>
+        </div>
+      </a>
+    </ng-template>
+
+  </ng-container>
+</div>
+
+<app-pagination-bar
+  [currentPage]="currentPage"
+  [totalPages]="totalPages"
+  (goToPage)="goToPage($event)">
+</app-pagination-bar>
+
+<footer class="dashboard-footer">
+  <div class="footer-main-row">
+    <span class="footer-address">Oregon City, Oregon 97045 USA</span>
+  </div>
+</footer>

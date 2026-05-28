@@ -2,7 +2,7 @@
   <div class="header-inner">
 
     <div class="header-logo">
-      <a routerLink="/dashboard"><img src="assets/logo.svg" alt="Logo" class="logo-img"></a>
+      <a routerLink="/selling"><img src="assets/logo.svg" alt="Logo" class="logo-img"></a>
     </div>
 
     <div class="header-center">
@@ -10,7 +10,7 @@
         <div class="header-title-line1">Lightning Comics Rocks<span class="header-title-since">since May 1, 2026</span></div>
       </div>
       <nav>
-        <a routerLink="/dashboard" routerLinkActive="active">Selling</a>
+        <a routerLink="/selling" routerLinkActive="active">Selling</a>
         <a routerLink="/trade" routerLinkActive="active">Trade</a>
 
         <ng-container *ngIf="auth.isLoggedIn() && !auth.isAdmin()">

@@ -56,7 +56,7 @@ export class AppComponent implements OnInit {
                   // Only navigate away from auth-callback or login pages after loading
                   const url = this.router.url;
                   if (url.includes('auth-callback') || url === '/login' || url === '/') {
-                    this.router.navigate(['/dashboard']);
+                    this.router.navigate(['/selling']);
                   }
                 }
               },

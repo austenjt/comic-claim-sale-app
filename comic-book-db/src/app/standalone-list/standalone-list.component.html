@@ -275,7 +275,7 @@
         <button class="qa-btn qa-btn-back" (click)="deleteSetSelected = null" [disabled]="deleteSetSaving">← Back</button>
         <button class="qa-btn qa-btn-reset" (click)="cancelDeleteSet()" [disabled]="deleteSetSaving">Cancel</button>
         <button class="qa-btn qa-btn-save" style="background:#e67e22;color:#fff" (click)="confirmDeleteSet()" [disabled]="deleteSetSaving">
-          {{ deleteSetSaving ? 'Deleting…' : 'Return to Dashboard' }}
+          {{ deleteSetSaving ? 'Deleting…' : 'Return to Selling' }}
         </button>
         <button class="qa-btn" style="background:#c0392b;color:#fff" (click)="requestFullDelete()" [disabled]="deleteSetSaving">
           Full Delete

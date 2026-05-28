@@ -1,0 +1,34 @@
+<div class="dashboard-toolbar">
+  <div class="search-row">
+    <app-comic-search></app-comic-search>
+    <div class="filter-panel">
+      <span class="items-count">
+        <ng-container *ngIf="isFiltered; else noFilter">{{ itemCount }} of {{ totalCount }} items</ng-container>
+        <ng-template #noFilter>{{ totalCount }} items</ng-template>
+      </span>
+      <div class="filter-buttons">
+        <button class="btn-exclude-claimed"
+                [class.btn-exclude-claimed-active]="excludeClaimed"
+                (click)="excludeClaimedChange.emit(!excludeClaimed)">
+          {{ excludeClaimed ? 'Show Claimed' : 'Exclude Claimed' }}
+        </button>
+<select class="sort-select"
+                [value]="sortOrder"
+                (change)="sortOrderChange.emit($any($event.target).value)">
+          <option value="oldest-first">Oldest First</option>
+          <option value="newest-first">Newest First</option>
+          <option value="claimed-first">Claimed First</option>
+          <option value="a-z">A–Z Sort</option>
+          <option value="z-a">Z–A Sort</option>
+          <option value="highest-price">Highest Price</option>
+          <option value="lowest-price">Lowest Price</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  <app-pagination-bar
+    [currentPage]="currentPage"
+    [totalPages]="totalPages"
+    (goToPage)="goToPage.emit($event)">
+  </app-pagination-bar>
+</div>

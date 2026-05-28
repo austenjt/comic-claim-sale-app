@@ -8,7 +8,7 @@ export class AdminGuard implements CanActivate {
 
   canActivate(): boolean {
     if (this.auth.isAdmin()) return true;
-    this.router.navigate(['/dashboard']);
+    this.router.navigate(['/selling']);
     return false;
   }
 }
