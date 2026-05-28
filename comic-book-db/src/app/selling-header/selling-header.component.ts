@@ -1,13 +1,13 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 
 @Component({
-    selector: 'app-dashboard-header',
-    templateUrl: './dashboard-header.component.html',
-    styleUrls: ['./dashboard-header.component.css'],
+    selector: 'app-selling-header',
+    templateUrl: './selling-header.component.html',
+    styleUrls: ['./selling-header.component.css'],
     standalone: false,
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class DashboardHeaderComponent {
+export class SellingHeaderComponent {
   @Input() itemCount: number = 0;
   @Input() totalCount: number = 0;
   @Input() currentPage: number = 1;

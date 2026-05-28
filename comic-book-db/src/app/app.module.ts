@@ -20,7 +20,7 @@ import { msalGuardConfig, msalInstanceFactory, msalInterceptorConfig } from './a
 import { AppRoutingModule } from './app-routing.module';
 
 import { AppComponent } from './app.component';
-import { DashboardComponent } from './dashboard/dashboard.component';
+import { SellingComponent } from './selling/selling.component';
 import { ComicDetailComponent } from './comic-detail/comic-detail.component';
 import { InventoryComponent } from './inventory/inventory.component';
 import { ComicSearchComponent } from './comic-search/comic-search.component';
@@ -34,7 +34,7 @@ import { AccountProfileComponent } from './account-profile/account-profile.compo
 import { OrderHistoryComponent } from './order-history/order-history.component';
 import { AdminSalesComponent } from './admin-sales/admin-sales.component';
 import { SetDetailComponent } from './set-detail/set-detail.component';
-import { DashboardHeaderComponent } from './dashboard-header/dashboard-header.component';
+import { SellingHeaderComponent } from './selling-header/selling-header.component';
 import { PaginationBarComponent } from './pagination-bar/pagination-bar.component';
 import { SalesModalComponent } from './sales-modal/sales-modal.component';
 import { SquarePaymentModalComponent } from './square-payment-modal/square-payment-modal.component';
@@ -44,7 +44,7 @@ import { ShippingModalComponent } from './shipping-modal/shipping-modal.componen
 @NgModule({
     declarations: [
         AppComponent,
-        DashboardComponent,
+        SellingComponent,
         InventoryComponent,
         ComicDetailComponent,
         ComicSearchComponent,
@@ -57,7 +57,7 @@ import { ShippingModalComponent } from './shipping-modal/shipping-modal.componen
         OrderHistoryComponent,
         AdminSalesComponent,
         SetDetailComponent,
-        DashboardHeaderComponent,
+        SellingHeaderComponent,
         PaginationBarComponent,
         SalesModalComponent,
         SquarePaymentModalComponent,

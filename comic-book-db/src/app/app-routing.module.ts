@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
-import { DashboardComponent } from './dashboard/dashboard.component';
+import { SellingComponent } from './selling/selling.component';
 import { InventoryComponent } from './inventory/inventory.component';
 import { ComicDetailComponent } from './comic-detail/comic-detail.component';
 import { LoginComponent } from './login/login.component';
@@ -16,7 +16,7 @@ import { SetDetailComponent } from './set-detail/set-detail.component';
 
 const routes: Routes = [
   { path: '',               redirectTo: '/selling', pathMatch: 'full' },
-  { path: 'selling',       component: DashboardComponent },
+  { path: 'selling',       component: SellingComponent },
   { path: 'detail/:id',    component: ComicDetailComponent },
   { path: 'set/:id',       component: SetDetailComponent },
   { path: 'inventory',     component: InventoryComponent },

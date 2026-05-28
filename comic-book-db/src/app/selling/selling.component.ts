@@ -16,12 +16,12 @@ import { Observable, of, Subscription } from 'rxjs';
 import { DocType } from '../comic.enums';
 
 @Component({
-    selector: 'app-dashboard',
-    templateUrl: './dashboard.component.html',
-    styleUrls: ['./dashboard.component.css'],
+    selector: 'app-selling',
+    templateUrl: './selling.component.html',
+    styleUrls: ['./selling.component.css'],
     standalone: false
 })
-export class DashboardComponent implements OnInit, OnDestroy {
+export class SellingComponent implements OnInit, OnDestroy {
 
   pageItems: Comic[] = [];
   totalCount = 0;
@@ -99,7 +99,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   ) {}
 
   private savePrefs(): void {
-    localStorage.setItem(DashboardComponent.PREFS_KEY, JSON.stringify({
+    localStorage.setItem(SellingComponent.PREFS_KEY, JSON.stringify({
       sortOrder: this._sortOrder,
       currentPage: this.currentPage,
       excludeClaimed: this._excludeClaimed
@@ -108,7 +108,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   private restorePrefs(): void {
     try {
-      const raw = localStorage.getItem(DashboardComponent.PREFS_KEY);
+      const raw = localStorage.getItem(SellingComponent.PREFS_KEY);
       if (!raw) return;
       const prefs = JSON.parse(raw);
       if (prefs.sortOrder) this._sortOrder = prefs.sortOrder;

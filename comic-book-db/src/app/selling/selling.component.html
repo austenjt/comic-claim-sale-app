@@ -1,4 +1,4 @@
-<app-dashboard-header
+<app-selling-header
   [itemCount]="displayComics.length"
   [totalCount]="totalCount"
   [currentPage]="currentPage"
@@ -6,7 +6,7 @@
   [(excludeClaimed)]="excludeClaimed"
 [(sortOrder)]="sortOrder"
   (goToPage)="goToPage($event)">
-</app-dashboard-header>
+</app-selling-header>
 
 <!-- Award modal -->
 <div *ngIf="awardingComic" class="award-modal-overlay modal-overlay" (click)="closeAwardModal()">
