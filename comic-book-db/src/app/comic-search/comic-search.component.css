@@ -83,8 +83,16 @@ ul.search-result {
   color: var(--color-text-muted);
 }
 
+.search-result-wanted {
+  margin-left: 6px;
+  font-size: 0.85em;
+  font-style: italic;
+  color: #b8860b;
+}
+
 .search-result li a:hover .search-result-number,
-.search-result li a:hover .search-result-set {
+.search-result li a:hover .search-result-set,
+.search-result li a:hover .search-result-wanted {
   color: rgba(240,234,210,0.75);
 }
 

@@ -9,8 +9,11 @@
         <span *ngIf="comic.number?.number != null || comic.number?.sentinel != null" class="search-result-number">
           #{{ comic.number?.sentinel ?? comic.number?.number }}
         </span>
-        <span *ngIf="comic.collectionGroup" class="search-result-set">
+        <span *ngIf="comic.collectionGroup && comic.docType !== 'SET'" class="search-result-set">
           · Set {{ comic.collectionGroup }}
+        </span>
+        <span *ngIf="comic.listingType === 'WANTED'" class="search-result-wanted">
+          · Wanted
         </span>
       </a>
     </li>
