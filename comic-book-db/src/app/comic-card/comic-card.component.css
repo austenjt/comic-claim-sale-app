@@ -1,0 +1,385 @@
+:host {
+  display: block;
+}
+
+a {
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  color: inherit;
+  box-sizing: border-box;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(108,88,76,0.1);
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+a:hover {
+  box-shadow: 0 6px 18px rgba(123,143,75,0.15);
+  transform: translateY(-2px);
+  background-color: var(--color-surface);
+  text-decoration: none;
+}
+
+/* Small phones — tighten inner padding */
+@media screen and (max-width: 480px) {
+  .image-container { padding: var(--space-2); min-height: 64px; }
+  .image-container img { height: 110px; }
+  .details { padding: var(--space-2) var(--space-3); }
+  .card-footer { padding: var(--space-1) var(--space-2); }
+}
+
+.image-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #c8d4a8;
+  padding: 14px;
+  border-bottom: 1px solid var(--color-border);
+  min-height: 80px;
+}
+
+.image-container img {
+  height: 130px;
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
+  border: none;
+}
+
+.image-container.two-images {
+  gap: 6px;
+}
+
+.image-container.two-images img {
+  max-width: 48%;
+}
+
+.details {
+  padding: 12px 14px;
+  flex-grow: 1;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  background-color: var(--color-surface);
+}
+
+.card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px 10px;
+  min-height: 36px;
+  border-top: 1px solid var(--color-border);
+  background-color: var(--color-surface);
+  flex-shrink: 0;
+}
+
+.footer-badges {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.footer-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.footer-actions button {
+  height: 28px;
+  padding: 0 14px;
+  font-size: 0.83rem;
+  font-weight: 700;
+  border-radius: 4px;
+  cursor: pointer;
+  white-space: nowrap;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+/* ── Footer badges ─────────────────────────────────────────── */
+
+.ebay-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  height: 28px;
+  padding: 0 var(--space-2);
+  background: #999;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  border-radius: 4px;
+  line-height: 1;
+  cursor: default;
+  box-sizing: border-box;
+}
+
+.ebay-badge::after,
+.badge-set::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 0;
+  background: var(--color-bg);
+  color: #000;
+  border: 1px solid #000;
+  font-size: 0.72rem;
+  font-style: normal;
+  font-weight: 400;
+  letter-spacing: normal;
+  text-transform: none;
+  white-space: nowrap;
+  padding: 3px 7px;
+  border-radius: 3px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.12s ease 0.25s;
+  z-index: 10;
+}
+
+.ebay-badge:hover::after,
+.badge-set:hover::after {
+  opacity: 1;
+}
+
+.badge-graded,
+.badge-set,
+.badge-key-issue {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.65rem;
+  font-weight: var(--fw-bold);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 3px var(--space-2);
+  border-radius: var(--radius-sm);
+  line-height: 1.4;
+  pointer-events: none;
+}
+
+.badge-graded {
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+}
+
+.badge-key-issue {
+  background: var(--color-warning);
+  color: var(--color-text-inverse);
+}
+
+.badge-set {
+  position: relative;
+  height: 28px;
+  box-sizing: border-box;
+  justify-content: center;
+  padding: 0 var(--space-2);
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: none;
+  letter-spacing: normal;
+  line-height: 1;
+  pointer-events: auto;
+  cursor: default;
+  background: var(--color-warm-accent-deep);
+  color: var(--color-text-inverse);
+}
+
+/* ── Comic metadata ─────────────────────────────────────────── */
+
+.comic-title {
+  font-size: 0.95rem;
+  margin-bottom: 4px;
+  color: var(--color-text);
+}
+
+.meta-grid {
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+
+.meta-grid > * {
+  width: 50%;
+  box-sizing: border-box;
+  padding-right: 4px;
+}
+
+.comic-number,
+.comic-series,
+.comic-volume,
+.comic-publisher,
+.comic-published,
+.comic-era,
+.comic-variant,
+.comic-publishdate,
+.comic-barcode,
+.comic-grade-certified,
+.comic-grade-est {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  margin-bottom: 3px;
+}
+
+.comic-key-issue {
+  font-size: 0.8rem;
+  color: var(--color-danger);
+  font-weight: 600;
+  margin-bottom: 3px;
+}
+
+.comic-estimate,
+.comic-price {
+  font-size: 0.85rem;
+  margin-top: 8px;
+  color: #7b8f4b;
+  font-weight: 600;
+}
+
+/* ── Action buttons ─────────────────────────────────────────── */
+
+.btn-claim,
+.btn-in-cart,
+.btn-claimed,
+.btn-award,
+.btn-sell,
+.btn-copy {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-1) var(--space-4);
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-14);
+  font-weight: var(--fw-bold);
+  line-height: 1.15;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition:
+    background-color var(--duration-base) var(--ease-standard),
+    border-color     var(--duration-base) var(--ease-standard),
+    color            var(--duration-base) var(--ease-standard),
+    box-shadow       var(--duration-base) var(--ease-standard);
+}
+
+.btn-claim {
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+  border-color: var(--color-primary);
+}
+.btn-claim:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+  border-color: var(--color-primary-hover);
+}
+.btn-claim:disabled {
+  background: #b8c89a;
+  border-color: #b8c89a;
+  cursor: not-allowed;
+}
+
+.btn-in-cart {
+  background: transparent;
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+  cursor: default;
+}
+
+.btn-claimed {
+  background: #c8d4a8;
+  color: var(--color-text-muted);
+  border-color: #c8d4a8;
+  cursor: default;
+}
+
+.btn-award {
+  height: 28px;
+  box-sizing: border-box;
+  background: #8C6750;
+  color: var(--color-text-inverse);
+  border-color: #8C6750;
+}
+.btn-award:hover:not(:disabled) {
+  background: #6F523F;
+  border-color: #6F523F;
+}
+
+.btn-sell {
+  background: #2d6a4f;
+  color: var(--color-text-inverse);
+  border-color: #2d6a4f;
+}
+.btn-sell:hover:not(:disabled) {
+  background: #1b4332;
+  border-color: #1b4332;
+}
+
+.btn-copy {
+  height: 28px;
+  box-sizing: border-box;
+  background: #6b7280;
+  color: var(--color-text-inverse);
+  border-color: #6b7280;
+}
+.btn-copy:hover:not(:disabled) {
+  background: #4b5563;
+  border-color: #4b5563;
+}
+.btn-copy:disabled { opacity: 0.55; cursor: not-allowed; }
+
+.btn-delete-card {
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-12);
+  font-weight: var(--fw-semibold);
+  cursor: pointer;
+  background: transparent;
+  color: var(--color-danger);
+  border: 1px solid var(--color-danger);
+  transition:
+    background-color var(--duration-base) var(--ease-standard),
+    color            var(--duration-base) var(--ease-standard);
+}
+.btn-delete-card:hover { background: var(--color-danger-bg); }
+.btn-delete-card-confirm {
+  border-color: var(--color-danger);
+  color: var(--color-danger);
+  background: var(--color-danger-bg);
+}
+.btn-delete-card-confirm:hover { background: rgba(168, 85, 63, 0.22); }
+
+/* ── Status labels ─────────────────────────────────────────── */
+
+.comic-claimed-status {
+  font-size: var(--fs-12);
+  font-weight: var(--fw-semibold);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.card-sold {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.card-deleting {
+  opacity: 0.3;
+  pointer-events: none;
+  filter: grayscale(100%);
+}
+
+.sold-label {
+  font-size: var(--fs-14);
+  font-weight: var(--fw-bold);
+  color: var(--color-danger);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}

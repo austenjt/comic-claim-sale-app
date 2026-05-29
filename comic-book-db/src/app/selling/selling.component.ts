@@ -3,7 +3,6 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Title, Meta } from '@angular/platform-browser';
 import { Comic, PagedResponse } from '../comic';
 import { ComicService } from '../comic.service';
-import { ImageService } from '../image.service';
 import { AuthService } from '../auth.service';
 import { CartService } from '../cart.service';
 import { LogService } from '../log.service';
@@ -12,7 +11,7 @@ import { ConfigService } from '../config.service';
 import { DashboardNavService } from '../dashboard-nav.service';
 import { Cart } from '../cart';
 import { User } from '../user';
-import { Observable, of, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { DocType } from '../comic.enums';
 
 @Component({
@@ -87,7 +86,6 @@ export class SellingComponent implements OnInit, OnDestroy {
 
   constructor(
     private comicService: ComicService,
-    private imageService: ImageService,
     public auth: AuthService,
     private cartService: CartService,
     private logService: LogService,
@@ -201,14 +199,6 @@ export class SellingComponent implements OnInit, OnDestroy {
     this.loadClaimedMap();
   }
 
-  comicNumberLabel(comic: Comic): string {
-    const n = comic.number;
-    if (!n) return '';
-    if (n.number != null) return ` #${n.number}`;
-    if (n.sentinel) return ` #${n.sentinel}`;
-    return '';
-  }
-
   claim(comic: Comic): void {
     this.claimError = '';
     if (comic.docType === DocType.SET) {
@@ -245,15 +235,6 @@ export class SellingComponent implements OnInit, OnDestroy {
         this.handleClaimError(err);
       }
     });
-  }
-
-  getSetPrice(container: Comic): number {
-    const members = container.items ?? [];
-    return members.reduce((sum, m) => sum + (m.salePrice ?? 0), 0);
-  }
-
-  setHasKeyIssue(container: Comic): boolean {
-    return (container.items ?? []).some(m => !!m.keyIssue);
   }
 
   isInMyCart(comicId: number): boolean {
@@ -372,9 +353,7 @@ export class SellingComponent implements OnInit, OnDestroy {
     });
   }
 
-  copyComic(comic: Comic, event: Event): void {
-    event.preventDefault();
-    event.stopPropagation();
+  copyComic(comic: Comic): void {
     this.copyingId = comic.id;
     const copy: Comic = {
       ...comic,
@@ -415,9 +394,4 @@ export class SellingComponent implements OnInit, OnDestroy {
   }
 
   trackById(_index: number, comic: Comic): number { return comic.id; }
-
-  getFullImageURLByName(imageName: string | null | undefined): Observable<string> {
-    if (!imageName) return of('assets/comic-book-small.png');
-    return of(this.imageService.getRemoteImageURLByName(imageName));
-  }
 }

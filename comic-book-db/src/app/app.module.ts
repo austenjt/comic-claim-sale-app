@@ -35,6 +35,7 @@ import { OrderHistoryComponent } from './order-history/order-history.component';
 import { AdminSalesComponent } from './admin-sales/admin-sales.component';
 import { SetDetailComponent } from './set-detail/set-detail.component';
 import { SellingHeaderComponent } from './selling-header/selling-header.component';
+import { ComicCardComponent } from './comic-card/comic-card.component';
 import { PaginationBarComponent } from './pagination-bar/pagination-bar.component';
 import { SalesModalComponent } from './sales-modal/sales-modal.component';
 import { SquarePaymentModalComponent } from './square-payment-modal/square-payment-modal.component';
@@ -58,6 +59,7 @@ import { ShippingModalComponent } from './shipping-modal/shipping-modal.componen
         AdminSalesComponent,
         SetDetailComponent,
         SellingHeaderComponent,
+        ComicCardComponent,
         PaginationBarComponent,
         SalesModalComponent,
         SquarePaymentModalComponent,

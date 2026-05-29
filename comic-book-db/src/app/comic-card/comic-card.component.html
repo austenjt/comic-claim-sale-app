@@ -1,0 +1,105 @@
+<!-- SET CARD -->
+<ng-container *ngIf="comic.docType === 'SET'; else normalCard">
+  <a routerLink="/set/{{comic.id}}">
+    <div class="image-container" [class.two-images]="comic.smallBackImageId">
+      <img [src]="imageUrl(comic.smallCachedImageId) | async" alt="Set Cover" loading="lazy">
+      <img *ngIf="comic.smallBackImageId"
+           [src]="imageUrl(comic.smallBackImageId) | async" alt="Set Back Cover" loading="lazy">
+    </div>
+    <div class="details">
+      <div class="comic-title"><b>{{ comic.title }}</b></div>
+      <div class="meta-grid">
+        <div *ngIf="comic.series && comic.series !== ''" class="comic-series">Series: <b>{{ comic.series }}</b></div>
+        <div *ngIf="comic.publisher" class="comic-publisher">Publisher: <b>{{ comic.publisher }}</b></div>
+        <div class="comic-number">Books: <b>{{ comic.items?.length ?? 0 }}</b></div>
+        <div *ngIf="setPrice > 0" class="comic-price">Total: <b>{{ setPrice | currency:'USD':'symbol':'1.2-2' }}</b></div>
+      </div>
+    </div>
+    <div class="card-footer">
+      <div class="footer-badges">
+        <span *ngIf="comic.ebayListingUrl" class="ebay-badge" data-tooltip="eBay listed">eBay</span>
+        <span class="badge-set" [attr.data-tooltip]="'Set ' + comic.collectionGroup">Set</span>
+      </div>
+      <div class="footer-actions">
+        <span *ngIf="isSetClaimedByOther" class="comic-claimed-status">Claimed</span>
+        <ng-container *ngIf="isApproved && !isAdmin">
+          <button *ngIf="isSetInMyCart" class="btn-in-cart" disabled>In Your Cart</button>
+          <button *ngIf="showClaimSetButton || isClaimingSet" class="btn-claim"
+            [disabled]="!canClaimSet || isClaimingSet"
+            [title]="canClaimSet ? '' : cartLockedTitle"
+            (click)="act($event, claimSetRequested)">
+            {{ isClaimingSet ? 'Adding…' : 'Claim Set' }}
+          </button>
+        </ng-container>
+        <button *ngIf="isAdmin && !comic.isForSale" class="btn-sell"
+          (click)="act($event, markForSaleRequested)">Sell</button>
+      </div>
+    </div>
+  </a>
+</ng-container>
+
+<!-- NORMAL CARD -->
+<ng-template #normalCard>
+  <a routerLink="/detail/{{comic.id}}" [class.card-sold]="comic.soldTo" [class.card-deleting]="isDeleting">
+    <div class="image-container" [class.two-images]="comic.smallBackImageId">
+      <img [src]="imageUrl(comic.smallCachedImageId) | async" alt="Front Cover" loading="lazy"
+           [class.is-sold]="comic.soldTo">
+      <img *ngIf="comic.smallBackImageId"
+           [src]="imageUrl(comic.smallBackImageId) | async" alt="Back Cover" loading="lazy"
+           [class.is-sold]="comic.soldTo">
+    </div>
+    <div class="details">
+      <div class="comic-title"><b>{{ comic.title }}{{ numberLabel }}</b></div>
+      <div class="meta-grid">
+        <div *ngIf="comic.series && comic.series !== ''" class="comic-series">Series: <b>{{ comic.series }}</b></div>
+        <div *ngIf="comic.publisher" class="comic-publisher">Publisher: <b>{{ comic.publisher }}</b></div>
+        <div *ngIf="comic.variant" class="comic-variant">Variant: <b>{{ comic.variant }}</b></div>
+        <div *ngIf="comic.publishedDate" class="comic-published">Published: <b>{{ comic.publishedDate }}</b></div>
+        <div *ngIf="comic.number?.number != null || comic.number?.sentinel != null" class="comic-number">
+          Number: <b>{{ comic.number?.sentinel ?? comic.number?.number }}</b>
+        </div>
+        <div *ngIf="comic.comicCondition?.notCertifiedGrade" class="comic-grade-est">
+          Est. Grade: <b>{{ comic.comicCondition?.notCertifiedGrade | number:'1.1-1' }}</b>
+        </div>
+        <div *ngIf="comic.salePrice && !comic.soldTo" class="comic-price">
+          Price: <b>{{ comic.salePrice | currency:'USD':'symbol':'1.2-2' }}</b>
+        </div>
+      </div>
+    </div>
+    <div class="card-footer">
+      <div class="footer-badges">
+        <span *ngIf="comic.ebayListingUrl" class="ebay-badge" data-tooltip="eBay listed">eBay</span>
+        <span *ngIf="comic.comicCondition?.cgcCondition?.grade || comic.comicCondition?.cbcsCondition?.grade"
+              class="badge-graded">Graded</span>
+        <span *ngIf="comic.keyIssue" class="badge-key-issue">Key Issue</span>
+      </div>
+      <div class="footer-actions">
+        <ng-container *ngIf="comic.soldTo; else notSold">
+          <span class="sold-label">Sold to {{ comic.soldTo }}</span>
+        </ng-container>
+        <ng-template #notSold>
+          <span *ngIf="isClaimedByOther" class="comic-claimed-status">
+            Claimed · {{ claimedDate | date:'shortDate' }}
+          </span>
+          <ng-container *ngIf="isApproved && !isAdmin">
+            <button *ngIf="isInMyCart" class="btn-in-cart" disabled>In Your Cart</button>
+            <button *ngIf="showClaimButton" class="btn-claim"
+              [disabled]="!canClaim"
+              [title]="canClaim ? '' : cartLockedTitle"
+              (click)="act($event, claimRequested)">Claim</button>
+          </ng-container>
+          <button *ngIf="isAdmin && awardModeEnabled && !claimedDate && !comic.comicCondition?.cgcCondition?.grade && !comic.comicCondition?.cbcsCondition?.grade"
+            class="btn-award"
+            (click)="act($event, awardRequested)">Award</button>
+          <button *ngIf="isAdmin && !comic.isForSale" class="btn-sell"
+            (click)="act($event, markForSaleRequested)">Sell</button>
+          <button *ngIf="isAdmin" class="btn-copy"
+            [disabled]="isCopying"
+            (click)="act($event, copyRequested)">
+            {{ isCopied ? 'Copied ✓' : isCopying ? 'Copying…' : 'Copy' }}
+          </button>
+        </ng-template>
+      </div>
+    </div>
+  </a>
+</ng-template>

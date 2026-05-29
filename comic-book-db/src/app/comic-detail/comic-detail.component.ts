@@ -12,6 +12,7 @@ import { CartService } from '../cart.service';
 import { AuthService } from '../auth.service';
 import { ConfigService, ComicEnums } from '../config.service';
 import { DashboardNavService, NavItem } from '../dashboard-nav.service';
+import { LogService } from '../log.service';
 import { Observable, of } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { DocType, ListingType, ERA_OPTIONS } from '../comic.enums';
@@ -76,6 +77,7 @@ export class ComicDetailComponent implements OnInit {
     private location: Location,
     private titleService: Title,
     private meta: Meta,
+    private logService: LogService,
   ) {}
 
   get activeLargeImageId(): string | null | undefined {
@@ -112,6 +114,15 @@ export class ComicDetailComponent implements OnInit {
           .subscribe({ next: cart => this.myCart = cart, error: () => {} });
       }
     });
+    this.logService.newClaimEvent$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(n => {
+        if (n.eventType === 'RETURN') {
+          delete this.claimedMap[n.comicId];
+        } else {
+          this.claimedMap[n.comicId] = n.claimedAt;
+        }
+      });
   }
 
   private resetForNewComic(): void {
