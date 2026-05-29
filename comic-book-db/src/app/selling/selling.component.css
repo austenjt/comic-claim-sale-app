@@ -6,20 +6,20 @@
   margin: 0;
 }
 
-.comics-list app-comic-card {
+.comics-list app-selling-card {
   width: calc(33.333% - 12px);
 }
 
 /* Tablet */
 @media screen and (max-width: 900px) {
-  .comics-list app-comic-card {
+  .comics-list app-selling-card {
     width: calc(50% - 8px);
   }
 }
 
 /* Mobile */
 @media screen and (max-width: 600px) {
-  .comics-list app-comic-card {
+  .comics-list app-selling-card {
     width: 100%;
   }
 }

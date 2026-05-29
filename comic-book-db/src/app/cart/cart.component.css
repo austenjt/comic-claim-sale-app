@@ -380,6 +380,12 @@ tfoot td { font-weight: bold; background: #adc178; }
   background: #f0fff0;
 }
 
+.trade-offered-grade {
+  margin-left: 0.4rem;
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+}
+
 .trade-badge {
   display: inline-flex;
   align-items: center;

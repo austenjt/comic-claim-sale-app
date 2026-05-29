@@ -35,6 +35,9 @@ public class CartItem {
     @JsonProperty("isTrade")
     private boolean isTrade;
 
+    /** Grade the user reported for their trade-in copy. Null for non-trade items. */
+    private Double offeredGrade;
+
     public CartItem() {}
 
     public String getComicId() { return comicId; }
@@ -66,4 +69,7 @@ public class CartItem {
 
     public boolean isTrade() { return isTrade; }
     public void setTrade(boolean trade) { isTrade = trade; }
+
+    public Double getOfferedGrade() { return offeredGrade; }
+    public void setOfferedGrade(Double offeredGrade) { this.offeredGrade = offeredGrade; }
 }

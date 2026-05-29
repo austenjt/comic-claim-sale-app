@@ -359,6 +359,7 @@ public class CartService {
         item.setPrice(-credit.doubleValue()); // negative = credit
         item.setClaimedAt(Instant.now().toString());
         item.setTrade(true);
+        item.setOfferedGrade(grade.getNumericGrade());
 
         cart.getItems().add(item);
         save(cart);

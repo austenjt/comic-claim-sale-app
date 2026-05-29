@@ -43,7 +43,7 @@
 </div>
 
 <div class="comics-list">
-  <app-comic-card
+  <app-selling-card
     *ngFor="let comic of displayComics; trackBy: trackById"
     [comic]="comic"
     [isInMyCart]="isInMyCart(comic.id)"
@@ -68,7 +68,7 @@
     (markForSaleRequested)="markForSale(comic)"
     (copyRequested)="copyComic(comic)"
     (awardRequested)="openAwardModal(comic)">
-  </app-comic-card>
+  </app-selling-card>
 </div>
 
 <app-pagination-bar

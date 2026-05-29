@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, DestroyRef, OnInit, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -7,15 +8,16 @@ import { Comic } from '../comic';
 import { ComicService } from '../comic.service';
 import { CartService } from '../cart.service';
 import { AuthService } from '../auth.service';
-import { ImageService } from '../image.service';
 import { ConfigService, GradeOption } from '../config.service';
+import { WantedCardComponent } from '../wanted-card/wanted-card.component';
+import { LogService } from '../log.service';
 
 @Component({
     selector: 'app-trade-board',
     templateUrl: './trade-board.component.html',
     styleUrls: ['./trade-board.component.css'],
     standalone: true,
-    imports: [CommonModule, FormsModule, RouterModule],
+    imports: [CommonModule, FormsModule, RouterModule, WantedCardComponent],
 })
 export class TradeBoardComponent implements OnInit {
   wantedComics: Comic[] = [];
@@ -28,9 +30,11 @@ export class TradeBoardComponent implements OnInit {
 
   // Grade selector modal
   modalComic: Comic | null = null;
-  selectedGrade: number | null = null; // must be explicitly chosen
+  selectedGrade: number | null = null;
   submitting = false;
   submitError = '';
+
+  private destroyRef = inject(DestroyRef);
 
   trackById(_index: number, c: Comic): number { return c.id; }
 
@@ -38,8 +42,8 @@ export class TradeBoardComponent implements OnInit {
     private comicService: ComicService,
     private cartService: CartService,
     public auth: AuthService,
-    private imageService: ImageService,
     private configService: ConfigService,
+    private logService: LogService,
     private title: Title
   ) {}
 
@@ -55,13 +59,15 @@ export class TradeBoardComponent implements OnInit {
       error: () => { this.error = 'Failed to load wanted comics.'; this.loading = false; }
     });
     this.cartService.getClaimedMap().subscribe({ next: m => this.claimedMap = m, error: () => {} });
-  }
-
-  imageUrl(comic: Comic): string {
-    if (comic.smallCachedImageId) {
-      return this.imageService.getRemoteImageURLByName(comic.smallCachedImageId);
-    }
-    return 'assets/comic-book-small.png';
+    this.logService.newClaimEvent$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(n => {
+        if (n.eventType === 'RETURN') {
+          delete this.claimedMap[n.comicId];
+        } else {
+          this.claimedMap[n.comicId] = n.claimedAt;
+        }
+      });
   }
 
   comicLabel(comic: Comic): string {
@@ -90,9 +96,7 @@ export class TradeBoardComponent implements OnInit {
 
   // ── Admin: duplicate comic ──────────────────────────────────────────────────
 
-  copyComic(comic: Comic, event: Event): void {
-    event.preventDefault();
-    event.stopPropagation();
+  copyComic(comic: Comic): void {
     this.copyingId = comic.id;
     const copy: Comic = {
       ...comic,

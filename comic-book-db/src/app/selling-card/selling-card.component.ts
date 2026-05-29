@@ -4,12 +4,12 @@ import { Comic } from '../comic';
 import { ImageService } from '../image.service';
 
 @Component({
-    selector: 'app-comic-card',
-    templateUrl: './comic-card.component.html',
-    styleUrls: ['./comic-card.component.css'],
+    selector: 'app-selling-card',
+    templateUrl: './selling-card.component.html',
+    styleUrls: ['./selling-card.component.css'],
     standalone: false,
 })
-export class ComicCardComponent {
+export class SellingCardComponent {
   @Input() comic!: Comic;
 
   // Precomputed state from parent

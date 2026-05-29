@@ -20,50 +20,18 @@
   </div>
 
   <div class="wanted-grid" *ngIf="wantedComics.length > 0">
-    <div class="wanted-card" *ngFor="let comic of wantedComics; trackBy: trackById">
-      <a [routerLink]="['/detail', comic.id]" class="wanted-image-link">
-        <div class="image-container">
-          <img [src]="imageUrl(comic)" [alt]="comicLabel(comic)" loading="lazy">
-        </div>
-      </a>
-      <div class="details">
-        <div class="comic-title">
-          <b><a [routerLink]="['/detail', comic.id]" class="comic-title-link">{{ comicLabel(comic) }}</a></b>
-        </div>
-        <div class="meta-grid">
-          <div *ngIf="comic.publisher" class="comic-publisher">{{ comic.publisher }}</div>
-          <div *ngIf="comic.publishedDate" class="comic-publish-date">Published: {{ comic.publishedDate }}</div>
-          <div *ngIf="comic.trade?.desiredGrade" class="comic-grade">Grade: <b>{{ comic.trade?.desiredGrade | number:'1.1-1' }}</b></div>
-          <div *ngIf="comic.expectedValue" class="comic-price">Expected Value: <b>{{ comic.expectedValue | currency }}</b></div>
-          <div *ngIf="comic.trade?.offeredGrade != null" class="comic-offered-grade">Offered Grade: <b>{{ comic.trade?.offeredGrade | number:'1.1-1' }}</b></div>
-          <div *ngIf="comic.salePrice != null && comic.trade?.offeredGrade != null" class="comic-offered-value">Calculated Value: <b>{{ comic.salePrice | currency }}</b></div>
-          <div class="wanted-credit-note">Credit varies by condition</div>
-          <div *ngIf="comic.publicNotes" class="wanted-notes">{{ comic.publicNotes }}</div>
-        </div>
-      </div>
-      <div class="card-footer">
-        <div class="footer-badges"></div>
-        <div class="footer-actions">
-          <button *ngIf="auth.isAdmin()" class="btn-copy"
-                  [disabled]="copyingId === comic.id"
-                  (click)="$event.preventDefault(); $event.stopPropagation(); copyComic(comic, $event)">
-            {{ copiedId === comic.id ? 'Copied ✓' : copyingId === comic.id ? 'Copying…' : 'Copy' }}
-          </button>
-          <ng-container *ngIf="canOffer()">
-            <button class="btn-offer-trade"
-                    [class.btn-offer-trade--done]="isAdded(comic)"
-                    [disabled]="isAdded(comic) || isOfferedByOther(comic) || !comic.expectedValue || auth.isAdmin()"
-                    [title]="auth.isAdmin() ? 'Admins cannot offer trades' : (!comic.expectedValue ? 'Trade value not yet available for this comic' : '')"
-                    (click)="openModal(comic)">
-              <ng-container *ngIf="isAdded(comic)">Added to Cart ✓</ng-container>
-              <ng-container *ngIf="isOfferedByOther(comic) && !isAdded(comic)">Offered</ng-container>
-              <ng-container *ngIf="!isAdded(comic) && !isOfferedByOther(comic) && !comic.expectedValue">Value Pending</ng-container>
-              <ng-container *ngIf="!isAdded(comic) && !isOfferedByOther(comic) && comic.expectedValue">Offer Trade</ng-container>
-            </button>
-          </ng-container>
-        </div>
-      </div>
-    </div>
+    <app-wanted-card
+      *ngFor="let comic of wantedComics; trackBy: trackById"
+      [comic]="comic"
+      [isAdded]="isAdded(comic)"
+      [isOfferedByOther]="isOfferedByOther(comic)"
+      [isCopying]="copyingId === comic.id"
+      [isCopied]="copiedId === comic.id"
+      [canOffer]="canOffer()"
+      [isAdmin]="auth.isAdmin()"
+      (offerRequested)="openModal(comic)"
+      (copyRequested)="copyComic(comic)">
+    </app-wanted-card>
   </div>
 </div>
 

@@ -81,6 +81,7 @@
               <a [routerLink]="['/detail', row.items[0].comicId]">
                 {{ row.items[0].comicTitle }}{{ row.items[0].comicNumber ? ' ' + row.items[0].comicNumber : '' }}
               </a>
+              <span *ngIf="row.items[0].offeredGrade != null" class="trade-offered-grade">Grade {{ row.items[0].offeredGrade | number:'1.1-1' }}</span>
               <span class="trade-badge">TRADE CREDIT</span>
             </td>
             <td class="trade-credit-price">{{ row.items[0].price | currency }}</td>

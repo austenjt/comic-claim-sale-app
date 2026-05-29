@@ -27,6 +27,8 @@ export interface CartItem {
   isGraded?: boolean;
   /** True when this item is a trade-in (negative credit, user sends comic to admin). */
   isTrade?: boolean;
+  /** Grade the user reported for their trade-in copy. Null for non-trade items. */
+  offeredGrade?: number | null;
 }
 
 export interface Cart {
