@@ -39,11 +39,11 @@ a:hover {
   background-color: #c8d4a8;
   padding: 8px;
   border-bottom: 1px solid var(--color-border);
-  min-height: 56px;
+  min-height: 70px;
 }
 
 .image-container img {
-  height: 88px;
+  height: 110px;
   width: auto;
   max-width: 100%;
   object-fit: contain;
