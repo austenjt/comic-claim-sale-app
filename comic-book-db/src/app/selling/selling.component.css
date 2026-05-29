@@ -7,26 +7,26 @@
 }
 
 .comics-list app-selling-card {
-  width: calc(33.333% - 12px);
+  width: calc(20% - 13px);
 }
 
-/* Tablet */
 @media screen and (max-width: 900px) {
+  .comics-list app-selling-card {
+    width: calc(33.333% - 11px);
+  }
+}
+
+@media screen and (max-width: 600px) {
   .comics-list app-selling-card {
     width: calc(50% - 8px);
   }
 }
 
-/* Mobile */
-@media screen and (max-width: 600px) {
+@media screen and (max-width: 400px) {
+  .comics-list { gap: var(--space-3); }
   .comics-list app-selling-card {
     width: 100%;
   }
-}
-
-/* Small phones — tighten gap */
-@media screen and (max-width: 480px) {
-  .comics-list { gap: var(--space-3); }
 }
 
 .claim-error {

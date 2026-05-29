@@ -25,12 +25,11 @@ a:hover {
   text-decoration: none;
 }
 
-/* Small phones — tighten inner padding */
-@media screen and (max-width: 480px) {
-  .image-container { padding: var(--space-2); min-height: 64px; }
-  .image-container img { height: 110px; }
-  .details { padding: var(--space-2) var(--space-3); }
-  .card-footer { padding: var(--space-1) var(--space-2); }
+@media screen and (max-width: 400px) {
+  .image-container { padding: 4px; min-height: 44px; }
+  .image-container img { height: 60px; }
+  .details { padding: 4px 6px; }
+  .card-footer { padding: 2px 4px; min-height: 28px; }
 }
 
 .image-container {
@@ -38,13 +37,13 @@ a:hover {
   justify-content: center;
   align-items: center;
   background-color: #c8d4a8;
-  padding: 14px;
+  padding: 8px;
   border-bottom: 1px solid var(--color-border);
-  min-height: 80px;
+  min-height: 56px;
 }
 
 .image-container img {
-  height: 130px;
+  height: 88px;
   width: auto;
   max-width: 100%;
   object-fit: contain;
@@ -60,7 +59,7 @@ a:hover {
 }
 
 .details {
-  padding: 12px 14px;
+  padding: 7px 10px;
   flex-grow: 1;
   word-wrap: break-word;
   overflow-wrap: break-word;
@@ -71,8 +70,8 @@ a:hover {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 5px 10px;
-  min-height: 36px;
+  padding: 4px 6px;
+  min-height: 32px;
   border-top: 1px solid var(--color-border);
   background-color: var(--color-surface);
   flex-shrink: 0;
@@ -91,9 +90,9 @@ a:hover {
 }
 
 .footer-actions button {
-  height: 28px;
-  padding: 0 14px;
-  font-size: 0.83rem;
+  height: 22px;
+  padding: 0 11px;
+  font-size: 0.66rem;
   font-weight: 700;
   border-radius: 4px;
   cursor: pointer;
@@ -112,7 +111,7 @@ a:hover {
   align-items: center;
   justify-content: center;
   position: relative;
-  height: 28px;
+  height: 22px;
   padding: 0 var(--space-2);
   background: #999;
   color: #fff;
@@ -179,7 +178,7 @@ a:hover {
 
 .badge-set {
   position: relative;
-  height: 28px;
+  height: 22px;
   box-sizing: border-box;
   justify-content: center;
   padding: 0 var(--space-2);
@@ -197,21 +196,20 @@ a:hover {
 /* ── Comic metadata ─────────────────────────────────────────── */
 
 .comic-title {
-  font-size: 0.95rem;
-  margin-bottom: 4px;
+  font-size: 0.76rem;
+  margin-bottom: 3px;
   color: var(--color-text);
 }
 
 .meta-grid {
   display: flex;
   flex-wrap: wrap;
-  margin-bottom: 4px;
+  margin-bottom: 2px;
 }
 
 .meta-grid > * {
-  width: 50%;
+  width: 100%;
   box-sizing: border-box;
-  padding-right: 4px;
 }
 
 .comic-number,
@@ -225,22 +223,22 @@ a:hover {
 .comic-barcode,
 .comic-grade-certified,
 .comic-grade-est {
-  font-size: 0.8rem;
+  font-size: 0.65rem;
   color: var(--color-text-muted);
-  margin-bottom: 3px;
+  margin-bottom: 2px;
 }
 
 .comic-key-issue {
-  font-size: 0.8rem;
+  font-size: 0.65rem;
   color: var(--color-danger);
   font-weight: 600;
-  margin-bottom: 3px;
+  margin-bottom: 2px;
 }
 
 .comic-estimate,
 .comic-price {
-  font-size: 0.85rem;
-  margin-top: 8px;
+  font-size: 0.72rem;
+  margin-top: 4px;
   color: #7b8f4b;
   font-weight: 600;
 }
@@ -256,11 +254,12 @@ a:hover {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: var(--space-1) var(--space-4);
+  height: 22px;
+  padding: 0 11px;
   border-radius: var(--radius-sm);
-  font-size: var(--fs-14);
+  font-size: 0.66rem;
   font-weight: var(--fw-bold);
-  line-height: 1.15;
+  line-height: 1;
   cursor: pointer;
   border: 1px solid transparent;
   transition:
@@ -300,7 +299,7 @@ a:hover {
 }
 
 .btn-award {
-  height: 28px;
+  height: 22px;
   box-sizing: border-box;
   background: #8C6750;
   color: var(--color-text-inverse);
@@ -322,7 +321,7 @@ a:hover {
 }
 
 .btn-copy {
-  height: 28px;
+  height: 22px;
   box-sizing: border-box;
   background: #6b7280;
   color: var(--color-text-inverse);

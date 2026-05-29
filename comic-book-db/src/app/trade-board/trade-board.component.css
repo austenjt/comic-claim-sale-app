@@ -64,22 +64,20 @@ h2 {
 }
 
 .wanted-grid app-wanted-card {
-  width: calc(33.333% - 12px);
+  width: calc(20% - 13px);
 }
 
-/* Tablet */
 @media screen and (max-width: 900px) {
+  .wanted-grid app-wanted-card { width: calc(33.333% - 11px); }
+}
+
+@media screen and (max-width: 600px) {
   .wanted-grid app-wanted-card { width: calc(50% - 8px); }
 }
 
-/* Mobile */
-@media screen and (max-width: 600px) {
-  .wanted-grid app-wanted-card { width: 100%; }
-}
-
-/* Small phones — tighten gap */
-@media screen and (max-width: 480px) {
+@media screen and (max-width: 400px) {
   .wanted-grid { gap: var(--space-3); }
+  .wanted-grid app-wanted-card { width: 100%; }
 }
 
 /* ── Grade selector modal ───────────────────────────────────────────────── */
