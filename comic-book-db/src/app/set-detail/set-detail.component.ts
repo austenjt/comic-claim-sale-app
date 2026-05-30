@@ -282,6 +282,38 @@ export class SetDetailComponent implements OnInit, OnDestroy {
     });
   }
 
+  regenSmallFrontImage(): void {
+    if (!this.container) return;
+    this.imageUploading = true;
+    this.imageUploadError = '';
+    this.imageService.regenSmallImage(this.container.id).subscribe({
+      next: (updated: any) => {
+        this.imageUploading = false;
+        if (this.container) this.container.smallCachedImageId = updated.smallCachedImageId;
+      },
+      error: (err: any) => {
+        this.imageUploading = false;
+        this.imageUploadError = 'Regen failed: ' + (err?.error || err?.message || 'Unknown error');
+      }
+    });
+  }
+
+  regenSmallBackImage(): void {
+    if (!this.container) return;
+    this.backImageUploading = true;
+    this.backImageUploadError = '';
+    this.imageService.regenSmallBackImage(this.container.id).subscribe({
+      next: (updated: any) => {
+        this.backImageUploading = false;
+        if (this.container) this.container.smallBackImageId = updated.smallBackImageId;
+      },
+      error: (err: any) => {
+        this.backImageUploading = false;
+        this.backImageUploadError = 'Regen failed: ' + (err?.error || err?.message || 'Unknown error');
+      }
+    });
+  }
+
   clearFrontImage(): void {
     if (!this.editContainer) return;
     this.editContainer.largeCachedImageId = null;

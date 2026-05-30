@@ -43,6 +43,9 @@
             <button class="img-update-btn" (click)="openCaptureModal('front')" [disabled]="imageUploading || saving">
               {{ imageUploading ? 'Uploading...' : 'Update Front Cover' }}
             </button>
+            <button *ngIf="container.largeCachedImageId" class="btn-img-regen" (click)="regenSmallFrontImage()" [disabled]="imageUploading || saving">
+              {{ imageUploading ? '…' : 'Regen Small' }}
+            </button>
             <button *ngIf="container.largeCachedImageId" class="btn-img-delete" (click)="clearFrontImage()" [disabled]="imageUploading || saving">
               {{ saving ? '…' : 'Delete' }}
             </button>
@@ -51,6 +54,9 @@
           <ng-container *ngIf="activeImage === 'back'">
             <button class="img-update-btn" (click)="openCaptureModal('back')" [disabled]="backImageUploading || saving">
               {{ backImageUploading ? 'Uploading...' : 'Update Back Cover' }}
+            </button>
+            <button *ngIf="container.largeBackImageId" class="btn-img-regen" (click)="regenSmallBackImage()" [disabled]="backImageUploading || saving">
+              {{ backImageUploading ? '…' : 'Regen Small' }}
             </button>
             <button *ngIf="container.largeBackImageId" class="btn-img-delete" (click)="clearBackImage()" [disabled]="backImageUploading || saving">
               {{ saving ? '…' : 'Delete' }}

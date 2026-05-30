@@ -293,6 +293,21 @@ button {
 .img-update-btn:hover:not(:disabled) { background-color: var(--color-primary-hover); border-color: var(--color-primary-hover); }
 .img-update-btn:disabled { opacity: 0.55; cursor: not-allowed; }
 
+.btn-img-regen {
+  margin-left: 8px;
+  padding: var(--space-1) var(--space-3);
+  background-color: #6b7280;
+  color: var(--color-text-inverse);
+  border: 1px solid #6b7280;
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-14);
+  font-weight: var(--fw-semibold);
+  cursor: pointer;
+  transition: background-color var(--duration-base) var(--ease-standard);
+}
+.btn-img-regen:hover:not(:disabled) { background-color: #4b5563; border-color: #4b5563; }
+.btn-img-regen:disabled { opacity: 0.55; cursor: not-allowed; }
+
 .btn-img-delete {
   margin-left: 8px;
   padding: var(--space-1) var(--space-3);

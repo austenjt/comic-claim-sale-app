@@ -56,17 +56,17 @@
 }
 
 .image-container img {
-  height: 100%;
+  height: auto;
+  max-height: 100%;
   width: auto;
   max-width: 100%;
-  object-fit: contain;
 }
 
 /* ── Details section ────────────────────────────────────────────────────── */
 
 .details {
-  padding: 7px 10px;
-  flex-grow: 1;
+  padding: 0 10px;
+  flex-grow: 0;
   word-wrap: break-word;
   overflow-wrap: break-word;
   overflow: hidden;
@@ -81,6 +81,11 @@
   overflow: hidden;
   margin-bottom: 0;
   transition: max-height 0.25s ease, opacity 0.2s ease, margin 0.2s ease;
+}
+
+:host.expanded .details {
+  padding: 7px 10px;
+  flex-grow: 1;
 }
 
 :host.expanded .comic-title {
@@ -152,12 +157,15 @@
 /* ── Card footer ────────────────────────────────────────────────────────── */
 
 .price-bar {
-  padding: 3px 12px 5px;
+  padding: 4px 12px;
   flex-shrink: 0;
+  flex: 0 0 auto;
   background-color: var(--color-surface);
+  border-top: 1px solid var(--color-border);
   display: flex;
   justify-content: flex-end;
   align-items: center;
+  line-height: 1;
 }
 
 .card-footer {

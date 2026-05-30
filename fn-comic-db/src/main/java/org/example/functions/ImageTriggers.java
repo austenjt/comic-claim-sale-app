@@ -195,10 +195,10 @@ public class ImageTriggers {
             imageService.updateImage(largeImageName, imageData, true, comicId, comic.getTitle(), comic.getSeries(), comicNumberStr);
             log.info("Stored large image: {}", largeImageName);
 
-            // Resize to ~104px tall and store the small image (best effort)
+            // Resize to ~260px tall and store the small image (best effort)
             String smallImageName = null;
             try {
-                byte[] smallImageData = imageResizeService.resizeToHeight(imageData, 104);
+                byte[] smallImageData = imageResizeService.resizeToHeight(imageData, 260);
                 smallImageName = comicId + "-small.png";
                 imageService.updateImage(smallImageName, smallImageData, true, comicId, comic.getTitle(), comic.getSeries(), comicNumberStr);
                 log.info("Stored small image: {} ({} bytes)", smallImageName, smallImageData.length);
@@ -273,7 +273,7 @@ public class ImageTriggers {
 
             String smallImageName = null;
             try {
-                byte[] smallImageData = imageResizeService.resizeToHeight(imageData, 104);
+                byte[] smallImageData = imageResizeService.resizeToHeight(imageData, 260);
                 smallImageName = comicId + "-back-small.png";
                 imageService.updateImage(smallImageName, smallImageData, true, comicId, comic.getTitle(), comic.getSeries(), comicNumberStr);
                 log.info("Stored small back image: {} ({} bytes)", smallImageName, smallImageData.length);
@@ -347,7 +347,7 @@ public class ImageTriggers {
 
             String smallImageName = null;
             try {
-                byte[] smallImageData = imageResizeService.resizeToHeight(imageData, 104);
+                byte[] smallImageData = imageResizeService.resizeToHeight(imageData, 260);
                 smallImageName = comicId + "-trade-small.png";
                 imageService.updateImage(smallImageName, smallImageData, true, comicId, comic.getTitle(), comic.getSeries(), comicNumberStr);
             } catch (Exception e) {
@@ -419,7 +419,7 @@ public class ImageTriggers {
 
             String smallImageName = null;
             try {
-                byte[] smallImageData = imageResizeService.resizeToHeight(imageData, 104);
+                byte[] smallImageData = imageResizeService.resizeToHeight(imageData, 260);
                 smallImageName = comicId + "-trade-back-small.png";
                 imageService.updateImage(smallImageName, smallImageData, true, comicId, comic.getTitle(), comic.getSeries(), comicNumberStr);
             } catch (Exception e) {
@@ -438,6 +438,98 @@ public class ImageTriggers {
                 .build();
         } catch (Exception e) {
             log.error("Error in uploadTradeComicBackImage.", e);
+            return HttpHelper.cors(request.createResponseBuilder(HttpStatus.INTERNAL_SERVER_ERROR))
+                .header("Content-Type", "text/plain").body("Error: " + e.getMessage()).build();
+        }
+    }
+
+    @FunctionName("regenSmallImage")
+    public HttpResponseMessage regenSmallImage(
+        @HttpTrigger(
+            name = "regenSmallImage",
+            route = "comics/{id}/regen-small",
+            methods = {HttpMethod.POST},
+            authLevel = AuthorizationLevel.ANONYMOUS)
+        HttpRequestMessage<Optional<String>> request,
+        @BindingName("id") String id)
+    {
+        log.info("Processing regenSmallImage for comic id: {}", id);
+        try {
+            User admin = AuthHelper.requireAdmin(request);
+            if (admin == null) return HttpHelper.unauthorized(request);
+
+            int comicId = Integer.parseInt(id);
+            ComicService comicService = ComicService.getServiceInstance();
+            ImageService imageService = ImageService.getServiceInstance();
+            ImageResizeService resizeService = ImageResizeService.getServiceInstance();
+
+            ComicBook comic = comicService.getComicById(comicId)
+                .orElseThrow(() -> new RuntimeException("Comic not found: " + comicId));
+            if (comic.getLargeCachedImageId() == null)
+                return HttpHelper.cors(request.createResponseBuilder(HttpStatus.BAD_REQUEST))
+                    .body("No large image exists to regenerate from.").build();
+
+            byte[] largeBytes = imageService.getImageByName(comic.getLargeCachedImageId());
+            byte[] smallBytes = resizeService.resizeToHeight(largeBytes, 260);
+            String smallName = comicId + "-small.png";
+            String comicNumberStr = comicNumberToString(comic.getNumber());
+            imageService.updateImage(smallName, smallBytes, true, comicId, comic.getTitle(), comic.getSeries(), comicNumberStr);
+            comic.setSmallCachedImageId(smallName);
+            ComicBook updated = comicService.updateComic(comic);
+            log.info("Regenerated small image for comic {}: {} bytes", comicId, smallBytes.length);
+
+            return HttpHelper.cors(request.createResponseBuilder(HttpStatus.OK))
+                .header("Content-Type", "application/json")
+                .body(OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(updated))
+                .build();
+        } catch (Exception e) {
+            log.error("Error in regenSmallImage.", e);
+            return HttpHelper.cors(request.createResponseBuilder(HttpStatus.INTERNAL_SERVER_ERROR))
+                .header("Content-Type", "text/plain").body("Error: " + e.getMessage()).build();
+        }
+    }
+
+    @FunctionName("regenSmallBackImage")
+    public HttpResponseMessage regenSmallBackImage(
+        @HttpTrigger(
+            name = "regenSmallBackImage",
+            route = "comics/{id}/regen-back-small",
+            methods = {HttpMethod.POST},
+            authLevel = AuthorizationLevel.ANONYMOUS)
+        HttpRequestMessage<Optional<String>> request,
+        @BindingName("id") String id)
+    {
+        log.info("Processing regenSmallBackImage for comic id: {}", id);
+        try {
+            User admin = AuthHelper.requireAdmin(request);
+            if (admin == null) return HttpHelper.unauthorized(request);
+
+            int comicId = Integer.parseInt(id);
+            ComicService comicService = ComicService.getServiceInstance();
+            ImageService imageService = ImageService.getServiceInstance();
+            ImageResizeService resizeService = ImageResizeService.getServiceInstance();
+
+            ComicBook comic = comicService.getComicById(comicId)
+                .orElseThrow(() -> new RuntimeException("Comic not found: " + comicId));
+            if (comic.getLargeBackImageId() == null)
+                return HttpHelper.cors(request.createResponseBuilder(HttpStatus.BAD_REQUEST))
+                    .body("No large back image exists to regenerate from.").build();
+
+            byte[] largeBytes = imageService.getImageByName(comic.getLargeBackImageId());
+            byte[] smallBytes = resizeService.resizeToHeight(largeBytes, 260);
+            String smallName = comicId + "-back-small.png";
+            String comicNumberStr = comicNumberToString(comic.getNumber());
+            imageService.updateImage(smallName, smallBytes, true, comicId, comic.getTitle(), comic.getSeries(), comicNumberStr);
+            comic.setSmallBackImageId(smallName);
+            ComicBook updated = comicService.updateComic(comic);
+            log.info("Regenerated small back image for comic {}: {} bytes", comicId, smallBytes.length);
+
+            return HttpHelper.cors(request.createResponseBuilder(HttpStatus.OK))
+                .header("Content-Type", "application/json")
+                .body(OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(updated))
+                .build();
+        } catch (Exception e) {
+            log.error("Error in regenSmallBackImage.", e);
             return HttpHelper.cors(request.createResponseBuilder(HttpStatus.INTERNAL_SERVER_ERROR))
                 .header("Content-Type", "text/plain").body("Error: " + e.getMessage()).build();
         }

@@ -11,6 +11,7 @@ import { AuthService } from '../auth.service';
 import { ConfigService, GradeOption } from '../config.service';
 import { WantedCardComponent } from '../wanted-card/wanted-card.component';
 import { LogService } from '../log.service';
+import { DashboardNavService } from '../dashboard-nav.service';
 
 @Component({
     selector: 'app-trade-board',
@@ -45,6 +46,7 @@ export class TradeBoardComponent implements OnInit {
     public auth: AuthService,
     private configService: ConfigService,
     private logService: LogService,
+    private navService: DashboardNavService,
     private title: Title
   ) {}
 
@@ -56,7 +58,7 @@ export class TradeBoardComponent implements OnInit {
     this.title.setTitle('Trade Board — Lightning Comics PDX');
     this.loading = true;
     this.comicService.getWantedComics().subscribe({
-      next: comics => { this.wantedComics = comics; this.loading = false; },
+      next: comics => { this.wantedComics = comics; this.loading = false; this.navService.setList(comics); },
       error: () => { this.error = 'Failed to load wanted comics.'; this.loading = false; }
     });
     this.cartService.getClaimedMap().subscribe({ next: m => this.claimedMap = m, error: () => {} });

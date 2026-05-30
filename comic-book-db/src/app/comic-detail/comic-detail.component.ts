@@ -505,6 +505,38 @@ export class ComicDetailComponent implements OnInit {
     });
   }
 
+  regenSmallFrontImage(): void {
+    if (!this.comic) return;
+    this.imageUploading = true;
+    this.imageUploadErrorSummary = '';
+    this.imageService.regenSmallImage(this.comic.id).subscribe({
+      next: (updatedComic: Comic) => {
+        this.imageUploading = false;
+        if (this.comic) this.comic.smallCachedImageId = updatedComic.smallCachedImageId;
+      },
+      error: (err: any) => {
+        this.imageUploading = false;
+        this.imageUploadErrorSummary = 'Regen failed: ' + (err?.error || err?.message || 'Unknown error');
+      }
+    });
+  }
+
+  regenSmallBackImage(): void {
+    if (!this.comic) return;
+    this.backImageUploading = true;
+    this.backImageUploadErrorSummary = '';
+    this.imageService.regenSmallBackImage(this.comic.id).subscribe({
+      next: (updatedComic: Comic) => {
+        this.backImageUploading = false;
+        if (this.comic) this.comic.smallBackImageId = updatedComic.smallBackImageId;
+      },
+      error: (err: any) => {
+        this.backImageUploading = false;
+        this.backImageUploadErrorSummary = 'Regen failed: ' + (err?.error || err?.message || 'Unknown error');
+      }
+    });
+  }
+
   clearFrontImage(): void {
     if (!this.editComic) return;
     this.editComic.largeCachedImageId = null;
@@ -650,7 +682,8 @@ export class ComicDetailComponent implements OnInit {
   }
 
   goBack(): void {
-    this.router.navigate(['/selling']);
+    const dest = this.comic?.listingType === 'WANTED' ? '/trade' : '/selling';
+    this.router.navigate([dest]);
   }
 
   copyShareLink(): void {

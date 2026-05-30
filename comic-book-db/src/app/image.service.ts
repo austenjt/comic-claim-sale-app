@@ -85,6 +85,14 @@ export class ImageService {
       );
   }
 
+  regenSmallImage(comicId: number): Observable<any> {
+    return this.http.post(`${this.baseServiceUrl}/comics/${comicId}/regen-small`, null);
+  }
+
+  regenSmallBackImage(comicId: number): Observable<any> {
+    return this.http.post(`${this.baseServiceUrl}/comics/${comicId}/regen-back-small`, null);
+  }
+
   private handleError<T>(result?: T) {
     return (error: any): Observable<T> => {
       this.telemetry.report(error, 'ImageService');

@@ -53,10 +53,10 @@ a:hover {
 }
 
 .image-container img {
-  height: 100%;
+  height: auto;
+  max-height: 100%;
   width: auto;
   max-width: 100%;
-  object-fit: contain;
   border: none;
 }
 
@@ -73,8 +73,8 @@ a.expanded .image-container {
 }
 
 .details {
-  padding: 7px 10px;
-  flex-grow: 1;
+  padding: 0 10px;
+  flex-grow: 0;
   word-wrap: break-word;
   overflow-wrap: break-word;
   overflow: hidden;
@@ -82,12 +82,15 @@ a.expanded .image-container {
 }
 
 .price-bar {
-  padding: 3px 12px 5px;
+  padding: 4px 12px;
   flex-shrink: 0;
+  flex: 0 0 auto;
   background-color: var(--color-surface);
+  border-top: 1px solid var(--color-border);
   display: flex;
   justify-content: flex-end;
   align-items: center;
+  line-height: 1;
 }
 
 .card-footer {
@@ -251,6 +254,11 @@ a.expanded .image-container.two-images img {
   overflow: hidden;
   margin-bottom: 0;
   transition: max-height 0.25s ease, opacity 0.2s ease, margin 0.2s ease;
+}
+
+a.expanded .details {
+  padding: 7px 10px;
+  flex-grow: 1;
 }
 
 a.expanded .comic-title {
