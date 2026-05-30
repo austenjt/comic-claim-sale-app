@@ -23,6 +23,7 @@ import { DocType } from '../comic.enums';
 export class SellingComponent implements OnInit, OnDestroy {
 
   pageItems: Comic[] = [];
+  expandedComicId: number | null = null;
   totalCount = 0;
   totalPages = 0;
   currentPage = 1;

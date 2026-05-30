@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, HostBinding, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { Comic } from '../comic';
@@ -20,10 +20,19 @@ export class WantedCardComponent {
   @Input() canOffer = false;
   @Input() isAdmin = false;
 
+  @Input() set expanded(value: boolean) { this._expanded = value; }
+  get expanded(): boolean { return this._expanded; }
+  @HostBinding('class.expanded') private _expanded = false;
+
   @Output() offerRequested = new EventEmitter<void>();
   @Output() copyRequested = new EventEmitter<void>();
+  @Output() expandRequested = new EventEmitter<void>();
 
   constructor(private imageService: ImageService) {}
+
+  onExpandClick(): void {
+    this.expandRequested.emit();
+  }
 
   get imageUrl(): string {
     if (this.comic.smallCachedImageId) {

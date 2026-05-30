@@ -29,6 +29,8 @@
       [isCopied]="copiedId === comic.id"
       [canOffer]="canOffer()"
       [isAdmin]="auth.isAdmin()"
+      [expanded]="expandedComicId === comic.id"
+      (expandRequested)="expandedComicId = comic.id"
       (offerRequested)="openModal(comic)"
       (copyRequested)="copyComic(comic)">
     </app-wanted-card>

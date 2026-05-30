@@ -3,6 +3,7 @@
 }
 
 a {
+  position: relative;
   display: flex;
   flex-direction: column;
   text-decoration: none;
@@ -13,7 +14,7 @@ a {
   border-radius: 8px;
   box-shadow: 0 2px 6px rgba(108,88,76,0.1);
   width: 100%;
-  height: 100%;
+  height: 363px;
   overflow: hidden;
   transition: box-shadow 0.2s, transform 0.2s;
 }
@@ -24,12 +25,19 @@ a:hover {
   background-color: var(--color-surface);
   text-decoration: none;
 }
+.expand-overlay {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 1;
+  cursor: pointer;
+}
+
 
 @media screen and (max-width: 400px) {
   .image-container { padding: 4px; min-height: 44px; }
   .image-container img { height: 60px; }
   .details { padding: 4px 6px; }
-  .card-footer { padding: 2px 4px; min-height: 28px; }
+.card-footer { padding: 2px 4px; min-height: 28px; }
 }
 
 .image-container {
@@ -39,15 +47,21 @@ a:hover {
   background-color: #c8d4a8;
   padding: 8px;
   border-bottom: 1px solid var(--color-border);
-  min-height: 70px;
+  flex: none;
+  height: calc(100% - 80px);
+  transition: height 0.3s ease;
 }
 
 .image-container img {
-  height: 110px;
+  height: 100%;
   width: auto;
   max-width: 100%;
   object-fit: contain;
   border: none;
+}
+
+a.expanded .image-container {
+  height: 126px;
 }
 
 .image-container.two-images {
@@ -63,7 +77,17 @@ a:hover {
   flex-grow: 1;
   word-wrap: break-word;
   overflow-wrap: break-word;
+  overflow: hidden;
   background-color: var(--color-surface);
+}
+
+.price-bar {
+  padding: 3px 12px 5px;
+  flex-shrink: 0;
+  background-color: var(--color-surface);
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
 }
 
 .card-footer {
@@ -193,17 +217,61 @@ a:hover {
   color: var(--color-text-inverse);
 }
 
+/* ── Back image: hidden until hover ─────────────────────────── */
+
+.back-image {
+  display: none;
+}
+
+a.expanded .back-image {
+  display: block;
+}
+
+/* Default two-images: first image fills full width since back is hidden */
+.image-container.two-images img {
+  max-width: 100%;
+}
+
+/* Hover two-images: restore side-by-side layout */
+a.expanded .image-container.two-images {
+  gap: 6px;
+}
+
+a.expanded .image-container.two-images img {
+  max-width: 48%;
+}
+
 /* ── Comic metadata ─────────────────────────────────────────── */
 
 .comic-title {
   font-size: 0.76rem;
-  margin-bottom: 3px;
   color: var(--color-text);
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  margin-bottom: 0;
+  transition: max-height 0.25s ease, opacity 0.2s ease, margin 0.2s ease;
+}
+
+a.expanded .comic-title {
+  max-height: 3rem;
+  opacity: 1;
+  margin-bottom: 3px;
 }
 
 .meta-grid {
   display: flex;
   flex-wrap: wrap;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  margin-bottom: 0;
+  transition: max-height 0.3s ease, opacity 0.25s ease, margin 0.2s ease;
+}
+
+a.expanded .meta-grid {
+  max-height: 200px;
+  opacity: 1;
   margin-bottom: 2px;
 }
 
@@ -238,7 +306,6 @@ a:hover {
 .comic-estimate,
 .comic-price {
   font-size: 0.72rem;
-  margin-top: 4px;
   color: #7b8f4b;
   font-weight: 600;
 }

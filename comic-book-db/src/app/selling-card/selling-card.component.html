@@ -1,9 +1,10 @@
 <!-- SET CARD -->
 <ng-container *ngIf="comic.docType === 'SET'; else normalCard">
-  <a routerLink="/set/{{comic.id}}">
+  <a routerLink="/set/{{comic.id}}" [class.expanded]="expanded">
+    <div class="expand-overlay" *ngIf="!expanded" (click)="onExpandClick($event)"></div>
     <div class="image-container" [class.two-images]="comic.smallBackImageId">
       <img [src]="imageUrl(comic.smallCachedImageId) | async" alt="Set Cover" loading="lazy">
-      <img *ngIf="comic.smallBackImageId"
+      <img *ngIf="comic.smallBackImageId" class="back-image"
            [src]="imageUrl(comic.smallBackImageId) | async" alt="Set Back Cover" loading="lazy">
     </div>
     <div class="details">
@@ -12,8 +13,10 @@
         <div *ngIf="comic.series && comic.series !== ''" class="comic-series">Series: <b>{{ comic.series }}</b></div>
         <div *ngIf="comic.publisher" class="comic-publisher">Publisher: <b>{{ comic.publisher }}</b></div>
         <div class="comic-number">Books: <b>{{ comic.items?.length ?? 0 }}</b></div>
-        <div *ngIf="setPrice > 0" class="comic-price">Total: <b>{{ setPrice | currency:'USD':'symbol':'1.2-2' }}</b></div>
       </div>
+    </div>
+    <div class="price-bar">
+      <div *ngIf="setPrice > 0" class="comic-price">Total: <b>{{ setPrice | currency:'USD':'symbol':'1.2-2' }}</b></div>
     </div>
     <div class="card-footer">
       <div class="footer-badges">
@@ -40,11 +43,12 @@
 
 <!-- NORMAL CARD -->
 <ng-template #normalCard>
-  <a routerLink="/detail/{{comic.id}}" [class.card-sold]="comic.soldTo" [class.card-deleting]="isDeleting">
+  <a routerLink="/detail/{{comic.id}}" [class.card-sold]="comic.soldTo" [class.card-deleting]="isDeleting" [class.expanded]="expanded">
+    <div class="expand-overlay" *ngIf="!expanded" (click)="onExpandClick($event)"></div>
     <div class="image-container" [class.two-images]="comic.smallBackImageId">
       <img [src]="imageUrl(comic.smallCachedImageId) | async" alt="Front Cover" loading="lazy"
            [class.is-sold]="comic.soldTo">
-      <img *ngIf="comic.smallBackImageId"
+      <img *ngIf="comic.smallBackImageId" class="back-image"
            [src]="imageUrl(comic.smallBackImageId) | async" alt="Back Cover" loading="lazy"
            [class.is-sold]="comic.soldTo">
     </div>
@@ -61,9 +65,11 @@
         <div *ngIf="comic.comicCondition?.notCertifiedGrade" class="comic-grade-est">
           Est. Grade: <b>{{ comic.comicCondition?.notCertifiedGrade | number:'1.1-1' }}</b>
         </div>
-        <div *ngIf="comic.salePrice && !comic.soldTo" class="comic-price">
-          Price: <b>{{ comic.salePrice | currency:'USD':'symbol':'1.2-2' }}</b>
-        </div>
+      </div>
+    </div>
+    <div class="price-bar">
+      <div *ngIf="comic.salePrice && !comic.soldTo" class="comic-price">
+        Price: <b>{{ comic.salePrice | currency:'USD':'symbol':'1.2-2' }}</b>
       </div>
     </div>
     <div class="card-footer">

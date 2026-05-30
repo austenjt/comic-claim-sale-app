@@ -566,11 +566,6 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://lightningcomics.rocks/detail/92215351</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
     <loc>https://lightningcomics.rocks/detail/71999081</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
@@ -622,6 +617,26 @@
   </url>
   <url>
     <loc>https://lightningcomics.rocks/detail/46744700</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://lightningcomics.rocks/detail/96755718</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://lightningcomics.rocks/detail/77960037</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://lightningcomics.rocks/detail/38006584</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://lightningcomics.rocks/detail/92215351</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>

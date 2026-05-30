@@ -63,6 +63,8 @@
     [isApproved]="auth.isApproved()"
     [isAdmin]="auth.isAdmin()"
     [awardModeEnabled]="configService.awardModeEnabled"
+    [expanded]="expandedComicId === comic.id"
+    (expandRequested)="expandedComicId = comic.id"
     (claimRequested)="claim(comic)"
     (claimSetRequested)="claim(comic)"
     (markForSaleRequested)="markForSale(comic)"

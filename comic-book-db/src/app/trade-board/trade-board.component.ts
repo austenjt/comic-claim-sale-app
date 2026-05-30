@@ -26,6 +26,7 @@ export class TradeBoardComponent implements OnInit {
   addedTradeIds = new Set<string>();
   claimedMap: Record<string, string> = {};
   copyingId: number | null = null;
+  expandedComicId: number | null = null;
   copiedId: number | null = null;
 
   // Grade selector modal

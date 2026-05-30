@@ -33,13 +33,22 @@ export class SellingCardComponent {
   @Input() isAdmin = false;
   @Input() awardModeEnabled = false;
 
+  @Input() expanded = false;
+
   @Output() claimRequested = new EventEmitter<void>();
   @Output() claimSetRequested = new EventEmitter<void>();
   @Output() markForSaleRequested = new EventEmitter<void>();
   @Output() copyRequested = new EventEmitter<void>();
   @Output() awardRequested = new EventEmitter<void>();
+  @Output() expandRequested = new EventEmitter<void>();
 
   constructor(private imageService: ImageService) {}
+
+  onExpandClick(e: Event): void {
+    e.stopPropagation();
+    e.preventDefault();
+    this.expandRequested.emit();
+  }
 
   get setPrice(): number {
     return (this.comic.items ?? []).reduce((sum, m) => sum + (Number(m.salePrice) || 0), 0);
